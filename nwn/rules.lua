@@ -1,0 +1,1 @@
+require 'nwn.rules.skills'
