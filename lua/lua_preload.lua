@@ -22,6 +22,9 @@ function string:tolocation()
   return Location(oArea, Vector(x,y,z), facing)
 end
 
+function string:trim()
+  return self:match "^%s*(.-)%s*$"
+end
 
 -- Object Orientation Functions
 function inheritsFrom( baseClass )
