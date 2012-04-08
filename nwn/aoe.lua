@@ -66,7 +66,8 @@ end
 --- Get's the creator of the AoE
 -- @return The creator or nwn.OBJECT_INVALID.
 function AoE:GetCreator()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(264, 1)
-   return nwn.engine.StackPopObject()
+   if not self:GetIsValid() then
+      return nwn.OBJECT_INVALID
+   end
+   return _NL_GET_CACHED_OBJECT(self.obj.aoe_creator)
 end
