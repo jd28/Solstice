@@ -16,31 +16,60 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
-local DAMAGES = {
-   nwn.DAMAGE_TYPE_BLUDGEONING,
-   nwn.DAMAGE_TYPE_PIERCING,
-   nwn.DAMAGE_TYPE_SLASHING,
-   nwn.DAMAGE_TYPE_MAGICAL,
-   nwn.DAMAGE_TYPE_ACID,
-   nwn.DAMAGE_TYPE_COLD,
-   nwn.DAMAGE_TYPE_DIVINE,
-   nwn.DAMAGE_TYPE_ELECTRICAL,
-   nwn.DAMAGE_TYPE_FIRE,
-   nwn.DAMAGE_TYPE_NEGATIVE,
-   nwn.DAMAGE_TYPE_POSITIVE,
-   nwn.DAMAGE_TYPE_SONIC,
-   -- The base weapon damage is the base damage delivered by the weapon before
-   -- any additional types of damage (e.g. fire) have been added.
-   nwn.DAMAGE_TYPE_BASE_WEAPON
-}
+local DAMAGES = {}
 
 --- Register Damage Types.
 -- This function MUST only be called from OnModuleLoad!
 -- @param damage_type nwn.DAMAGE_TYPE_*
-function nwn.RegisterDamage(damage_type)
+function nwn.RegisterDamage(damage_type, name, color)
    table.insert(DAMAGES, damage_type)
+   DAMAGES[damage_type] = { name = name,
+                            color = color }
 end
 
 function nwn.GetDamageCount()
    return #DAMAGES
 end
+
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_BLUDGEONING,
+                   "Bludgeoning",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_PIERCING,
+                   "Piercing",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_SLASHING,
+                   "Slashing",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_MAGICAL,
+                   "Magical",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_ACID,
+                   "Acid",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_COLD,
+                   "Cold",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_DIVINE,
+                   "Divine",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_ELECTRICAL,
+                   "Electrical",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_FIRE,
+                   "Fire",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_NEGATIVE,
+                   "Negative",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_POSITIVE,
+                   "Positive",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_SONIC,
+                   "Sonic",
+                   "")
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_BASE_WEAPON
+                   "Physical",
+                   "")
+
+return DAMAMGES
+
