@@ -15,11 +15,12 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
+require 'nwn.funcs'
+require 'nwn.effects'
 
 local ffi = require "ffi"
 local C = ffi.C
-require 'nwn.funcs'
-require 'nwn.effects'
+
 
 ffi.cdef[[
 void *malloc(size_t size);
