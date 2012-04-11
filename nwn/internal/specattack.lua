@@ -15,37 +15,35 @@
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
-------------------------------------------------------------------------
--- Special Attacks
 
 -- TODO Ranged Special Attacks.
 
 local spec_attacks = {}
+local spec_attacks_ranged = {}
 
-function spec_attacks.RegisterSpecialAttackHook(attack_type, f_resolve, f_resolveab, f_resolvedb)
+function nwn.RegisterMeleeSpecialAttack(attack_type, f_resolve, f_resolveab, f_resolvedb)
    spec_attacks[attack_type] = { f_resolve, f_resolveab, f_resolvedb }
+end
+
+function nwn.RegisterRangedSpecialAttack(attack_type, f_resolve, f_resolveab, f_resolvedb)
+   spec_attacks_ranged[attack_type] = { f_resolve, f_resolveab, f_resolvedb }
 end
 
 ------------------------------------------------------------------------
 -- Global Functions
--- The following are for communicating with lua from NWNX.  Probably
--- shouldn't change these unless you understand what they're doing.
 
-function _NL_IS_SPECATTACK_HOOKED(attack_type, event_type)
+function NSMeleeSpecialAttack(attack_type, event_type, attacker, defender, attack)
    if spec_attacks[attack_type] and spec_attacks[attack_type][event_type] then
-      return true
+      return spec_attacks[attack_type][event_type](attacker, defender, attack)
    end
-
-   return false
 end
 
-function _NL_SPECATTACK(attack_type, event_type, attacker, defender, attack_roll)
-   attacker = _NL_GET_CACHED_OBJECT(attacker)
-   defender = _NL_GET_CACHED_OBJECT(defender)
-   return spec_attacks[attack_type][event_type](attacker, defender, attack_roll)
+function NSMeleeRangedAttack(attack_type, event_type, attacker, defender, attack)
+   if spec_attacks_ranged[attack_type] and spec_attacks[attack_type][event_type] then
+      return spec_attacks_ranged[attack_type][event_type](attacker, defender, attack)
+   end
 end
 
--- Global Functions
 ------------------------------------------------------------------------
 
 return spec_attacks
