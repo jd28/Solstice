@@ -18,6 +18,7 @@
 
 local ffi = require 'ffi'
 require 'nwn.ctypes.effect'
+require 'nwn.ctypes.itemprop'
 
 ffi.cdef [[
 typedef struct Itemprop {
