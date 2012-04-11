@@ -18,6 +18,7 @@
 
 require 'nwn.ctypes.item'
 local ffi = require 'ffi'
+local C = ffi.C
 
 ffi.cdef [[
 typedef struct Item {
@@ -163,6 +164,15 @@ end
 function Item:GetIdentified()
    if not self:GetIsValid() then return false end
    return self.obj.it_identified == 1
+end
+
+function Item:GetIsRangedWeapon()
+   if not self:GetIsValid() then return false end
+
+   local bi = C.nwn_GetBaseItem(self:GetBaseType())
+   if bi == nil then return false end
+
+   return bi.bi_is_ranged == 1
 end
 
 function Item:GetIsUnarmedWeapon()
