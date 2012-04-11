@@ -20,6 +20,7 @@ require 'nwn.ctypes.foundation'
 require 'nwn.ctypes.vector'
 require 'nwn.ctypes.location'
 require 'nwn.ctypes.effect'
+require 'nwn.ctypes.itemprop'
 require 'nwn.ctypes.object'
 require 'nwn.ctypes.area'
 require 'nwn.ctypes.aoe'
@@ -55,16 +56,21 @@ void nwn_ExecuteScript (const char *scr, nwn_objid_t oid);
 ffi.cdef [[
 void                  nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObject *target, CNWSArea* area, CScriptLocation *loc, int prop);
 int                   nwn_AddKnownFeat(CNWSCreature *cre, uint16_t feat, uint32_t level);
+int                   nwn_CalculateOffHandAttacks(CNWSCombatRound *cr);
 uint32_t              nwn_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
-//void                  nwn_DelayCommand(uint32_t obj_id, double delay, CVirtualMachineScript *vms);
+void                  nwn_DelayCommand(uint32_t obj_id, double delay, void *vms);
 void                  nwn_DeleteLocalFloat(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalInt(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalLocation(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalObject(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalString(CNWSScriptVarTable *vt, const char *var_name);
-//void                  nwn_DoCommand(CNWSObject *obj, CVirtualMachineScript *vms);
+void                  nwn_DoCommand(CNWSObject *obj, void *vms);
 void                  nwn_ExecuteCommand(int command, int num_args);
 CNWSArea             *nwn_GetAreaById(uint32_t id);
+CNWSCombatAttackData *nwn_GetAttack(CNWSCombatRound *cr, int attack);
+int                   nwn_GetAttackResultHit(CNWSCreature *cre, CNWSCombatAttackData *data);
+int                   nwn_GetAttacksPerRound(CNWSCreatureStats *stats);
+CNWBaseItem          *nwn_GetBaseItem(uint32_t basetype);
 CExoLocStringElement *nwn_GetCExoLocStringElement(CExoLocString* str, uint32_t locale);
 char                 *nwn_GetCExoLocStringText(CExoLocString* str, uint32_t locale);
 uint32_t              nwn_GetCommandObjectId();
@@ -73,8 +79,11 @@ int                   nwn_GetCriticalHitRange(CNWSCreatureStats *stats, bool off
 CGameEffect*          nwn_GetEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                     const int eff_spellid, const int eff_type, const int eff_int0, const int eff_int1);
 int32_t               nwn_GetFactionId(uint32_t id);
+int                   nwn_GetFeatRemainingUses(CNWSCreatureStats *stats, uint16_t feat);
+int                   nwn_GetFlanked(CNWSCreature *cre, CNWSCreature *target);
 int                   nwn_GetHasEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                        const int eff_spellid, const int eff_type, const int eff_int0);
+bool                  nwn_HasPropertyType(CNWSItem *item, uint16_t type);
 bool                  nwn_GetIsClassBonusFeat(int32_t cls, uint16_t feat);
 bool                  nwn_GetIsClassGeneralFeat(int32_t cls, uint16_t feat);
 bool                  nwn_GetIsClassGrantedFeat(int32_t cls, uint16_t feat);
@@ -89,9 +98,11 @@ const char           *nwn_GetLocalString(CNWSScriptVarTable *vt, const char *var
 CScriptVariable      *nwn_GetLocalVariableByPosition (CNWSScriptVarTable *vt, int idx);
 int                   nwn_GetLocalVariableCount (CNWSScriptVarTable *vt);
 CNWSModule           *nwn_GetModule();
-//CNWSPlayer           *nwn_GetPlayerByID (nwn_objid_t oid);
+CNWSPlayer           *nwn_GetPlayerByID (nwn_objid_t oid);
+CNWItemProperty      *nwn_GetPropertyByType(CNWSItem *item, uint16_t type);
 int                   nwn_GetRelativeWeaponSize(CNWSCreature *cre, CNWSItem *weapon);
 int                   nwn_GetRemainingFeatUses(CNWSCreatureStats *stats, uint16_t feat);
+int                   nwn_GetTotalDamage(CNWSCombatAttackData *data, int a);
 int                   nwn_GetTotalEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                          const int eff_spellid, const int eff_type, const int eff_int0);
 int                   nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
@@ -103,6 +114,7 @@ void                  nwn_ResolveCachedSpecialAttacks(CNWSCreature *cre);
 void                  nwn_ResolveSituationalModifiers(CNWSCreature *cre, CNWSObject *target);
 void                  nwn_SendMessage(uint32_t mode, uint32_t id, char *msg, uint32_t to);
 uint8_t               nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
+void                  nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
 uint32_t              nwn_SetCommandObjectId(uint32_t obj);
 void                  nwn_SetFactionId(nwn_objid_t id, int32_t faction);
 void                  nwn_SetLocalFloat(CNWSScriptVarTable *vt, const char *var_name, float value);
@@ -113,7 +125,7 @@ void                  nwn_SetLocalString(CNWSScriptVarTable *vt, const char *var
 void                  nwn_SetTag(CNWSObject *obj, const char *);
 void                  nwn_SignalMeleeDamage(CNWSCreature *cre, CNWSObject *target, int32_t attack_count);
 bool                  nwn_StackPopBoolean();
-int                   nwn_StackPopxInteger();
+int                   nwn_StackPopInteger();
 float                 nwn_StackPopFloat();
 char                 *nwn_StackPopString();
 Vector               *nwn_StackPopVector();
