@@ -18,11 +18,12 @@
 
 require 'nwn.class'
 
-function Creature:CanUseAbilities(class)
-   local f = nwn.GetClassAbilityRequirements()
-   if not f then return true end
-
-   return f(self)
+function Creature:CanUseClassAbilities(class)
+   return true
+--   local f = nwn.GetClassAbilityRequirements()
+--   if not f then return true end
+--
+--   return f(self)
 end
 
 ---

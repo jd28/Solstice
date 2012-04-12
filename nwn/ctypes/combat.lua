@@ -20,16 +20,16 @@ local ffi = require 'ffi'
 
 ffi.cdef[[
 typedef struct CCombatInformation {
-    uint8_t NumAttacks;
-    uint8_t OnHandAttackMod;
-    uint8_t OnHandDamageMod;
-    uint8_t OffHandAttackMod;
-    uint8_t OffHandDamageMod;
-    uint8_t SpellResistance;
-    uint8_t ArcaneSpellFail;
-    uint8_t ArmorCheckPen;
-    uint8_t UnarmedDamDice;
-    uint8_t UnarmedDamDie;
+    uint8_t com_attacks;
+    uint8_t com_onhand_ab_mod;
+    uint8_t com_onhand_dmg_mod;
+    uint8_t com_offhand_ab_mod;
+    uint8_t com_offhand_dmg_mod;
+    uint8_t com_spell_resistance;
+    uint8_t com_arcane_failure;
+    uint8_t com_armor_check_pen;
+    uint8_t com_unarmed_dam_dice;
+    uint8_t com_unarmed_dam_sides;
     uint8_t field_0A;  // Creature attack dice...
     uint8_t field_0B;
     uint8_t field_0C;
@@ -63,53 +63,51 @@ typedef struct CCombatInformation {
 } CCombatInformation;
 
 typedef struct CNWSCombatAttackData {
-    uint8_t cad_attack_group;         /* 0000 */
-    uint8_t field_01;                 /* 0001 */
-    uint16_t AnimationLength;         /* 0002 */
+    uint8_t  cad_attack_group;        /* 0000 */
+    uint8_t  field_01;                /* 0001 */
+    uint16_t cad_anim_length;         /* 0002 */
     uint32_t cad_target;              /* 0004 */
-    uint16_t ReaxnDelay;              /* 0008 */
-    uint16_t ReaxnAnimation;          /* 000A */
-    uint16_t ReaxnAnimLength;         /* 000C */
-    uint8_t ToHitRoll;                /* 000E */
-    uint8_t ThreatRoll;               /* 000F */
-    uint32_t ToHitMod;                /* 0010 */
-    uint8_t MissedBy;                 /* 0014 */
-    uint8_t field_15;                 /* 0015 */
-    uint16_t Damage_Bludgeoning;      /* 0016 */
-    uint16_t Damage_Piercing;         /* 0018 */
-    uint16_t Damage_Slashing;         /* 001A */
-    uint16_t Damage_Magical;          /* 001C */
-    uint16_t Damage_Acid;             /* 001E */
-    uint16_t Damage_cold;             /* 0020 */
-    uint16_t Damage_Divine;           /* 0022 */
-    uint16_t Damage_Electrical;       /* 0024 */
-    uint16_t Damage_Fire;             /* 0026 */
-    uint16_t Damage_Negative;         /* 0028 */
-    uint16_t Damage_Positive;         /* 002A */
-    uint16_t Damage_Sonic;            /* 002C */
-    uint16_t BaseDamage;              /* 002E */
+    uint16_t cad_react_delay;         /* 0008 */
+    uint16_t cad_react_anim;          /* 000A */
+    uint16_t cad_react_anim_len;      /* 000C */
+    uint8_t  cad_attack_roll;         /* 000E */
+    uint8_t  cad_threat_roll;         /* 000F */
+    uint32_t cad_attack_mod;          /* 0010 */
+    uint8_t  cad_missed;              /* 0014 */
+    uint8_t  field_15;                /* 0015 */
+    uint16_t cad_dmg_bludge;          /* 0016 */
+    uint16_t cad_dmg_pierce;          /* 0018 */
+    uint16_t cad_dmg_slash;           /* 001A */
+    uint16_t cad_dmg_magical;         /* 001C */
+    uint16_t cad_dmg_acid;            /* 001E */
+    uint16_t cad_dmg_cold;            /* 0020 */
+    uint16_t cad_dmg_divine;          /* 0022 */
+    uint16_t cad_dmg_electrical;      /* 0024 */
+    uint16_t cad_dmg_Fire;            /* 0026 */
+    uint16_t cad_dmg_negative;        /* 0028 */
+    uint16_t cad_dmg_positive;        /* 002A */
+    uint16_t cad_dmg_sonic;           /* 002C */
+    uint16_t cad_base_damage;         /* 002E */
     uint8_t cad_weapon_type;          /* 0030 */
     uint8_t cad_attack_mode;          /* 0031 */
-    uint8_t Concealment;              /* 0032 */
+    uint8_t cad_concealment;          /* 0032 */
     uint8_t field_33;                 /* 0033 */
-    uint32_t RangedAttack;            /* 0034 */
-    uint32_t SneakAttack;             /* 0038 */
-    uint32_t field_3C;                /* 003C */
-    uint32_t KillingBlow;             /* 0040 */
+    uint32_t cad_ranged_attack;       /* 0034 */
+    uint32_t cad_sneak_attack;        /* 0038 */
+    uint32_t cad_death_attack;        /* 003C */
+    uint32_t cad_killing_blow;        /* 0040 */
     uint32_t cad_coupdegrace;         /* 0044 */
-    uint32_t CriticalThreat;          /* 0048 */
-    uint32_t AttackDeflected;         /* 004C */
+    uint32_t cad_critical_hit;        /* 0048 */
+    uint32_t cad_attack_deflected;    /* 004C */
     uint8_t cad_attack_result;        /* 0050 */
     uint8_t field_51;                 /* 0051 */
     uint16_t cad_attack_type;         /* 0052 */
     uint16_t field_54;                /* 0054 */
     uint16_t field_56;                /* 0056 */
-    float RangedTargetX;              /* 0058 */
-    float RangedTargetY;              /* 005C */
-    float RangedTargetZ;              /* 0060 */
-    uint32_t AmmoItem;                /* 0064 */
-    CExoString AttackDebugText;
-    CExoString DamageDebugText;
+    Vector cad_ranged_target_loc;
+    uint32_t cad_ammo_id;             /* 0064 */
+    CExoString cad_debug_attack;
+    CExoString cad_debug_dmg;
     uint32_t field_78;
     uint32_t field_7C_a12;
     uint32_t field_80;
@@ -125,19 +123,13 @@ typedef struct CNWSCombatAttackData {
 } CNWSCombatAttackData;
 
 typedef struct CNWSCombatRound {
-    CNWSCombatAttackData AttackData[50]; /* 0x0000 - 0x20CC*/
-    uint16_t *SpecialAttack;
-    int32_t SpecAttackList;
-    uint8_t field_9;
-    uint8_t field_10;
-    uint8_t field_11;
-    uint8_t field_12;
-    uint16_t *SpecialAttackId;
-    int32_t SpecAttackIdList;
-    uint8_t field_21;
-    uint8_t field_22;
-    uint8_t field_23;
-    uint8_t field_24;
+    CNWSCombatAttackData AttackData[50];              /* 0x0000 - 0x20CC*/
+    uint16_t            *cr_special_attack;           /* 20D0 */
+    uint32_t             cr_special_attack_len;       /* 20D0 */
+    uint32_t             cr_special_attack_alloc;     /* 20D4 */
+    uint16_t            *cr_special_attack_id;        /* 20D8 */
+    uint32_t             cr_special_attack_id_len;    /* 20E0 */
+    uint32_t             cr_special_attack_id_alloc;  /* 20E4 */
     int16_t AttackID[2];
     uint8_t RoundStarted;             /* 0x20EC */
     uint8_t field_30;
@@ -161,7 +153,7 @@ typedef struct CNWSCombatRound {
     uint8_t field_66;
     uint8_t field_67;
     uint8_t field_68;
-    uint8_t cr_current_attack;             /* 0x2114 */
+    uint8_t              cr_current_attack;             /* 0x2114 */
     uint8_t AttackGroup;
     uint8_t field_71;
     uint8_t field_72;
@@ -182,12 +174,12 @@ typedef struct CNWSCombatRound {
     uint32_t NumCleaves;               /* 0x212C */
     uint32_t NumCircleKicks;           /* 0x2130 */
     uint32_t NewAttackTarget;
-    uint32_t OnHandAttacks;            /* 0x2138 */
-    uint32_t OffHandAttacks;           /* 0x213C */
-    uint32_t OffHandTaken;             /* 0x2140 */
-    uint32_t ExtraTaken;               /* 0x2144 */
-    uint32_t AdditAttacks;             /* 0x2148 */
-    uint32_t EffectAttacks;            /* 0x214C */
+    uint32_t cr_onhand_atks;            /* 0x2138 */
+    uint32_t cr_offhand_atks;           /* 0x213C */
+    uint32_t cr_offhand_taken;          /* 0x2140 */
+    uint32_t cr_extra_taken;               /* 0x2144 */
+    uint32_t cr_additional_atks;       /* 0x2148 */
+    uint32_t cr_effect_atks;         /* 0x214C */
     uint8_t ParryActions;              /* 0x2150 */
     uint8_t field_130;                 /* 0x2151 */
     uint8_t field_131;                 /* 0x2152 */

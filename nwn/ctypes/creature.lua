@@ -170,7 +170,8 @@ typedef struct CNWSCreatureStats {
 
     uint8_t                     cs_override_bab;        /* 0411 */
 
-    uint8_t                     cs_override_atks;       /* 0412 -- Seems to be some onhand attack override. */
+    uint8_t                     cs_override_atks;       /* 0412 -- Seems to be some onhand attack override. 
+                                                                   See SetBaseAttackBonus & RestoreBaseAttackBonus */
     uint8_t                     field_40B;
     uint32_t                    field_40C;
     uint32_t                    field_410;
@@ -189,14 +190,20 @@ typedef struct CNWSCreatureStats {
 
     uint32_t                    field_438;
     uint32_t                    field_43C;
-    uint32_t                    field_440;
-    uint32_t                    field_444;
-    uint32_t                    field_448;
-    uint32_t                    field_44C;
-    uint32_t                    field_450;
+    uint16_t                    field_440;
+    uint16_t                    cs_first_ac_eff;
+    uint16_t                    cs_first_ab_effect;
+    uint16_t                    cs_first_dred_eff;
+    uint16_t                    cs_first_dresist_eff;
+    uint16_t                    cs_first_damage_eff;
+    uint16_t                    cs_first_aistate_eff;
+    uint16_t                    cs_first_icon_eff;
+    uint16_t                    field_450;
+    uint16_t                    cs_first_conceal_eff;
     uint32_t                    field_454;
     uint32_t                    field_458;
-    uint32_t                    field_45C;
+    uint16_t                    cs_first_misschance_eff;
+    uint16_t                    field_45E;
     uint32_t                    field_460;
     uint32_t                    field_464;
     uint32_t                    field_468;

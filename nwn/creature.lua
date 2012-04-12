@@ -16,19 +16,27 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
+nwn.SITUATIONAL_FLAG_COUP_DE_GRACE = 1
+nwn.SITUATIONAL_FLAG_SNEAK_ATTACK = 2
+nwn.SITUATIONAL_FLAG_DEATH_ATTACK = 4
+
+nwn.SITUATIONAL_COUP_DE_GRACE = 0
+nwn.SITUATIONAL_SNEAK_ATTACK = 1
+nwn.SITUATIONAL_DEATH_ATTACK = 2
+nwn.SITUATIONAL_NUM = 3
+
 require 'nwn.ctypes.combat'
 require 'nwn.ctypes.creature'
 
 local ffi = require 'ffi'
 
-ffi.cdef[[
+ffi.cdef (string.gsub([[
 typedef struct CombatWeapon {
    uint32_t id;
    uint32_t base_type;
-
+   uint8_t iter;
    uint8_t ab_ability;
    uint8_t dmg_ability;
-
    uint8_t ab_mod;
    uint8_t crit_range;
    uint8_t crit_mult;
@@ -41,29 +49,54 @@ typedef struct CombatWeapon {
 
 } CombatWeapon;
 
+typedef struct CombatMod {
+   int32_t ab;
+   int32_t ac;
+   uint32_t dmg_dice;
+   uint32_t dmg_sides;
+   uint32_t dmg_bonus;
+} CombatMod;
+
 typedef struct CombatInformation {
    uint32_t attacker;
    uint32_t target;
 
+   double target_distance;
+
    uint32_t wield_type;
-
    int32_t bab;
-   int32_t ab_mode;
-   int32_t ab_size;
-   int32_t ab_offhand_penalty;
-   int32_t ab_area;
-   int32_t ab_feat;
+   int32_t offhand_penalty_on;
+   int32_t offhand_penalty_off;
 
+   CombatMod area;
+   CombatMod class;
+   CombatMod feat;
+   CombatMod mode;
+   CombatMod race;
+   CombatMod size;
+   CombatMod fe; // Favored Enemy
+   CombatMod situational[$NS_SITUATIONAL_NUM];
 
-   uint8_t *resist;
-   int16_t *immunity;
+   uint32_t fe_mask; // favored enemy mask
+   uint32_t training_vs_mask; // Training vs race
+   uint32_t target_state_mask;
+   uint32_t situational_flags;
 
-   uint16_t soak[20];
-
-   int8_t save_mods[3];
-
+   uint32_t resist[$NS_DAMAGES_NUM];
+   int32_t immunity[$NS_DAMAGES_NUM];
+   uint32_t soak[20];
+   int32_t save_mods[3];
    CombatWeapon equips[6];
+
+   uint32_t first_cr_effect;
+   uint32_t first_cm_effect;
 } CombatInformation;
+
+typedef struct CombatAttackDataExt {
+   uint32_t ext_damage[$NS_DAMAGES_NUM];
+
+
+} CombatAttackDataExt;
 
 typedef struct Creature {
     uint32_t           type;
@@ -72,7 +105,8 @@ typedef struct Creature {
     CNWSCreatureStats *stats;
     CombatInformation  ci;
 } Creature;
-]]
+]], "%$([%w_]+)", { NS_DAMAGES_NUM = "12",
+                    NS_SITUATIONAL_NUM = "3" }))
 
 local creature_mt = { __index = Creature }
 creature_t = ffi.metatype("Creature", creature_mt)

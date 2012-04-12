@@ -17,6 +17,8 @@
 --------------------------------------------------------------------------------
 
 local ne = nwn.engine
+local ffi = require 'ffi'
+local C = ffi.C
 
 --- Check if a creature is using a given action mode
 -- @param mode nwn.ACTION_MODE_*
@@ -27,11 +29,27 @@ function Creature:GetActionMode(mode)
    return ne.StackPopBoolean()
 end
 
+--- Determines if a creature is blind.
+function Creature:GetIsBlind()
+   if not self:GetIsValid() then return false end
+   return C.nwn_GetIsBlind(self.obj)
+end
+
 --- Determines if a creature is dead or dying.
 function Creature:GetIsDead()
    ne.StackPushObject(self)
    ne.ExecuteCommand(140, 1)
    return ne.StackPopBoolean()
+end
+
+function Creature:GetIsFlanked(target)
+   if not target:GetIsValid() then return false end
+   return C.nwn_GetIsFlanked(self.obj, target.obj)
+end
+
+function Creature:GetIsFlatfooted()
+   if not self:GetIsValid() then return false end
+   return C.nwn_GetIsFlatfooted(self.obj)
 end
 
 --- Determines whether an object is in conversation.

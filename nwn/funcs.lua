@@ -76,6 +76,7 @@ char                 *nwn_GetCExoLocStringText(CExoLocString* str, uint32_t loca
 uint32_t              nwn_GetCommandObjectId();
 int                   nwn_GetCriticalHitMultiplier(CNWSCreatureStats *stats, bool offhand);
 int                   nwn_GetCriticalHitRange(CNWSCreatureStats *stats, bool offhand);
+CNWSItem             *nwn_GetCurrentAttackWeapon(CNWSCombatRound *cr, int attack_type);
 CGameEffect*          nwn_GetEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                     const int eff_spellid, const int eff_type, const int eff_int0, const int eff_int1);
 int32_t               nwn_GetFactionId(uint32_t id);
@@ -88,6 +89,7 @@ bool                  nwn_GetIsClassBonusFeat(int32_t cls, uint16_t feat);
 bool                  nwn_GetIsClassGeneralFeat(int32_t cls, uint16_t feat);
 bool                  nwn_GetIsClassGrantedFeat(int32_t cls, uint16_t feat);
 bool                  nwn_GetIsClassSkill (int32_t idx, uint16_t skill);
+bool                  nwn_GetIsVisible(CNWSCreature *cre, nwn_objid_t target);
 CNWSItem             *nwn_GetItemById(uint32_t id);
 //CNWSStats_Level      *nwn_GetLevelStats(CNWSCreatureStats *stats, int level);
 float                 nwn_GetLocalFloat(CNWSScriptVarTable *vt, const char *var_name);
@@ -97,6 +99,7 @@ uint32_t              nwn_GetLocalObject(CNWSScriptVarTable *vt, const char *var
 const char           *nwn_GetLocalString(CNWSScriptVarTable *vt, const char *var_name);
 CScriptVariable      *nwn_GetLocalVariableByPosition (CNWSScriptVarTable *vt, int idx);
 int                   nwn_GetLocalVariableCount (CNWSScriptVarTable *vt);
+double                nwn_GetMaxAttackRange(CNWSCreature *cre, nwn_objid_t target);
 CNWSModule           *nwn_GetModule();
 CNWSPlayer           *nwn_GetPlayerByID (nwn_objid_t oid);
 CNWItemProperty      *nwn_GetPropertyByType(CNWSItem *item, uint16_t type);

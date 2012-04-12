@@ -58,6 +58,12 @@ function Creature:GetDeity()
 end
 
 ---
+function Creature:GetDeityId()
+   return 0
+end
+
+
+---
 function Creature:GetHitDice()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(166, 1)
@@ -90,6 +96,15 @@ function Creature:GetPCFileName()
 end
 
 ---
+function Creature:GetRacialType()
+   if not self:GetIsValid() then
+      return nwn.RACIAL_TYPE_INVALID
+   end
+
+   return self.stats.cs_race
+end
+
+---
 function Creature:GetStartingPackage()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(766, 1)
@@ -101,6 +116,11 @@ end
 function Creature:GetSubrace()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.stats.cs_subrace)
+end
+
+---
+function Creature:GetSubraceId()
+   return 0
 end
 
 ---

@@ -115,6 +115,10 @@ function nwn.engine.StackPushFloat(value)
 end
 
 function nwn.engine.StackPushInteger(value)
+   if not value then
+      print(debug.traceback())
+      error "Nil value passed to StackPushInteger"
+   end
    C.nwn_StackPushInteger(value)
 end
 

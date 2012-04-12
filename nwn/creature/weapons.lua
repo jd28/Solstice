@@ -2,7 +2,52 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 function Creature:GetWeaponAttackBonus(weap)
-   return 0
+   local feat = -1
+   local ab = 0
+   local base = weap:GetBaseType()
+   local ewf = false
+
+   -- Epic Weapon Focus
+   feat = nwn.GetWeaponFeat(nwn.WEAPON_MASTERFEAT_FOCUS_EPIC, base)
+   if feat ~= -1 and self:GetHasFeat(feat) then
+      ab = ab + 3
+      ewf = true
+   end
+   
+   -- Weapon Focus, included above if creature has EWF
+   if not ewf then
+      feat = nwn.GetWeaponFeat(nwn.WEAPON_MASTERFEAT_FOCUS, base)
+      if feat ~= -1 and self:GetHasFeat(feat) then
+         ab = ab + 1
+      end
+   end
+
+   -- WM Weapon of Choice
+   local wm = self:GetLevelByClass(nwn.CLASS_TYPE_WEAPON_MASTER)
+   if wm >= 5 then
+      feat = nwn.GetWeaponFeat(nwn.WEAPON_MASTERFEAT_WEAPON_OF_CHOICE, base)
+      if feat ~= -1 and self:GetHasFeat(feat) then
+         ab = ab + 1
+      end
+      if wm >= 13 then
+         ab = ab + math.floor((wm - 10) / 3)
+      end
+   end
+
+   -- Enchant Arrow
+   if base == nwn.BASE_ITEM_LONGBOW or base == nwn.BASE_ITEM_SHORTBOW then
+      feat = self:GetHighestFeatInRange(nwn.FEAT_PRESTIGE_ENCHANT_ARROW_6, nwn.FEAT_PRESTIGE_ENCHANT_ARROW_20)
+      if feat ~= -1 and self:GetHasFeat(feat) then
+         ab = ab + (feat - nwn.FEAT_PRESTIGE_ENCHANT_ARROW_6) + 6
+      else
+         feat = self:GetHighestFeatInRange(nwn.FEAT_PRESTIGE_ENCHANT_ARROW_1, nwn.FEAT_PRESTIGE_ENCHANT_ARROW_5)
+         if feat ~= -1 and self:GetHasFeat(feat) then
+            ab = ab + (feat - nwn.FEAT_PRESTIGE_ENCHANT_ARROW_1) + 1
+         end
+      end
+   end
+
+   return ab
 end
 
 function Creature:GetWeaponAttackAbility(weap)
@@ -13,7 +58,7 @@ function Creature:GetWeaponAttackAbility(weap)
       abil = nwn.ABILITY_STRENGTH 
    end
    local mod = self:GetAbilityModifier(abil)
-   
+
    for i = 0, 5 do
       local t = nwn.GetWeaponAttackAbilityModifier(self, weap, i)
       if t > mod then
@@ -21,6 +66,7 @@ function Creature:GetWeaponAttackAbility(weap)
          mod = t
       end
    end
+
    return abil
 end
 
@@ -57,7 +103,8 @@ function Creature:GetWeaponBaseDamage(weap)
    -- In Solstice Monster Damage works on all weapons, if it exists
    -- it overwrites base damage dice.
    if C.nwn_HasPropertyType(weap.obj, nwn.ITEM_PROPERTY_MONSTER_DAMAGE) then
-      local ip = nwn_GetPropertyByType(weap.obj, nwn.ITEM_PROPERTY_MONSTER_DAMAGE)
+      local ip = C.nwn_GetPropertyByType(weap.obj, nwn.ITEM_PROPERTY_MONSTER_DAMAGE)
+      dice, sides = 0, 0
    else
       local bi = C.nwn_GetBaseItem(basetype)
       dice = bi.bi_dmg_dice
@@ -67,7 +114,10 @@ function Creature:GetWeaponBaseDamage(weap)
    if weap:GetIsUnarmedWeapon() and
       self:CanUseClassAbilities(nwn.CLASS_TYPE_MONK)
    then
-
+      local udice, usides = 0, 0
+      if (udice * usides) / 2 > (dice * sides) / 2 then
+         dice, sides = udice, usides
+      end
    end
 
    return dice, sides
@@ -168,4 +218,20 @@ function Creature:GetWeaponCritDamage(weap)
       end
    end
    return dice, sides
+end
+
+---
+-- TODO: FIX!!!
+function Creature:GetWeaponIteration(weap)
+   local iter = 5
+   
+   if self:GetLevelByClass(nwn.CLASS_TYPE_MONK) > 0 
+      and self:CanUseClassAbilities(nwn.CLASS_TYPE_MONK)
+      and (not weap:GetIsValid() or weap:GetIsUnarmedWeapon())
+   then
+      iter = 3
+   end
+      
+
+   return iter
 end

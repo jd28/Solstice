@@ -50,7 +50,7 @@ function _NL_GET_CACHED_OBJECT(id)
    end
 
    local type = ffi.cast("CGameObject*", obj).type
-   --print (obj, type, id)
+   print (obj, type, id)
 
    local object
    if type == nwn.GAME_OBJECT_TYPE_CREATURE then

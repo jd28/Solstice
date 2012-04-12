@@ -57,6 +57,8 @@ function Creature:GetHighestFeatInRange(low_feat, high_feat)
       end
       high_feat = high_feat - 1
    end
+
+   return -1
 end
 
 ---

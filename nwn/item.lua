@@ -169,10 +169,17 @@ end
 function Item:GetIsRangedWeapon()
    if not self:GetIsValid() then return false end
 
-   local bi = C.nwn_GetBaseItem(self:GetBaseType())
-   if bi == nil then return false end
-
-   return bi.bi_is_ranged == 1
+   local base = self:GetBaseType()
+   if base == nwn.BASE_ITEM_LONGBOW
+      or base == nwn.BASE_ITEM_SHORTBOW
+      or base == nwn.BASE_ITEM_THROWINGAXE
+      or base == nwn.BASE_ITEM_SLING
+      or base == nwn.BASE_ITEM_DART
+   then
+      return true
+   end
+   
+   return false
 end
 
 function Item:GetIsUnarmedWeapon()

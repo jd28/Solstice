@@ -8,11 +8,22 @@ nwn.RegisterWeaponUsableWithFeat(nwn.FEAT_WEAPON_FINESSE, nwn.BASE_ITEM_KATANA, 
 nwn.RegisterWeaponAttackAbility(
    nwn.ABILITY_DEXTERITY, 
    function (cre, weap, abil)
-      if not cre:GetHasFeat(nwn.FEAT_WEAPON_FINESSE) or
-         not cre:GetIsWeaponFinessable(weap)
+      if not cre:GetHasFeat(nwn.FEAT_WEAPON_FINESSE)
+         or not cre:GetIsWeaponFinessable(weap)
       then
          return 0
       end
       return cre:GetAbilityModifier(abil)
    end)
 
+-- Zen Archery
+nwn.RegisterWeaponAttackAbility(
+   nwn.ABILITY_WISDOM, 
+   function (cre, weap, abil)
+      if not weap:GetIsRangedWeapon()
+         or not cre:GetHasFeat(nwn.FEAT_ZEN_ARCHERY)
+      then
+         return 0
+      end
+      return cre:GetAbilityModifier(abil)
+   end)

@@ -18,199 +18,456 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
+local bit = require 'bit'
 
---nwn.WIELD_TYPE_CREATURE
---nwn.WIELD_TYPE_SINGLE
---nwn.WIELD_TYPE_DUAL
---nwn.WIELD_TYPE_UNARMED
-
---nwn.COMBAT_CATEGORY_AB
---nwn.COMBAT_CATEGORY_AC
---nwn.COMBAT_CATEGORY_CONCEALMENT
---nwn.COMBAT_CATEGORY_DAMAGE
---nwn.COMBAT_CATEGORY_CRIT_MULT
---nwn.COMBAT_CATEGORY_CRIT_RANGE
-
-nwn.COMBAT_BONUS_ABILITY = 1
-nwn.COMBAT_BONUS_CLASS = 2
-nwn.COMBAT_BONUS_FEAT = 3
-nwn.COMBAT_BONUS_SKILL = 4
-nwn.COMBAT_BONUS_MASTER_FEAT = 5
-nwn.COMBAT_BONUS_SUBRACE = 6
-nwn.COMBAT_BONUS_DEITY = 7
-nwn.COMBAT_BONUS_MODE = 8
-
-function nwn.RegisterCombatBonus(bonus_type, cat, id, val)
-end
-
-local COMBAT_BONUS = {}
-local TRANSIENT_COMBAT_BONUS = {}
-
---- Register a transient combat bonus.
--- A transient combat bonus is one that must be calculated every attack.
--- @param f A function called with the attacker, target, and weapon.
---     e,g. function (attack, attacker, target, weapon) ... end
-function nwn.RegisterTransientCombatBonus(f)
-   table.insert(TRANSIENT_COMBAT_BONUS, f)
-end
-
-function nwn.GetAttackResult(attack_data)
+function NSGetAttackResult(attack_data)
    local t = attack_data.cad_attack_result
 
    return t == 1 or t == 3 or t == 5 or t == 6 or t == 7 or t == 10
 end
 
---- Register a combat bonus.
--- These are combat bonuses that don't need to be calculated every round.
--- and therefor can cached and updated only when necessary.
--- @param val Integer or Function 
-function nwn.RegisterCombatBonus(f)
-   table.insert(TRANSIENT_COMBAT_BONUS, f)
-end
+-- @param weap Attack weapon, if nil then the call is coming from the plugin.
+function NSGetCriticalHitMultiplier(attacker, offhand, weap)
+   local result
+   if weap then
+      result = weap.crit_mult
+   else
+      local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      local cr = attacker.obj.cre_combat_round
+      if offhand then
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+         if not weapon:GetIsValid() then
+            weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+         end
+      else
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+      end
 
----
-function nwn.GetCombatBonus(obj, bonus_type, cat, id)
-   local val = COMBAT_BONUS[bonus_type][id]
-   if not val then return 0 end 
+      if not weapon:GetIsValid() then
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_ARMS)
+      end
 
-   if type(val) == "function" then
-      return val(obj)
-   elseif type(val) == "number" then
-      return val
+      if not weapon:GetIsValid() then
+         weapon = C.nwn_GetCurrentAttackWeapon(cr, 0)
+         if weapon == nil then
+            weapon = nwn.OBJECT_INVALID
+         else
+            weapon = _NL_GET_CACHED_OBJECT(weapon.obj.obj_id)
+         end
+      end
+
+      if not weapon:GetIsValid() then
+         result = 1
+      else 
+         result = attacker:GetWeaponCritMultiplier(weapon)
+      end
    end
+   
+   -- Effects...
+   result = result + attacker:GetEffectCritMultBonus()
+
+   return result
 end
 
-function nwn.ApplyTransientCombatBonus(attack, attacker, target, weapon)
-   for _, cb in ipairs(TRANSIENT_COMBAT_BONUS) do
-      cb(attack, attacker, target, weapon)
+-- @param weap Attack weapon, if nil then the call is coming from the plugin.
+function NSGetCriticalHitRoll(attacker, offhand, weap)
+   local result
+   if weap then
+      result = weap.crit_range
+   else
+      local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      local cr = attacker.obj.cre_combat_round
+      if offhand then
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+         if not weapon:GetIsValid() then
+            weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+         end
+      else
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+      end
+
+      if not weapon:GetIsValid() then
+         weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_ARMS)
+      end
+
+      if not weapon:GetIsValid() then
+         weapon = C.nwn_GetCurrentAttackWeapon(cr, 0)
+         if weapon == nil then
+            weapon = nwn.OBJECT_INVALID
+         else
+            weapon = _NL_GET_CACHED_OBJECT(weapon.obj.obj_id)
+         end
+      end
+
+      if not weapon:GetIsValid() then
+         result = 1
+      else 
+         result = attacker:GetWeaponCritRange(weapon)
+      end
    end
+   
+   -- Effects...
+   result = result + attacker:GetEffectCritRangeBonus()
+
+   return 21 - result
 end
 
-function NSResolveDamage ()
-end
+function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
+   local weapon = C.nwn_GetCurrentAttackWeapon(combat_round, attack_type)
+   local ci_weap_number = -1
 
-function NSResolvePostMeleeDamage(attacker, target, attack_data)
-   if not target:GetIsValid() then return end
-
-   local cr = attacker.cre_combat_round
-end
-
-function GetCurrentAttackWeapon(combat_round)
-
-end
-
-function GetAttackModifierVs(att_stats, target)
-   local attack
-   local combat_round
-
-   local attack_type = attack.cad_weapon_type
-   local attack_num = combat_round.cr_current_attack
-   local weap = GetCurrentAttackWeapon(combat_round)
-
-   local bab = attacker.ci.bab - (attack_num * weap.iter)
-
-   local ab_clamp = nwn.GetMaxABBonus(attacker)
-   local ab_abil = attacker:GetAbilityModifier(attacker.ci.ab_ability)
-
-   is_offhand = nwn.GetOffhandAttack(cr)
-
-   if attacker.ci.onhand and attacker.ci.onhand.id == weap.obj_id then
-      weap = attacker.ci.onhand
-   elseif attacker.ci.offhand.id == weap.obj_id then
-      weap = attacker.ci.offhand
-   elseif attacker.ci.onhand.id == weap.obj_id then
-      weap = attacker.ci.onhand
+   if attacker then
+      for i = 0, 5 do
+         if attacker.ci.equips[i].id == weapon.obj.obj_id then
+            ci_weap_number = i
+            break
+         end
+      end
    end
+   return _NL_GET_CACHED_OBJECT(weapon.obj.obj_id), ci_weap_number
+end
+
+function NSGetArmorClassVs(target, attacker)
+
+end
+
+--- GetAttackModifierVersus
+function NSGetAttackModifierVersus(attacker, target, from_hook)
+   if from_hook then
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      target = _NL_GET_CACHED_OBJECT(target)
+   end
+
+   local cr = attacker.obj.cre_combat_round
+   local current_attack = cr.cr_current_attack
+   local attack = C.nwn_GetAttack(cr, current_attack)
+   local weapon_type = attack.cad_weapon_type
+   local attack_num = cr.cr_current_attack
+   local weap, ci_weap_number = NSGetCurrentAttackWeapon(cr, weapon_type, attacker)
+   local bab
+
+   if weapon_type == 2 then
+      bab = attacker.ci.bab - (5 * cr.cr_offhand_taken)
+      cr.cr_offhand_taken = cr.cr_offhand_taken + 1
+   elseif weapon_type == 6 or weapon_type == 8 then
+      bab = attacker.ci.bab
+      if attack.cad_attack_type ~= 867 
+         or attack.cad_attack_type ~= 868
+         or attack.cad_attack_type ~= 391
+      then
+         bab = bab - (5 * cr.cr_extra_taken)
+      end
+      cr.cr_extra_taken = cr.cr_extra_taken + 1
+   else
+      if attack.cad_attack_type == 65002 
+         or attack.cad_attack_type == 6
+         or attack.cad_attack_type == 391
+      then
+         bab = attacker.ci.bab
+      else
+         bab = attacker.ci.bab - (attack_num * attacker.ci.equips[ci_weap_number].iter)
+      end
+   end
+
+   local ab_abil = attacker:GetAbilityModifier(attacker.ci.equips[ci_weap_number].ab_ability)
+   local is_offhand = NSGetOffhandAttack(cr)
 
    -- Base Attack Bonus
+   local ab = bab
 
    -- Offhand Attack Penalty
+   if is_offhand then
+      ab = ab + attacker.ci.offhand_penalty_off
+   else
+      ab = ab + attacker.ci.offhand_penalty_on      
+   end
 
    -- Size Modifier
-
-   -- Attack Mode Modifier
-
-   -- Special Attack Modifier
+   ab = ab + attacker.ci.size.ab
 
    -- Area Modifier
+   ab = ab + attacker.ci.area.ab
 
    -- Feat Modifier
+   ab = ab + attacker.ci.feat.ab
+
+   -- Attack Mode Modifier
+   ab = ab + attacker.ci.mode.ab
+
+   -- Special Attack Modifier
+   ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack)
+
+   -- Favored Enemies
+   if attacker.ci.fe_mask ~= 0 
+      and target.type == nwn.nwn.GAME_OBJECT_TYPE_CREATURE
+      and bit.band(attacker.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
+   then
+      ab = ab + attacker.ci.fe.ab
+   end
+
+   -- +1 Offensive Training Vs.
+   if attacker.ci.training_vs_mask ~= 0 
+      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+      and bit.band(attacker.ci.training_vs_mask, bit.lshift(1, target:GetRacialType())) ~= 0
+   then
+      ab = ab + 1
+   end
 
    -- Race Modifier
+   ab = ab + attacker.ci.race.ab
 
-   -- 
+   -- Weapon AB Mod.  i.e, WF, SWF, EWF, etc
+   ab = ab + attacker.ci.equips[ci_weap_number].ab_mod
 
+   -- Target State
+   ab = ab + attacker:GetEnemyStateAttackBonus(attack.cad_ranged_attack)
 
-   local ab_mod = weap.ab
-
-   local trace = target:GetRacialType()
-   local tgoodevil = target:GetGoodEvilValue()
-   local tlawchaos = target:GetLawChaosValue()
-   local tdeity_id = target:GetDeityId()
-   local tsubrace_id = target:GetSubraceId()
-
-   for i = 0, attacker.ab_mod_count - 1 do
-      local add = true
-      if attacker.ab_mods[i].vs_race >= 0 and
-         attacker.ab_mods[i].vs_race ~= trace 
-      then
-         add = false
-      end
-      if attacker.ab_mods[i].vs_goodevil >= 0 and
-         attacker.ab_mods[i].vs_goodevil ~= tgoodevil
-      then
-         add = false
-      end
-      if attacker.ab_mods[i].vs_lawchaos >= 0 and
-         attacker.ab_mods[i].vs_lawchaos ~= tlawchaos
-      then
-         add = false
-      end
-      if attacker.ab_mods[i].vs_deity >= 0 and
-         attacker.ab_mods[i].vs_deity ~= tdeity_id
-      then
-         add = false
-      end
-      if attacker.ab_mods[i].vs_subrace >= 0 and
-         attacker.ab_mods[i].vs_subrace ~= tsubrace_id
-      then
-         add = false
-      end
-
-      if add then
-         ab_mod = ab_mod + amount
-      end
-
-      if ab_mod > ab_clamp then
-         ab_mod = ab_clamp
-         break
-      end
+   -- Ranged Attacker Modifications
+   if attack.cad_ranged_attack == 1 then
+      local r = attacker:GetRangedAttackMod(target)
+      print(r)
+      ab = ab + r
    end
+   
+   local eff_ab = attacker:GetEffectAttackBonus(target, weapon_type)
+   local sit_ab = attacker:GetSituationalAttackBonus()
 
-   return roll + bab + ab_abil + ab_mod + attacker.ab_mode
+   return ab + ab_abil + eff_ab + sit_ab
 end
 
-function NS_RESOLVE_ATTACK_ROLL(attacker, target)
+function NSGetOffhandAttack(cr)
+   return cr.cr_current_attack + 1 > 
+      cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
+end
+
+function NSInitializeNumberOfAttacks (cre, combat_round)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   if not cre:GetIsValid() then return end
+   combat_round = cre.obj.cre_combat_round
+
+   cre:UpdateCombatInfo()
+
+   local rh = cre:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   local rh_valid = rh:GetIsValid()
+   local lh = cre:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+   local age = cre.stats.cs_age
+   local style = (age / 100) % 10
+   local extra_onhand = (age / 10000) % 10
+   local extra_offhand = (age / 1000) % 10
+   local attacks = 0
+   local offhand_attacks = 0
+
+   combat_round.cr_extra_taken = 0
+   combat_round.cr_offhand_taken = 0
+
+   if rh_valid and
+      (rh.obj.it_baseitem == nwn.BASE_ITEM_HEAVYCROSSBOW or
+       rh.obj.it_baseitem == nwn.BASE_ITEM_LIGHTCROSSBOW)
+      and not cre:GetHasFeat(nwn.FEAT_RAPID_RELOAD)
+   then
+      attacks = 1
+   elseif cre.stats.cs_override_atks > 0 then
+      -- appearently some kind of attack override
+      attacks = cre.stats.cs_override_atks
+   else
+      attacks = C.nwn_GetAttacksPerRound(cre.stats)
+   end
+
+   -- STYLE
+   if style == 7 and not rh:GetIsValid() then
+      -- sunfist
+      extra_onhand = extra_onhand + 1
+   elseif style == 3 and lh:GetIsValid() and -- spartan
+      (lh.obj.it_baseitem == nwn.BASE_ITEM_SMALLSHIELD or
+       lh.obj.it_baseitem == nwn.BASE_ITEM_LARGESHIELD or
+       lh.obj.it_baseitem == nwn.BASE_ITEM_TOWERSHIELD)
+   then
+      extra_onhand = extra_onhand + 1;
+   elseif cre:GetLevelByClass(nwn.CLASS_TYPE_RANGER) >= 40 and
+      cre:GetLevelByClass(nwn.CLASS_TYPE_MONK) == 0
+   then
+      extra_offhand = extra_offhand + 1; 
+   end
+
+   -- FEAT
+   if not rh:GetIsValid() and cre:GetKnowsFeat(nwn.FEAT_CIRCLE_KICK) then
+      extra_onhand = extra_onhand + 1
+   end
+
+   offhand_attacks = C.nwn_CalculateOffHandAttacks(combat_round)
+
+   if cre.obj.cre_slowed ~= 0 and attacks > 1 then
+      attacks = attacks - 1
+   end
+
+   if cre.obj.cre_mode_combat == 10 then -- Dirty Fighting
+      cre:SetCombatMode(0)
+      combat_round.cr_onhand_atks = 1
+      combat_round.cr_offhand_atks = 0
+      return
+   elseif cre.obj.cre_mode_combat == 6 and -- Rapid Shot
+      rh:GetIsValid() and
+      (rh.obj.it_baseitem == nwn.BASE_ITEM_LONGBOW or
+       rh.obj.it_baseitem == nwn.BASE_ITEM_SHORTBOW) 
+   then
+      combat_round.cr_additional_atks = 1
+   elseif cre.obj.cre_mode_combat == 5 and -- flurry
+      (not rh:GetIsValid() or
+       rh.obj.it_baseitem == 40 or
+       rh:GetIsFlurryable())
+   then
+      combat_round.cr_additional_atks = 1
+   end
+
+   if cre.obj.cre_hasted then
+      combat_round.cr_additional_atks = combat_round.cr_additional_atks + 1
+   end
+
+   -- Only give extra offhand attacks if we have one to begin with.
+   if offhand_attacks > 0 then
+      offhand_attacks = offhand_attacks + extra_offhand
+   end
+
+   combat_round.cr_onhand_atks = attacks + extra_onhand
+   combat_round.cr_offhand_atks = offhand_attacks
+
+end
+
+function NSResolveAttackRoll(attacker, target, attack)
+   local ab = 0
+   local ac = 0
+
+   if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
+      target = nwn.OBJECT_INVALID
+   end
+   -- Modifier Vs
+   ab = ab + NSGetAttackModifierVersus(attacker, target)
+   attack.cad_attack_mod = ab
+
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      ac = ac + NSGetArmorClassVs(target, attacker)
+   end
+
+   -- If there is a Coup De Grace, automatic hit.  Effects are dealt with in 
+   -- NSResolvePostMelee/RangedDamage
+   if attack.cad_coupdegrace == 1 then
+      attack.cad_attack_result = 7
+      attack.cad_attack_roll = 20
+      return
+   end
+
    local roll = math.random(20)
+   attack.cad_attack_roll = roll 
+
+   local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
+   -- NSResolveDefensiveEffects(attacker, target, hit)
+
+   if not hit then
+      attack.cad_attack_result = 4
+      if roll == 1 then
+         attack.cad_missed = 1
+      else
+         attack.cad_missed = ac - ab + roll
+      end
+      return
+   end
+
+   -- Is critical hit
+   attack.cad_attack_result = 3
+
+   -- Isn't Crit
+   attack.cad_attack_result = 1
+end
+
+function NSResolveDamage(attacker, target)
+
+end
+
+function NSGetDamageRoll(attacker, target, offhand, unknown, sneak, death, ki_damage)
+
+end
+
+function NSGetDamageBonus(attacker, target, int)
+end
+
+function NSResolveSpecialAttackAttackBonus(attacker, target, attack)
+   return NSMeleeSpecialAttack(attack.cad_attack_type, 1, attacker, target, attack) or 0
+end
+
+function NSResolveSpecialAttackDamageBonus(attacker, target)
+   local dice, sides, bonus = 
+      NSMeleeSpecialAttack(attack.cad_attack_type, 2, attacker, target, attack)
+end
+
+function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
+   if not target:GetIsValid() then return end
+   local cr = attacker.cre_combat_round
+   local current_attack = cr.cr_current_attack
+   local attack = C.nwn_GetAttack(cr, current_attack)
+   local attack_group = attack.cad_attack_group
+   local sa = attack.cad_attack_type
+
+   if attack.cad_attack_type < 1115 and
+      attacker:GetFeatRemaintingUses(attack.cad_attack_type) == 0
+   then
+      attack.cad_attack_type = 0
+   end
+
+   ResolveAttackRoll(attacker, target, attack)
+   if NSGetAttackResult(attack) then
+      NSResolveDamage(attacker, target)
+      NSResolvePostMeleeDamage(attacker, target)
+   end
+   C.nwn_ResolveMeleeAnimations(attacker, i, attack_count, target, a)
+
+   if not nwn.GetAttackResult(attack) then return end
+   
+   attacker:DecrementFeatRemaintingUses(attack.cad_attack_type)
+   NSMeleeSpecialAttack(attack.cad_attack_type, 0, attacker, target, attack)
+end
+
+function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
+   if not target:GetIsValid() then return end
+   local cr = attacker.cre_combat_round
+   local current_attack = cr.cr_current_attack
+   local attack = C.nwn_GetAttack(cr, current_attack)
+   local attack_group = attack.cad_attack_group
+   local sa = attack.cad_attack_type
+
+   if attack.cad_attack_type < 1115 and
+      attacker:GetFeatRemaintingUses(attack.cad_attack_type) == 0
+   then
+      attack.cad_attack_type = 0
+   end
+
+   ResolveAttackRoll(attacker, target, attack)
+   if NSGetAttackResult(attack) then
+      NSResolveDamage(attacker, target)
+      NSResolvePostRangedDamage(attacker, target)
+   end
+   C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, a)
+
+   if not nwn.GetAttackResult(attack) then return end
+   
+   attacker:DecrementFeatRemaintingUses(attack.cad_attack_type)
+   NSRangedSpecialAttack(attack.cad_attack_type, 0, attacker, target, attack)
+end
+
+function NSResolveMeleeAttack(attacker, target, attack_count, a)
+   if target == nwn.OBJECT_INVALID.id then return end
+
    attacker = _NL_GET_CACHED_OBJECT(attacker)
    target = _NL_GET_CACHED_OBJECT(target)
-
-   local ab = 0 
-   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      GetAttackModifierVs(attacker.stats, target)
-   end
-end
-
-function _NS_RESOLVE_MELEE_ATTACK(attacker, target, attack_count, a4)
-   if target == nil then return end
-
-   att = _NL_GET_CACHED_OBJECT(attacker.obj.obj_id)
-   tar = _NL_GET_CACHED_OBJECT(target.obj_id)
    
    local cr = attacker.cre_combat_round
    local current_attack = cr.cr_current_attack
    local attack = C.nwn_GetAttack(cr, current_attack)
    local attack_group = attack.cad_attack_group
+   
+   NSResolveTargetState(attacker, target)
+   NSResolveSituationalModifiers(attack, target)
 
    for i = 0, attack_count - 1 do
       attack.cad_attack_group = attack_group
@@ -223,17 +480,214 @@ function _NS_RESOLVE_MELEE_ATTACK(attacker, target, attack_count, a4)
       end
 
       if attack.cad_attack_type ~= 0 then
-         -- Special Attack... 
+         -- Special Attacks... 
+         NSResolveMeleeSpecialAttack(attacker, i, attack_count, target, a)
       else
-         ResolveAttackRoll(attacker, target, attack_data)
-         if GetAttackResult(attack) then
-
+         ResolveAttackRoll(attacker, target, attack)
+         if NSGetAttackResult(attack) then
+            NSResolveDamage(attacker, target)
+            NSResolvePostMeleeDamage(attacker, target)
          end
-         C.nwn_ResolveMeleeAnimations(attacker, i, attack_count, target, a4)
+         C.nwn_ResolveMeleeAnimations(attacker, i, attack_count, target, a)
       end
       current_attack = current_attack + 1
       cr.cr_current_attack = current_attack
       attack = C.nwn_GetAttack(cr, current_attack)
    end
    C.nwn_SignalMeleeDamage(attacker, target, attack_count)
+end
+
+function NSResolveRangedAttack(attacker, target, attack_count, a)
+   if target == nwn.OBJECT_INVALID.id then return end
+
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   target = _NL_GET_CACHED_OBJECT(target)
+
+   if not target:GetIsValid() or
+      not attacker:GetAmmunitionAvailable(attack_count)
+   then 
+      --CNWSCombatRound__SetRoundPaused(*(_DWORD *)(a1 + 0xACC), 0, 0x7F000000u);
+      --CNWSCombatRound__SetPauseTimer(*(_DWORD *)(a1 + 0xACC), 0, 0);
+      --return (*(int (__cdecl **)(int, signed int))(*(_DWORD *)(a1 + 0xC) + 0x88))(a1, 1);
+   end
+
+   local cr = attacker.cre_combat_round
+   local current_attack = cr.cr_current_attack
+   local attack = C.nwn_GetAttack(cr, current_attack)
+   local attack_group = attack.cad_attack_group
+
+   NSResolveTargetState(attacker, target)
+   NSResolveSituationalModifiers(attacker, target)
+
+   for i = 0, attack_count - 1 do
+      attack.cad_attack_group = attack_group
+      attack.cad_target = target.obj_id
+      attack.cad_attack_mode = attacker.cre_mode_combat
+      attack.cad_weapon_type = C.nwn_GetWeaponAttackType(cr)
+
+      if attack.cad_coupdegrace == 0 then
+         C.nwn_ResolveCachedSpecialAttacks(attacker)
+      end
+
+      if attack.cad_attack_type ~= 0 then
+         -- Special Attacks... 
+         NSResolveRangedSpecialAttack(attacker, i, attack_count, target, a)
+      else
+         NSResolveAttackRoll(attacker, target, attack)
+         if NSGetAttackResult(attack) then
+            NSResolveDamage(attacker, target)
+            NSResolvePostRangedDamage(attacker, target)
+         else
+            C.nwn_ResolveRangedMiss(attacker.obj, target.obj.obj)
+         end
+         C.nwn_ResolveMeleeAnimations(attacker.obj, target.obj.obj, a)
+      end
+      current_attack = current_attack + 1
+      cr.cr_current_attack = current_attack
+      attack = C.nwn_GetAttack(cr, current_attack)
+   end
+   C.nwn_SignalRangendDamage(attacker.obj, target.obj.obj, attack_count)
+end
+
+function NSResolveDefensiveEffects(attacker, target, hit)
+   -- Miss Chance
+   -- Conceal
+   -- Deflect Arrow
+   -- Parry
+end
+
+function NSSignalMeleeDamage(attacker, target, attack_count)
+
+end
+
+function NSSignalRangedDamage(attacker, target, attack_count)
+
+end
+
+--C.nwn_AddParryAttack
+--C.nwn_AddParryIndex
+
+
+function NSResolveDamage ()
+
+end
+
+function NSResolvePostMeleeDamage(attacker, target, attack_data)
+   if not target:GetIsValid() then return end
+
+   local cr = attacker.cre_combat_round
+end
+
+function NSResolvePostRangedDamage(attacker, target, attack_data)
+   if not target:GetIsValid() then return end
+
+   local cr = attacker.cre_combat_round
+end
+
+function NSResolveSituationalModifiers(attacker, target)
+   local flags = 0
+   local x = attacker.obj.obj.obj_position.x - target.obj.obj.obj_position.x
+   local y = attacker.obj.obj.obj_position.y - target.obj.obj.obj_position.y
+   local z = attacker.obj.obj.obj_position.z - target.obj.obj.obj_position.z
+
+   attacker.ci.target_distance = x ^ 2 + y ^ 2 + z ^ 2
+
+   -- Save some time by not sqrt'ing to get magnitude
+   if attacker.ci.target_distance <= 100 then
+      -- Coup De Grace
+      if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ASLEEP)
+         and target:GetHitDice() < 5
+      then
+         flags = bit.bor(flags, nwn.SITUATION_COUPDEGRACE)
+      end
+
+      local death = attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg_dice > 0
+         or attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg_bonus > 0
+      
+      local sneak = attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg_dice > 0
+         or attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg_bonus > 0
+
+      -- Sneak Attack & Death Attack
+      if (sneak or death) and
+         (bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ATTACKER_UNSEEN) ~= 0
+          or bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_FLATFOOTED) ~= 0
+          or bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_FLANKED)) ~= 0
+      then
+         -- Death Attack.  If it's a Death Attack it's also a sneak attack.
+         if death then
+            flags = bit.bor(flags, nwn.SITUATION_FLAG_DEATH_ATTACK)
+            flags = bit.bor(flags, nwn.SITUATION_FLAG_SNEAK_ATTACK)
+         end
+
+         -- Sneak Attack
+         if sneak then
+            flags = bit.bor(flags, nwn.SITUATION_FLAG_SNEAK_ATTACK)
+         end
+      end 
+   end
+   attacker.ci.situational_flags = flags
+end
+ 
+--- TODO: finish, test nwn funcs
+function NSResolveTargetState(attacker, target)
+   attacker.ci.target_state_mask = 0
+   if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
+      return
+   end
+
+   local mask = 0
+
+   if target:GetIsBlind()
+      and not target:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
+   then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_BLIND)
+   end
+
+   if attacker:GetIsInvisible(target)
+      and not target:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
+   then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_INVIS)
+   end
+
+   if target:GetIsVisibile(attacker) then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_UNSEEN)
+   end
+
+   if target.obj.obj.obj_anim == 4
+      or target.obj.obj.obj_anim == 87
+      or target.obj.obj.obj_anim == 86
+   then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_MOVING)
+   end
+
+   if target.obj.obj.obj_anim == 36       
+      or target.obj.obj.obj_anim == 33
+      or target.obj.obj.obj_anim == 32
+      or target.obj.obj.obj_anim == 7
+      or target.obj.obj.obj_anim == 5
+   then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_PRONE)
+   end
+
+   if target.obj.cre_state == 6 then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_STUNNED)
+   end
+
+   if target:GetIsFlanked(attacker) then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_FLANKED)
+   end
+
+   if target:GetIsFlatfooted() then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_FLATFOOTED)
+   end
+
+   if target.obj.cre_state == 9 or target.obj.cre_state == 8 then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ASLEEP)
+   end
+
+   if attacker:GetIsVisibile(target) then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_UNSEEN)
+   end
+
+   attacker.ci.target_state_mask = mask
 end
