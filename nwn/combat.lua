@@ -143,27 +143,27 @@ function NSGetAttackModifierVersus(attacker, target, from_hook)
    local cr = attacker.obj.cre_combat_round
    local current_attack = cr.cr_current_attack
    local attack = C.nwn_GetAttack(cr, current_attack)
-   local weapon_type = attack.cad_weapon_type
+   local attack_type = attack.cad_attack_type
    local attack_num = cr.cr_current_attack
-   local weap, ci_weap_number = NSGetCurrentAttackWeapon(cr, weapon_type, attacker)
+   local weap, ci_weap_number = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
    local bab
 
-   if weapon_type == 2 then
+   if attack_type == 2 then
       bab = attacker.ci.bab - (5 * cr.cr_offhand_taken)
       cr.cr_offhand_taken = cr.cr_offhand_taken + 1
-   elseif weapon_type == 6 or weapon_type == 8 then
+   elseif attack_type == 6 or attack_type == 8 then
       bab = attacker.ci.bab
-      if attack.cad_attack_type ~= 867 
-         or attack.cad_attack_type ~= 868
-         or attack.cad_attack_type ~= 391
+      if attack.cad_special_attack ~= 867 
+         or attack.cad_special_attack ~= 868
+         or attack.cad_special_attack ~= 391
       then
          bab = bab - (5 * cr.cr_extra_taken)
       end
       cr.cr_extra_taken = cr.cr_extra_taken + 1
    else
-      if attack.cad_attack_type == 65002 
-         or attack.cad_attack_type == 6
-         or attack.cad_attack_type == 391
+      if attack.cad_special_attack == 65002 
+         or attack.cad_special_attack == 6
+         or attack.cad_special_attack == 391
       then
          bab = attacker.ci.bab
       else
@@ -231,7 +231,7 @@ function NSGetAttackModifierVersus(attacker, target, from_hook)
       ab = ab + r
    end
    
-   local eff_ab = attacker:GetEffectAttackBonus(target, weapon_type)
+   local eff_ab = attacker:GetEffectAttackBonus(target, attack_type)
    local sit_ab = attacker:GetSituationalAttackBonus()
 
    return ab + ab_abil + eff_ab + sit_ab
@@ -393,12 +393,12 @@ function NSGetDamageBonus(attacker, target, int)
 end
 
 function NSResolveSpecialAttackAttackBonus(attacker, target, attack)
-   return NSMeleeSpecialAttack(attack.cad_attack_type, 1, attacker, target, attack) or 0
+   return NSMeleeSpecialAttack(attack.cad_special_attack, 1, attacker, target, attack) or 0
 end
 
 function NSResolveSpecialAttackDamageBonus(attacker, target)
    local dice, sides, bonus = 
-      NSMeleeSpecialAttack(attack.cad_attack_type, 2, attacker, target, attack)
+      NSMeleeSpecialAttack(attack.cad_special_attack, 2, attacker, target, attack)
 end
 
 function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
@@ -407,12 +407,12 @@ function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, targ
    local current_attack = cr.cr_current_attack
    local attack = C.nwn_GetAttack(cr, current_attack)
    local attack_group = attack.cad_attack_group
-   local sa = attack.cad_attack_type
+   local sa = attack.cad_special_attack
 
-   if attack.cad_attack_type < 1115 and
-      attacker:GetFeatRemaintingUses(attack.cad_attack_type) == 0
+   if attack.cad_special_attack < 1115 and
+      attacker:GetFeatRemaintingUses(attack.cad_special_attack) == 0
    then
-      attack.cad_attack_type = 0
+      attack.cad_special_attack = 0
    end
 
    ResolveAttackRoll(attacker, target, attack)
@@ -424,8 +424,8 @@ function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, targ
 
    if not nwn.GetAttackResult(attack) then return end
    
-   attacker:DecrementFeatRemaintingUses(attack.cad_attack_type)
-   NSMeleeSpecialAttack(attack.cad_attack_type, 0, attacker, target, attack)
+   attacker:DecrementFeatRemaintingUses(attack.cad_special_attack)
+   NSMeleeSpecialAttack(attack.cad_special_attack, 0, attacker, target, attack)
 end
 
 function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
@@ -434,12 +434,12 @@ function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, tar
    local current_attack = cr.cr_current_attack
    local attack = C.nwn_GetAttack(cr, current_attack)
    local attack_group = attack.cad_attack_group
-   local sa = attack.cad_attack_type
+   local sa = attack.cad_special_attack
 
-   if attack.cad_attack_type < 1115 and
-      attacker:GetFeatRemaintingUses(attack.cad_attack_type) == 0
+   if attack.cad_special_attack < 1115 and
+      attacker:GetFeatRemaintingUses(attack.cad_special_attack) == 0
    then
-      attack.cad_attack_type = 0
+      attack.cad_special_attack = 0
    end
 
    ResolveAttackRoll(attacker, target, attack)
@@ -451,8 +451,8 @@ function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, tar
 
    if not nwn.GetAttackResult(attack) then return end
    
-   attacker:DecrementFeatRemaintingUses(attack.cad_attack_type)
-   NSRangedSpecialAttack(attack.cad_attack_type, 0, attacker, target, attack)
+   attacker:DecrementFeatRemaintingUses(attack.cad_special_attack)
+   NSRangedSpecialAttack(attack.cad_special_attack, 0, attacker, target, attack)
 end
 
 function NSResolveMeleeAttack(attacker, target, attack_count, a)
@@ -473,13 +473,13 @@ function NSResolveMeleeAttack(attacker, target, attack_count, a)
       attack.cad_attack_group = attack_group
       attack.cad_target = target.obj_id
       attack.cad_attack_mode = attacker.cre_mode_combat
-      attack.cad_weapon_type = C.nwn_GetWeaponAttackType(cr)
+      attack.cad_attack_type = C.nwn_GetWeaponAttackType(cr)
 
       if attack.cad_coupdegrace == 0 then
          C.nwn_ResolveCachedSpecialAttacks(attacker)
       end
 
-      if attack.cad_attack_type ~= 0 then
+      if attack.cad_special_attack ~= 0 then
          -- Special Attacks... 
          NSResolveMeleeSpecialAttack(attacker, i, attack_count, target, a)
       else
@@ -523,13 +523,13 @@ function NSResolveRangedAttack(attacker, target, attack_count, a)
       attack.cad_attack_group = attack_group
       attack.cad_target = target.obj_id
       attack.cad_attack_mode = attacker.cre_mode_combat
-      attack.cad_weapon_type = C.nwn_GetWeaponAttackType(cr)
+      attack.cad_attack_type = C.nwn_GetWeaponAttackType(cr)
 
       if attack.cad_coupdegrace == 0 then
          C.nwn_ResolveCachedSpecialAttacks(attacker)
       end
 
-      if attack.cad_attack_type ~= 0 then
+      if attack.cad_special_attack ~= 0 then
          -- Special Attacks... 
          NSResolveRangedSpecialAttack(attacker, i, attack_count, target, a)
       else

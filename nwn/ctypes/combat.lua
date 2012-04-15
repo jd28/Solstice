@@ -88,7 +88,7 @@ typedef struct CNWSCombatAttackData {
     uint16_t cad_dmg_positive;        /* 002A */
     uint16_t cad_dmg_sonic;           /* 002C */
     uint16_t cad_base_damage;         /* 002E */
-    uint8_t cad_weapon_type;          /* 0030 */
+    uint8_t cad_attack_type;          /* 0030 */
     uint8_t cad_attack_mode;          /* 0031 */
     uint8_t cad_concealment;          /* 0032 */
     uint8_t field_33;                 /* 0033 */
@@ -101,7 +101,7 @@ typedef struct CNWSCombatAttackData {
     uint32_t cad_attack_deflected;    /* 004C */
     uint8_t cad_attack_result;        /* 0050 */
     uint8_t field_51;                 /* 0051 */
-    uint16_t cad_attack_type;         /* 0052 */
+    uint16_t cad_special_attack;      /* 0052 */
     uint16_t field_54;                /* 0054 */
     uint16_t field_56;                /* 0056 */
     Vector cad_ranged_target_loc;
