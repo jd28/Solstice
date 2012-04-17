@@ -37,6 +37,11 @@ _OBJECTS = { }
 nl_internal.NL_CACHE = true
 
 function _NL_GET_CACHED_OBJECT(id)
+   if type(id) ~= "number" then
+      print(debug.traceback())
+      error "Expected Object Id"
+   end
+
    if id == nil or id == -1 or id == 0x7F000000 then
       return nwn.OBJECT_INVALID
    end
@@ -50,7 +55,7 @@ function _NL_GET_CACHED_OBJECT(id)
    end
 
    local type = ffi.cast("CGameObject*", obj).type
-   print (obj, type, id)
+   --print (obj, type, id)
 
    local object
    if type == nwn.GAME_OBJECT_TYPE_CREATURE then
