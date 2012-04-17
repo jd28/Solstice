@@ -26,6 +26,13 @@ function inventory.SetCanEquipHandler(func)
    can_equip_handler = func
 end
 
+function NSGetWeaponFinesse(cre, item)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   item = _NL_GET_CACHED_OBJECT(item)
+
+   return cre:GetIsWeaponFinessable(item)
+end
+
 function _NL_CAN_EQUIP(cre, item)
    cre  = _NL_GET_CACHED_OBJECT(cre)
    item = _NL_GET_CACHED_OBJECT(item)
