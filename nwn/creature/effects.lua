@@ -1,3 +1,6 @@
+local ffi = require 'ffi'
+local C = ffi.C
+
 ---
 function Creature:GetHasFeatEffect(nFeat)
    nwn.engine.StackPushObject(self.id)
@@ -7,13 +10,12 @@ function Creature:GetHasFeatEffect(nFeat)
 end
 
 ---
-function Creature:GetIsInvisible()
-   return self:GetHasEffect(EFFECT_TYPE_INVISIBILITY)
-      or self:GetHasEffect(EFFECT_TYPE_IMPROVEDINVISIBILITY)
-      or (self:GetHasSpellEffect(SPELL_DARKNESS) and self:GetHasSpellEffect(SPELL_DARKVISION))
-      or self:GetActionMode(ACTION_MODE_STEALTH)
-      or self:GetHasEffect(EFFECT_TYPE_SANCTUARY)
-      or GetHasEffect(EFFECT_TYPE_ETHEREAL, oSelf)
+function Creature:GetIsInvisible(target)
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      return C.nwn_GetIsInvisible(self.obj, target.obj.obj)
+   end
+
+   return false
 end
 
 ---
