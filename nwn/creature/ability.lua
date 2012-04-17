@@ -99,6 +99,15 @@ function Creature:GetAbilityScore(ability, base)
    return result
 end
 
+---
+function Creature:GetDexMod(armor_check)
+   return C.nwn_GetDexMod(self.stats, armor_check)
+end
+
+function Creature:GetMaxAbilityBonus(abil)
+   return 12
+end
+
 --- Modifies the ability score of a specific type for a creature. 
 -- NWScript: nwnx_funcs by Acaos.
 -- @param ability nwn.ABILITY_*.
