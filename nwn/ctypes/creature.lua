@@ -188,8 +188,6 @@ typedef struct CNWSCreatureStats {
 
     void                       *cs_specabil;            /* 043C */
 
-    uint32_t                    field_438;
-    uint32_t                    field_43C;
     uint16_t                    field_440;
     uint16_t                    cs_first_ac_eff;
     uint16_t                    cs_first_ab_effect;
@@ -207,7 +205,10 @@ typedef struct CNWSCreatureStats {
     uint32_t                    field_460;
     uint32_t                    field_464;
     uint32_t                    field_468;
-    uint16_t                    field_46C;
+    uint16_t                    cs_first_save_eff;
+    uint16_t                    field_46E;
+    uint32_t                    field_470;
+    uint16_t                    field_474;
 
     uint16_t                    cs_skill_points;        /* 0476 */
     uint8_t                    *cs_skills;              /* 0478 */

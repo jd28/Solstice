@@ -184,7 +184,7 @@ typedef struct CNWSCombatRound {
     uint8_t field_130;                 /* 0x2151 */
     uint8_t field_131;                 /* 0x2152 */
     uint8_t field_132;                 /* 0x2153 */
-    uint32_t DodgeTarget;              /* 0x2154 */ 
+    uint32_t cr_dodge_target;              /* 0x2154 */ 
     uint32_t **SchedActionList;        /* 0x2158 */
     void    *org_nwcreature;      /* 0x215C */
 } CNWSCombatRound;
