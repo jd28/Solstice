@@ -66,7 +66,7 @@ function nwn.GetWeaponUsableWithFeat(feat, baseitem)
 end
 
 function nwn.RegisterWeaponAttackAbility(ability, f)
-   WEAPONS.ab_abil = WEAPONS.dmg_abil or {}
+   WEAPONS.ab_abil = WEAPONS.ab_abil or {}
    WEAPONS.ab_abil[ability] = f
 end
 
