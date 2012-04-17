@@ -19,6 +19,7 @@
 local ne = nwn.engine
 local ffi = require 'ffi'
 local C = ffi.C
+local bit = require 'bit'
 
 --- Check if a creature is using a given action mode
 -- @param mode nwn.ACTION_MODE_*
@@ -32,7 +33,17 @@ end
 --- Determines if a creature is blind.
 function Creature:GetIsBlind()
    if not self:GetIsValid() then return false end
-   return C.nwn_GetIsBlind(self.obj)
+
+   if bit.band(self.obj.cre_vision_type, 4) == 0
+      and bit.band(self.obj.cre_vision_type, 0x20) == 0
+      and (bit.band(self.obj.cre_vision_type, 0x10) ~= 0
+           or (bit.band(self.obj.cre_vision_type, 0x8) ~= 0
+               and bit.band(self.obj.cre_vision_type, 0x2) == 0))
+   then
+      return true
+   end
+
+   return false
 end
 
 --- Determines if a creature is dead or dying.
@@ -44,12 +55,12 @@ end
 
 function Creature:GetIsFlanked(target)
    if not target:GetIsValid() then return false end
-   return C.nwn_GetIsFlanked(self.obj, target.obj)
+   return C.nwn_GetFlanked(self.obj, target.obj)
 end
 
 function Creature:GetIsFlatfooted()
    if not self:GetIsValid() then return false end
-   return C.nwn_GetIsFlatfooted(self.obj)
+   return C.nwn_GetFlatFooted(self.obj)
 end
 
 --- Determines whether an object is in conversation.
