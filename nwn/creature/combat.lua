@@ -77,13 +77,13 @@ function Creature:GetCombatMode()
 end
 
 function Creature:GetEffectAttackBonus(target, attack_type)
-   local atk_type, race, lawchaos, goodevil, subrace, deity
+   local atk_type, race, lawchaos, goodevil, subrace, deity, amount
    local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
 
    local total = 0
    local eff_type
 
-   if target and target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       trace = target:GetRacialType()
       tgoodevil = target:GetGoodEvilValue()
       tlawchaos = target:GetLawChaosValue()
@@ -95,6 +95,7 @@ function Creature:GetEffectAttackBonus(target, attack_type)
 
    for i = self.stats.cs_first_ab_effect, self.obj.obj.obj_effects_len - 1 do
       eff_type = self.obj.obj.obj_effects[i].eff_type
+
       if eff_type > nwn.EFFECT_TRUETYPE_ATTACK_DECREASE then
          break
       end
@@ -108,8 +109,6 @@ function Creature:GetEffectAttackBonus(target, attack_type)
       deity    = self.obj.obj.obj_effects[i].eff_integers[6]
       valid    = false
 
-      --print(attack_type, amount, atk_type, race, lawchaos, goodevil, subrace, deity)
-
       if atk_type == nwn.ATTACK_BONUS_MISC or atk_type == attack_type then
          valid = true
       elseif attack_type == 6 and (atk_type == nwn.ATTACK_BONUS_ONHAND or nwn.ATTACK_BONUS_CWEAPON1) then
@@ -119,6 +118,7 @@ function Creature:GetEffectAttackBonus(target, attack_type)
       end
 
       if valid then
+         -- TODO this is wrong...
          if (race == nwn.RACIAL_TYPE_INVALID and lawchaos == 0 and  goodevil == 0 and  subrace == 0 and deity == 0)
             or race == trace
             or lawchaos == tlawchaos
@@ -135,6 +135,12 @@ function Creature:GetEffectAttackBonus(target, attack_type)
       end
    end
    return total
+end
+
+function Creature:GetEffectArmorClassBonus(attacker, touch)
+   local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge = 0, 0, 0, 0, 0
+
+   return eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge
 end
 
 ---
@@ -346,6 +352,10 @@ function Creature:GetMaxAttackRange(target)
    return C.nwn_GetMaxAttackRange(self.obj, target.id)
 end
 
+function Creature:GetMaxDodgeAC(target)
+   return 20
+end
+
 ---
 function Creature:GetOffhandAttackPenalty()
    local on = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
@@ -512,9 +522,11 @@ function Creature:GetRangedAttackMod(target)
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       -- Ranged Attack in Melee Target Range
-      local max = target:GetMaxAttackRange(self)   
+      local max = target:GetMaxAttackRange(self)
+      local weap = target:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
       if self.ci.target_distance <= max * max
-         and not target:GetRangedWeaponEquiped()
+         and weap:GetIsValid()
+         and not weap:GetIsRangedWeapon()
       then
          ab = ab - 4
       end
@@ -566,6 +578,7 @@ function Creature:UpdateCombatInfo(update_flags)
       self:UpdateCombatModifierRace()
       self:UpdateCombatModifierSize()
    end
+   self:UpdateCombatModifierSkill()
 end
 
 ---
@@ -589,8 +602,18 @@ end
 
 ---
 function Creature:UpdateCombatModifierClass()
-   local mod = self.ci.class
-   zero_combat_mod(mod)
+   zero_combat_mod(self.ci.class)
+   local ac = 0
+
+   local monk = self:GetLevelByClass(nwn.CLASS_TYPE_MONK)
+   if monk > 0 and
+      self:CanUseClassAbilities(nwn.CLASS_TYPE_MONK)
+   then
+      ac = ac + self:GetAbilityModifier(nwn.ABILITY_WISDOM)
+      ac = ac + (monk / 5)
+   end
+
+   self.ci.class.ac = ac
 end
 
 ---
@@ -613,8 +636,7 @@ end
 
 ---
 function Creature:UpdateCombatModifierMode()
-   local mod = self.ci.mode
-   zero_combat_mod(mod)
+   zero_combat_mod(self.ci.mode)
    local mode = self:GetCombatMode()
    local ab, ac = 0, 0
 
@@ -626,10 +648,10 @@ function Creature:UpdateCombatModifierMode()
       ac = 0
    elseif mode == nwn.COMBAT_MODE_POWER_ATTACK then
       ab = -5
-      mod.dmg_bonus = 10
+      self.ci.dmg_bonus = 10
    elseif mode == nwn.COMBAT_MODE_IMPROVED_POWER_ATTACK then
       ab = -10
-      mod.dmg_bonus = 10
+      self.ci.dmg_bonus = 10
    elseif mode == nwn.COMBAT_MODE_FLURRY_OF_BLOWS then
       ab = -2
    elseif mode == nwn.COMBAT_MODE_RAPID_SHOT then
@@ -678,6 +700,21 @@ function Creature:UpdateCombatModifierSize()
    mod.ab = ab
    mod.ac = ac
 end
+
+---
+--
+function Creature:UpdateCombatModifierSkill()
+   zero_combat_mod(self.ci.skill)
+
+   local ac = 0
+   print(self:GetSkillRank(nwn.SKILL_TUMBLE, true),
+         math.floor(self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5))
+
+   ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5
+
+   self.ci.skill.ac = ac
+end
+
 
 ---
 function Creature:UpdateCombatWeaponInfo()

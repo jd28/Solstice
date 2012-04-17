@@ -27,10 +27,10 @@ function NSGetAttackResult(attack_data)
 end
 
 -- @param weap Attack weapon, if nil then the call is coming from the plugin.
-function NSGetCriticalHitMultiplier(attacker, offhand, weap)
+function NSGetCriticalHitMultiplier(attacker, offhand, weap, weap_num)
    local result
    if weap then
-      result = weap.crit_mult
+      result = attacker.ci.equips[weap_num].crit_mult
    else
       local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
       attacker = _NL_GET_CACHED_OBJECT(attacker)
@@ -71,10 +71,10 @@ function NSGetCriticalHitMultiplier(attacker, offhand, weap)
 end
 
 -- @param weap Attack weapon, if nil then the call is coming from the plugin.
-function NSGetCriticalHitRoll(attacker, offhand, weap)
+function NSGetCriticalHitRoll(attacker, offhand, weap, weap_num)
    local result
    if weap then
-      result = weap.crit_range
+      result = attacker.ci.equips[weap_num].crit_range
    else
       local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
       attacker = _NL_GET_CACHED_OBJECT(attacker)
@@ -129,23 +129,171 @@ function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
    return _NL_GET_CACHED_OBJECT(weapon.obj.obj_id), ci_weap_number
 end
 
-function NSGetArmorClassVs(target, attacker)
-
-end
-
---- GetAttackModifierVersus
-function NSGetAttackModifierVersus(attacker, target, from_hook)
+---
+-- TODO: AC Versus Effects
+-- Note: it's already been established that target is a creature
+function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
+
+      target:UpdateCombatInfo()
+   else
+      target:UpdateCombatInfo()
    end
 
-   local cr = attacker.obj.cre_combat_round
-   local current_attack = cr.cr_current_attack
-   local attack = C.nwn_GetAttack(cr, current_attack)
-   local attack_type = attack.cad_attack_type
-   local attack_num = cr.cr_current_attack
-   local weap, ci_weap_number = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
+   -- 10 base AC
+   local ac = 10
+   local nat, armor, shield, deflect, dodge = 0, 0, 0, 0, 0
+
+   -- Size Modifier
+   ac = ac + target.ci.size.ac
+
+   -- Armor AC
+   ac = ac + target.stats.cs_ac_armour_base
+   armor = target.stats.cs_ac_armour_bonus
+   armorpen = target.stats.cs_ac_armour_penalty
+
+   -- Deflect AC
+   deflect = target.stats.cs_ac_deflection_bonus - target.stats.cs_ac_deflection_penalty
+
+   -- Natural AC
+   ac = ac + target.stats.cs_ac_natural_base
+   nat = target.stats.cs_ac_natural_bonus - target.stats.cs_ac_natural_penalty
+
+
+   -- Shield AC
+   ac = ac + target.stats.cs_ac_shield_base
+   shield = target.stats.cs_ac_shield_bonus - target.stats.cs_ac_shield_penalty
+
+   -- Class: Monk, RDD, PM, ...
+   ac = ac + target.ci.class.ac
+
+   -- Attack Mode Modifier
+   ac = ac + attacker.ci.mode.ac
+
+   -- Feat: Armor Skin, etc
+   ac = ac + target.ci.feat.ac
+
+   -- Dex Modifier
+   local dex_mod = target:GetDexMod(true)
+   local dexed = false
+
+   -- Attacker is invis and target doesn't have blindfight or target is Flatfooted
+   -- then target gets no Dex mod.
+   if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ATTACKER_INVIS) == 0
+      and bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_FLATFOOTED) == 0
+   then
+      -- Attacker is seen or target has Blindfight and it's not a ranged attack then target
+      -- gets dex_mod and dodge AC
+      if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ATTACKER_UNSEEN) == 0
+         or (target:GetHasFeat(nwn.FEAT_BLIND_FIGHT) and attack.cad_ranged_attack == 0)
+      then
+         if dex_mod > 0 then
+            dexed = true
+         end
+         -- Dodge AC
+         dodge = target.stats.cs_ac_dodge_bonus - target.stats.cs_ac_dodge_penalty
+
+         -- Skill: Tumble...
+        -- print("Tumble", target.ci.skill.ac)
+         ac = ac + target.ci.skill.ac
+         
+         -- If this is an attack of opportunity and target has mobility
+         -- there is a +4 ac bonus.
+         if attack.cad_special_attack == -534 
+            and target:GetHasFeat(nwn.FEAT_MOBILITY)
+         then
+            ac = ac + 4
+         end
+         
+         if target:GetHasFeat(nwn.FEAT_DODGE) then
+            if target.obj.cre_combat_round.cr_dodge_target == nwn.OBJECT_INVALID.id then
+               target.obj.cre_combat_round.cr_dodge_target = attacker.id
+            end
+            if target.obj.cre_combat_round.cr_dodge_target == attacker.id
+               and not target:CanUseClassAbilities(nwn.CLASS_TYPE_MONK)
+            then
+               ac = ac + 1
+            end
+         end
+      end
+   -- If dex_mod is negative we add it in.
+   elseif dex_mod < 0 then
+      dexed = true
+   end
+
+   -- If target has Uncanny Dodge 1 or Defensive Awareness 1, target gets
+   -- dex modifier.
+   if not dexed
+      and dex_mod > 0
+      and (target:GetHasFeat(nwn.FEAT_PRESTIGE_DEFENSIVE_AWARENESS_1)
+           or target:GetHasFeat(nwn.FEAT_UNCANNY_DODGE_1))
+   then
+      dexed = true
+   end
+
+   if dexed then
+--    print("Dex Mod", dex_mod)
+      ac = ac + dex_mod
+   end
+
+   -- +4 Defensive Training Vs.
+   if target.ci.training_vs_mask ~= 0 
+      and attacker.type == nwn.GAME_OBJECT_TYPE_CREATURE
+      and bit.band(target.ci.training_vs_mask, bit.lshift(1, attacker:GetRacialType())) ~= 0
+   then
+      ac = ac + 4
+   end
+
+   local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge =
+      target:GetEffectArmorClassBonus(attacker, touch)
+
+   dodge = dodge + eff_dodge
+   local max_dodge_ac = target:GetMaxDodgeAC()
+   if dodge > max_dodge_ac then
+      dodge = max_dodge_ac
+   end
+
+   if touch then
+      return ac + dodge
+   end
+
+   if eff_nat > nat then nat = eff_nat end
+   if eff_armor > armor then armor = eff_armor end
+   if eff_shield > shield then shield = eff_shield end
+   if eff_deflect > deflect then deflect = eff_deflect end
+
+
+-- print("AC:", nat, armor, shield, deflect, dodge)
+-- print("AC:", ac + nat + armor + shield + deflect + dodge)
+
+   return ac + nat + armor + shield + deflect + dodge
+end
+
+--- GetAttackModifierVersus
+function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, attack_type, weap, weap_num, is_offhand)
+   local attack_num
+   if from_hook then
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      target = _NL_GET_CACHED_OBJECT(target)
+
+      cr = attacker.obj.cre_combat_round
+      attack_num = cr.cr_current_attack
+      attack = C.nwn_GetAttack(cr, attack_num)
+      attack_type = attack.cad_attack_type
+      weap, weap_num = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
+      is_offhand = NSGetOffhandAttack(cr)
+
+      -- Temporary
+      NSResolveTargetState(attacker, target)
+   else
+      attack_num = cr.cr_current_attack
+
+      -- Temporary
+      NSResolveTargetState(attacker, target)
+   end
+
    local bab
 
    if attack_type == 2 then
@@ -167,12 +315,11 @@ function NSGetAttackModifierVersus(attacker, target, from_hook)
       then
          bab = attacker.ci.bab
       else
-         bab = attacker.ci.bab - (attack_num * attacker.ci.equips[ci_weap_number].iter)
+         bab = attacker.ci.bab - (attack_num * attacker.ci.equips[weap_num].iter)
       end
    end
 
-   local ab_abil = attacker:GetAbilityModifier(attacker.ci.equips[ci_weap_number].ab_ability)
-   local is_offhand = NSGetOffhandAttack(cr)
+   local ab_abil = attacker:GetAbilityModifier(attacker.ci.equips[weap_num].ab_ability)
 
    -- Base Attack Bonus
    local ab = bab
@@ -219,19 +366,23 @@ function NSGetAttackModifierVersus(attacker, target, from_hook)
    ab = ab + attacker.ci.race.ab
 
    -- Weapon AB Mod.  i.e, WF, SWF, EWF, etc
-   ab = ab + attacker.ci.equips[ci_weap_number].ab_mod
+   ab = ab + attacker.ci.equips[weap_num].ab_mod
 
    -- Target State
-   ab = ab + attacker:GetEnemyStateAttackBonus(attack.cad_ranged_attack)
+   local state = attacker:GetEnemyStateAttackBonus(attack.cad_ranged_attack)
+   ab = ab + state
 
    -- Ranged Attacker Modifications
    if attack.cad_ranged_attack == 1 then
       local r = attacker:GetRangedAttackMod(target)
-      print(r)
       ab = ab + r
    end
    
    local eff_ab = attacker:GetEffectAttackBonus(target, attack_type)
+   if eff_ab > 20 then
+      eff_ab = 20
+   end
+
    local sit_ab = attacker:GetSituationalAttackBonus()
 
    return ab + ab_abil + eff_ab + sit_ab
@@ -335,20 +486,34 @@ function NSInitializeNumberOfAttacks (cre, combat_round)
 
 end
 
-function NSResolveAttackRoll(attacker, target, attack)
+function NSResolveAttackRoll(attacker, target, from_hook)
+   if from_hook then
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      target = _NL_GET_CACHED_OBJECT(target)
+   end
+   local cr = attacker.obj.cre_combat_round
+   local current_attack = cr.cr_current_attack
+   local attack = C.nwn_GetAttack(cr, current_attack)
+   local attack_type = attack.cad_attack_type
+   local is_offhand = NSGetOffhandAttack(cr)
+   local weap, weap_num = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
+
    local ab = 0
    local ac = 0
 
    if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
       target = nwn.OBJECT_INVALID
    end
+
    -- Modifier Vs
-   ab = ab + NSGetAttackModifierVersus(attacker, target)
+   ab = ab + NSGetAttackModifierVersus(attacker, target, false, cr, attack, attack_type, weap, weap_num, is_offhand)
    attack.cad_attack_mod = ab
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      ac = ac + NSGetArmorClassVs(target, attacker)
+      ac = ac + NSGetArmorClassVersus(target, attacker, false, false, attack)
    end
+
+   print(ab, ac)
 
    -- If there is a Coup De Grace, automatic hit.  Effects are dealt with in 
    -- NSResolvePostMelee/RangedDamage
@@ -363,7 +528,7 @@ function NSResolveAttackRoll(attacker, target, attack)
 
    local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
    -- NSResolveDefensiveEffects(attacker, target, hit)
-
+   
    if not hit then
       attack.cad_attack_result = 4
       if roll == 1 then
@@ -372,13 +537,24 @@ function NSResolveAttackRoll(attacker, target, attack)
          attack.cad_missed = ac - ab + roll
       end
       return
+   else
+      attack.cad_attack_result = 1
    end
 
-   -- Is critical hit
-   attack.cad_attack_result = 3
 
-   -- Isn't Crit
-   attack.cad_attack_result = 1
+   if roll < NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
+      attack.cad_threat_roll = math.random(20)
+      attack.cad_critical_hit = 1
+
+      -- TODO Difficulty Settings
+      -- TODO immunity
+      if attack.cad_threat_roll + ab >= ac then
+         -- Is critical hit
+         attack.cad_attack_result = 3
+      end
+   end
+
+
 end
 
 function NSResolveDamage(attacker, target)
@@ -640,6 +816,7 @@ function NSResolveTargetState(attacker, target)
    if target:GetIsBlind()
       and not target:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
    then
+      print("Blind")
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_BLIND)
    end
 
@@ -649,7 +826,19 @@ function NSResolveTargetState(attacker, target)
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_INVIS)
    end
 
-   if target:GetIsVisibile(attacker) then
+   if target:GetIsInvisible(attacker)
+      and not attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
+   then
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_INVIS)
+   end
+
+   if not target:GetIsVisibile(attacker) then
+      print("COMBAT_TARGET_STATE_ATTACKER_UNSEEN")
+      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_UNSEEN)
+   end
+
+   if not attacker:GetIsVisibile(target) then
+      print("COMBAT_TARGET_STATE_UNSEEN")
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_UNSEEN)
    end
 
@@ -683,10 +872,6 @@ function NSResolveTargetState(attacker, target)
 
    if target.obj.cre_state == 9 or target.obj.cre_state == 8 then
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ASLEEP)
-   end
-
-   if attacker:GetIsVisibile(target) then
-      mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_UNSEEN)
    end
 
    attacker.ci.target_state_mask = mask
