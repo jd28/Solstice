@@ -74,6 +74,7 @@ typedef struct CombatInformation {
    CombatMod mode;
    CombatMod race;
    CombatMod size;
+   CombatMod skill;
    CombatMod fe; // Favored Enemy
    CombatMod situational[$NS_SITUATIONAL_NUM];
 
