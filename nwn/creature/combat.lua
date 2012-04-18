@@ -39,6 +39,11 @@ function Creature:GetAC(for_future)
 end
 
 ---
+function Creature:AddParryAttack(attacker)
+   C.nwn_AddParryAttack(self.obj.cre_combat_round, attacker.id)
+end
+
+---
 function Creature:GetArcaneSpellFailure()
    ne.StackPushObject(self)
    ne.ExecuteCommand(737, 1)
@@ -74,6 +79,10 @@ end
 function Creature:GetCombatMode()
    if not self:GetIsValid() then return 0 end
    return self.obj.cre_mode_combat
+end
+
+function Creature:GetDamageFlags()
+   return C.nwn_GetDamageFlags(self.obj)
 end
 
 function Creature:GetEffectAttackBonus(target, attack_type)
@@ -139,8 +148,103 @@ end
 
 function Creature:GetEffectArmorClassBonus(attacker, touch)
    local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge = 0, 0, 0, 0, 0
+   local eff_nat_neg, eff_armor_neg, eff_shield_neg, eff_deflect_neg = 0, 0, 0, 0
+   local eff_type, dmg_flags
+   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
 
-   return eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge
+   if attacker.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      trace = attacker:GetRacialType()
+      tgoodevil = attacker:GetGoodEvilValue()
+      tlawchaos = attacker:GetLawChaosValue()
+      tdeity_id = attacker:GetDeityId()
+      tsubrace_id = attacker:GetSubraceId()
+      dmg_flags = attacker:GetDamageFlags()
+   end
+
+   local valid = false
+
+   for i = self.stats.cs_first_ac_eff, self.obj.obj.obj_effects_len - 1 do
+      eff_type = self.obj.obj.obj_effects[i].eff_type
+
+      if eff_type > nwn.EFFECT_TRUETYPE_AC_DECREASE then
+         break
+      end
+
+      ac_type  = self.obj.obj.obj_effects[i].eff_integers[0]
+      amount   = self.obj.obj.obj_effects[i].eff_integers[1]
+      race     = self.obj.obj.obj_effects[i].eff_integers[2]
+      lawchaos = self.obj.obj.obj_effects[i].eff_integers[3]
+      goodevil = self.obj.obj.obj_effects[i].eff_integers[4]
+      damage   = self.obj.obj.obj_effects[i].eff_integers[5]
+      subrace  = self.obj.obj.obj_effects[i].eff_integers[6]
+      deity    = self.obj.obj.obj_effects[i].eff_integers[7]
+      valid    = false
+
+      -- Only look at effects that are versus a particular type
+      if (race ~= nwn.RACIAL_TYPE_INVALID or lawchaos ~= 0 or goodevil ~= 0 or damage ~= nwn.AC_VS_DAMAGE_TYPE_ALL or subrace ~= 0 or deity ~= 0) then
+         valid = true
+      end
+
+      if valid
+         and (race == nwn.RACIAL_TYPE_INVALID or race == trace)
+         and (lawchaos == 0 or lawchaos == tlawchaos)
+         and (goodevil == 0 or goodevil == tgoodevil)
+         and (damage == nwn.AC_VS_DAMAGE_TYPE_ALL or bit.band(dmg_flags, damage) ~= 0)
+         and (subrace == 0 or subrace == tsubrace_id)
+         and (deity == 0 or deity == tdeity_id)
+      then
+         if eff_type == nwn.EFFECT_TRUETYPE_AC_DECREASE then
+            if ac_type == nwn.AC_DODGE_BONUS then
+               eff_dodge = eff_dodge - amount
+            elseif not touch then
+               if ac_type == nwn.AC_NATURAL_BONUS then
+                  if amount > eff_nat_neg then
+                     eff_nat_neg = amount
+                  end
+               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
+                  if amount > eff_armor_neg then
+                     eff_armor_neg = amount
+                  end
+               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
+                  if amount > eff_shield_neg then
+                     eff_shield_neg = amount
+                  end
+               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
+                  if amount > eff_deflect_neg then
+                     eff_deflect_neg = amount
+                  end
+               end
+            end
+         elseif eff_type == nwn.EFFECT_TRUETYPE_AC_INCREASE then
+            if ac_type == nwn.AC_DODGE_BONUS then
+               eff_dodge = eff_dodge + amount
+            elseif not touch then
+               if ac_type == nwn.AC_NATURAL_BONUS then
+                  if amount > eff_nat then
+                     eff_nat = amount
+                  end
+               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
+                  if amount > eff_armor then
+                     eff_armor = amount
+                  end
+               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
+                  if amount > eff_shield then
+                     eff_shield = amount
+                  end
+               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
+                  if amount > eff_deflect then
+                     eff_deflect = amount
+                  end
+               end
+            end
+         end 
+      end
+   end
+   return (eff_nat - eff_nat_neg),
+          (eff_armor - eff_armor_neg),
+          (eff_shield - eff_shield_neg),
+          (eff_deflect - eff_deflect_neg),
+          eff_dodge
 end
 
 ---

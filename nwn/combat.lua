@@ -130,7 +130,6 @@ function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
 end
 
 ---
--- TODO: AC Versus Effects
 -- Note: it's already been established that target is a creature
 function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
    if from_hook then
@@ -491,6 +490,7 @@ function NSResolveAttackRoll(attacker, target, from_hook)
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
    end
+
    local cr = attacker.obj.cre_combat_round
    local current_attack = cr.cr_current_attack
    local attack = C.nwn_GetAttack(cr, current_attack)
@@ -527,8 +527,13 @@ function NSResolveAttackRoll(attacker, target, from_hook)
    attack.cad_attack_roll = roll 
 
    local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
-   -- NSResolveDefensiveEffects(attacker, target, hit)
-   
+   if NSResolveMissChance(attacker, target, hit, cr, attack)
+      or NSResolveDeflectArrow(attacker, target, hit, cr, attack)
+      or NSResolveParry(attacker, target, hit, cr, attack)
+   then
+      return
+   end
+
    if not hit then
       attack.cad_attack_result = 4
       if roll == 1 then
@@ -553,8 +558,6 @@ function NSResolveAttackRoll(attacker, target, from_hook)
          attack.cad_attack_result = 3
       end
    end
-
-
 end
 
 function NSResolveDamage(attacker, target)
@@ -725,26 +728,136 @@ function NSResolveRangedAttack(attacker, target, attack_count, a)
    C.nwn_SignalRangendDamage(attacker.obj, target.obj.obj, attack_count)
 end
 
-function NSResolveDefensiveEffects(attacker, target, hit)
-   -- Miss Chance
-   -- Conceal
+function NSResolveDeflectArrow(attacker, target, hit, cr, attack)
+   if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
+      return false
+   end
    -- Deflect Arrow
-   -- Parry
+   if hit 
+      and cr.cr_deflect_arrow == 1
+      and attack.cad_ranged_attack ~= 0
+      and bit.band(attacker.ci.target_state, nwn.COMBAT_TARGET_STATE_FLATFOOTED) == 0
+      and target:GetHasFeat(nwn.FEAT_DEFLECT_ARROWS)
+   then
+      local on = target:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+      local off = target:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+
+      if not on:GetIsValid()
+         or (target:GetRelativeWeaponSize(on) <= 0
+             and not on:GetIsRangedWeapon()
+             and not off:GetIsValid())
+      then
+         on = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+         on = on:GetBaseType()
+         local bow
+         if on ~= nwn.BASE_ITEM_DART 
+            and on ~= nwn.BASE_ITEM_THROWINGAXE 
+            and on ~= nwn.BASE_ITEM_SHURIKEN
+         then
+            bow = 0
+         else
+            bow = 1
+         end
+         local v = vector_t(target.obj.obj.obj_position.x,
+                            target.obj.obj.obj_position.y,
+                            target.obj.obj.obj_position.z)
+
+         C.nwn_CalculateProjectileTimeToTarget(attacker.obj, v, bow)
+         cr.cr_deflect_arrow = 0
+         attack.cad_attack_result = 2
+         attack.cad_attack_deflected = 1
+         return true
+      end
+   end
+   return false
+end
+
+function NSResolveMissChance(attacker, target, hit, cr, attack)
+   if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
+      return false
+   end
+
+   -- Miss Chance
+   local miss_chance = attacker:GetMissChance(attack)
+   -- Conceal
+   local conceal = target:GetConcealment(attacker, attack)
+
+   if conceal > 0 or miss_chance > 0 then
+      if miss_chance < conceal then
+         if math.random(1, 100) >= conceal
+            or (attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
+                and math.random(1, 100) >= conceal)
+         then
+            attack.cad_attack_result = 8
+            attack.cad_concealment = math.floor((conceal ^ 2) / 100)
+            attack.cad_missed = 1
+            return true
+         end
+      else
+         if math.random(1, 100) >= miss_chance
+            or (attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
+                and math.random(1, 100) >= miss_chance)
+         then
+            attack.cad_attack_result = 9
+            attack.cad_concealment = math.floor((miss_chance ^ 2) / 100)
+            attack.cad_missed = 1
+            return true
+         end
+      end
+   end
+   return false
 end
 
 function NSSignalMeleeDamage(attacker, target, attack_count)
 
 end
 
+function NSResolveParry(attacker, target, hit, cr, attack)
+   if attack.cad_attack_roll == 20
+      or attacker.obj.cre_mode_combat ~= nwn.COMBAT_MODE_PARRY
+      or cr.cr_parry_actions == 0
+      or cr.cr_round_paused ~= 0
+      or attack.cad_ranged_attack ~= 0
+   then
+      return false
+   end
+   
+   -- Can not Parry when using a Ranged Weapon.
+   local on = target:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   if on:GetIsValid() and on:GetIsRangedWeapon() then
+      return false
+   end
+
+   local roll = math.random(20) + target:GetSkillRank(nwn.SKILL_PARRY)
+
+   target.obj.cre_combat_round.cr_parry_actions = 
+      target.obj.cre_combat_round.cr_parry_actions - 1
+
+   if roll >= attack.cad_attack_roll + attack.cad_attack_mod then
+      if roll - 10 >= attack.cad_attack_roll + attack.cad_attack_mod then
+         target:AddParryAttack(attacker)
+      end
+      attack.cad_attack_result = 2
+      return true
+   end
+
+   C.nwn_AddParryIndex(target.obj.cre_combat_round)
+   return false
+end
+
 function NSSignalRangedDamage(attacker, target, attack_count)
 
 end
 
---C.nwn_AddParryAttack
---C.nwn_AddParryIndex
-
-
 function NSResolveDamage ()
+   -- Epic Dodge : Don't want to use it unless we take damage.
+   if hit
+      and cr.cr_epic_dodge_used == 0
+      and target:GetHasFeat(nwn.FEAT_EPIC_DODGE)
+   then
+      -- Send Epic Dodge Message
+      cr.cr_epic_dodge_used = 1
+   end
 
 end
 

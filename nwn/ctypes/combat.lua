@@ -143,7 +143,7 @@ typedef struct CNWSCombatRound {
     uint32_t RoundLength;
     uint32_t OverlapAmount;
     uint32_t BleedTimer;               /* 0x2100 */
-    uint8_t RoundPaused;
+    uint8_t cr_round_paused;
     uint8_t field_54;
     uint8_t field_55;
     uint8_t field_56;
@@ -157,7 +157,7 @@ typedef struct CNWSCombatRound {
     uint8_t AttackGroup;
     uint8_t field_71;
     uint8_t field_72;
-    uint8_t DeflectArrow;              /* 0x2118 */
+    uint8_t cr_deflect_arrow;              /* 0x2118 */
     uint8_t field_74;
     uint8_t field_75;
     uint8_t field_76;
@@ -165,7 +165,7 @@ typedef struct CNWSCombatRound {
     uint8_t field_78;
     uint8_t field_79;
     uint8_t field_80;
-    uint8_t EpicDodgeUsed;             /* 0x2120 */
+    uint8_t cr_epic_dodge_used;             /* 0x2120 */
     uint8_t field_82;
     uint8_t field_83;
     uint8_t field_84;
@@ -180,7 +180,7 @@ typedef struct CNWSCombatRound {
     uint32_t cr_extra_taken;               /* 0x2144 */
     uint32_t cr_additional_atks;       /* 0x2148 */
     uint32_t cr_effect_atks;         /* 0x214C */
-    uint8_t ParryActions;              /* 0x2150 */
+    uint8_t cr_parry_actions;              /* 0x2150 */
     uint8_t field_130;                 /* 0x2151 */
     uint8_t field_131;                 /* 0x2152 */
     uint8_t field_132;                 /* 0x2153 */
