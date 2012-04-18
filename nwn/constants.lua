@@ -168,21 +168,26 @@ nwn.GENDER_BOTH    = 2
 nwn.GENDER_OTHER   = 3
 nwn.GENDER_NONE    = 4
 
-nwn.DAMAGE_TYPE_BLUDGEONING  = 1
-nwn.DAMAGE_TYPE_PIERCING     = 2
-nwn.DAMAGE_TYPE_SLASHING     = 4
-nwn.DAMAGE_TYPE_MAGICAL      = 8
-nwn.DAMAGE_TYPE_ACID         = 16
-nwn.DAMAGE_TYPE_COLD         = 32
-nwn.DAMAGE_TYPE_DIVINE       = 64
-nwn.DAMAGE_TYPE_ELECTRICAL   = 128
-nwn.DAMAGE_TYPE_FIRE         = 256
-nwn.DAMAGE_TYPE_NEGATIVE     = 512
-nwn.DAMAGE_TYPE_POSITIVE     = 1024
-nwn.DAMAGE_TYPE_SONIC        = 2048
+nwn.DAMAGE_TYPE_BLUDGEONING  = 0x1
+nwn.DAMAGE_TYPE_PIERCING     = 0x2
+nwn.DAMAGE_TYPE_SLASHING     = 0x4
+nwn.DAMAGE_TYPE_MAGICAL      = 0x8
+nwn.DAMAGE_TYPE_ACID         = 0x10
+nwn.DAMAGE_TYPE_COLD         = 0x20
+nwn.DAMAGE_TYPE_DIVINE       = 0x40
+nwn.DAMAGE_TYPE_ELECTRICAL   = 0x80
+nwn.DAMAGE_TYPE_FIRE         = 0x100
+nwn.DAMAGE_TYPE_NEGATIVE     = 0x200
+nwn.DAMAGE_TYPE_POSITIVE     = 0x400
+nwn.DAMAGE_TYPE_SONIC        = 0x800
 -- The base weapon damage is the base damage delivered by the weapon before
 -- any additional types of damage (e.g. fire) have been added.
-nwn.DAMAGE_TYPE_BASE_WEAPON  = 4096
+nwn.DAMAGE_TYPE_BASE_WEAPON  = 0x1000
+
+-- The following are for testing damage flags, not doing damage.
+nwn.DAMAGE_TYPE_PHYSICAL     = 0x1007
+nwn.DAMAGE_TYPE_ELEMENT      = 0x9B0
+nwn.DAMAGE_TYPE_ENERGY       = 0x648
 
 -- Special versus flag just for AC effects
 nwn.AC_VS_DAMAGE_TYPE_ALL    = 4103
