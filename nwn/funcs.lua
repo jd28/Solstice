@@ -77,6 +77,7 @@ uint32_t              nwn_GetCommandObjectId();
 int                   nwn_GetCriticalHitMultiplier(CNWSCreatureStats *stats, bool offhand);
 int                   nwn_GetCriticalHitRange(CNWSCreatureStats *stats, bool offhand);
 CNWSItem             *nwn_GetCurrentAttackWeapon(CNWSCombatRound *cr, int attack_type);
+uint16_t              nwn_GetDamageFlags(CNWSCreature *cre);
 int32_t               nwn_GetDexMod(CNWSCreatureStats *stats, bool armor_check);
 CGameEffect*          nwn_GetEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                     const int eff_spellid, const int eff_type, const int eff_int0, const int eff_int1);
