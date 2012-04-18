@@ -56,6 +56,8 @@ void nwn_ExecuteScript (const char *scr, nwn_objid_t oid);
 ffi.cdef [[
 void                  nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObject *target, CNWSArea* area, CScriptLocation *loc, int prop);
 int                   nwn_AddKnownFeat(CNWSCreature *cre, uint16_t feat, uint32_t level);
+void                  nwn_AddParryAttack(CNWSCombatRound *cr, nwn_objid_t target);
+void                  nwn_AddParryIndex(CNWSCombatRound *cr);
 int                   nwn_CalculateOffHandAttacks(CNWSCombatRound *cr);
 uint32_t              nwn_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
 void                  nwn_DelayCommand(uint32_t obj_id, double delay, void *vms);
