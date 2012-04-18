@@ -27,6 +27,7 @@ nwn.SITUATIONAL_NUM = 3
 
 require 'nwn.ctypes.combat'
 require 'nwn.ctypes.creature'
+require 'nwn.dice'
 
 local ffi = require 'ffi'
 
@@ -41,20 +42,16 @@ typedef struct CombatWeapon {
    uint8_t crit_range;
    uint8_t crit_mult;
    uint16_t slot;
-   uint16_t dmg_dice;
-   uint16_t dmg_sides;
-   uint16_t dmg_mod;
-   uint16_t crit_dice;
-   uint16_t crit_sides;
 
+   DiceRoll base_dmg;
+   DiceRoll crit_dmg;
 } CombatWeapon;
 
 typedef struct CombatMod {
    int32_t ab;
    int32_t ac;
-   uint32_t dmg_dice;
-   uint32_t dmg_sides;
-   uint32_t dmg_bonus;
+   DiceRoll dmg;
+   uint32_t dmg_type;
 } CombatMod;
 
 typedef struct CombatInformation {
@@ -92,12 +89,6 @@ typedef struct CombatInformation {
    uint32_t first_cr_effect;
    uint32_t first_cm_effect;
 } CombatInformation;
-
-typedef struct CombatAttackDataExt {
-   uint32_t ext_damage[$NS_DAMAGES_NUM];
-
-
-} CombatAttackDataExt;
 
 typedef struct Creature {
     uint32_t           type;
