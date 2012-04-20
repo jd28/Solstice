@@ -36,6 +36,10 @@ function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
    local weapon = C.nwn_GetCurrentAttackWeapon(combat_round, attack_type)
    local ci_weap_number = -1
 
+   if weapon == nil then
+      return nwn.OBJECT_INVALID, 3
+   end
+
    if attacker then
       for i = 0, 5 do
          if attacker.ci.equips[i].id == weapon.obj.obj_id then

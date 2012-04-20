@@ -25,9 +25,10 @@ local ne = nwn.engine
 local function zero_combat_mod(mod)
    mod.ab = 0
    mod.ac = 0
-   mod.dmg_dice = 0
-   mod.dmg_dice = 0
-   mod.dmg_bonus = 0
+   mod.dmg.dice = 0
+   mod.dmg.dice = 0
+   mod.dmg.bonus = 0
+   mod.dmg_type = nwn.DAMAGE_TYPE_BASE_WEAPON
 end
 
 ---
@@ -832,25 +833,26 @@ function Creature:UpdateCombatWeaponInfo()
 
          self.ci.equips[i].iter = self:GetWeaponIteration(weap)
 
-         self.ci.equips[i].dmg_dice,
-         self.ci.equips[i].dmg_sides = self:GetWeaponBaseDamage(weap)
-         self.ci.equips[i].dmg_mod = self:GetWeaponDamageBonus(weap)
+         self.ci.equips[i].base_dmg.dice,
+         self.ci.equips[i].base_dmg.sides = self:GetWeaponBaseDamage(weap)
+         self.ci.equips[i].base_dmg.bonus = self:GetWeaponDamageBonus(weap)
 
          self.ci.equips[i].crit_range = self:GetWeaponCritRange(weap)
          self.ci.equips[i].crit_mult = self:GetWeaponCritMultiplier(weap)
-         self.ci.equips[i].crit_dice,
-         self.ci.equips[i].crit_sides = self:GetWeaponCritDamage(weap)
+         self.ci.equips[i].crit_dmg.dice,
+         self.ci.equips[i].crit_dmg.sides = self:GetWeaponCritDamage(weap)
       else
          self.ci.equips[i].ab_mod = 0
          self.ci.equips[i].ab_ability = 0
          self.ci.equips[i].dmg_ability = 0
-         self.ci.equips[i].dmg_dice = 0
-         self.ci.equips[i].dmg_sides = 0
-         self.ci.equips[i].dmg_mod = 0
+         self.ci.equips[i].base_dmg.dice = 0
+         self.ci.equips[i].base_dmg.sides = 0
+         self.ci.equips[i].base_dmg.bonus = 0
          self.ci.equips[i].crit_range = 0
          self.ci.equips[i].crit_mult = 0
-         self.ci.equips[i].crit_dice = 0
-         self.ci.equips[i].crit_sides = 0
+         self.ci.equips[i].crit_dmg.dice = 0
+         self.ci.equips[i].crit_dmg.sides = 0
+         self.ci.equips[i].crit_dmg.bonus = 0
       end
    end
 end

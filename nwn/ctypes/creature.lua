@@ -193,7 +193,7 @@ typedef struct CNWSCreatureStats {
     uint16_t                    cs_first_ab_effect;
     uint16_t                    cs_first_dred_eff;
     uint16_t                    cs_first_dresist_eff;
-    uint16_t                    cs_first_damage_eff;
+    uint16_t                    cs_first_dmg_eff;
     uint16_t                    cs_first_aistate_eff;
     uint16_t                    cs_first_icon_eff;
     uint16_t                    field_450;

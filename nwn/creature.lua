@@ -82,7 +82,7 @@ typedef struct CombatInformation {
 
    uint32_t resist[$NS_DAMAGES_NUM];
    int32_t immunity[$NS_DAMAGES_NUM];
-   uint32_t soak[20];
+   uint32_t soak[21];
    int32_t save_mods[3];
    CombatWeapon equips[6];
 

@@ -109,6 +109,21 @@ function Creature:GetIsInvisible(target)
    return false
 end
 
+function Creature:GetDamageImmunity(dmg_idx)
+   -- RDD
+
+   return self.ci.immunity[dmg_idx]
+end
+
+function Creature:GetDamageReduction(dmg_power)
+   -- Dwarved Defender
+
+   return self.ci.soak[dmg_power]
+end
+
+function Creature:GetDamageResistance(dmg_idx)
+   return self.ci.resist[dmg_idx]
+end
 ---
 function Creature:GetIsImmune(immunity, versus)
    nwn.engine.StackPushObject(versus)
