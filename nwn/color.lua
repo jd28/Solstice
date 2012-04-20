@@ -16,66 +16,32 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
--- TODO: Unbork these...
+-- NOTE: Colors MUST be encoded with rgb values, string constants
+-- copied from NWScript will NOT work in most cases.
+
+--
+local function encode_color(r, g, b)
+   return "<c".. string.char(r)..string.char(g)..string.char(b)..">"
+end
 
 local color = {}
 
-color.END = "</c>"
-color.ORANGE    = "<cþh>" -- NWN Orange. Used in Log (Ex. "... killed Gobln")
-color.GREEN_L   = "<c þ >" -- NWN Green. Used in tell channel
-color.GREEN = "<c þ >" --tells - acid
-color.RED = "<cþ<<>"
-color.RED2 = "<cþ>" --fire damage
-color.GRAY      = "<c°°°>" -- NWN Gray. Used in Log on players enter\leave
-color.WHITE     = "<cððð>" -- NWN White. Used in Talk Channel
-color.WHITE_T   = "<cþþþ>" -- True White
-color.BLUE = "<c!}þ>"  --electrical damage
-color.BLUE_L    = "<c™þþ>" -- NWN Light Blue. Used in player name
-color.BLUE_N    = "<cf²þ>" -- NWN Normal Blue. Used in Conversations
-color.BLUE_D    = "<cþ>" -- Dark Blue
-color.PURPLE = "<cþ>" --names
-color.LT_PURPLE = "<cÍþ>"
-color.LT_GREEN = "<c´þd>"
-color.GOLD = "<cþïP>" --shouts
-color.YELLOW = "<cþþ>" --send message to pc default (server messages)
-color.LT_BLUE = "<cßþ>" --dm channel
-color.LT_BLUE2 = "<c›þþ>" --cold damage
-color.CRIMSON = "<c‘  >"
-color.MAGENTA   = "<c? ?>" -- Magenta
-color.VIOLET    = "<cþ>" -- NWN Violet. Used in Names in Chat Channel
-color.VIOLET_L  = "<cÌwþ>" -- NWN Light Violet. Used in cast-action in Log (Ex. "casting unnkown spell")
-color.VIOLET_SL = "<cÌ™Ì>" -- NWN SuperLight Violet. Used in Object Names, who does cast-action in Log
-color.PLUM = "<cþww>"
-color.TANGERINE = "<cÇZ >"
-color.PEACH = "<cþÇ >"
-color.AMBER = "<cœœ >"
-color.LEMON = "<cþþw>"
-color.EMERALD = "<c ~ >"
-color.LIME = "<cwþw>"
-color.MIDNIGHT = "<c  t>"
-color.NAVY = "<c  ‘>"
-color.AZURE = "<c~~þ>"
-color.SKYBLUE = "<cÇÇþ>"
-color.LAVENDER = "<cþ~þ>"
-color.BLACK = "<c   >"
-color.SLATE = "<c666>"
-color.DK_GREY = "<cZZZ>"
-color.GREY = "<c~~~>"
-color.LT_GREY = "<c¯¯¯>"
-color.TURQUOISE = "<c ¥¥>"
-color.JADE = "<c tt>"
-color.CYAN = "<c þþ>"
-color.CERULEAN = "<cœþþ>"
-color.AQUA = "<cZÇ¯>"
-color.SILVER = "<c¿¯Ç>"
-color.ROSE = "<cÎFF>"
-color.PINK = "<cþV¿>"
-color.WOOD = "<c‘Z(>"
-color.BROWN = "<cÇ~6>"
-color.TAN = "<cß‘F>"
-color.FLESH = "<cû¥Z>"
-color.IVORY = "<cþÎ¥>"
-color.NONE = ""
-color.ASCII = [[                                            !!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥§©©ª«¬­®¯°±²³´µ¶·¸¸º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïñòóôõö÷øùúûüýþþþ]]
+-- The follow are all from the PRC
+-- colours for log messages
+-- Colors in String messages to PCs
+color.BLUE         = encode_color(102, 204, 254)    -- used by saving throws.
+color.DARK_BLUE    = encode_color(32, 102, 254)     -- used for electric damage.
+color.GRAY         = encode_color(153, 153, 153)    -- used for negative damage.
+color.GREEN        = encode_color(32, 254, 32)      -- used for acid damage.
+color.LIGHT_BLUE   = encode_color(153, 254, 254)    -- used for the player's name, and cold damage.
+color.LIGHT_GRAY   = encode_color(176, 176, 176)    -- used for system messages.
+color.LIGHT_ORANGE = encode_color(254, 153, 32)     -- used for sonic damage.
+color.LIGHT_PURPLE = encode_color(204, 153, 204)    -- used for a target's name.
+color.ORANGE       = encode_color(254, 102, 32)     -- used for attack rolls and physical damage.
+color.PURPLE       = encode_color(204, 119, 254)    -- used for spell casts, as well as magic damage.
+color.RED          = encode_color(254, 32, 32)      -- used for fire damage.
+color.WHITE        = encode_color(254, 254, 254)    -- used for positive damage.
+color.YELLOW       = encode_color(254, 254, 32)     -- used for healing, and sent messages.
+color.END          = "</c>"
 
 return color
