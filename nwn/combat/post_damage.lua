@@ -23,11 +23,11 @@ local bit = require 'bit'
 function NSResolvePostMeleeDamage(attacker, target, attack_data)
    if not target:GetIsValid() then return end
 
-   local cr = attacker.cre_combat_round
+   local cr = attacker.obj.cre_combat_round
 end
 
 function NSResolvePostRangedDamage(attacker, target, attack_data)
    if not target:GetIsValid() then return end
 
-   local cr = attacker.cre_combat_round
+   local cr = attacker.obj.cre_combat_round
 end

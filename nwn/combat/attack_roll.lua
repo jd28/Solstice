@@ -92,7 +92,6 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
          dodge = target.stats.cs_ac_dodge_bonus - target.stats.cs_ac_dodge_penalty
 
          -- Skill: Tumble...
-        -- print("Tumble", target.ci.skill.ac)
          ac = ac + target.ci.skill.ac
          
          -- If this is an attack of opportunity and target has mobility
@@ -130,7 +129,6 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
    end
 
    if dexed then
---    print("Dex Mod", dex_mod)
       ac = ac + dex_mod
    end
 
@@ -159,10 +157,6 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
    if eff_armor > armor then armor = eff_armor end
    if eff_shield > shield then shield = eff_shield end
    if eff_deflect > deflect then deflect = eff_deflect end
-
-
--- print("AC:", nat, armor, shield, deflect, dodge)
--- print("AC:", ac + nat + armor + shield + deflect + dodge)
 
    return ac + nat + armor + shield + deflect + dodge
 end
@@ -311,8 +305,6 @@ function NSResolveAttackRoll(attacker, target, from_hook)
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       ac = ac + NSGetArmorClassVersus(target, attacker, false, false, attack)
    end
-
-   print(ab, ac)
 
    -- If there is a Coup De Grace, automatic hit.  Effects are dealt with in 
    -- NSResolvePostMelee/RangedDamage

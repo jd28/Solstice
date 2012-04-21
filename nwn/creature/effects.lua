@@ -162,3 +162,10 @@ function Creature:GetMissChance(attack)
    return total
 end
 
+function NSSetDamageImmunity(obj, dmg_flag, amount)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   local idx = nwn.GetDamageIndexFromFlag(dmg_flag)
+   if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      obj.ci.immunity[idx] = amount
+   end
+end

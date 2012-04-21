@@ -104,22 +104,22 @@ typedef struct CNWSCombatAttackData {
     uint16_t cad_special_attack;      /* 0052 */
     uint16_t field_54;                /* 0054 */
     uint16_t field_56;                /* 0056 */
-    Vector cad_ranged_target_loc;
+    Vector cad_ranged_target_loc;     /* 0058-0060 */
     uint32_t cad_ammo_id;             /* 0064 */
-    CExoString cad_debug_attack;
-    CExoString cad_debug_dmg;
-    uint32_t field_78;
-    uint32_t field_7C_a12;
-    uint32_t field_80;
-    uint32_t field_84;
-    uint32_t field_88_a12;
-    uint32_t field_8C;
-    uint32_t field_90;
-    uint32_t field_94_a12;
-    uint32_t field_98;
-    uint32_t field_9C;
-    uint32_t field_A0_a12;
-    uint32_t field_A4;
+    CExoString cad_debug_attack;      /* 0068 */
+    CExoString cad_debug_dmg;         /* 0070 */
+    CGameEffect **cad_onhit_effs;     /* 0078 */
+    uint32_t      cad_onhit_effs_len; /* 007C */
+    uint32_t      cad_onhit_effs_alloc; /* 0080 */
+    void        **cad_onhit_spells;     /* 0084 */
+    uint32_t      cad_onhit_spells_len; /* 0088 */
+    uint32_t      cad_onhit_spells_alloc; /* 008C */
+    void        **cad_onhit_spells2;       /* 0090 */
+    uint32_t      cad_onhit_spells2_len;   /* 0094 */
+    uint32_t      cad_onhit_spells2_alloc; /* 0098 */
+    void        **cad_feedback;            /* 009C */
+    uint32_t      cad_feedback_len;        /* 00A0 */
+    uint32_t      cad_feedback_alloc;      /* 00A4 */
 } CNWSCombatAttackData;
 
 typedef struct CNWSCombatRound {

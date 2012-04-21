@@ -37,11 +37,11 @@ function NSResolveSituationalModifiers(attacker, target)
          flags = bit.bor(flags, nwn.SITUATION_COUPDEGRACE)
       end
 
-      local death = attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg_dice > 0
-         or attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg_bonus > 0
+      local death = attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg.dice > 0
+         or attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg.bonus > 0
       
-      local sneak = attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg_dice > 0
-         or attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg_bonus > 0
+      local sneak = attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg.dice > 0
+         or attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg.bonus > 0
 
       -- Sneak Attack & Death Attack
       if (sneak or death) and

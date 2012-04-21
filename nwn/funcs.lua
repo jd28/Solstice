@@ -120,7 +120,11 @@ int                   nwn_RecalculateDexModifier(CNWSCreatureStats *stats);
 void                  nwn_RemoveEffectById(CNWSObject *obj, uint32_t id);
 //void                  nwn_RemoveKnownFeat(CNWSCreatureStats *stats, uint16_t feat);
 void                  nwn_ResolveCachedSpecialAttacks(CNWSCreature *cre);
+void                  nwn_ResolveItemCastSpell(CNWSCreature *cre, CNWSObject *target);
+void                  nwn_ResolveMeleeAnimations(CNWSCreature *attacker, int32_t attack_num, int32_t attack_count, CNWSObject *target, int32_t anim);
 void                  nwn_ResolveSituationalModifiers(CNWSCreature *cre, CNWSObject *target);
+void                  nwn_ResolveOnHitEffect(CNWSCreature *attacker, CNWSObject *target, bool is_offhand, bool crit);
+void                  nwn_ResolveOnHitVisuals(CNWSCreature *cre, CNWSObject *target);
 void                  nwn_SendMessage(uint32_t mode, uint32_t id, char *msg, uint32_t to);
 uint8_t               nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
 void                  nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
@@ -151,7 +155,14 @@ void                  nwn_StackPushEngineStructure(uint32_t type, void * value);
 
 -- Solstice Functions
 ffi.cdef [[
-void         ns_ActionDoCommand(CNWSObject * object, uint32_t token);
-void         ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
-void         ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
+void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
+void ns_AddOnHitVisual(CNWSCombatAttackData *attack, nwn_objid_t creator, uint32_t vfx);
+void ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
+void ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
+
+void ns_SignalAOO(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
+void ns_SignalAttack(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
+void ns_SignalDamage(CNWSCreature *cre, CNWSObject *obj, double event_number, int32_t anim_len);
+void ns_SignalMiss(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
+void ns_SignalOnHitEffects(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 ]]

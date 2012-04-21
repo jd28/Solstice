@@ -812,8 +812,6 @@ function Creature:UpdateCombatModifierSkill()
    zero_combat_mod(self.ci.skill)
 
    local ac = 0
-   print(self:GetSkillRank(nwn.SKILL_TUMBLE, true),
-         math.floor(self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5))
 
    ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5
 
