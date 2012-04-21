@@ -26,12 +26,14 @@ DAMAGES.format = {}
 --- Register Damage Types.
 -- This function MUST only be called from OnModuleLoad!
 -- @param damage_type nwn.DAMAGE_TYPE_*
-function nwn.RegisterDamage(damage_type, index, name, dmg_color)
+function nwn.RegisterDamage(damage_type, index, name, dmg_color, melee_vfx)
    table.insert(DAMAGES, damage_type)
    DAMAGES[damage_type] = { name = name,
-                            color = dmg_color }
+                            color = dmg_color,
+                            melee_vfx = melee_vfx
+   }
    DAMAGES.index[damage_type] = index
-   DAMAGES.format[index] = dmg_color .. name .. ": %d" .. color.END
+   DAMAGES.format[index] = dmg_color .. "%d " .. name  .. color.END
 end
 
 function nwn.RegisterDamageRoll(id, dice, side, bonus)
@@ -63,18 +65,26 @@ function nwn.GetDamageRollFromConstant(id)
    return DAMAGES.roll[id] or dice_roll_t(0,0,0)
 end
 
+function nwn.GetDamageVFX(flag, is_ranged)
+   if is_ranaged then
+      return
+   end
+
+   return DAMAGES[flag].melee_vfx
+end
+
 nwn.RegisterDamage(nwn.DAMAGE_TYPE_BLUDGEONING, 0, "Bludgeoning", color.ORANGE)
 nwn.RegisterDamage(nwn.DAMAGE_TYPE_PIERCING, 1, "Piercing", color.ORANGE)
 nwn.RegisterDamage(nwn.DAMAGE_TYPE_SLASHING, 2, "Slashing", color.ORANGE)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_MAGICAL, 3, "Magical", color.PURPLE)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_ACID, 4, "Acid", color.GREEN)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_COLD, 5, "Cold", color.LIGHT_BLUE)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_DIVINE, 6, "Divine", "")
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_ELECTRICAL, 7, "Electrical", color.DARK_BLUE)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_FIRE, 8, "Fire", color.RED)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_NEGATIVE, 9, "Negative", color.GRAY)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_POSITIVE, 10, "Positive", color.WHITE)
-nwn.RegisterDamage(nwn.DAMAGE_TYPE_SONIC, 11, "Sonic", color.LIGHT_ORANGE)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_MAGICAL, 3, "Magical", color.PURPLE, 76)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_ACID, 4, "Acid", color.GREEN, 283)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_COLD, 5, "Cold", color.LIGHT_BLUE, 281)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_DIVINE, 6, "Divine", color.YELLOW, 289)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_ELECTRICAL, 7, "Electrical", color.DARK_BLUE, 282)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_FIRE, 8, "Fire", color.RED, 280)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_NEGATIVE, 9, "Negative", color.GRAY, 282)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_POSITIVE, 10, "Positive", color.WHITE, 289)
+nwn.RegisterDamage(nwn.DAMAGE_TYPE_SONIC, 11, "Sonic", color.LIGHT_ORANGE, 284)
 nwn.RegisterDamage(nwn.DAMAGE_TYPE_BASE_WEAPON, 12, "Physical", color.ORANGE)
 
 nwn.RegisterDamageRoll(1, 0, 0, 1)
