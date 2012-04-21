@@ -23,7 +23,7 @@ function Object:FortitudeSave(nDC, nSaveType, oSaveVersus)
    nwn.engine.StackPushInteger(nDC)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(108, 4)
-   return nwn.engine.StackPopInteger()
+   return nwn.engine.StackPopBoolean()
 end
 
 ---
@@ -54,7 +54,7 @@ function Object:ReflexSave(nDC, nSaveType, oSaveVersus)
    nwn.engine.StackPushInteger(nDC)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(109, 4)
-   return nwn.engine.StackPopInteger()
+   return nwn.engine.StackPopBoolean()
 end
 
 ---
@@ -85,5 +85,5 @@ function Object:WillSave(nDC, nSaveType, oSaveVersus)
    nwn.engine.StackPushInteger(nDC)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(110, 4)
-   return nwn.engine.StackPopInteger()
+   return nwn.engine.StackPopBoolean()
 end
