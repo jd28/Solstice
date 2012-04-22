@@ -46,13 +46,6 @@ function Creature:GetIsBlind()
    return false
 end
 
---- Determines if a creature is dead or dying.
-function Creature:GetIsDead()
-   ne.StackPushObject(self)
-   ne.ExecuteCommand(140, 1)
-   return ne.StackPopBoolean()
-end
-
 function Creature:GetIsFlanked(target)
    if not target:GetIsValid() then return false end
    return C.nwn_GetFlanked(self.obj, target.obj)

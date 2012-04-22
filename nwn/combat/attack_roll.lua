@@ -1,4 +1,4 @@
---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 --  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
 -- 
 --  This program is free software; you can redistribute it and/or modify
@@ -20,8 +20,8 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function NSGetAttackResult(attack_data)
-   local t = attack_data.cad_attack_result
+function NSGetAttackResult(attack_info)
+   local t = attack_info.attack.cad_attack_result
 
    return t == 1 or t == 3 or t == 5 or t == 6 or t == 7 or t == 10
 end
@@ -162,50 +162,30 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
 end
 
 --- GetAttackModifierVersus
-function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, attack_type, weap, weap_num, is_offhand)
-   local attack_num
-   if from_hook then
-      attacker = _NL_GET_CACHED_OBJECT(attacker)
-      target = _NL_GET_CACHED_OBJECT(target)
-
-      cr = attacker.obj.cre_combat_round
-      attack_num = cr.cr_current_attack
-      attack = C.nwn_GetAttack(cr, attack_num)
-      attack_type = attack.cad_attack_type
-      weap, weap_num = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
-      is_offhand = NSGetOffhandAttack(cr)
-
-      -- Temporary
-      NSResolveTargetState(attacker, target)
-   else
-      attack_num = cr.cr_current_attack
-
-      -- Temporary
-      NSResolveTargetState(attacker, target)
-   end
-
+function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, weap, weap_num)
+   
    local bab
 
    if attack_type == 2 then
-      bab = attacker.ci.bab - (5 * cr.cr_offhand_taken)
-      cr.cr_offhand_taken = cr.cr_offhand_taken + 1
+      bab = attacker.ci.bab - (5 * attack_info.attacker_cr.cr_offhand_taken)
+      attack_info.attacker_cr.cr_offhand_taken = attack_info.attacker_cr.cr_offhand_taken + 1
    elseif attack_type == 6 or attack_type == 8 then
       bab = attacker.ci.bab
-      if attack.cad_special_attack ~= 867 
-         or attack.cad_special_attack ~= 868
-         or attack.cad_special_attack ~= 391
+      if attack_info.attack.cad_special_attack ~= 867 
+         or attack_info.attack.cad_special_attack ~= 868
+         or attack_info.attack.cad_special_attack ~= 391
       then
-         bab = bab - (5 * cr.cr_extra_taken)
+         bab = bab - (5 * attack_info.attacker_cr.cr_extra_taken)
       end
-      cr.cr_extra_taken = cr.cr_extra_taken + 1
+      attack_info.attacker_cr.cr_extra_taken = attack_info.attacker_cr.cr_extra_taken + 1
    else
-      if attack.cad_special_attack == 65002 
-         or attack.cad_special_attack == 6
-         or attack.cad_special_attack == 391
+      if attack_info.attack.cad_special_attack == 65002 
+         or attack_info.attack.cad_special_attack == 6
+         or attack_info.attack.cad_special_attack == 391
       then
          bab = attacker.ci.bab
       else
-         bab = attacker.ci.bab - (attack_num * attacker.ci.equips[weap_num].iter)
+         bab = attacker.ci.bab - (attack_info.current_attack * attacker.ci.equips[weap_num].iter)
       end
    end
 
@@ -215,7 +195,7 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, atta
    local ab = bab
 
    -- Offhand Attack Penalty
-   if is_offhand then
+   if attack_info.is_offhand then
       ab = ab + attacker.ci.offhand_penalty_off
    else
       ab = ab + attacker.ci.offhand_penalty_on      
@@ -234,7 +214,7 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, atta
    ab = ab + attacker.ci.mode.ab
 
    -- Special Attack Modifier
-   ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack)
+   ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack_info.attack)
 
    -- Favored Enemies
    if attacker.ci.fe_mask ~= 0 
@@ -259,11 +239,11 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, atta
    ab = ab + attacker.ci.equips[weap_num].ab_mod
 
    -- Target State
-   local state = attacker:GetEnemyStateAttackBonus(attack.cad_ranged_attack)
+   local state = attacker:GetEnemyStateAttackBonus(attack_info.attack.cad_ranged_attack)
    ab = ab + state
 
    -- Ranged Attacker Modifications
-   if attack.cad_ranged_attack == 1 then
+   if attack_info.attack.cad_ranged_attack == 1 then
       local r = attacker:GetRangedAttackMod(target)
       ab = ab + r
    end
@@ -278,18 +258,14 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, cr, attack, atta
    return ab + ab_abil + eff_ab + sit_ab
 end
 
-function NSResolveAttackRoll(attacker, target, from_hook)
+function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
    end
 
-   local cr = attacker.obj.cre_combat_round
-   local current_attack = cr.cr_current_attack
-   local attack = C.nwn_GetAttack(cr, current_attack)
-   local attack_type = attack.cad_attack_type
-   local is_offhand = NSGetOffhandAttack(cr)
-   local weap, weap_num = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
+   local attack_type = attack_info.attack.cad_attack_type
+   local weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
 
    local ab = 0
    local ac = 0
@@ -299,53 +275,56 @@ function NSResolveAttackRoll(attacker, target, from_hook)
    end
 
    -- Modifier Vs
-   ab = ab + NSGetAttackModifierVersus(attacker, target, false, cr, attack, attack_type, weap, weap_num, is_offhand)
-   attack.cad_attack_mod = ab
+   ab = ab + NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, weap, weap_num)
+   attack_info.attack.cad_attack_mod = ab
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      ac = ac + NSGetArmorClassVersus(target, attacker, false, false, attack)
+      ac = ac + NSGetArmorClassVersus(target, attacker, false, false, attack_info.attack)
    end
 
    -- If there is a Coup De Grace, automatic hit.  Effects are dealt with in 
    -- NSResolvePostMelee/RangedDamage
-   if attack.cad_coupdegrace == 1 then
-      attack.cad_attack_result = 7
-      attack.cad_attack_roll = 20
+   if attack_info.attack.cad_coupdegrace == 1 then
+      attack_info.attack.cad_attack_result = 7
+      attack_info.attack.cad_attack_roll = 20
       return
    end
 
    local roll = math.random(20)
-   attack.cad_attack_roll = roll 
+   attack_info.attack.cad_attack_roll = roll 
 
    local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
-   if NSResolveMissChance(attacker, target, hit, cr, attack)
-      or NSResolveDeflectArrow(attacker, target, hit, cr, attack)
-      or NSResolveParry(attacker, target, hit, cr, attack)
+
+   if NSResolveMissChance(attacker, target, hit, attack_info)
+      or NSResolveDeflectArrow(attacker, target, hit, attack_info)
+      or NSResolveParry(attacker, target, hit, attack_info)
    then
       return
    end
 
    if not hit then
-      attack.cad_attack_result = 4
+      attack_info.attack.cad_attack_result = 4
       if roll == 1 then
-         attack.cad_missed = 1
+         attack_info.attack.cad_missed = 1
       else
-         attack.cad_missed = ac - ab + roll
+         attack_info.attack.cad_missed = ac - ab + roll
       end
       return
    else
-      attack.cad_attack_result = 1
+      attack_info.attack.cad_attack_result = 1
    end
 
+--[[
    if roll < NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
-      attack.cad_threat_roll = math.random(20)
-      attack.cad_critical_hit = 1
+      attack_info.attack.cad_threat_roll = math.random(20)
+      attack_info.attack.cad_critical_hit = 1
 
       -- TODO Difficulty Settings
       -- TODO immunity
-      if attack.cad_threat_roll + ab >= ac then
+      if attack_info.attack.cad_threat_roll + ab >= ac then
          -- Is critical hit
-         attack.cad_attack_result = 3
+         attack_info.attack.cad_attack_result = 3
       end
    end
+   --]]
 end

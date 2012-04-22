@@ -20,14 +20,14 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function NSResolveDeflectArrow(attacker, target, hit, cr, attack)
+function NSResolveDeflectArrow(attacker, target, hit, attack_info)
    if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
       return false
    end
    -- Deflect Arrow
    if hit 
-      and cr.cr_deflect_arrow == 1
-      and attack.cad_ranged_attack ~= 0
+      and attack_info.attacker_cr.cr_deflect_arrow == 1
+      and attack_info.attack.cad_ranged_attack ~= 0
       and bit.band(attacker.ci.target_state, nwn.COMBAT_TARGET_STATE_FLATFOOTED) == 0
       and target:GetHasFeat(nwn.FEAT_DEFLECT_ARROWS)
    then
@@ -55,21 +55,21 @@ function NSResolveDeflectArrow(attacker, target, hit, cr, attack)
                             target.obj.obj.obj_position.z)
 
          C.nwn_CalculateProjectileTimeToTarget(attacker.obj, v, bow)
-         cr.cr_deflect_arrow = 0
-         attack.cad_attack_result = 2
-         attack.cad_attack_deflected = 1
+         attack_info.attacker_cr.cr_deflect_arrow = 0
+         attack_info.attack.cad_attack_result = 2
+         attack_info.attack.cad_attack_deflected = 1
          return true
       end
    end
    return false
 end
 
-function NSResolveParry(attacker, target, hit, cr, attack)
-   if attack.cad_attack_roll == 20
+function NSResolveParry(attacker, target, hit, attack_info)
+   if attack_info.attack.cad_attack_roll == 20
       or attacker.obj.cre_mode_combat ~= nwn.COMBAT_MODE_PARRY
-      or cr.cr_parry_actions == 0
-      or cr.cr_round_paused ~= 0
-      or attack.cad_ranged_attack ~= 0
+      or attack_info.attacker_cr.cr_parry_actions == 0
+      or attack_info.attacker_cr.cr_round_paused ~= 0
+      or attack_info.attack.cad_ranged_attack ~= 0
    then
       return false
    end
@@ -81,18 +81,16 @@ function NSResolveParry(attacker, target, hit, cr, attack)
    end
 
    local roll = math.random(20) + target:GetSkillRank(nwn.SKILL_PARRY)
+   attack_info.target_cr.cr_parry_actions = attack_info.target_cr.cr_parry_actions - 1
 
-   target.obj.cre_combat_round.cr_parry_actions = 
-      target.obj.cre_combat_round.cr_parry_actions - 1
-
-   if roll >= attack.cad_attack_roll + attack.cad_attack_mod then
-      if roll - 10 >= attack.cad_attack_roll + attack.cad_attack_mod then
+   if roll >= attack_info.attack.cad_attack_roll + attack_info.attack.cad_attack_mod then
+      if roll - 10 >= attack_info.attack.cad_attack_roll + attack_info.attack.cad_attack_mod then
          target:AddParryAttack(attacker)
       end
-      attack.cad_attack_result = 2
+      attack_info.attack.cad_attack_result = 2
       return true
    end
 
-   C.nwn_AddParryIndex(target.obj.cre_combat_round)
+   C.nwn_AddParryIndex(attack_info.target_cr)
    return false
 end

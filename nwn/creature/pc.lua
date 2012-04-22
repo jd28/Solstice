@@ -89,7 +89,7 @@ end
 ---
 function Creature:GetIsPC()
    if not self:GetIsValid() then return false end
-   return not (ffi.C.nl_GetPlayerByID(self.id) == nil)
+   return not (ffi.C.nwn_GetPlayerByID(self.id) == nil)
 end
 
 --- Removes a journal quest entry from a PCs journal.

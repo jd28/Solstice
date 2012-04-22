@@ -20,7 +20,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function NSResolveSituationalModifiers(attacker, target)
+function NSResolveSituationalModifiers(attacker, target, attack_info)
    local flags = 0
    local x = attacker.obj.obj.obj_position.x - target.obj.obj.obj_position.x
    local y = attacker.obj.obj.obj_position.y - target.obj.obj.obj_position.y
@@ -62,4 +62,5 @@ function NSResolveSituationalModifiers(attacker, target)
       end 
    end
    attacker.ci.situational_flags = flags
+   attack_info.situational_flags = flags
 end

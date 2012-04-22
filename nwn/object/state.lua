@@ -16,11 +16,40 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
+NS_OPT_HP_LIMIT = -10
+
+function NSGetIsDead(obj)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   return obj:GetIsDead()
+end
+
 ---
 function Object:GetCommandable()
    nwn.engine.StackPushObject(self);
    nwn.engine.ExecuteCommand(163, 1);
    return nwn.engine.StackPopBoolean();
+end
+
+--- Determines if a creature is dead or dying.
+function Object:GetIsDead()
+   if not self:GetIsValid() then
+      return true
+   end
+
+   local hp = self:GetCurrentHitPoints()
+   if self.type == nwn.GAME_OBJECT_TYPE_CREATURE 
+      and (self:GetIsPC() or self:GetIsPossessedFamiliar())
+   then
+      if hp <= NS_OPT_HP_LIMIT then
+         return true
+      end
+   else
+      if hp <= 0 then
+         return true
+      end
+   end
+
+   return false
 end
 
 ---

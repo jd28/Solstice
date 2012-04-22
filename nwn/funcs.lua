@@ -37,6 +37,11 @@ require 'nwn.ctypes.waypoint'
 
 local ffi = require 'ffi'
 
+-- clib functions
+ffi.cdef[[
+char *strdup(const char *s);
+]]
+
 -- Exalt NWN Functions
 ffi.cdef[[
 CGameObject *nwn_GetObjectByID (nwn_objid_t oid);
@@ -67,6 +72,8 @@ void                  nwn_DeleteLocalLocation(CNWSScriptVarTable *vt, const char
 void                  nwn_DeleteLocalObject(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalString(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DoCommand(CNWSObject *obj, void *vms);
+int32_t               nwn_DoDamage(void *obj, uint32_t obj_type, int32_t amount);
+void                  nwn_EffectSetNumIntegers(CGameEffect *eff, uint32_t num);
 void                  nwn_ExecuteCommand(int command, int num_args);
 CNWSArea             *nwn_GetAreaById(uint32_t id);
 CNWSCombatAttackData *nwn_GetAttack(CNWSCombatRound *cr, int attack);
@@ -165,4 +172,6 @@ void ns_SignalAttack(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* a
 void ns_SignalDamage(CNWSCreature *cre, CNWSObject *obj, double event_number, int32_t anim_len);
 void ns_SignalMiss(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 void ns_SignalOnHitEffects(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
+
+CGameEffect *Local_GetLastDamageEffect();
 ]]

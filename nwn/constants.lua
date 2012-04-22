@@ -6007,3 +6007,4 @@ nwn.EFFECT_TRUETYPE_IMMUNITY_DECREASE                     =  96
 -- Custom Effects.
 nwn.EFFECT_CUSTOM_MODIFY_NUM_ATTACKS                      =  0
 nwn.EFFECT_CUSTOM_RECURRING_EFFECT                        =  1
+nwn.EFFECT_CUSTOM_COMBAT_DAMAGE                           =  2

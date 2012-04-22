@@ -20,15 +20,15 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function NSResolveMissChance(attacker, target, hit, cr, attack)
+function NSResolveMissChance(attacker, target, hit, attack_info)
    if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
       return false
    end
 
    -- Miss Chance
-   local miss_chance = attacker:GetMissChance(attack)
+   local miss_chance = attacker:GetMissChance(attack_info.attack)
    -- Conceal
-   local conceal = target:GetConcealment(attacker, attack)
+   local conceal = target:GetConcealment(attacker, attack_info.attack)
 
    if conceal > 0 or miss_chance > 0 then
       if miss_chance < conceal then
@@ -36,9 +36,9 @@ function NSResolveMissChance(attacker, target, hit, cr, attack)
             or (attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
                 and math.random(1, 100) >= conceal)
          then
-            attack.cad_attack_result = 8
-            attack.cad_concealment = math.floor((conceal ^ 2) / 100)
-            attack.cad_missed = 1
+            attack_info.attack.cad_attack_result = 8
+            attack_info.attack.cad_concealment = math.floor((conceal ^ 2) / 100)
+            attack_info.attack.cad_missed = 1
             return true
          end
       else
@@ -46,9 +46,9 @@ function NSResolveMissChance(attacker, target, hit, cr, attack)
             or (attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
                 and math.random(1, 100) >= miss_chance)
          then
-            attack.cad_attack_result = 9
-            attack.cad_concealment = math.floor((miss_chance ^ 2) / 100)
-            attack.cad_missed = 1
+            attack_info.attack.cad_attack_result = 9
+            attack_info.attack.cad_concealment = math.floor((miss_chance ^ 2) / 100)
+            attack_info.attack.cad_missed = 1
             return true
          end
       end

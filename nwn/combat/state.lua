@@ -21,12 +21,8 @@ local C = ffi.C
 local bit = require 'bit'
 
 --- TODO: finish, test nwn funcs
-function NSResolveTargetState(attacker, target)
+function NSResolveTargetState(attacker, target, attack_info)
    attacker.ci.target_state_mask = 0
-   if target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
-      return
-   end
-
    local mask = 0
 
    if target:GetIsBlind()
@@ -91,4 +87,6 @@ function NSResolveTargetState(attacker, target)
    end
 
    attacker.ci.target_state_mask = mask
+
+   attack_info.target_state = mask
 end

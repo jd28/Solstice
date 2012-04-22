@@ -20,50 +20,71 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
+local ATTACK_ID = 1
+
 function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
-   local cr, current_attack, attack, attack_group
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
    end
-   cr = attacker.obj.cre_combat_round
-   current_attack = cr.cr_current_attack
-   attack = C.nwn_GetAttack(cr, current_attack)
-   attack_group = attack.cad_attack_group
+   if not target:GetIsValid() then return end 
 
-   local damamge_rolls = {}
-   
-   if not target:GetIsValid() then return end   
+   local attacks = {}
+   local damage_rolls = {}
 
-   NSResolveTargetState(attacker, target)
-   NSResolveSituationalModifiers(attacker, target)
-   print(current_attack)
    for i = 0, attack_count - 1 do
-      attack.cad_attack_group = attack_group
-      attack.cad_target = target.id
-      attack.cad_attack_mode = attacker.obj.cre_mode_combat
-      attack.cad_attack_type = C.nwn_GetWeaponAttackType(cr)
+      local attack_info = attack_info_t()
+      attack_info.attacker_cr = attacker.obj.cre_combat_round
+      attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
+      attack_info.attacker = attacker.id
+      attack_info.target = target.id
+      attack_info.attack_id = ATTACK_ID
+      ATTACK_ID = ATTACK_ID + 1
+      attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
+      attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
+      attack_info.attack.cad_target = target.id
+      attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
+      attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
+      attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
 
-      if attack.cad_coupdegrace == 0 then
+      if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+         attack_info.target_cr = target.obj.cre_combat_round
+         NSResolveTargetState(attacker, target, attack_info)
+         NSResolveSituationalModifiers(attacker, target, attack_info)
+      end
+
+      if attack_info.attack.cad_coupdegrace == 0 then
          C.nwn_ResolveCachedSpecialAttacks(attacker.obj)
       end
 
-      if attack.cad_special_attack ~= 0 then
+      if attack_info.attack.cad_special_attack ~= 0 then
          -- Special Attacks... 
-         NSResolveMeleeSpecialAttack(attacker, i, attack_count, target, a)
-      else
-         NSResolveAttackRoll(attacker, target, nil)
-         if NSGetAttackResult(attack) then
-            NSResolveDamage(attacker, target, false)
-            NSResolvePostMeleeDamage(attacker, target)
+         if attack_info.attack.cad_special_attack < 1115 and
+            attacker:GetRemainingFeatUses(attack.cad_special_attack) == 0
+         then
+            attack_info.attack.cad_special_attack = 0
          end
-         C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, a)
       end
-      current_attack = current_attack + 1
-      cr.cr_current_attack = current_attack
-      attack = C.nwn_GetAttack(cr, current_attack)
+
+      NSResolveAttackRoll(attacker, target, nil, attack_info)
+      if NSGetAttackResult(attack_info) then
+         attack_info.dmg_roll = NSResolveDamage(attacker, target, false, attack_info)
+         NSResolvePostMeleeDamage(attacker, target)
+      end
+      C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, a)
+
+      if attack_info.attack.cad_special_attack ~= 0
+         and NSGetAttackResult(attack_info) then
+         attacker:DecrementRemainingFeatUses(attack_info.attack.cad_special_attack)
+         NSMeleeSpecialAttack(attack_info.attack.cad_special_attack, 0, attacker, target, attack_info.attack)
+      end
+      print("NSResolveMeleeAttack", attack_info.attack_id, string.format("%x, %x", attacker.id, target.id), attack_info.dmg_roll, NSGetAttackResult(attack_info))
+
+      table.insert(attacks, attack_info)
+
+      attack_info.attacker_cr.cr_current_attack = attack_info.attacker_cr.cr_current_attack + 1
    end
-   NSSignalMeleeDamage(attacker, target, attack_count)
+   NSSignalMeleeDamage(attacker, target, attack_count, attacks)
 end
 
 

@@ -5,7 +5,7 @@ local nie = require 'nwn.internal.effects'
 TA_EFFECT_DECREASE_DC = 3
 
 function nwn.EffectDecreaseDC(amount)
-   local eff = nwn.EffectCustom(TA_EFFECT_DECREASE_DC, { amount })
+   local eff = nwn.EffectCustom(TA_EFFECT_DECREASE_DC, amount)
    return eff
 end
 

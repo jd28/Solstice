@@ -130,10 +130,25 @@ function Effect:SetInt(index, value)
    return self.eff.eff_integers[index]
 end
 
+---
+function Effect:SetNumIntegers(num)
+   C.nwn_EffectSetNumIntegers(self.eff, num)
+end
+
 --- Sets the effect's spell id as specified, which will later be returned
 -- with Effect:GetSpellId(). Source: nwnx_structs by Acaos
 function Effect:SetSpellId (spellid)
    self.eff.eff_spellid = spellid
+end
+
+---
+function Effect:SetString(index, str)
+   if index < 0 or index > 5 then
+      error "Effect:SetString must be between 0 and 5"
+      return
+   end
+   self.eff.eff_strings[index].text = C.strdup(str)
+   self.eff.eff_strings[index].len = #str
 end
 
 --- Set the subtype of the effect.
@@ -346,6 +361,25 @@ end
 --- Create a Charm effect
 function nwn.EffectCharmed()
    return CreateEffect(156, 0)
+end
+
+---
+-- @param damages An array containing the damages to be applied
+--    in order of index.
+-- @param unblockable (Default: false)
+function nwn.EffectCombatDamage(dmg_power, damages, unblockable)
+   local eff = nwn.EffectCustom(nwn.EFFECT_CUSTOM_COMBAT_DAMAGE)
+   local num_dmgs = table.maxn(damages)
+
+   eff:SetInt(1, dmg_power)
+   eff:SetInt(2, unblockable)
+   eff:SetNumIntegers(num_dmgs + 3)
+   
+   for i = 1, num_dmgs do
+      eff:SetInt(i+2, damages[i] or 0)
+   end
+
+   return eff
 end
 
 --- Creates a concealment effect.

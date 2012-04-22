@@ -14,11 +14,56 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------y
+--------------------------------------------------------------------------------
 
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
+
+ffi.cdef[[
+
+typedef struct DamageResult {
+   int32_t    damages[13];
+   int32_t    immunity_adjust[13];
+   int32_t    resist_adjust[13];
+   int32_t    soak_adjust;
+} DamageResult;
+
+typedef struct DamageRoll {
+   uint32_t    damage_power;
+
+   DiceRoll    bonus[100];
+   uint32_t    bonus_type[100];
+   uint32_t    bonus_count;
+
+   DiceRoll    penalty[100];
+   uint32_t    penalty_type[100];
+   uint32_t    penalty_count;
+
+   DamageResult result;
+} DamageRoll;
+]]
+
+ffi.cdef[[
+typedef struct AttackInfo {
+   CNWSCombatRound  *attacker_cr;
+   CNWSCombatRound  *target_cr;
+   CNWSCombatAttackData *attack;
+   uint32_t current_attack;
+   uint32_t attack_id;
+   uint32_t target_state;
+   uint32_t situational_flags;
+   bool is_offhand;
+   nwn_objid_t attacker;
+   nwn_objid_t target;
+   DamageRoll *dmg_roll;
+} AttackInfo;
+]]
+
+damage_result_t = ffi.typeof("DamageResult")
+attack_info_t = ffi.typeof("AttackInfo")
+damage_roll_t = ffi.typeof("DamageRoll")
+
 
 require 'nwn.combat.attack_melee'
 require 'nwn.combat.attack_ranged'
