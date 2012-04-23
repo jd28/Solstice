@@ -73,15 +73,15 @@ typedef struct CombatInformation {
    CombatMod size;
    CombatMod skill;
    CombatMod fe; // Favored Enemy
-   CombatMod situational[$NS_SITUATIONAL_NUM];
+   CombatMod situational[$NS_OPT_NUM_SITUATIONS];
 
    uint32_t fe_mask; // favored enemy mask
    uint32_t training_vs_mask; // Training vs race
    uint32_t target_state_mask;
    uint32_t situational_flags;
 
-   uint32_t resist[$NS_DAMAGES_NUM];
-   int32_t immunity[$NS_DAMAGES_NUM];
+   uint32_t resist[$NS_OPT_NUM_DAMAGES];
+   int32_t immunity[$NS_OPT_NUM_DAMAGES];
    uint32_t soak[21];
    int32_t save_mods[3];
    CombatWeapon equips[6];
@@ -97,8 +97,7 @@ typedef struct Creature {
     CNWSCreatureStats *stats;
     CombatInformation  ci;
 } Creature;
-]], "%$([%w_]+)", { NS_DAMAGES_NUM = "12",
-                    NS_SITUATIONAL_NUM = "3" }))
+]], "%$([%w_]+)", NS_SETTINGS))
 
 local creature_mt = { __index = Creature }
 creature_t = ffi.metatype("Creature", creature_mt)

@@ -69,7 +69,7 @@ function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
       NSResolveAttackRoll(attacker, target, nil, attack_info)
       if NSGetAttackResult(attack_info) then
          attack_info.dmg_roll = NSResolveDamage(attacker, target, false, attack_info)
-         NSResolvePostMeleeDamage(attacker, target)
+         NSResolvePostMeleeDamage(attacker, target, attack_info)
       end
       C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, a)
 
@@ -78,7 +78,6 @@ function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
          attacker:DecrementRemainingFeatUses(attack_info.attack.cad_special_attack)
          NSMeleeSpecialAttack(attack_info.attack.cad_special_attack, 0, attacker, target, attack_info.attack)
       end
-      print("NSResolveMeleeAttack", attack_info.attack_id, string.format("%x, %x", attacker.id, target.id), attack_info.dmg_roll, NSGetAttackResult(attack_info))
 
       table.insert(attacks, attack_info)
 

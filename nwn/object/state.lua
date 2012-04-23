@@ -16,8 +16,6 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
-NS_OPT_HP_LIMIT = -10
-
 function NSGetIsDead(obj)
    obj = _NL_GET_CACHED_OBJECT(obj)
    return obj:GetIsDead()

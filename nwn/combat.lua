@@ -20,29 +20,31 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-ffi.cdef[[
+ffi.cdef (string.gsub([[
 
 typedef struct DamageResult {
-   int32_t    damages[13];
-   int32_t    immunity_adjust[13];
-   int32_t    resist_adjust[13];
+   int32_t    damages[$NS_OPT_NUM_DAMAGES];
+   int32_t    immunity_adjust[$NS_OPT_NUM_DAMAGES];
+   int32_t    resist_adjust[$NS_OPT_NUM_DAMAGES];
    int32_t    soak_adjust;
 } DamageResult;
+]], "%$([%w_]+)", NS_SETTINGS))
 
+ffi.cdef(string.gsub([[
 typedef struct DamageRoll {
    uint32_t    damage_power;
 
-   DiceRoll    bonus[100];
-   uint32_t    bonus_type[100];
+   DiceRoll    bonus[$NS_OPT_MAX_DMG_ROLL_MODS];
+   uint32_t    bonus_type[$NS_OPT_MAX_DMG_ROLL_MODS];
    uint32_t    bonus_count;
 
-   DiceRoll    penalty[100];
-   uint32_t    penalty_type[100];
+   DiceRoll    penalty[$NS_OPT_MAX_DMG_ROLL_MODS];
+   uint32_t    penalty_type[$NS_OPT_MAX_DMG_ROLL_MODS];
    uint32_t    penalty_count;
 
    DamageResult result;
 } DamageRoll;
-]]
+]], "%$([%w_]+)", NS_SETTINGS))
 
 ffi.cdef[[
 typedef struct AttackInfo {

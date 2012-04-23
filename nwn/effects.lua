@@ -554,11 +554,8 @@ end
 -- @param
 -- @param
 function nwn.EffectDeath(specatular, feedback)
-   spectacular = spectacular and 1 or 0
-   feedback = feedback and 1 or 0
-
-   nwn.engine.StackPushInteger(feedback)
-   nwn.engine.StackPushInteger(spectacular)
+   nwn.engine.StackPushBoolean(feedback)
+   nwn.engine.StackPushBoolean(spectacular)
 
    return CreateEffect(133, 2)
 end

@@ -24,11 +24,10 @@ local color = require 'nwn.color'
 local DAMAGE_ROLLS = {}
 local DAMAGE_ID = 0
 
-
 local function NSAddDamageBonus(dmg_roll, dmg_type, roll)
    local idx = dmg_roll.bonus_count
-   if idx >= 100 then
-      error "Only 25 damage bonuses can be applicable at one time..."
+   if idx >= NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS then
+      error("Only "..NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS.." damage bonuses can be applicable at one time.")
       return
    end
 
@@ -40,8 +39,8 @@ end
 
 local function NSAddDamagePenalty(dmg_roll, dmg_type, roll)
    local idx = dmg_roll.penalty_count
-   if idx >= 100 then
-      error "Only 25 damage penalties can be applicable at one time..."
+   if idx >= NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS then
+      error("Only "..NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS.." damage penalties can be applicable at one time.")
       return
    end
 
@@ -74,7 +73,7 @@ function NSApplyDamageRollById(target, attacker, id)
    eff.eff.eff_integers[3] = dmg_roll.damage_power
    eff.eff.eff_integers[4] = 1000
 
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       eff.eff.eff_integers[5 + i] = dmg_roll.result.damages[i]
    end
 
@@ -88,7 +87,7 @@ end
 function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
    local dmg, resist, imm, imm_adj
 
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       dmg = dmg_result.damages[i]
       imm = target:GetDamageImmunity(i)
       imm_adj = math.floor((imm * dmg) / 100)
@@ -224,7 +223,6 @@ function NSGetDamageBonus(attacker, target, int, dmg_roll)
 end
 
 function NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type)
-   print("NSGetEffectDamageBonus", dmg_roll.bonus_count)
    local atk_type, race, lawchaos, goodevil, subrace, deity, amount
    local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
 
@@ -287,7 +285,7 @@ end
 
 function NSGetTotalDamage(dmg_result)
    local total = 0
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       total = total + dmg_result.damages[i]
    end
    return total
@@ -295,7 +293,7 @@ end
 
 function NSGetTotalImmunityAdjustment(dmg_result)
    local total = 0
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       total = total + dmg_result.immunity_adjust[i]
    end
    return total
@@ -303,7 +301,7 @@ end
 
 function NSGetTotalResistAdjustment(dmg_result)
    local total = 0
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       total = total + dmg_result.resist_adjust[i]
    end
    return total
@@ -389,7 +387,7 @@ function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
    local highest_vfx
    local vfx
 
-   for i = 0, 12 do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
       flag = bit.lshift(1, i)
       vfx = nwn.GetDamageVFX(flag, attack.cad_ranged_attack == 1)
       if vfx and dmg_roll.result.damages[i] > highest then

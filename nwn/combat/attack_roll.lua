@@ -314,8 +314,8 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
       attack_info.attack.cad_attack_result = 1
    end
 
---[[
-   if roll < NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
+
+   if roll > NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
       attack_info.attack.cad_threat_roll = math.random(20)
       attack_info.attack.cad_critical_hit = 1
 
@@ -326,5 +326,4 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
          attack_info.attack.cad_attack_result = 3
       end
    end
-   --]]
 end
