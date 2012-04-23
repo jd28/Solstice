@@ -46,7 +46,6 @@ Itemprop = inheritsFrom(Effect)
 Location = {}
 Talent   = {}
 Vector   = {}
-cep = {}
 
 require "nwn.internal.internal"
 require "nwn.ctypes.foundation"
