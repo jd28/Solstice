@@ -1,0 +1,1 @@
+require 'cep.constants.damage'

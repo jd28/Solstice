@@ -1,0 +1,3 @@
+cep = {}
+
+require 'cep.constants'
