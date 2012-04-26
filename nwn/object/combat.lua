@@ -55,7 +55,6 @@ function NSOnApplyDamage(obj, a)
       NSDoDamageAdjustments(attacker, obj, dmg, dmg_power)
    end
 
-
    local total = NSGetTotalDamage(dmg)
 
    obj:DoDamage(total)
@@ -68,17 +67,14 @@ function NSOnApplyDamage(obj, a)
       return 1
    end
 
-   local death = nwn.EffectDeath()
+   local death = nwn.EffectDeath(true, true)
    death:SetCreator(attacker)
-   death:SetInt(0, 0)
-   death:SetInt(1, 1) -- Supernatural
    
    obj:ApplyEffect(death)
 end
 
 ---
 function Object:DoDamage(amount)
-   print(self:GetName(), self.obj, self.type, amount)
    return C.nwn_DoDamage(self.obj, self.type, amount)
 end
 
