@@ -1,3 +1,15 @@
+--Effect type constants
+nwn.DURATION_TYPE_INSTANT    = 0
+nwn.DURATION_TYPE_TEMPORARY  = 1
+nwn.DURATION_TYPE_PERMANENT  = 2
+nwn.DURATION_TYPE_EQUIPPED   = 3
+nwn.DURATION_TYPE_INNATE     = 4
+
+nwn.SUBTYPE_MAGICAL          = 8
+nwn.SUBTYPE_SUPERNATURAL     = 0x10
+nwn.SUBTYPE_EXTRAORDINARY    = 0x18
+nwn.SUBTYPE_UNRESISTABLE     = 0x20
+
 nwn.EFFECT_TRUETYPE_INVALIDEFFECT                         =   0
 nwn.EFFECT_TRUETYPE_HASTE                                 =   1
 nwn.EFFECT_TRUETYPE_DAMAGE_RESISTANCE                     =   2
