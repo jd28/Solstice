@@ -38,7 +38,7 @@ function Object:GetIsDead()
    if self.type == nwn.GAME_OBJECT_TYPE_CREATURE 
       and (self:GetIsPC() or self:GetIsPossessedFamiliar())
    then
-      if hp <= NS_OPT_HP_LIMIT then
+      if hp <= NS_SETTINGS.NS_OPT_HP_LIMIT then
          return true
       end
    else

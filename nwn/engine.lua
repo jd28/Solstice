@@ -55,6 +55,11 @@ end
 -- Probably should do any casting on this side...
 -- @param es_type The type of the Engine Structure being popped.
 function nwn.engine.StackPopEngineStructure(es_type)
+   if not es_type then
+      print(debug.traceback())
+      error "Nil value passed to StackPopEngineStructure"
+   end
+
    local es = C.nwn_StackPopEngineStructure(es_type)
    if es == nil then return end
 
@@ -63,7 +68,10 @@ function nwn.engine.StackPopEngineStructure(es_type)
    elseif es_type == nwn.ENGINE_STRUCTURE_EVENT then
       es = es
    elseif es_type == nwn.ENGINE_STRUCTURE_LOCATION then
-      es = ffi.cast("Location*", es)
+      es = ffi.cast("CScriptLocation*", es)
+      local temp = location_t(es.position, es.orientation, es.area)
+      ffi.C.free(es)
+      return temp
    elseif es_type == nwn.ENGINE_STRUCTURE_TALENT then
       es = es
    elseif es_type == nwn.ENGINE_STRUCTURE_ITEMPROPERTY then
@@ -101,8 +109,9 @@ end
 
 function nwn.engine.StackPopVector()
    local v = C.nwn_StackPopVector()
-   v = ffi.gc(v, ffi.C.free)
-   return v
+   local temp = vector_t(v.x, v.y, v.z)
+   C.free(v)
+   return temp
 end
 
 function nwn.engine.StackPushBoolean(value)

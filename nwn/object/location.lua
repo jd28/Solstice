@@ -34,7 +34,7 @@ end
 function Object:GetLocation()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(213, 1)
-   return nwn.engine.StackPopEngineStructure(ENGINE_STRUCTURE_LOCATION)
+   return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION)
 end
 
 ---
@@ -46,7 +46,7 @@ end
 
 ---
 function Object:JumpToLocation(loc)
-   nwn.engine.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, loc)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, loc)
    nwn.engine.ExecuteCommand(313, 1)
 end
 

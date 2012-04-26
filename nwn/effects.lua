@@ -17,7 +17,8 @@
 --------------------------------------------------------------------------------
 
 require 'nwn.ctypes.effect'
-local ffi = require "ffi"
+local ffi = require 'ffi'
+local C = ffi.C
 
 ffi.cdef [[
 typedef struct Effect {
@@ -28,7 +29,13 @@ typedef struct Effect {
 
 local nie = require 'nwn.internal.effects'
 
-local effect_mt = { __index = Effect }
+local effect_mt = { __index = Effect,
+                    __gc = function(eff) 
+                       if not eff.direct then
+                          C.free(eff)
+                       end
+                    end
+}
 effect_t = ffi.metatype("Effect", effect_mt)
 
 local function CreateEffect(command, args)
@@ -662,10 +669,13 @@ end
 
 --- Create an Immunity effect.
 -- @param immunity One of the nwn.IMMUNITY_TYPE_* constants.
-function nwn.EffectImmunity(immunity)
+function nwn.EffectImmunity(immunity, percent)
+   percent = percent or 100
    nwn.engine.StackPushInteger(immunity)
+   local eff = CreateEffect(273, 1)
+   eff:SetInt(1, percent)
 
-   return CreateEffect(273, 1)
+   return eff
 end
 
 --- Create an Invisibility effect.
