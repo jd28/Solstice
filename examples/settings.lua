@@ -13,6 +13,19 @@ local settings = {
    -- combat round.
    NS_OPT_MAX_DMG_ROLL_MODS = 100,
 
+   -- If set to true only one damage visual effect will be applied to a
+   -- target, rather than all applicable.
+   NS_OPT_ONE_COMBAT_VFX = true,
+
+   -- If set to true, 0 damage will not float above the target.
+   NS_OPT_NO_FLOAT_ZERO_DAMAGE = false,
+
+   -- If set to true, damage results will not float above the target.
+   -- If true it will override NS_OPT_NO_FLOAT_ZERO_DAMAGE.
+   -- When the data is broadcast you could also allow individual players
+   -- to choose their own preference.
+   NS_OPT_NO_FLOAT_DAMAGE = false,
+
    -- Number of situational atatcks.
    NS_OPT_NUM_SITUATIONS = 3,
 
