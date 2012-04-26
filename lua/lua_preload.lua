@@ -59,11 +59,12 @@ end
 function iter_first_next_isvalid(first, next)
    local self
    return function (...)
-      local args = arg or {}
-      local cur, prev = first(unpack(args))
-      while cur:GetIsValid() do
-         prev, cur = cur, next(unpack(args))
-         return prev
+      local cur, prev = first(...)
+      return function (...)
+         while cur:GetIsValid() do
+            prev, cur = cur, next(...)
+            return prev
+         end
       end
    end
 end
