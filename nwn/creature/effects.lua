@@ -111,17 +111,15 @@ end
 
 function Creature:GetDamageImmunity(dmg_idx)
    -- RDD
-
    return self.ci.immunity[dmg_idx]
 end
 
-function Creature:GetDamageReduction(dmg_power)
+function Creature:GetInnateDamageReduction(dmg_power)
    -- Dwarved Defender
-
    return self.ci.soak[dmg_power]
 end
 
-function Creature:GetDamageResistance(dmg_idx)
+function Creature:GetInnateDamageResistance(dmg_idx)
    return self.ci.resist[dmg_idx]
 end
 ---
@@ -167,5 +165,84 @@ function NSSetDamageImmunity(obj, dmg_flag, amount)
    local idx = nwn.GetDamageIndexFromFlag(dmg_flag)
    if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       obj.ci.immunity[idx] = amount
+   end
+end
+
+function Creature:UpdateDamageResistance()
+   local eff_type, amount, dmg_flg, idx
+   local cur_eff
+
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+      self.ci.eff_resist[i] = -1
+   end
+
+   for i = self.stats.cs_first_dresist_eff, self.obj.obj.obj_effects_len - 1 do
+      eff_type = self.obj.obj.obj_effects[i].eff_type
+
+      if eff_type ~= nwn.EFFECT_TRUETYPE_DAMAGE_RESISTANCE then
+         break
+      end
+
+      dmg_flag = self.obj.obj.obj_effects[i].eff_integers[0]
+      amount = self.obj.obj.obj_effects[i].eff_integers[1]
+      limit = self.obj.obj.obj_effects[i].eff_integers[2]
+
+      if dmg_flag > 0 then
+         idx = nwn.GetDamageIndexFromFlag(dmg_flag)
+         cur_eff = self.ci.eff_resist[idx]
+         if cur_eff < 0 then
+            self.ci.eff_resist[idx] = i
+         else
+            local camount = self.obj.obj.obj_effects[cur_eff].eff_integers[1]
+            local climit = self.obj.obj.obj_effects[cur_eff].eff_integers[2]
+            
+            -- If the resist amount is higher, set the resist effect list to the effect index.
+            -- If they are equal prefer the one with the highest damage limit.
+            if amount > camount 
+               or (amount == camount and limit > climit)
+            then
+               self.ci.eff_resist[idx] = i
+            end
+         end
+      end
+   end
+end
+
+function Creature:UpdateDamageReduction()
+   local eff_type, amount, dmg_power, dur_type, limit
+   local cur_eff
+   
+   -- Reset the soak effect index list.
+   for i = 0, 20 do
+      self.ci.eff_soak[i] = -1
+   end
+
+   for i = self.stats.cs_first_dred_eff, self.obj.obj.obj_effects_len - 1 do
+      eff_type = self.obj.obj.obj_effects[i].eff_type
+
+      -- 
+      if eff_type ~= nwn.EFFECT_TRUETYPE_DAMAGE_REDUCTION then
+         break
+      end
+
+      amount = self.obj.obj.obj_effects[i].eff_integers[0]
+      dmg_power = self.obj.obj.obj_effects[i].eff_integers[1]
+      limit = self.obj.obj.obj_effects[i].eff_integers[2]
+      
+      cur_eff = self.ci.eff_soak[dmg_power]
+      if cur_eff < 0 then
+         self.ci.eff_soak[dmg_power] = i
+      else
+         local camount = self.obj.obj.obj_effects[cur_eff].eff_integers[0]
+         local climit = self.obj.obj.obj_effects[cur_eff].eff_integers[2]
+         
+         -- If the soak amount is higher, set the soak effect list to the effect index.
+         -- If they are equal prefer the one with the highest damage limit.
+         if amount > camount 
+            or (amount == camount and limit > climit)
+         then
+            self.ci.eff_soak[dmg_power] = i
+         end
+      end
    end
 end

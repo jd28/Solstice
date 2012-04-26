@@ -31,6 +31,117 @@ local function zero_combat_mod(mod)
    mod.dmg_type = nwn.DAMAGE_TYPE_BASE_WEAPON
 end
 
+function Creature:DoDamageImmunity(attacker, dmg_result)
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+      dmg = dmg_result.damages[i]
+      imm = self:GetDamageImmunity(i)
+      imm_adj = math.floor((imm * dmg) / 100)
+      -- Immunity
+      dmg_result.immunity_adjust[i] = imm_adj
+      dmg_result.damages[i] = dmg - imm_adj
+   end
+end
+
+function Creature:DoDamageResistance(attacker, dmg_result)
+   local eff_type, amount, dmg_flg, idx
+   local limit, use_eff, resist
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+      -- Innate / Feat resistance.  In the case of damage reduction these stack
+      -- with damage resistance effects.
+      if self.ci.resist[i] > 0 then
+         resist = math.min(dmg_result.damages[i], self.ci.resist[i])
+         dmg_result.resist_adjust[i] = resist
+         dmg_result.damages[i] = dmg_result.damages[i] - resist
+      end
+      -- If there is any damage left to be resisted by effects.
+      if dmg_result.damages[i] > 0 then
+         local eff = self.ci.eff_resist[i]
+
+         -- If there is a resist effect for this damage, use it.
+         if eff >= 0 then
+            use_eff = self.obj.obj.obj_effects[eff]
+         end
+      end
+
+      -- If using a resist effect determine if the effect has a limit and adjust it if so.
+      if use_eff then
+         resist = math.min(use_eff.eff_integers[1], dmg_result.damages[i])
+         local eff_limit = use_eff.eff_integers[2]
+         if eff_limit > 0 then
+            if eff_limit <= resist then
+               resist = eff_limit
+               self:RemoveEffectById(eff.eff_id)
+            else
+               use_eff.eff_integers[2] = eff_limit - resist
+            end
+         end
+
+         -- Resist adjustment must be incremented by effect resistance in case any
+         -- innate resistance has already been applied.
+         dmg_result.resist_adjust[i] = dmg_result.resist_adjust[i] + resist
+         dmg_result.damages[i] = dmg_result.damages[i] - resist
+      end
+   end
+end
+
+--- Modifies damage roll by highest applicable soak, if any.
+function Creature:DoDamageReduction(attacker, dmg_result, damage_power)
+   -- Set highest soak amount to the players innate soak.  E,g their EDR
+   -- Dwarven Defender, and/or Barbarian Soak.
+   local highest_soak = self.ci.soak
+
+   -- In the NWN Engine base damage is stored in damage index 12.
+   local base_damage = dmg_result.damages[12]
+   local use_eff
+
+   -- If damage power is greater then 20 or less than zero something is most
+   -- likely wrong so don't bother with effects
+   if damage_power < 20 and damage_power >= 0 then
+      -- Loop through the soak effects and find a soak that is a) higher than innate soak
+      -- and b) is greater than the damage power.
+      for i = damage_power + 1, 20 do
+         local eff = self.ci.eff_soak[i]
+         if eff >= 0 then
+            local eff_amount = self.obj.obj.obj_effects[eff].eff_integers[0]
+            -- If the soak amount is greater than the higest soak, save the effect for later use.
+            -- If it has a limit it will need to be adjusted or removed.  Update the new highest
+            -- soak amount.  The limit here is itself not relevent.
+            if eff_amount >= highest_soak then
+               highest_soak = eff_amount
+               use_eff = self.obj.obj.obj_effects[eff]
+            end
+         end
+      end
+   end
+
+   -- Now that the highest soak amount has been found, determine the minimum of it and
+   -- the base damage.  I.e. you can't soak more than your damamge.
+   highest_soak = math.min(base_damage, highest_soak)
+
+   -- If using a soak effect determine if the effect has a limit and adjust it if so.
+   if use_eff then
+      local eff_limit = use_eff.eff_integers[2]
+      if eff_limit > 0 then
+         -- If the effect damage limit is less than the highest soak amount then
+         -- the effect needs to be remove and the highest soak amount adjusted. I.e.
+         -- You can't soak more than the remaing limit on soak damage.  Effect removal
+         -- will trigger Creature:UpdateDamageReduction to determine the new best soak
+         -- effects.
+         -- Else the current limit must be adjusted by the highest soak amount.
+         if eff_limit <= highest_soak then
+            highest_soak = eff_limit
+            self:RemoveEffectById(eff.eff_id)
+         else
+            use_eff.eff_integers[2] = eff_limit - highest_soak
+         end
+      end      
+   end
+
+   -- Set the soak amount and adjust the base damage result
+   dmg_result.soak_adjust = highest_soak
+   dmg_result.damages[12] = base_damage - highest_soak
+end
+
 ---
 function Creature:GetAC(for_future)
    ne.StackPushInteger(for_future or 0)
@@ -654,6 +765,9 @@ end
 ---
 function Creature:UpdateCombatInfo(update_flags)
    update_flags = nwn.COMBAT_UPDATE_ALL
+
+   self:UpdateDamageResistance()
+   self:UpdateDamageReduction()
 
    --self.num_attacks_on = self:GetNumberOfAttacks()
    --self.num_attacks_off = self:GetNumberOfAttacks(true)

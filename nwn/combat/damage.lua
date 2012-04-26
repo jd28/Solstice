@@ -55,14 +55,9 @@ function NSApplyDamageRollById(target, attacker, id)
    attacker = _NL_GET_CACHED_OBJECT(attacker)
    target = _NL_GET_CACHED_OBJECT(target)
 
---   print("NSApplyDamageRollById", string.format("%x, %x", attacker.id, target.id), DAMAGE_ROLLS[id], id)
-
    local dmg_roll = DAMAGE_ROLLS[id]
    if dmg_roll == nil then return end
 
---   print("NSApplyDamageRollById", NSGetTotalDamage(dmg_roll.result))
-   
-   NSFormatDamageRoll(attacker, target, dmg_roll.result)
    NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
 
    local eff = nwn.EffectDamage(1)
@@ -73,13 +68,56 @@ function NSApplyDamageRollById(target, attacker, id)
    eff.eff.eff_integers[3] = dmg_roll.damage_power
    eff.eff.eff_integers[4] = 1000
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
       eff.eff.eff_integers[5 + i] = dmg_roll.result.damages[i]
    end
 
    target:ApplyEffect(eff)
 
+   NSBroadcastDamage(attacker, target, dmg_roll)
+
    DAMAGE_ROLLS[id] = nil
+end
+
+function NSBroadcastDamage(attacker, target, dmg_roll)
+   local total = NSGetTotalDamage(dmg_roll.result)
+   local log
+
+   if NS_SETTINGS.NS_OPT_NO_FLOAT_DAMAGE then
+      log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
+   elseif NS_SETTINGS.NS_OPT_NO_FLOAT_ZERO_DAMAGE and total <= 0 then
+      log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
+   else
+      C.nwn_PrintDamage(attacker.id, target.id, total, dmg_roll.result.damages)
+      local extra = NSGetTotalDamage(dmg_roll.result, 13)
+      if extra > 0 then
+         log = NSFormatDamageRoll(attacker, target, dmg_roll.result, 13)
+      end
+   end
+
+   local tloc = target:GetLocation()
+   local ploc
+   local imm = NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
+   local resist = NSFormatDamageRollResistance(attacker, target, dmg_roll.result)
+   local dr = NSFormatDamageRollReduction(attacker, target, dmg_roll.result)
+
+   for pc in nwn.PCs() do
+      ploc = pc:GetLocation()
+      if tloc:GetDistanceBetween(ploc) <= 20 then
+         if log then
+            pc:SendMessage(log)
+         end
+         if dr then
+            pc:SendMessage(dr)
+         end
+         if imm then
+            pc:SendMessage(imm)
+         end
+         if resist then
+            pc:SendMessage(resist)
+         end
+      end
+   end
 end
 
 ---
@@ -87,32 +125,21 @@ end
 function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
    local dmg, resist, imm, imm_adj
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
       dmg = dmg_result.damages[i]
       imm = target:GetDamageImmunity(i)
       imm_adj = math.floor((imm * dmg) / 100)
-
       -- Immunity
       dmg_result.immunity_adjust[i] = imm_adj
       dmg_result.damages[i] = dmg - imm_adj
       
-      -- Resist
-      resist = target:GetDamageResistance(i)
-      dmg_result.resist_adjust[i] = resist
-      dmg_result.damages[i] = dmg - resist
    end
 
-   local highest_soak = 0
-   if damage_power < 20 and damage_power >= 0 then
-      for i = damage_power + 1, 20 do
-         if target.ci.soak[i] > highest_soak then
-            highest_soak = target:GetDamageReduction(i)
-         end
-      end
-   end
-
-   dmg_result.soak_adjust = highest_soak
-   dmg_result.damages[12] = dmg_result.damages[12] - highest_soak
+   -- Resist
+   target:DoDamageResistance(attacker, dmg_result)
+   
+   -- Damage Reduction
+   target:DoDamageReduction(attacker, dmg_result, damage_power)
 end
 
 function NSDoCritDamageRoll(dmg_roll, mult, attacker, weap_num)
@@ -164,8 +191,8 @@ function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damag
    local dmg_roll = damage_roll_t()
 
 
-   NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[weap_num].base_dmg)
-   NSGetDamageBonus(attacker, target, 0, dmg_roll)
+  -- NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[weap_num].base_dmg)
+  -- NSGetDamageBonus(attacker, target, 0, dmg_roll)
 
    -- Effects
    NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type)
@@ -283,9 +310,9 @@ function NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type
    end
 end
 
-function NSGetTotalDamage(dmg_result)
+function NSGetTotalDamage(dmg_result, idx)
    local total = 0
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = idx or 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.damages[i]
    end
    return total
@@ -293,7 +320,7 @@ end
 
 function NSGetTotalImmunityAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.immunity_adjust[i]
    end
    return total
@@ -301,7 +328,7 @@ end
 
 function NSGetTotalResistAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.resist_adjust[i]
    end
    return total
@@ -387,7 +414,7 @@ function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
    local highest_vfx
    local vfx
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES do
+   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
       flag = bit.lshift(1, i)
       vfx = nwn.GetDamageVFX(flag, attack.cad_ranged_attack == 1)
       if vfx and dmg_roll.result.damages[i] > highest then
@@ -432,7 +459,33 @@ function NSSignalMeleeDamage(attacker, target, attack_count, attacks)
    end
 end
 
-function NSSignalRangedDamage(attacker, target, attack_count)
+function NSSignalRangedDamage(attacker, target, attack_count, attacks)
+   local attack_anim --v35
+   local target_anim = 0 --v36
+   local dmg_id
 
+   for i, attack_info in ipairs(attacks) do
+      if not attack_anim then
+         attack_anim = bit.rshift(attack_info.attack.cad_anim_length, 1) --v35
+      end
+
+      C.ns_SignalAttack(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
+      C.ns_SignalAOO(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
+      C.nwn_ResolveSafeProjectile(attacker.obj, bit.rshift(attack_info.attack.cad_anim_length, 1), i-1)
+      C.nwn_ResolveAmmunition(attacker.obj, attack_anim + 1);
+--      print("NSSignalMeleeDamage", attack_info.attack_id, string.format("%x, %x", attacker.id, target.id), attack_info.dmg_roll, DAMAGE_ID, NSGetAttackResult(attack_info))
+
+      if NSGetAttackResult(attack_info) then
+         dmg_id = DAMAGE_ID
+         DAMAGE_ROLLS[dmg_id] = attack_info.dmg_roll
+         DAMAGE_ID = DAMAGE_ID + 1
+
+         C.ns_SignalDamage(attacker.obj, target.obj.obj, dmg_id, attack_anim)
+         C.ns_SignalOnHitEffects(attacker.obj, target.obj.obj, attack_info.attack, attack_anim)
+      end
+
+      attack_anim = attack_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
+      target_anim = target_anim + target_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
+   end
 end
 

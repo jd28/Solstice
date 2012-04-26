@@ -80,9 +80,13 @@ typedef struct CombatInformation {
    uint32_t target_state_mask;
    uint32_t situational_flags;
 
-   uint32_t resist[$NS_OPT_NUM_DAMAGES];
    int32_t immunity[$NS_OPT_NUM_DAMAGES];
-   uint32_t soak[21];
+
+   int32_t eff_resist[$NS_OPT_NUM_DAMAGES];
+   int32_t resist[$NS_OPT_NUM_DAMAGES];
+
+   int32_t eff_soak[21];
+   uint32_t soak;
    int32_t save_mods[3];
    CombatWeapon equips[6];
 
