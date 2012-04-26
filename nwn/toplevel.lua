@@ -129,7 +129,7 @@ function nwn.GetNextPC()
    return nwn.engine.StackPopObject()
 end
 
-nwn.PCs = iter_first_next_notnull(nwn.GetFirstPC, nwn.GetNextPC)
+nwn.PCs = iter_first_next_isvalid(nwn.GetFirstPC, nwn.GetNextPC)
 
 --- Gets an object by tag
 -- @param tag Tag of object
