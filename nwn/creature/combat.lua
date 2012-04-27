@@ -198,37 +198,15 @@ function Creature:GetDamageFlags()
 end
 
 function Creature:GetEffectAttackBonus(target, attack_type)
-   local atk_type, race, lawchaos, goodevil, subrace, deity, amount
-   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
-
-   local total = 0
-   local eff_type
-
-   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      trace = target:GetRacialType()
-      tgoodevil = target:GetGoodEvilValue()
-      tlawchaos = target:GetLawChaosValue()
-      tdeity_id = target:GetDeityId()
-      tsubrace_id = target:GetSubraceId()
-   end
-
-   local valid = false
-
-   for i = self.stats.cs_first_ab_effect, self.obj.obj.obj_effects_len - 1 do
-      eff_type = self.obj.obj.obj_effects[i].eff_type
-
-      if eff_type > nwn.EFFECT_TRUETYPE_ATTACK_DECREASE then
-         break
-      end
-
-      amount   = self.obj.obj.obj_effects[i].eff_integers[0]
-      atk_type = self.obj.obj.obj_effects[i].eff_integers[1]
-      race     = self.obj.obj.obj_effects[i].eff_integers[2]
-      lawchaos = self.obj.obj.obj_effects[i].eff_integers[3]
-      goodevil = self.obj.obj.obj_effects[i].eff_integers[4]
-      subrace  = self.obj.obj.obj_effects[i].eff_integers[5]
-      deity    = self.obj.obj.obj_effects[i].eff_integers[6]
-      valid    = false
+   local function valid(eff, vs_info)
+      local atk_type  = eff.eff_integers[1]
+      local race      = eff.eff_integers[2]
+      local lawchaos  = eff.eff_integers[3]
+      local goodevil  = eff.eff_integers[4]
+      local subrace   = eff.eff_integers[5]
+      local deity     = eff.eff_integers[6]
+      local target    = eff.eff_integers[7]
+      local valid     = false
 
       if atk_type == nwn.ATTACK_BONUS_MISC or atk_type == attack_type then
          valid = true
@@ -238,24 +216,41 @@ function Creature:GetEffectAttackBonus(target, attack_type)
          valid = true
       end
 
-      if valid then
-         -- TODO this is wrong...
-         if (race == nwn.RACIAL_TYPE_INVALID and lawchaos == 0 and  goodevil == 0 and  subrace == 0 and deity == 0)
-            or race == trace
-            or lawchaos == tlawchaos
-            or goodevil == tgoodevil
-            or subrace == tsubrace_id
-            or deity == tdeity_id
-         then
-            if eff_type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE then
-               total = total - amount
-            elseif eff_type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE then
-               total = total + amount
-            end 
-         end
+      if valid
+         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
+         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
+         and (goodevil == 0 or goodevil == vs_info.goodevil)
+         and (subrace == 0 or subrace == vs_info.subrace_id)
+         and (deity == 0 or deity == vs_info.deity_id)
+         and (target == 0 or target == vs_info.target)
+      then
+         return true
       end
+      return false
    end
-   return total
+
+   local function range(type)
+      if type > nwn.EFFECT_TRUETYPE_ATTACK_DECREASE
+         or type < nwn.EFFECT_TRUETYPE_ATTACK_INCREASE
+      then
+         return false
+      end
+      return true
+   end
+
+
+   local function get_amount(eff)
+      return eff.eff_integers[1]
+   end
+
+   local info = effect_info_t(self.stats.cs_first_ab_eff, 
+                              nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
+                              nwn.EFFECT_TRUETYPE_ATTACK_INCREASE,
+                              true, false, false)
+
+   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+                     0, 
+                     self:GetMaxABBonus())
 end
 
 function Creature:GetEffectArmorClassBonus(attacker, touch)
@@ -270,7 +265,6 @@ function Creature:GetEffectArmorClassBonus(attacker, touch)
       tlawchaos = attacker:GetLawChaosValue()
       tdeity_id = attacker:GetDeityId()
       tsubrace_id = attacker:GetSubraceId()
-      dmg_flags = attacker:GetDamageFlags()
    end
 
    local valid = false
@@ -291,11 +285,6 @@ function Creature:GetEffectArmorClassBonus(attacker, touch)
       subrace  = self.obj.obj.obj_effects[i].eff_integers[6]
       deity    = self.obj.obj.obj_effects[i].eff_integers[7]
       valid    = false
-
-      -- Only look at effects that are versus a particular type
-      if (race ~= nwn.RACIAL_TYPE_INVALID or lawchaos ~= 0 or goodevil ~= 0 or damage ~= nwn.AC_VS_DAMAGE_TYPE_ALL or subrace ~= 0 or deity ~= 0) then
-         valid = true
-      end
 
       if valid
          and (race == nwn.RACIAL_TYPE_INVALID or race == trace)
@@ -429,7 +418,7 @@ function Creature:GetEffectCritRangeBonus(target)
    for i = self.ci.first_cr_effect, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
          (self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_INCREASE and
-          self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_DESCREASE)
+          self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE)
       then
          break
       end
@@ -449,7 +438,7 @@ function Creature:GetEffectCritRangeBonus(target)
          or subrace == tsubrace_id
          or deity == tdeity_id
       then
-         if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DESCREASE then
+         if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE then
             if math.random(100) <= percent then
                total = total - amount
             end

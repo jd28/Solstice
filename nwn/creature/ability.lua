@@ -137,3 +137,43 @@ function Creature:SetAbilityScore(ability, value)
    value = math.clamp(value, 3, 255)
    return C.nwn_SetAbilityScore(self, ability, value)
 end
+
+function NSGetTotalAbilityBonus(cre, vs, abil)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+
+   return cre:GetTotalEffectAbilityBonus(vs, abil)
+end
+
+function Creature:GetTotalEffectAbilityBonus(vs, abil)
+   local function valid(eff, vs_info)
+      local eabil = eff.eff_integers[0]
+
+      if eabil == abil then
+         return true
+      end
+      return false
+   end
+
+   local function range(type)
+      if type > nwn.EFFECT_TRUETYPE_ABILITY_DECREASE
+         or type < nwn.EFFECT_TRUETYPE_ABILITY_INCREASE
+      then
+         return false
+      end
+      return true
+   end
+
+   local function get_amount(eff)
+      return eff.eff_integers[1]
+   end
+
+   local info = effect_info_t(self.stats.cs_first_ability_eff, 
+                              nwn.EFFECT_TRUETYPE_ABILITY_DECREASE,
+                              nwn.EFFECT_TRUETYPE_ABILITY_INCREASE,
+                              false, false, false)
+
+   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+                     0, 
+                     self:GetMaxAbilityBonus(abil))
+end

@@ -101,6 +101,10 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    return ret
 end
 
+function Creature:GetMaxSkillBonus(skill)
+   return 20
+end
+
 --- Gets the amount a skill was increased at a level.
 -- @param level Level to check
 -- @param skill nwn.SKILL_*
@@ -133,6 +137,58 @@ function Creature:GetSkillRank(skill, base)
    ne.StackPushInteger(skill)
    ne.ExecuteCommand(315, 3)
    return ne.StackPopInteger()
+end
+
+function NSGetTotalSkillBonus(cre, vs, skill)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+   return cre:GetTotalEffectSkillBonus(vs, skill)
+end
+
+function Creature:GetTotalEffectSkillBonus(vs, skill)
+   local function valid(eff, vs_info)
+      local eskill    = eff.eff_integers[0]
+      local race      = eff.eff_integers[2]
+      local lawchaos  = eff.eff_integers[3]
+      local goodevil  = eff.eff_integers[4]
+      local subrace   = eff.eff_integers[5]
+      local deity     = eff.eff_integers[6]
+      local target    = eff.eff_integers[7]
+
+      if eskill == skill 
+         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
+         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
+         and (goodevil == 0 or goodevil == vs_info.goodevil)
+         and (subrace == 0 or subrace == vs_info.subrace_id)
+         and (deity == 0 or deity == vs_info.deity_id)
+         and (target == 0 or target == vs_info.target)
+      then
+         return true
+      end
+      return false
+   end
+
+   local function range(type)
+      if type > nwn.EFFECT_TRUETYPE_SKILL_DECREASE
+         or type < nwn.EFFECT_TRUETYPE_SKILL_INCREASE
+      then
+         return false
+      end
+      return true
+   end
+
+   local function get_amount(eff)
+      return eff.eff_integers[1]
+   end
+
+   local info = effect_info_t(self.stats.cs_first_skill_eff, 
+                              nwn.EFFECT_TRUETYPE_SKILL_DECREASE,
+                              nwn.EFFECT_TRUETYPE_SKILL_INCREASE,
+                              true, false, false)
+
+   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+                     0, 
+                     self:GetMaxSkillBonus(skill))
 end
 
 ---

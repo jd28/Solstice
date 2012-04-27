@@ -1,6 +1,174 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
+ffi.cdef[[
+typedef struct VersusInfo {
+   int32_t race;
+   int32_t goodevil;
+   int32_t lawchaos;
+   int32_t deity_id;
+   int32_t subrace_id;
+   uint32_t obj_id;
+} VersusInfo;
+
+typedef struct EffectInfo {
+   int32_t index;
+   int32_t type_dec;
+   int32_t type_inc;
+   bool stack;
+   bool item_stack;
+   bool spell_stack;
+} EffectInfo;
+]]
+
+versus_info_t = ffi.typeof("VersusInfo")
+effect_info_t = ffi.typeof("EffectInfo")
+
+
+function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check, get_amount)
+   local total = 0
+   local eff_type, vs_info, eff_creator, eff, amount
+
+   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      vs_info = versus_info_t(vs:GetRacialType(),
+                              vs:GetGoodEvilValue(),
+                              vs:GetLawChaosValue(),
+                              vs:GetDeityId(),
+                              vs:GetSubraceId(),
+                              vs.id)
+   end
+
+   local bonus = {}
+   local pen = {}
+
+   local spell_bonus, item_bonus, spell_pen, item_pen
+   if not spell_stack then
+      spell_bonus = {}
+      spell_pen = {}
+   end
+
+   if not item_stack then
+      item_bonus = {}
+      item_pen = {}
+   end
+
+   for i = eff_info.index, self.obj.obj.obj_effects_len - 1 do
+      eff = self.obj.obj.obj_effects[i]
+      eff_type = eff.eff_type
+
+      amount = get_amount(eff)
+
+      -- If the effect is not in the effect type range then there is nothing left to do.
+      if not range_check(eff_type) then break end
+
+      -- Check if this effect is applicable versus the target.
+      if validity_check(eff, vs_info) then
+         if eff_type == eff_info.type_dec then
+            -- If effects from items do not stack and the effect was applied by an item,
+            -- find the highest applying
+            if not item_stack and not C.nwn_GetItemById(eff.eff_creator) == nil then
+               -- If the effect was applied by an item and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the bonus.
+               if not item_pen[eff.eff_creator] then
+                  item_pen[eff.eff_creator] = math.max(item_pen[eff.eff_creator], amount)
+               else
+                  item_pen[eff.eff_creator] = amount
+               end
+            -- If spells do not stack and the effect was applied via a spell, find the hightest
+            -- applying
+            elseif not spell_stack and eff.eff_spellid ~= -1 then
+               -- If the effect was applied by an item and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the bonus.
+               if not spell_pen[eff.eff_creator] then
+                  spell_pen[eff.eff_spellid] = math.max(spell_pen[eff.eff_spellid], amount)
+               else
+                  spell_pen[eff.eff_spellid] = amount
+               end
+            else
+               table.insert(pen, amount)
+            end
+         elseif eff_type == eff_info.type_inc then
+            -- If effects from items do not stack and the effect was applied by an item,
+            -- find the highest applying
+            if not item_stack and not C.nwn_GetItemById(eff.eff_creator) == nil then 
+               -- If the effect was applied by an item and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if not item_bonus[eff.eff_creator] then
+                  item_bonus[eff.eff_creator] = math.max(item_bonus[eff.eff_creator], amount)
+               else
+                  item_bonus[eff.eff_creator] = amount
+               end
+            -- If spells do not stack and the effect was applied via a spell, find the hightest
+            -- applying
+            elseif not spell_stack and eff.eff_spellid ~= -1 then
+               -- If the effect was applied by a spell and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if not spell_bonus[eff.eff_creator] then
+                  spell_bonus[eff.eff_spellid] = math.max(spell_bonus[eff.eff_spellid], amount)
+               else
+                  spell_bonus[eff.eff_spellid] = amount
+               end
+            else
+               table.insert(bonus, amount)
+            end
+         end
+      end
+   end
+
+   local total = 0
+   local total_pen = 0
+
+   for _, amount in ipairs(bonus) do
+      if eff_info.stack then
+         total = total + amount
+      else
+         total = math.max(total, amount)
+      end
+   end
+   
+   for _, amount in ipairs(spell_bonus) do
+      if eff_info.stack then
+         total = total + amount
+      else
+         total = math.max(total, amount)
+      end
+   end
+
+   for _, amount in ipairs(item_bonus) do
+      if eff_info.stack then
+         total = total + amount
+      else
+         total = math.max(total, amount)
+      end
+   end
+
+   for _, amount in ipairs(pen) do
+      if eff_info.stack then
+         total_pen = total_pen + amount
+      else
+         total_pen = math.max(total_pen, amount)
+      end
+   end
+
+   for _, amount in ipairs(spell_pen) do
+      if eff_info.stack then
+         total_pen = total_pen + amount
+      else
+         total_pen = math.max(total_pen, amount)
+      end
+   end
+
+   for _, amount in ipairs(item_pen) do
+      if eff_info.stack then
+         total_pen = total_pen + amount
+      else
+         total_pen = math.max(total_pen, amount)
+      end
+   end
+   
+   return total - total_pen
+end
+
 function Creature:GetConcealment(target, attack)
    local race, lawchaos, goodevil, subrace, deity, amount
    local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
@@ -246,3 +414,4 @@ function Creature:UpdateDamageReduction()
       end
    end
 end
+
