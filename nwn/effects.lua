@@ -81,6 +81,12 @@ function Effect:GetDurationRemaining ()
    return expire - current / 1000.0
 end 
 
+--- Get duration type
+-- @return nwn.DURATION_TYPE_*
+function Effect:GetDurationType()
+   return bit.band(self.eff.eff_dursubtype, 0x7)
+end
+
 --- Gets the specifed effects Id
 function Effect:GetId()
    return self.eff.eff_id
@@ -108,11 +114,10 @@ function Effect:GetSpellId()
    return self.eff.eff_spellid
 end
 
-
 --- Get the subtype of the effect.
--- @return SUBTYPE_*
+-- @return nwn.SUBTYPE_*
 function Effect:GetSubType()
-   return self.eff.eff_dursubtype
+   return bit.band(self.eff.eff_dursubtype, 0xFFF8)
 end
 
 --- Gets effects internal 'true' type.
@@ -125,6 +130,11 @@ end
 -- @param object 
 function Effect:SetCreator(object)
     self.eff.eff_creator = object.id
+end
+
+function Effect:SetDurationType(dur)
+   self.eff.eff_dursubtype = bit.bor(value, bit.band(self.eff.eff_dursubtype, 0xFFF8))
+   return self.eff.eff_dursubtype
 end
 
 --- Sets the internal effect integer at the specified index to the
@@ -159,9 +169,9 @@ function Effect:SetString(index, str)
 end
 
 --- Set the subtype of the effect.
--- @param value SUBTYPE_*
+-- @param value nwn.SUBTYPE_*
 function Effect:SetSubType(value)
-   self.eff.eff_dursubtype = value
+   self.eff.eff_dursubtype = bit.bor(value, bit.band(self.eff.eff_dursubtype, 0x7))
    return self.eff.eff_dursubtype
 end
 
