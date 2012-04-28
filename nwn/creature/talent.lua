@@ -22,7 +22,7 @@ local ne = nwn.engine
 -- @param talent The talent which will be checked for on the given creature.
 function Creature:GetHasTalent(talent)
    ne.StackPushObject(self)
-   ne.StackPushEngineStructure(ENGINE_STRUCTURE_TALENT, talent)
+   ne.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_TALENT, talent)
    ne.ExecuteCommand(306, 2)
    return ne.StackPopBoolean()
 end
@@ -35,7 +35,7 @@ function Creature:GetTalentBest(category, cr_max)
    ne.StackPushInteger(cr_max)
    ne.StackPushInteger(category)
    ne.ExecuteCommand(308, 3)
-   return ne.StackPopEngineStructure(ENGINE_STRUCTURE_TALENT)
+   return ne.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_TALENT)
 end
 
 --- Retrieves a random talent from a group of talents that a creature possesses.
@@ -44,6 +44,6 @@ function Creature:GetTalentRandom(category)
    ne.StackPushObject(self)
    ne.StackPushInteger(category)
    ne.ExecuteCommand(307, 2)
-   return ne.StackPopEngineStructure(ENGINE_STRUCTURE_TALENT)
+   return ne.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_TALENT)
 end
 

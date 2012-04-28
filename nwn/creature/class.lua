@@ -74,28 +74,43 @@ end
 ---
 -- @param class
 function Creature:GetLevelByClass(class)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(class)
-   nwn.engine.ExecuteCommand(343, 2)
-   return nwn.engine.StackPopInteger()
+   for cl in self:Classes() do
+      if cl_class == class then
+         return cl.cl_level
+      end
+   end
+
+   return 0
 end
 
 ---
 -- @param position
 function Creature:GetLevelByPosition(position)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(position)
-   nwn.engine.ExecuteCommand(342, 2)
-   return nwn.engine.StackPopInteger()
+   if position < 0 or position > 2 then 
+      error("Invalid class position: " .. position)
+   end
+
+   if not self:GetIsValid() then return 0 end
+
+   local cl = self.stats.cs_classes[position]
+   if cl == nil then return 0 end
+
+   return cl.cl_level
 end
 
 ---
 -- @param position
 function Creature:GetClassByPosition(position)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(position)
-   nwn.engine.ExecuteCommand(341, 2)
-   return nwn.engine.StackPopInteger()
+   if position < 0 or position > 2 then 
+      error("Invalid class position: " .. position)
+   end
+
+   if not self:GetIsValid() then return 0 end
+
+   local cl = self.stats.cs_classes[position]
+   if cl == nil then return 0 end
+
+   return cl.cl_class
 end
 
 ---

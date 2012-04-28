@@ -17,6 +17,7 @@
 --------------------------------------------------------------------------------
 
 local ffi = require 'ffi'
+local C = ffi.C
 
 ---
 function Creature:GetAge()
@@ -26,9 +27,8 @@ end
 
 ---
 function Creature:GetAppearanceType()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(577, 1)
-   return nwn.engine.StackPopInteger()
+   if not self:GetIsValid() then return -1 end
+   return self.stats.cs_appearance
 end
 
 ---
@@ -62,12 +62,20 @@ function Creature:GetDeityId()
    return 0
 end
 
-
----
-function Creature:GetHitDice()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(166, 1)
-   return nwn.engine.StackPopInteger()
+--- Calculate a creature's hit dice.
+-- @param use_neg_levels If true negative levels factored in to
+--    total hit dice. (Default: false)
+function Creature:GetHitDice(use_neg_levels)
+   local total = 0
+   for cl in self:Classes() do
+      -- Class level can never be negative.
+      if use_neg_levels then
+         total = total + math.max(0, cl.cl_level - cl.cl_negative_level)
+      else
+         total = total + cl.cl_level
+      end
+   end
+   return total
 end
 
 ---
@@ -79,9 +87,8 @@ end
 
 ---
 function Creature:GetIsEncounterCreature()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(409, 1)
-   return nwn.engine.StackPopBoolean()
+   if not self:GeIsValid() then return false end
+   return self.obj.cre_encounter_obj ~= nwn.OBJECT_INVALID.id
 end
 
 ---
@@ -92,7 +99,10 @@ end
 
 ---
 function Creature:GetPCFileName()
-   error "not implemented yet"
+   if not self:GetIsValid() then return "" end
+
+   local pl = C.nwn_GetPlayerByID(self.id)
+   return ffi.string(pl.pl_bicfile)
 end
 
 ---
@@ -106,9 +116,8 @@ end
 
 ---
 function Creature:GetStartingPackage()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(766, 1)
-   return nwn.engine.StackPopInteger()
+   if not self:GetIsValid() then return -1 end
+   return self.stats.cs_starting_package
 end
 
 ---
@@ -139,15 +148,16 @@ end
 function Creature:SetAge(age)
    if not self:GetIsValid() then return -1 end
    self.stats.cs_age = age
-   return self:GetAge()
+   return self.stats.cs_age
 end
 
 ---
 -- @param type
 function Creature:SetAppearanceType(type)
-   nwn.engine.StackPushInteger(type)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(765, 2)
+   if not self:GetIsValid() then return -1 end
+   
+   self.stats.cs_appearance = type
+   return self.stats.cs_appearance
 end
 
 ---
@@ -162,8 +172,15 @@ end
 
 ---
 --
-function Creature:SetDeity(sDeity)
-   error "unimplemented"
+function Creature:SetDeity(deity)
+   if not self:GetIsValid() then return "" end
+   
+   if self.stats.cs_deity ~= nil then
+      C.free(self.stats.cs_deity)
+   end
+   
+   self.stats.cs_deity = C.strdup(deity)
+   return deity
 end
 
 ---
@@ -185,5 +202,13 @@ end
 ---
 --
 function Creature:SetSubrace(subrace)
-   error "unimplemented"
+   if not self:GetIsValid() then return "" end
+   
+   if self.stats.cs_deity ~= nil then
+      C.free(self.stats.cs_subrace)
+   end
+   
+   self.stats.cs_subrace = C.strdup(subrace)
+   self.stats.cs_subrace_len = #subrace
+   return subrace
 end

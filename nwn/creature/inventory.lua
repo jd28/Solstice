@@ -20,6 +20,12 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 ---
+-- TODO fill in.
+function Creature:GetAmmunitionAvailable(attack_count)
+   return true
+end
+
+---
 --
 function Creature:Equips(creature)
    local i, _i = 1
