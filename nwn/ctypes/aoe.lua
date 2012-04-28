@@ -47,7 +47,7 @@ typedef struct CNWSAreaOfEffectObject {
     uint32_t            aoe_last_hb_day;     /* 021C */
     uint32_t            aoe_last_hb_time;    /* 0220 */
     uint32_t            aoe_duration;        /* 0224 */
-    uint8_t             aoe_duration_tyoe;   /* 0228 */
+    uint8_t             aoe_duration_type;   /* 0228 */
     uint8_t             field_0229;          /* 0229 */
     uint8_t             field_022A;          /* 022A */
     uint8_t             field_022B;          /* 022B */

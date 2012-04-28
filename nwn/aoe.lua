@@ -25,10 +25,12 @@ require 'nwn.ctypes.aoe'
 --     (Default: nwn.PERSISTENT_ZONE_ACTIVE) 
 -- @return All objects satisfying the object mask.
 function AoE:ObjectsInEffect(object_mask, persistent_zone)
-   local obj, _obj = self:GetFirstInPersistentObject(object_mask, persistent_zone)
-   while obj:GetIsValid() do
-      _obj, obj = obj, self:GetNextInPersistentObject(object_mask, persistent_zone)
-      return _obj
+   return function ()
+      local obj, _obj = self:GetFirstInPersistentObject(object_mask, persistent_zone)
+      while obj:GetIsValid() do
+         _obj, obj = obj, self:GetNextInPersistentObject(object_mask, persistent_zone)
+         return _obj
+      end
    end
 end
 
@@ -73,4 +75,20 @@ function AoE:GetCreator()
       return nwn.OBJECT_INVALID
    end
    return _NL_GET_CACHED_OBJECT(self.obj.aoe_creator)
+end
+
+---
+function AoE:SetSpellDC(dc)
+   if not self:GetIsValid() then return -1 end
+   
+   self.obj.aoe_spell_dc = dc
+   return self.obj.aoe_spell_dc
+end
+
+---
+function AoE:SetSpellLevel(level)
+   if not self:GetIsValid() then return -1 end
+   
+   self.obj.aoe_spell_level = level
+   return self.obj.aoe_spell_level
 end

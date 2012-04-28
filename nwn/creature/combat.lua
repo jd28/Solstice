@@ -248,9 +248,9 @@ function Creature:GetEffectAttackBonus(target, attack_type)
                               nwn.EFFECT_TRUETYPE_ATTACK_INCREASE,
                               true, false, false)
 
-   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+   return math.clamp(self:GetTotalEffectBonus(target, info, range, valid, get_amount),
                      0, 
-                     self:GetMaxABBonus())
+                     self:GetMaxAttackBonus())
 end
 
 function Creature:GetEffectArmorClassBonus(attacker, touch)
@@ -550,6 +550,11 @@ function Creature:GetLastTrapDetected()
    ne.StackPushObject(self)
    ne.ExecuteCommand(486, 1)
    return ne.StackPopObject()
+end
+
+---
+function Creature:GetMaxAttackBonus()
+   return 20
 end
 
 ---

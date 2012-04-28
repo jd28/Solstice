@@ -19,25 +19,6 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
---[[
-function Object:ApplyCustomDamage(type, amount, power)
-   if not _CUSTOM_DAMAGE[type] then 
-      error("Invalid Custom Damage Type")
-   end
-   for eff in self:EffectsDirect() do
-      if eff:GetTrueType() == EFFECT_TRUETYPE_TEMPORARY_HITPOINTS then
-         local thp = eff:GetInt(0)
-         if thp > amount then
-            eff:SetInt(0, thp - amount)
-         else
-            amount = amount - thp
-            self:RemoveEffectById(eff.eff.eff_id)
-         end
-      end
-   end
-end
---]]
-
 --- Applies damage to an object.
 -- @param type Damage type. (Default: nwn.DAMAGE_TYPE_MAGICAL)
 -- @param amount Amount of damage.

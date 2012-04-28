@@ -31,8 +31,8 @@ local nie = require 'nwn.internal.effects'
 
 local effect_mt = { __index = Effect,
                     __gc = function(eff) 
-                       if not eff.direct then
-                          C.free(eff)
+                       if not eff.direct and eff.eff ~= nil then
+                          C.free(eff.eff)
                        end
                     end
 }
@@ -182,63 +182,143 @@ function Effect:SetTrueType(value)
    return self.eff.eff_type
 end
 
---[[
 function Effect:SetVersusAlignment(lawchaos, goodevil)
+   local lcidx
+   local geidx
+   local type = self.eff.eff_type
    lawchaos = lawchaos or nwn.ALIGNMENT_ALL
    goodevil = goodevil or nwn.ALIGNMENT_ALL
-   --self.eff.
+
+   if type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_SKILL_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_SKILL_DECREASE 
+   then
+      lcidx, geidx = 3, 4
+   elseif type == nwn.EFFECT_TRUETYPE_CONCEALMENT 
+      or type == nwn.EFFECT_TRUETYPE_IMMUNITY 
+      or type == nwn.EFFECT_TRUETYPE_INVISIBILITY
+      or type == nwn.EFFECT_TRUETYPE_SANCTUARY
+   then
+      lcidx, geidx = 2, 3
+   else
+      error(string.format("Effect Type (%d) does not support versus alignment", type))
+      return
+   end
+
+   self:SetInt(lcidx, lawchaos)
+   self:SetInt(geidx, goodevil)
+end
+
+function Effect:SetVersusDeity(deity)
+   local idx
+   local type = self.eff.eff_type
+
+   if type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_DECREASE 
+   then
+      idx = 6
+   elseif type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_AC_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_DECREASE
+   then
+      idx = 7
+   elseif type == nwn.EFFECT_TRUETYPE_IMMUNITY then
+      
+   else
+      error(string.format("Effect Type (%d) does not support versus deity", type))
+      return
+   end
+
+   self:SetInt(idx, deity)
 end
 
 function Effect:SetVersusRace(race)
+   local idx
+   local type = self.eff.eff_type
 
+  if type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_DECREASE
+      or type == nwn.EFFECT_TRUETYPE_SKILL_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_SKILL_DECREASE 
+   then
+      idx = 2
+   elseif type == nwn.EFFECT_TRUETYPE_CONCEALMENT 
+      or type == nwn.EFFECT_TRUETYPE_IMMUNITY 
+      or type == nwn.EFFECT_TRUETYPE_INVISIBILITY
+      or type == nwn.EFFECT_TRUETYPE_SANCTUARY
+   then
+      idx = 1
+      error(string.format("Effect Type (%d) does not support versus race", type))
+      return
+   end
+
+   self:SetInt(idx, race)
 end
 
-function Effect:SetVersusTrap()
+function Effect:SetVersusSubrace(subrace)
+   local idx
+   local type = self.eff.eff_type
 
+   if type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_DECREASE 
+   then
+      idx = 5
+   elseif type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_AC_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_DECREASE
+   then
+      idx = 6
+   elseif type == nwn.EFFECT_TRUETYPE_CONCEALMENT then
+   elseif type == nwn.EFFECT_TRUETYPE_IMMUNITY then
+   else
+      error(string.format("Effect Type (%d) does not support versus subrace", type))
+      return
+   end
+
+   self:SetInt(idx, subrace)
 end
 
-static int NWScript_VersusAlignmentEffect(lua_State *L)
-{
-	void *eEffect = luaL_checklightnwndata(L, 1, EFFECT)
-	int nLawChaos = luaL_optint(L, 2, ALIGNMENT_ALL)
-	int nGoodEvil = luaL_optint(L, 3, ALIGNMENT_ALL)
-	
-	StackPushInteger(nGoodEvil)
-	StackPushInteger(nLawChaos)
-	StackPushEngineStructure(ENGINE_STRUCTURE_EFFECT, eEffect)
-	VM_ExecuteCommand(355, 3)
-	void *pRetVal
-	StackPopEngineStructure(ENGINE_STRUCTURE_EFFECT, &pRetVal)
-	lua_pushlightuserdata(L, pRetVal)
-  return 1
-}
+function Effect:SetVersusTarget(target)
+   if not target:GetIsValid() then return end
 
-static int NWScript_VersusRacialTypeEffect(lua_State *L)
-{
-	void *eEffect = luaL_checklightnwndata(L, 1, EFFECT)
-	int nRacialType = luaL_checkint(L, 2)
-  
-	StackPushInteger(nRacialType)
-	StackPushEngineStructure(ENGINE_STRUCTURE_EFFECT, eEffect)
-	VM_ExecuteCommand(356, 2)
-	void *pRetVal
-	StackPopEngineStructure(ENGINE_STRUCTURE_EFFECT, &pRetVal)
-	lua_pushlightuserdata(L, pRetVal)
-  return 1
-}
+   local idx
+   local type = self.eff.eff_type
 
-static int NWScript_VersusTrapEffect(lua_State *L)
-{
-	void *eEffect = luaL_checklightnwndata(L, 1, EFFECT)
-  
-	StackPushEngineStructure(ENGINE_STRUCTURE_EFFECT, eEffect)
-	VM_ExecuteCommand(357, 1)
-	void *pRetVal
-	StackPopEngineStructure(ENGINE_STRUCTURE_EFFECT, &pRetVal)
-	lua_pushlightuserdata(L, pRetVal)
-  return 1
-}
-   --]]
+   if type == nwn.EFFECT_TRUETYPE_ATTACK_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_ATTACK_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_INCREASE 
+      or type == nwn.EFFECT_TRUETYPE_SKILL_DECREASE 
+   then
+      idx = 7
+   elseif type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE 
+      or type == nwn.EFFECT_TRUETYPE_AC_INCREASE
+      or type == nwn.EFFECT_TRUETYPE_AC_DECREASE
+   then
+      idx = 8
+   elseif type == nwn.EFFECT_TRUETYPE_IMMUNITY then
+   else
+      error(string.format("Effect Type (%d) does not support versus target", type))
+      return
+   end
+
+   self:SetInt(idx, target.id)
+end
 
 ----------------------------------------------------------------------
 

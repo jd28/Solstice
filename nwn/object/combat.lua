@@ -60,6 +60,25 @@ function NSOnApplyDamage(obj, a)
    obj:DoDamage(total)
    -- OnDamagedEvent
 
+   -- To do these VFX really aren't worthwhile.
+   if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      local c = nwn.Get2DAString("appearance", "BLOODCOLR", obj:GetAppearanceType())
+      local vfx
+      if c == "W" or obj.obj.cre_state == 15 then
+         vfx = 239
+      elseif c == "R" then
+         vfx = 239
+      elseif c == "G" then
+         vfx = 116
+      elseif c == "Y" then
+            vfx = 117
+      end
+      print(c, vfx)
+      if vfx then
+         obj:ApplyVisual(vfx)
+      end
+   end
+
    -- If after applying the damage the target isn't 'dead'
    -- there's nothing left to do.  If however they are dead
    -- a death effect must be applied.
@@ -87,16 +106,18 @@ end
 
 --- Determine who last attacked a creature, door or placeable object.
 function Object:GetLastAttacker()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(36, 1)
-   return nwn.engine.StackPopObject()
+   if not self:GetIsValid() then return nwn.OBJECT_INVALID end
+   local actor = self.obj.obj.obj_last_attacker
+   
+   return _NL_GET_CACHED_OBJECT(actor)
 end
 
 --- Get the object which last damaged a creature or placeable object.
 function Object:GetLastDamager()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(346, 1)
-   nwn.engine.StackPopObject()
+   if not self:GetIsValid() then return nwn.OBJECT_INVALID end
+   local actor = self.obj.obj.obj_last_damager
+   
+   return _NL_GET_CACHED_OBJECT(actor)
 end
 
 --- Gets the last living, non plot creature that performed a

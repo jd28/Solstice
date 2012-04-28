@@ -17,7 +17,6 @@
 --------------------------------------------------------------------------------
 
 local class_ability_reqs = {}
-local class_combat_bonus = {}
 
 function nwn.GetClassAbilityRequirements(class)
    return class_ability_reqs[class]
@@ -25,12 +24,4 @@ end
 
 function nwn.SetClassAbilityRequirements(class, f)
    class_ability_reqs[class] = f
-end
-
-function nwn.GetClassCombatBonus(class)
-   return class_combat_bonus[class]
-end
-
-function nwn.SetClassCombatBonus(class, f)
-   class_combat_bonus[class] = f
 end

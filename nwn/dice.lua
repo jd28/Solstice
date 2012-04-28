@@ -14,106 +14,63 @@ dice_roll_t = ffi.typeof('DiceRoll')
 -- @param count number of dice to roll
 function nwn.d2(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(2)
-   end
-   return result
+   return nwn.RollDice(count, 2)
 end
 
 --- Rolls a d3
 -- @param count number of dice to roll
 function nwn.d3(count)
    count = count or 1
-   local result = 0    
-
-   for i = 1, count do
-      result = result + math.random(3)
-   end
-   return result
+   return nwn.RollDice(count, 3)
 end
 
 --- Rolls a d4
 -- @param count number of dice to roll
 function nwn.d4(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(4)
-   end
-   return result
+   return nwn.RollDice(count, 4)
 end
 
 --- Rolls a d6
 -- @param count number of dice to roll
 function nwn.d6(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(6)
-   end
-   return result
+   return nwn.RollDice(count, 6)
 end
 
 --- Rolls a d8
 -- @param count number of dice to roll
 function nwn.d8(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(8)
-   end
+   return nwn.RollDice(count, 8)
 end
 
 --- Rolls a d10
 -- @param count number of dice to roll
 function nwn.d10(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(10)
-   end
-   return result
+   return nwn.RollDice(count, 10)
 end
 
 --- Rolls a d12
 -- @param count number of dice to roll
 function nwn.d12(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(12)
-   end
+   return nwn.RollDice(count, 12)
 end
 
 --- Rolls a d20
 -- @param count number of dice to roll
 function nwn.d20(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(20)
-   end
-   return result
+   return nwn.RollDice(count, 20)
 end
 
 --- Rolls a d100
 -- @param count number of dice to roll
 function nwn.d100(count)
    count = count or 1
-   local result = 0
-   
-   for i = 1, count do
-      result = result + math.random(100)
-   end
-   return result
+   return nwn.RollDice(count, 100)
 end
 
 function nwn.DoDiceRoll(roll)
@@ -121,6 +78,7 @@ function nwn.DoDiceRoll(roll)
 end
 
 function nwn.RollDice(dice, sides, bonus)
+   bonus = bonus or 0
    local result = 0
    
    for i = 1, dice do

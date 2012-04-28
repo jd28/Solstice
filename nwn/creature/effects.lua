@@ -206,7 +206,7 @@ function Creature:GetConcealment(target, attack)
       race      = self.obj.obj.obj_effects[i].eff_integers[1]
       lawchaos  = self.obj.obj.obj_effects[i].eff_integers[2]
       goodevil  = self.obj.obj.obj_effects[i].eff_integers[3]
-      miss_type = self.obj.obj.obj_effects[i].eff_integers[3]
+      miss_type = self.obj.obj.obj_effects[i].eff_integers[4]
       subrace   = self.obj.obj.obj_effects[i].eff_integers[5]
       deity     = self.obj.obj.obj_effects[i].eff_integers[6]
       valid     = false
@@ -258,6 +258,74 @@ function Creature:GetConcealment(target, attack)
       end
    end
    return total
+end
+
+function NSGetEffectImmunity(cre, vs, imm_type)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+   return cre:GetEffectImmunity(vs, imm_type)
+end
+
+---
+-- @param imm_type NOTE: This is NOT an nwn.IMMUNITY_TYPE_* constant.
+--   it is an internal game engine constant.  Passing in nwn.IMMUNITY_TYPE_*
+--   will result in weird behavior.  The internal constant is 
+--   nwn.IMMUNITY_TYPE_* + 69
+function Creature:GetEffectImmunity(vs, imm_type)
+   local race, lawchaos, goodevil, subrace, deity, immunity, percent
+   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id, target
+
+   local total = 0
+   local eff_type
+
+   if vs:GetIsValid() then
+      trace = vs:GetRacialType()
+      tgoodevil = vs:GetGoodEvilValue()
+      tlawchaos = vs:GetLawChaosValue()
+      tdeity_id = vs:GetDeityId()
+      tsubrace_id = vs:GetSubraceId()
+   end
+
+   for i = self.stats.cs_first_imm_eff, self.obj.obj.obj_effects_len - 1 do
+      eff_type = self.obj.obj.obj_effects[i].eff_type
+
+      if eff_type ~= nwn.EFFECT_TRUETYPE_IMMUNITY then
+         break
+      end
+      
+      immunity  = self.obj.obj.obj_effects[i].eff_integers[0]
+
+      race      = self.obj.obj.obj_effects[i].eff_integers[1]
+      lawchaos  = self.obj.obj.obj_effects[i].eff_integers[2]
+      goodevil  = self.obj.obj.obj_effects[i].eff_integers[3]
+
+      percent   = self.obj.obj.obj_effects[i].eff_integers[4]
+
+      subrace   = self.obj.obj.obj_effects[i].eff_integers[5]
+      deity     = self.obj.obj.obj_effects[i].eff_integers[6]
+      target    = self.obj.obj.obj_effects[i].eff_integers[6]
+            
+      if immunity == imm_type
+         and (race == nwn.RACIAL_TYPE_INVALID or race == trace)
+         and (lawchaos == 0 or lawchaos == tlawchaos)
+         and (goodevil == 0 or goodevil == tgoodevil)
+         and (subrace == 0 or subrace == tsubrace_id)
+         and (deity == 0 or deity == tdeity_id)
+         and (target == 0 or target == vs.id)
+      then
+         total = total + percent
+      end
+   end
+
+   if percent >= 100 then 
+      return true
+   elseif percent <= 0 then
+      return false
+   elseif percent > math.random(100) then
+      return true
+   end
+
+   return false
 end
 
 ---
