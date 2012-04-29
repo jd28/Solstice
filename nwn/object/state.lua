@@ -50,6 +50,29 @@ function Object:GetIsDead()
    return false
 end
 
+function NSGetIsPCDying(obj)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   return obj:GetIsPCDying()
+end
+
+--- Determines if a creature is dead or dying.
+function Object:GetIsPCDying()
+   if not self:GetIsValid() 
+      or self.type ~= nwn.GAME_OBJECT_TYPE_CREATURE 
+      or not self:GetIsPC()
+      or not self:GetIsPossessedFamiliar()
+   then
+      return false
+   end
+
+   local hp = self:GetCurrentHitPoints()
+   if hp <= 0 and hp > NS_SETTINGS.NS_OPT_HP_LIMIT then
+      return true
+   end
+
+   return false
+end
+
 ---
 function Object:SetCommandable(commandable)
    nwn.engine.StackPushObject(self);
