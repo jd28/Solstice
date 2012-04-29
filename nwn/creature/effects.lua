@@ -317,11 +317,11 @@ function Creature:GetEffectImmunity(vs, imm_type)
       end
    end
 
-   if percent >= 100 then 
+   if total >= 100 then 
       return true
-   elseif percent <= 0 then
+   elseif total <= 0 then
       return false
-   elseif percent > math.random(100) then
+   elseif total > math.random(100) then
       return true
    end
 

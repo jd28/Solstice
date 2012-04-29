@@ -19,21 +19,21 @@
 ---
 --
 function Creature:GetPCBodyBag()
-   if not self:GetIsValid then return -1 end
+   if not self:GetIsValid() then return -1 end
    return self.obj.cre_bodybag
 end
 
 ---
 --
 function Creature:GetPCBodyBagID()
-   if not self:GetIsValid then return -1 end
+   if not self:GetIsValid() then return -1 end
    return self.obj.cre_bodybag_id
 end
 
 ---
 --
 function Creature:SetPCBodyBag(bodybag)
-   if not self:GetIsValid then return -1 end
+   if not self:GetIsValid() then return -1 end
 
    self.obj.cre_bodybag = bodybag
    return self.obj.cre_bodybag
@@ -42,7 +42,7 @@ end
 ---
 --
 function Creature:SetPCBodyBagID(bodybagid)
-   if not self:GetIsValid then return -1 end
+   if not self:GetIsValid() then return -1 end
 
    self.obj.cre_bodybag_id = bodybagid
    return self.obj.cre_bodybag_id
@@ -51,7 +51,7 @@ end
 ---
 --
 function Creature:SetPCLootable(lootable)
-   if not self:GetIsValid then return -1 end
+   if not self:GetIsValid() then return -1 end
 
    self.obj.cre_lootable = lootable
    return self.obj.cre_lootable
