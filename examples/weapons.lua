@@ -1,5 +1,8 @@
 require 'nwn.weapons'
 
+-- Register Monk weapons and their requist levels.
+nwn.RegisterMonkWeapon(nwn.BASE_ITEM_KAMA, 1)
+
 -- The value is the minimum creature size necessary to finesse weapon.
 nwn.RegisterWeaponUsableWithFeat(nwn.FEAT_WEAPON_FINESSE, nwn.BASE_ITEM_RAPIER, 3)
 nwn.RegisterWeaponUsableWithFeat(nwn.FEAT_WEAPON_FINESSE, nwn.BASE_ITEM_KATANA, 3)

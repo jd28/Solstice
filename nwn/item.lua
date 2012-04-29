@@ -166,6 +166,10 @@ function Item:GetIdentified()
    return self.obj.it_identified == 1
 end
 
+function Item:GetIsMonkWeapon()
+   return nwn.GetIsMonkWeapon(self:GetBaseType())
+end
+
 function Item:GetIsRangedWeapon()
    if not self:GetIsValid() then return false end
 

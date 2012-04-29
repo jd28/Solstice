@@ -28,6 +28,10 @@ nwn.WEAPON_MASTERFEAT_WEAPON_OF_CHOICE = 9
 nwn.WEAPON_MASTERFEAT_SPECIALIZATION = 2
 nwn.WEAPON_MASTERFEAT_SPECIALIZATION_EPIC = 11
 
+function nwn.GetIsMonkWeapon(baseitem)
+   return WEAPONS.monk[baseitem]
+end
+
 function nwn.GetWeaponAttackAbilityModifier(cre, weap, ability)
    if not WEAPONS.ab_abil or not WEAPONS.ab_abil[ability] then
       return 0
@@ -63,6 +67,11 @@ function nwn.GetWeaponUsableWithFeat(feat, baseitem)
       return 
    end
    return WEAPONS.useable[feat][baseitem]
+end
+
+function nwn.RegisterMonkWeapon(baseitem, level)
+   WEAPONS.monk = WEAPONS.monk or {}
+   WEAPONS.monk[baseitem] = level
 end
 
 function nwn.RegisterWeaponAttackAbility(ability, f)

@@ -1,3 +1,237 @@
+nwn.ITEM_APPR_TYPE_SIMPLE_MODEL         = 0
+nwn.ITEM_APPR_TYPE_WEAPON_COLOR         = 1
+nwn.ITEM_APPR_TYPE_WEAPON_MODEL         = 2
+nwn.ITEM_APPR_TYPE_ARMOR_MODEL          = 3
+nwn.ITEM_APPR_TYPE_ARMOR_COLOR          = 4
+nwn.ITEM_APPR_NUM_TYPES                 = 5
+
+nwn.ITEM_APPR_ARMOR_COLOR_LEATHER1      = 0
+nwn.ITEM_APPR_ARMOR_COLOR_LEATHER2      = 1
+nwn.ITEM_APPR_ARMOR_COLOR_CLOTH1        = 2
+nwn.ITEM_APPR_ARMOR_COLOR_CLOTH2        = 3
+nwn.ITEM_APPR_ARMOR_COLOR_METAL1        = 4
+nwn.ITEM_APPR_ARMOR_COLOR_METAL2        = 5
+nwn.ITEM_APPR_ARMOR_NUM_COLORS          = 6
+
+nwn.ITEM_APPR_ARMOR_MODEL_RFOOT         = 0
+nwn.ITEM_APPR_ARMOR_MODEL_LFOOT         = 1
+nwn.ITEM_APPR_ARMOR_MODEL_RSHIN         = 2
+nwn.ITEM_APPR_ARMOR_MODEL_LSHIN         = 3
+nwn.ITEM_APPR_ARMOR_MODEL_LTHIGH        = 4
+nwn.ITEM_APPR_ARMOR_MODEL_RTHIGH        = 5
+nwn.ITEM_APPR_ARMOR_MODEL_PELVIS        = 6
+nwn.ITEM_APPR_ARMOR_MODEL_TORSO         = 7
+nwn.ITEM_APPR_ARMOR_MODEL_BELT          = 8
+nwn.ITEM_APPR_ARMOR_MODEL_NECK          = 9
+nwn.ITEM_APPR_ARMOR_MODEL_RFOREARM      = 10
+nwn.ITEM_APPR_ARMOR_MODEL_LFOREARM      = 11
+nwn.ITEM_APPR_ARMOR_MODEL_RBICEP        = 12
+nwn.ITEM_APPR_ARMOR_MODEL_LBICEP        = 13
+nwn.ITEM_APPR_ARMOR_MODEL_RSHOULDER     = 14
+nwn.ITEM_APPR_ARMOR_MODEL_LSHOULDER     = 15
+nwn.ITEM_APPR_ARMOR_MODEL_RHAND         = 16
+nwn.ITEM_APPR_ARMOR_MODEL_LHAND         = 17
+nwn.ITEM_APPR_ARMOR_MODEL_ROBE          = 18
+nwn.ITEM_APPR_ARMOR_NUM_MODELS          = 19
+
+nwn.ITEM_APPR_WEAPON_MODEL_BOTTOM       = 0
+nwn.ITEM_APPR_WEAPON_MODEL_MIDDLE       = 1
+nwn.ITEM_APPR_WEAPON_MODEL_TOP          = 2
+
+nwn.ITEM_APPR_WEAPON_COLOR_BOTTOM       = 0
+nwn.ITEM_APPR_WEAPON_COLOR_MIDDLE       = 1
+nwn.ITEM_APPR_WEAPON_COLOR_TOP          = 2
+
+nwn.ITEM_PROPERTY_ABILITY_BONUS                            = 0
+nwn.ITEM_PROPERTY_AC_BONUS                                 = 1
+nwn.ITEM_PROPERTY_AC_BONUS_VS_ALIGNMENT_GROUP              = 2
+nwn.ITEM_PROPERTY_AC_BONUS_VS_DAMAGE_TYPE                  = 3
+nwn.ITEM_PROPERTY_AC_BONUS_VS_RACIAL_GROUP                 = 4
+nwn.ITEM_PROPERTY_AC_BONUS_VS_SPECIFIC_ALIGNMENT           = 5
+nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS                        = 6
+nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS_VS_ALIGNMENT_GROUP     = 7
+nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS_VS_RACIAL_GROUP        = 8
+nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS_VS_SPECIFIC_ALIGNEMENT = 9
+nwn.ITEM_PROPERTY_DECREASED_ENHANCEMENT_MODIFIER           = 10
+nwn.ITEM_PROPERTY_BASE_ITEM_WEIGHT_REDUCTION               = 11
+nwn.ITEM_PROPERTY_BONUS_FEAT                               = 12
+nwn.ITEM_PROPERTY_BONUS_SPELL_SLOT_OF_LEVEL_N              = 13
+
+nwn.ITEM_PROPERTY_CAST_SPELL                               = 15
+nwn.ITEM_PROPERTY_DAMAGE_BONUS                             = 16
+nwn.ITEM_PROPERTY_DAMAGE_BONUS_VS_ALIGNMENT_GROUP          = 17
+nwn.ITEM_PROPERTY_DAMAGE_BONUS_VS_RACIAL_GROUP             = 18
+nwn.ITEM_PROPERTY_DAMAGE_BONUS_VS_SPECIFIC_ALIGNMENT       = 19
+nwn.ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE                     = 20
+nwn.ITEM_PROPERTY_DECREASED_DAMAGE                         = 21
+nwn.ITEM_PROPERTY_DAMAGE_REDUCTION                         = 22
+nwn.ITEM_PROPERTY_DAMAGE_RESISTANCE                        = 23
+nwn.ITEM_PROPERTY_DAMAGE_VULNERABILITY                     = 24
+
+nwn.ITEM_PROPERTY_DARKVISION                               = 26
+nwn.ITEM_PROPERTY_DECREASED_ABILITY_SCORE                  = 27
+nwn.ITEM_PROPERTY_DECREASED_AC                             = 28
+nwn.ITEM_PROPERTY_DECREASED_SKILL_MODIFIER                 = 29
+
+
+nwn.ITEM_PROPERTY_ENHANCED_CONTAINER_REDUCED_WEIGHT        = 32
+nwn.ITEM_PROPERTY_EXTRA_MELEE_DAMAGE_TYPE                  = 33
+nwn.ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE                 = 34
+nwn.ITEM_PROPERTY_HASTE                                    = 35
+nwn.ITEM_PROPERTY_HOLY_AVENGER                             = 36
+nwn.ITEM_PROPERTY_IMMUNITY_MISCELLANEOUS                   = 37
+nwn.ITEM_PROPERTY_IMPROVED_EVASION                         = 38
+nwn.ITEM_PROPERTY_SPELL_RESISTANCE                         = 39
+nwn.ITEM_PROPERTY_SAVING_THROW_BONUS                       = 40
+nwn.ITEM_PROPERTY_SAVING_THROW_BONUS_SPECIFIC              = 41
+nwn.ITEM_PROPERTY_KEEN                                     = 43
+nwn.ITEM_PROPERTY_LIGHT                                    = 44
+nwn.ITEM_PROPERTY_MIGHTY                                   = 45
+nwn.ITEM_PROPERTY_MIND_BLANK                               = 46
+nwn.ITEM_PROPERTY_NO_DAMAGE                                = 47
+nwn.ITEM_PROPERTY_ON_HIT_PROPERTIES                        = 48
+nwn.ITEM_PROPERTY_DECREASED_SAVING_THROWS                  = 49
+nwn.ITEM_PROPERTY_DECREASED_SAVING_THROWS_SPECIFIC         = 50
+nwn.ITEM_PROPERTY_REGENERATION                             = 51
+nwn.ITEM_PROPERTY_SKILL_BONUS                              = 52
+nwn.ITEM_PROPERTY_IMMUNITY_SPECIFIC_SPELL                  = 53
+nwn.ITEM_PROPERTY_IMMUNITY_SPELL_SCHOOL                    = 54
+nwn.ITEM_PROPERTY_THIEVES_TOOLS                            = 55
+nwn.ITEM_PROPERTY_ATTACK_BONUS                             = 56
+nwn.ITEM_PROPERTY_ATTACK_BONUS_VS_ALIGNMENT_GROUP          = 57
+nwn.ITEM_PROPERTY_ATTACK_BONUS_VS_RACIAL_GROUP             = 58
+nwn.ITEM_PROPERTY_ATTACK_BONUS_VS_SPECIFIC_ALIGNMENT       = 59
+nwn.ITEM_PROPERTY_DECREASED_ATTACK_MODIFIER                = 60
+nwn.ITEM_PROPERTY_UNLIMITED_AMMUNITION                     = 61
+nwn.ITEM_PROPERTY_USE_LIMITATION_ALIGNMENT_GROUP           = 62
+nwn.ITEM_PROPERTY_USE_LIMITATION_CLASS                     = 63
+nwn.ITEM_PROPERTY_USE_LIMITATION_RACIAL_TYPE               = 64
+nwn.ITEM_PROPERTY_USE_LIMITATION_SPECIFIC_ALIGNMENT        = 65
+nwn.ITEM_PROPERTY_USE_LIMITATION_TILESET                   = 66
+nwn.ITEM_PROPERTY_REGENERATION_VAMPIRIC                    = 67
+
+nwn.ITEM_PROPERTY_TRAP                                     = 70
+nwn.ITEM_PROPERTY_TRUE_SEEING                              = 71
+nwn.ITEM_PROPERTY_ON_MONSTER_HIT                           = 72
+nwn.ITEM_PROPERTY_TURN_RESISTANCE                          = 73
+nwn.ITEM_PROPERTY_MASSIVE_CRITICALS                        = 74
+nwn.ITEM_PROPERTY_FREEDOM_OF_MOVEMENT                      = 75
+
+-- no longer working, poison is now a on_hit subtype
+nwn.ITEM_PROPERTY_POISON                                   = 76
+
+nwn.ITEM_PROPERTY_MONSTER_DAMAGE                           = 77
+nwn.ITEM_PROPERTY_IMMUNITY_SPELLS_BY_LEVEL                 = 78
+
+nwn.ITEM_PROPERTY_SPECIAL_WALK                             = 79
+nwn.ITEM_PROPERTY_HEALERS_KIT                              = 80
+nwn.ITEM_PROPERTY_WEIGHT_INCREASE                          = 81
+nwn.ITEM_PROPERTY_ONHITCASTSPELL                           = 82
+nwn.ITEM_PROPERTY_VISUALEFFECT                             = 83
+nwn.ITEM_PROPERTY_ARCANE_SPELL_FAILURE                     = 84
+
+nwn.ITEM_PROPERTY_MATERIAL                                 = 85
+nwn.ITEM_PROPERTY_QUALITY                                  = 86
+nwn.ITEM_PROPERTY_ADDITIONAL                               = 87
+
+
+nwn.BASE_ITEM_SHORTSWORD            = 0
+nwn.BASE_ITEM_LONGSWORD             = 1
+nwn.BASE_ITEM_BATTLEAXE             = 2
+nwn.BASE_ITEM_BASTARDSWORD          = 3
+nwn.BASE_ITEM_LIGHTFLAIL            = 4
+nwn.BASE_ITEM_WARHAMMER             = 5
+nwn.BASE_ITEM_HEAVYCROSSBOW         = 6
+nwn.BASE_ITEM_LIGHTCROSSBOW         = 7
+nwn.BASE_ITEM_LONGBOW               = 8
+nwn.BASE_ITEM_LIGHTMACE             = 9
+nwn.BASE_ITEM_HALBERD               = 10
+nwn.BASE_ITEM_SHORTBOW              = 11
+nwn.BASE_ITEM_TWOBLADEDSWORD        = 12
+nwn.BASE_ITEM_GREATSWORD            = 13
+nwn.BASE_ITEM_SMALLSHIELD           = 14
+nwn.BASE_ITEM_TORCH                 = 15
+nwn.BASE_ITEM_ARMOR                 = 16
+nwn.BASE_ITEM_HELMET                = 17
+nwn.BASE_ITEM_GREATAXE              = 18
+nwn.BASE_ITEM_AMULET                = 19
+nwn.BASE_ITEM_ARROW                 = 20
+nwn.BASE_ITEM_BELT                  = 21
+nwn.BASE_ITEM_DAGGER                = 22
+nwn.BASE_ITEM_MISCSMALL             = 24
+nwn.BASE_ITEM_BOLT                  = 25
+nwn.BASE_ITEM_BOOTS                 = 26
+nwn.BASE_ITEM_BULLET                = 27
+nwn.BASE_ITEM_CLUB                  = 28
+nwn.BASE_ITEM_MISCMEDIUM            = 29
+nwn.BASE_ITEM_DART                  = 31
+nwn.BASE_ITEM_DIREMACE              = 32
+nwn.BASE_ITEM_DOUBLEAXE             = 33
+nwn.BASE_ITEM_MISCLARGE             = 34
+nwn.BASE_ITEM_HEAVYFLAIL            = 35
+nwn.BASE_ITEM_GLOVES                = 36
+nwn.BASE_ITEM_LIGHTHAMMER           = 37
+nwn.BASE_ITEM_HANDAXE               = 38
+nwn.BASE_ITEM_HEALERSKIT            = 39
+nwn.BASE_ITEM_KAMA                  = 40
+nwn.BASE_ITEM_KATANA                = 41
+nwn.BASE_ITEM_KUKRI                 = 42
+nwn.BASE_ITEM_MISCTALL              = 43
+nwn.BASE_ITEM_MAGICROD              = 44
+nwn.BASE_ITEM_MAGICSTAFF            = 45
+nwn.BASE_ITEM_MAGICWAND             = 46
+nwn.BASE_ITEM_MORNINGSTAR           = 47
+
+nwn.BASE_ITEM_POTIONS               = 49
+nwn.BASE_ITEM_QUARTERSTAFF          = 50
+nwn.BASE_ITEM_RAPIER                = 51
+nwn.BASE_ITEM_RING                  = 52
+nwn.BASE_ITEM_SCIMITAR              = 53
+nwn.BASE_ITEM_SCROLL                = 54
+nwn.BASE_ITEM_SCYTHE                = 55
+nwn.BASE_ITEM_LARGESHIELD           = 56
+nwn.BASE_ITEM_TOWERSHIELD           = 57
+nwn.BASE_ITEM_SHORTSPEAR            = 58
+nwn.BASE_ITEM_SHURIKEN              = 59
+nwn.BASE_ITEM_SICKLE                = 60
+nwn.BASE_ITEM_SLING                 = 61
+nwn.BASE_ITEM_THIEVESTOOLS          = 62
+nwn.BASE_ITEM_THROWINGAXE           = 63
+nwn.BASE_ITEM_TRAPKIT               = 64
+nwn.BASE_ITEM_KEY                   = 65
+nwn.BASE_ITEM_LARGEBOX              = 66
+nwn.BASE_ITEM_MISCWIDE              = 68
+nwn.BASE_ITEM_CSLASHWEAPON          = 69
+nwn.BASE_ITEM_CPIERCWEAPON          = 70
+nwn.BASE_ITEM_CBLUDGWEAPON          = 71
+nwn.BASE_ITEM_CSLSHPRCWEAP          = 72
+nwn.BASE_ITEM_CREATUREITEM          = 73
+nwn.BASE_ITEM_BOOK                  = 74
+nwn.BASE_ITEM_SPELLSCROLL           = 75
+nwn.BASE_ITEM_GOLD                  = 76
+nwn.BASE_ITEM_GEM                   = 77
+nwn.BASE_ITEM_BRACER                = 78
+nwn.BASE_ITEM_MISCTHIN              = 79
+nwn.BASE_ITEM_CLOAK                 = 80
+nwn.BASE_ITEM_GRENADE               = 81
+nwn.BASE_ITEM_TRIDENT               = 95
+
+nwn.BASE_ITEM_BLANK_POTION          = 101
+nwn.BASE_ITEM_BLANK_SCROLL          = 102
+nwn.BASE_ITEM_BLANK_WAND            = 103
+
+nwn.BASE_ITEM_ENCHANTED_POTION      = 104
+nwn.BASE_ITEM_ENCHANTED_SCROLL      = 105
+nwn.BASE_ITEM_ENCHANTED_WAND        = 106
+
+nwn.BASE_ITEM_DWARVENWARAXE         = 108
+nwn.BASE_ITEM_CRAFTMATERIALMED      = 109
+nwn.BASE_ITEM_CRAFTMATERIALSML      = 110
+nwn.BASE_ITEM_WHIP                  = 111
+
+
+nwn.BASE_ITEM_INVALID               = 256
+
 -- The following is all the item property constants...
 nwn.IP_CONST_ABILITY_STR                        = 0
 nwn.IP_CONST_ABILITY_DEX                        = 1
