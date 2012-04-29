@@ -97,9 +97,21 @@ function NSBroadcastDamage(attacker, target, dmg_roll)
 
    local tloc = target:GetLocation()
    local ploc
-   local imm = NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
-   local resist = NSFormatDamageRollResistance(attacker, target, dmg_roll.result)
-   local dr = NSFormatDamageRollReduction(attacker, target, dmg_roll.result)
+
+   local imm
+   if NSGetTotalImmunityAdjustment(dmg_roll.result) > 0 then
+      imm = NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
+   end
+
+   local resist
+   if NSGetTotalResistAdjustment(dmg_roll.result) > 0 then
+      resist = NSFormatDamageRollResistance(attacker, target, dmg_roll.result)
+   end
+
+   local dr 
+   if dmg_roll.result.soak_adjust > 0 then
+      dr = NSFormatDamageRollReduction(attacker, target, dmg_roll.result)
+   end
 
    for pc in nwn.PCs() do
       ploc = pc:GetLocation()
