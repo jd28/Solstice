@@ -22,7 +22,7 @@ local C = ffi.C
 local bit = require 'bit'
 local ne = nwn.engine
 
-local function zero_combat_mod(mod)
+function nwn.ZeroCombatMod(mod)
    mod.ab = 0
    mod.ac = 0
    mod.dmg.dice = 0
@@ -783,10 +783,6 @@ function Creature:UpdateCombatInfo(update_flags)
       self:UpdateCombatModifierFeat()
    end
 
-   if bit.band(nwn.COMBAT_UPDATE_MODE, update_flags) then
-      self:UpdateCombatModifierMode()
-   end
-
    if bit.band(nwn.COMBAT_UPDATE_SHIFT, update_flags) then
       self:UpdateCombatModifierRace()
       self:UpdateCombatModifierSize()
@@ -797,7 +793,7 @@ end
 ---
 function Creature:UpdateCombatModifierArea()
    local mod = self.ci.area
-   zero_combat_mod(mod)
+   nwn.ZeroCombatMod(mod)
    local area = self:GetArea()
    local area_type = area.obj.area_type
    local ab = 0
@@ -815,7 +811,7 @@ end
 
 ---
 function Creature:UpdateCombatModifierClass()
-   zero_combat_mod(self.ci.class)
+   nwn.ZeroCombatMod(self.ci.class)
    local ac = 0
 
    local monk = self:GetLevelByClass(nwn.CLASS_TYPE_MONK)
@@ -832,7 +828,7 @@ end
 ---
 function Creature:UpdateCombatModifierFeat()
    local mod = self.ci.feat
-   zero_combat_mod(mod)
+   nwn.ZeroCombatMod(mod)
    local ab, ac = 0, 0
 
    if self:GetHasFeat(nwn.FEAT_EPIC_PROWESS) then
@@ -848,55 +844,15 @@ function Creature:UpdateCombatModifierFeat()
 end
 
 ---
-function Creature:UpdateCombatModifierMode()
-   zero_combat_mod(self.ci.mode)
-   local mode = self:GetCombatMode()
-   local ab, ac = 0, 0
-
-   if mode == nwn.COMBAT_MODE_INVALID then
-      return
-   end
-
-   if mode == nwn.COMBAT_MODE_PARRY then
-      ac = 0
-   elseif mode == nwn.COMBAT_MODE_POWER_ATTACK then
-      ab = -5
-      self.ci.dmg_bonus = 10
-   elseif mode == nwn.COMBAT_MODE_IMPROVED_POWER_ATTACK then
-      ab = -10
-      self.ci.dmg_bonus = 10
-   elseif mode == nwn.COMBAT_MODE_FLURRY_OF_BLOWS then
-      ab = -2
-   elseif mode == nwn.COMBAT_MODE_RAPID_SHOT then
-      ac = 0
-   elseif mode == nwn.COMBAT_MODE_EXPERTISE then
-      ab = -5
-      ac = 5
-   elseif mode == nwn.COMBAT_MODE_IMPROVED_EXPERTISE then
-      ab = -10
-      ac = 10
-   elseif mode == nwn.COMBAT_MODE_DEFENSIVE_CASTING then
-      ac = 0
-   elseif mode == nwn.COMBAT_MODE_DIRTY_FIGHTING then
-      ac = 0
-   elseif mode == nwn.COMBAT_MODE_DEFENSIVE_STANCE then
-      ac = 0
-   end
-
-   self.ci.mode.ab = ab
-   self.ci.mode.ac = ac
-end
-
----
 function Creature:UpdateCombatModifierRace()
    local mod = self.ci.race
-   zero_combat_mod(mod)
+   nwn.ZeroCombatMod(mod)
 end
 
 ---
 function Creature:UpdateCombatModifierSize()
    local mod = self.ci.size
-   zero_combat_mod(mod)
+   nwn.ZeroCombatMod(mod)
    local size = self:GetSize()
    local ac, ab = 0, 0
 
@@ -917,7 +873,7 @@ end
 ---
 --
 function Creature:UpdateCombatModifierSkill()
-   zero_combat_mod(self.ci.skill)
+   nwn.ZeroCombatMod(self.ci.skill)
 
    local ac = 0
 
