@@ -33,7 +33,7 @@ function NSGetWeaponFinesse(cre, item)
    return cre:GetIsWeaponFinessable(item)
 end
 
-function _NL_CAN_EQUIP(cre, item)
+function NSCanEquipItem(cre, item)
    cre  = _NL_GET_CACHED_OBJECT(cre)
    item = _NL_GET_CACHED_OBJECT(item)
    local t = can_equip_handler(cre, item)
