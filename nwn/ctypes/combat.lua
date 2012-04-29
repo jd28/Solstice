@@ -131,7 +131,7 @@ typedef struct CNWSCombatRound {
     uint32_t             cr_special_attack_id_len;    /* 20E0 */
     uint32_t             cr_special_attack_id_alloc;  /* 20E4 */
     int16_t AttackID[2];
-    uint8_t RoundStarted;             /* 0x20EC */
+    uint8_t              cr_round_started;             /* 0x20EC */
     uint8_t field_30;
     uint8_t field_31;
     uint8_t field_32;

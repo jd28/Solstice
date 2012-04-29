@@ -123,6 +123,7 @@ int                   nwn_GetTotalEffect(const CNWSObject *obj, const nwn_objid_
                                          const int eff_spellid, const int eff_type, const int eff_int0);
 int                   nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
 int8_t                nwn_GetWeaponAttackType(CNWSCombatRound *cr);
+void                  nwn_NotifyAssociateActionToggle(CNWSCreature *cre, int32_t mode);
 void                  nwn_PrintDamage(nwn_objid_t attacker, nwn_objid_t target, int32_t total_damage, int32_t *damages);
 int                   nwn_RecalculateDexModifier(CNWSCreatureStats *stats);
 void                  nwn_RemoveEffectById(CNWSObject *obj, uint32_t id);
@@ -138,6 +139,7 @@ void                  nwn_ResolveRangedAnimations(CNWSCreature *attacker, CNWSOb
 void                  nwn_ResolveRangedMiss(CNWSCreature *attacker, CNWSObject *target);
 void                  nwn_SendMessage(uint32_t mode, uint32_t id, char *msg, uint32_t to);
 uint8_t               nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
+void                  nwn_SetActivity(CNWSCreature *cre, int32_t a, int32_t b);
 void                  nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
 uint32_t              nwn_SetCommandObjectId(uint32_t obj);
 void                  nwn_SetFactionId(nwn_objid_t id, int32_t faction);
