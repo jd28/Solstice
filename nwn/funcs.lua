@@ -29,6 +29,7 @@ require 'nwn.ctypes.combat'
 require 'nwn.ctypes.creature'
 require 'nwn.ctypes.door'
 require 'nwn.ctypes.encounter'
+require 'nwn.ctypes.feat'
 require 'nwn.ctypes.item'
 require 'nwn.ctypes.module'
 require 'nwn.ctypes.placeable'
@@ -91,6 +92,7 @@ int32_t               nwn_GetDexMod(CNWSCreatureStats *stats, bool armor_check);
 CGameEffect*          nwn_GetEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                     const int eff_spellid, const int eff_type, const int eff_int0, const int eff_int1);
 int32_t               nwn_GetFactionId(uint32_t id);
+CNWFeat              *nwn_GetFeat(uint16_t feat);
 int                   nwn_GetFeatRemainingUses(CNWSCreatureStats *stats, uint16_t feat);
 bool                  nwn_GetFlanked(CNWSCreature *cre, CNWSCreature *target);
 bool                  nwn_GetFlatFooted(CNWSCreature *cre);
@@ -137,7 +139,7 @@ void                  nwn_ResolveOnHitEffect(CNWSCreature *attacker, CNWSObject 
 void                  nwn_ResolveOnHitVisuals(CNWSCreature *cre, CNWSObject *target);
 void                  nwn_ResolveRangedAnimations(CNWSCreature *attacker, CNWSObject *target, int32_t anim);
 void                  nwn_ResolveRangedMiss(CNWSCreature *attacker, CNWSObject *target);
-void                  nwn_SendMessage(uint32_t mode, uint32_t id, char *msg, uint32_t to);
+void                  nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
 uint8_t               nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
 void                  nwn_SetActivity(CNWSCreature *cre, int32_t a, int32_t b);
 void                  nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);

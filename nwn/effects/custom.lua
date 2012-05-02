@@ -14,8 +14,9 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
+--------------------------------------------------------------------------------y
 
+require 'nwn.ctypes.effect'
 local ffi = require 'ffi'
 local C = ffi.C
 
@@ -23,25 +24,26 @@ ffi.cdef [[
 CGameEffect * nl_GetLastCustomEffect();
 ]]
 
-local effects = {}
+local CUSTOM_EFFECTS = {}
 
-function _NL_CUSTOM_EFFECT(obj, is_apply)
+---
+function NSCustomEffectImpact(obj, is_apply)
+   -- Treat last custome effect as direct, it will be deleted
+   -- by the game engine.
    local eff = effect_t(C.nl_GetLastCustomEffect(), true)
    obj = _NL_GET_CACHED_OBJECT(obj)
 
-   local eff_type = eff:GetCustomType()
-   local h = effects[eff_type]
+   local eff_type = eff:GetTrueType()
+   local h = CUSTOM_EFFECTS[eff_type]
    if not h then
       return true
-      --error("Invalid custom effect type.")
    end
-   local t = h(eff, obj, is_apply)
-   return t
+
+   return h(eff, obj, is_apply)
 end
 
-
-function effects.GetIsRegistered(eff_type)
-   local h = effects[eff_type]
+function nwn.GetIsCustomEffectRegistered(eff_type)
+   local h = CUSTOM_EFFECTS[eff_type]
    if not h then
       return false
    end
@@ -55,8 +57,6 @@ end
 --      called with two parameters: the effect being applied and the target it is being applied to.
 -- @param on_remove Function to call on object when effect is removed.  Function will be
 --      called with two parameters: the effect being applied and the target it is being applied to.
-function effects.RegisterCustomEffect(effect_type, handler)
-   effects[effect_type] = handler
+function nwn.RegisterCustomEffect(effect_type, handler)
+   CUSTOM_EFFECTS[effect_type] = handler
 end
-
-return effects

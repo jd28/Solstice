@@ -19,21 +19,6 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
---- Applies damage to an object.
--- @param type Damage type. (Default: nwn.DAMAGE_TYPE_MAGICAL)
--- @param amount Amount of damage.
--- @param power Damage power. (Default: nwn.DAMAGE_POWER_NORMAL)
-function Object:ApplyDamage(type, amount, power)
-   type = type or nwn.DAMAGE_TYPE_MAGICAL
-   power = power or nwn.DAMAGE_POWER_NORMAL
-
-   if type > nwn.DAMAGE_TYPE_BASE_WEAPON then
-      self:ApplyEffect(nwn.EffectDamage(type, amount, power))
-   else
-      self:ApplyCustomDamage(type, amount, power)
-   end
-end
-
 --- Applies an effect to an object.
 -- @param effect Effect to apply.
 -- @param duration Time in seconds for effect to last. (Default: 0.0)
@@ -96,7 +81,6 @@ function Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_r
                             return false
                          end
                          self:ApplyEffect(effect)
-                         --_NL_CUSTOM_EFFECT(eff_type, self, true)
                          return true
                       end)
                          
@@ -104,7 +88,7 @@ end
 
 --- Applies a permenant effect.
 -- As defined by nwn.DURATION_TYPE_PERMANENT
--- @param effect Effect too apply.
+-- @param effect Effect to apply.
 function Object:ApplyPermenantEffect(effect)
    nwn.engine.StackPushFloat(0.0)
    nwn.engine.StackPushObject(self)
@@ -141,7 +125,7 @@ end
 --- Get if an object has an effecy by ID
 -- @param id Effect ID.
 function Object:GetHasEffectById(id)
-   for eff in self:Effects() do
+   for eff in self:EffectsDirect() do
       if eff:GetId() == id then
          return true
       end
@@ -151,12 +135,16 @@ function Object:GetHasEffectById(id)
 end
 
 --- Get if object has an effect applied by a spell.
--- @param spell SPELL_* that the effect was created by.
-function Object:GetHasSpellEffect(nSpell)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(nSpell)
-   nwn.engine.ExecuteCommand(304, 2)
-   return nwn.engine.StackPopBoolean()
+-- @param spell nwn.SPELL_* that the effect was created by.
+function Object:GetHasSpellEffect(spell)
+   if not self:GetIsValid() return false end
+   for eff in self:EffectsDirect() do
+      if eff:GetSpellId() == spell then
+         return true
+      end
+   end
+   
+   return false
 end
 
 --- Gets first effect.
@@ -177,6 +165,7 @@ function Object:GetNextEffect()
 end
 
 --- Removes an effect from object
+-- @param effect Effec to remove.
 function Object:RemoveEffect(effect)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, effect)
    nwn.engine.StackPushObject(self)
@@ -184,6 +173,8 @@ function Object:RemoveEffect(effect)
 end
 
 --- Removes an effect from object by ID
+-- @param id Effect id to remove.
 function Object:RemoveEffectByID(id)
+   if not self:GetIsValid() return end
    C.nwn_RemoveEffectById(self.obj.obj, id)
 end
