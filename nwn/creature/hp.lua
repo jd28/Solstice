@@ -20,8 +20,8 @@ require 'nwn.funcs'
 local ffi = require 'ffi'
 local C = ffi.C
 
----
--- @param level
+--- Get max hit points by level
+-- @param level The level in question.
 function Creature:GetMaxHitPointsByLevel(level)
    if not self:GetIsValid() then return 0 end
 
@@ -31,9 +31,9 @@ function Creature:GetMaxHitPointsByLevel(level)
    return ls.ls_hp
 end
 
----
--- @param level
--- @param hp
+--- Set max hitpoints by level.
+-- @param level The level in question.
+-- @param hp Amount of hitpoints.
 function Creature:SetMaxHitPointsByLevel(level, hp)
    if not self:GetIsValid() then return 0 end
 

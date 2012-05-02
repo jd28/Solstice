@@ -19,19 +19,19 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
----
+--- Gets creature's age
 function Creature:GetAge()
    if not self:GetIsValid() then return -1 end
    return self.stats.cs_age
 end
 
----
+--- Gets creature's appearance type
 function Creature:GetAppearanceType()
    if not self:GetIsValid() then return -1 end
    return self.stats.cs_appearance
 end
 
----
+--- Gets creature's body part
 -- @param part
 function Creature:GetBodyPart(part)
    nwn.engine.StackPushObject(self)
@@ -40,24 +40,25 @@ function Creature:GetBodyPart(part)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Gets creature's conversation resref
 function Creature:GetConversation()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.stats.cs_conv)
 end
 
----
+--- Gets creature's size
 function Creature:GetSize()
+   if not self:GetIsValid() then return -1 end
    return self.obj.cre_size
 end
 
----
+--- Gets creature's deity.
 function Creature:GetDeity()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.stats.cs_deity)
 end
 
----
+--- Gets creature's deity ID.
 function Creature:GetDeityId()
    return 0
 end
@@ -78,26 +79,26 @@ function Creature:GetHitDice(use_neg_levels)
    return total
 end
 
----
+--- Gets if creature is possessed by DM.
 function Creature:GetIsDMPossessed()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(723, 1)
    return nwn.engine.StackPopBoolean()
 end
 
----
+--- Get if creature was spawned by encounter.
 function Creature:GetIsEncounterCreature()
    if not self:GeIsValid() then return false end
    return self.obj.cre_encounter_obj ~= nwn.OBJECT_INVALID.id
 end
 
----
-function Creature:GetGender(gender)
+--- Gets creature's gender
+function Creature:GetGender()
    if not self:GeIsValid() then return -1 end
    return self.stats.cs_gender
 end
 
----
+--- Gets PC characters bic file.
 function Creature:GetPCFileName()
    if not self:GetIsValid() then return "" end
 
@@ -105,7 +106,7 @@ function Creature:GetPCFileName()
    return ffi.string(pl.pl_bicfile)
 end
 
----
+--- Gets creature's race.
 function Creature:GetRacialType()
    if not self:GetIsValid() then
       return nwn.RACIAL_TYPE_INVALID
@@ -114,31 +115,30 @@ function Creature:GetRacialType()
    return self.stats.cs_race
 end
 
----
+--- Gets creature's starting package.
 function Creature:GetStartingPackage()
    if not self:GetIsValid() then return -1 end
    return self.stats.cs_starting_package
 end
 
----
---
+--- Gets creature's subrace
 function Creature:GetSubrace()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.stats.cs_subrace)
 end
 
----
+--- Gets creature's subrace id.
 function Creature:GetSubraceId()
    return 0
 end
 
----
+--- Gets creature's tail
 function Creature:GetTail()
    if not self:GetIsValid() then return -1 end
    return self.stats.cs_tail
 end
 
----
+--- Gets creature's wings
 function Creature:GetWings()
    if not self:GetIsValid() then return -1 end
    return self.stats.cs_wings
@@ -151,8 +151,8 @@ function Creature:SetAge(age)
    return self.stats.cs_age
 end
 
----
--- @param type
+--- Sets creature's appearance type
+-- @param type Appearance type.
 function Creature:SetAppearanceType(type)
    if not self:GetIsValid() then return -1 end
    
@@ -160,7 +160,7 @@ function Creature:SetAppearanceType(type)
    return self.stats.cs_appearance
 end
 
----
+--- Sets creature's body part
 -- @param part
 -- @param model_number
 function Creature:SetBodyPart(part, model_number)
@@ -170,8 +170,8 @@ function Creature:SetBodyPart(part, model_number)
    nwn.engine.ExecuteCommand(793, 3)
 end
 
----
---
+--- Sets creature's deity
+-- @param deity New deity
 function Creature:SetDeity(deity)
    if not self:GetIsValid() then return "" end
    
@@ -183,24 +183,24 @@ function Creature:SetDeity(deity)
    return deity
 end
 
----
--- @param gender
+--- Sets creature's gender
+-- @param gender New gender
 function Creature:SetGender(gender)
    if not self:GetIsValid() then return -1 end
    self.stats.cs_gender = gender
    return self:GetGender()
 end
 
----
--- @param lootable
+--- Sets creature lootable
+-- @param lootable New lootable value
 function Creature:SetLootable(lootable)
    nwn.engine.StackPushBoolean(lootable)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(740, 2)
 end
 
----
---
+--- Set creature's subrace
+-- @param subrace New subrace
 function Creature:SetSubrace(subrace)
    if not self:GetIsValid() then return "" end
    

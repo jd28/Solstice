@@ -18,8 +18,8 @@
 
 local ne = nwn.engine
 
----
--- @param skill
+--- Determines if a creature has a skill
+-- @param skill nwn.SKILL_*
 function Creature:GetHasSkill(skill)
    ne.StackPushObject(self)
    ne.StackPushInteger(skill)
@@ -27,23 +27,23 @@ function Creature:GetHasSkill(skill)
    return ne.StackPopBoolean()
 end
 
----
--- @param skill
--- @param dc
+--- Determines if skill check is successful
+-- @param skill nwn.SKILL_*
+-- @param dc Difficult Class
 function Creature:GetIsSkillSuccessful(skill, dc)
    return self:GetSkillCheckResult(skill, dc) > 0
 end
 
----
+--- Determine's a skill check.
 -- Source: FunkySwerve on NWN bioboards
--- @param skill
--- @param dc
--- @param vs
--- @param feedback
--- @param auto
--- @param delay
--- @param take
--- @param bonus
+-- @param skill nwn.SKILL_*
+-- @param dc Difficult Class
+-- @param vs Versus a target
+-- @param feedback If true sends feedback to participants.
+-- @param auto If true a roll of 20 is automatic success, 1 an automatic failure
+-- @param delay Delay in seconds.
+-- @param take Replaces dice roll.
+-- @param bonus And bonus.
 function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus)
    vs = vs or nwn.OBJECT_INVALID
    if feedback == nil then feedback = true end
@@ -101,6 +101,8 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    return ret
 end
 
+--- Determines maximum skill bonus from effects/gear.
+-- @param skill nwn.SKILL_*
 function Creature:GetMaxSkillBonus(skill)
    return 20
 end
@@ -129,8 +131,8 @@ function Creature:GetSkillPoints()
    return self.stats.cs_skill_points
 end
 
----
---
+--- Gets creature's skill rank.
+-- @param skill nwn.SKILL_*
 function Creature:GetSkillRank(skill, base)
    ne.StackPushBoolean(base)
    ne.StackPushObject(self)
@@ -139,12 +141,9 @@ function Creature:GetSkillRank(skill, base)
    return ne.StackPopInteger()
 end
 
-function NSGetTotalSkillBonus(cre, vs, skill)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
-   return cre:GetTotalEffectSkillBonus(vs, skill)
-end
-
+--- Determines total skill bonus from effects/gear.
+-- @param vs Versus a target
+-- @param skill nwn.SKILL_*
 function Creature:GetTotalEffectSkillBonus(vs, skill)
    local function valid(eff, vs_info)
       local eskill    = eff.eff_integers[0]
@@ -184,14 +183,18 @@ function Creature:GetTotalEffectSkillBonus(vs, skill)
    local info = effect_info_t(self.stats.cs_first_skill_eff, 
                               nwn.EFFECT_TRUETYPE_SKILL_DECREASE,
                               nwn.EFFECT_TRUETYPE_SKILL_INCREASE,
-                              true, false, false)
+                              NS_OPT_EFFECT_SKILL_STACK,
+                              NS_OPT_EFFECT_SKILL_STACK_GEAR,
+                              NS_OPT_EFFECT_SKILL_STACK_SPELL)
 
    return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, 
-                     self:GetMaxSkillBonus(skill))
+                     0, self:GetMaxSkillBonus(skill))
 end
 
----
+--- Modifies skill rank.
+-- @param skill nwn.SKILL_*
+-- @param amount Amount to modify skill rank.
+-- @param level If a level is specified the modification will occur at that level.
 function Creature:ModifySkillRank(skill, amount, level)
    if not self:GetIsValid() or
       skill < 0 or skill > nwn.SKILL_LAST
@@ -217,8 +220,8 @@ function Creature:ModifySkillRank(skill, amount, level)
    return self.stats.cs_skills[skill]
 end
 
----
---
+--- Sets a creatures skillpoints available.
+-- @param amount New amount
 function Creature:SetSkillPoints(amount)
    if not self:GetIsValid() then return 0 end
 
@@ -226,7 +229,9 @@ function Creature:SetSkillPoints(amount)
    return self.stats.cs_skill_points
 end
 
----
+--- Sets a creatures skill rank
+-- @param skill nwn.SKILL_*
+-- @param amount New skill rank
 function Creature:SetSkillRank(skill, amount)
    if not self:GetIsValid() or
       skill < 0 or skill > nwn.SKILL_LAST
@@ -240,4 +245,13 @@ function Creature:SetSkillRank(skill, amount)
 
    self.stats.cs_skills[skill] = amount
    return self.stats.cs_skills[skill]
+end
+
+
+
+
+function NSGetTotalSkillBonus(cre, vs, skill)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+   return cre:GetTotalEffectSkillBonus(vs, skill)
 end

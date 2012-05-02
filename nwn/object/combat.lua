@@ -23,6 +23,11 @@ function NSOnApplyDamage(obj, a)
    obj = _NL_GET_CACHED_OBJECT(obj)
    local eff = C.Local_GetLastDamageEffect()
 
+   -- If target is invulnverable it can't be damaged.
+   if target.obj.obj.obj_is_invulnerable == 1 then
+      return 1
+   end
+
    -- If object is already dead, no need to damage it.
    if obj:GetIsDead() then return 1 end
    
@@ -60,7 +65,7 @@ function NSOnApplyDamage(obj, a)
    obj:DoDamage(total)
    -- OnDamagedEvent
 
-   -- To do these VFX really aren't worthwhile.
+   -- TODO: these VFX really aren't worthwhile.
    if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       local c = nwn.Get2DAString("appearance", "BLOODCOLR", obj:GetAppearanceType())
       local vfx
@@ -73,7 +78,7 @@ function NSOnApplyDamage(obj, a)
       elseif c == "Y" then
             vfx = 117
       end
-      print(c, vfx)
+
       if vfx then
          obj:ApplyVisual(vfx)
       end

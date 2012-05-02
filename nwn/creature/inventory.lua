@@ -25,12 +25,12 @@ function Creature:GetAmmunitionAvailable(attack_count)
    return true
 end
 
----
---
+--- Iterator of a creature's equipped items.
+-- @param creature If true include creature items.
 function Creature:Equips(creature)
-   local i, _i = 1
+   local i, _i = 0
    local obj, _obj = pc:GetItemInSlot(i)
-   local max = creature and nwn.NUM_INV_SLOTS or 15
+   local max = creature and nwn.NUM_INVENTORY_SLOTS or 14
    return function ()
       while obj and i < max do
          _i, i = i, i + 1
@@ -40,8 +40,8 @@ function Creature:Equips(creature)
    end
 end
 
----
---
+--- Forces creature to equip items
+-- @param equips A list of items to equip
 function Creature:ForceEquip(equips)
    self:ClearAllActions(true)
    for _, equip in ipairs(equips) do
@@ -51,8 +51,8 @@ function Creature:ForceEquip(equips)
    self:SetCommandable(false)
 end
 
----
---
+--- Forces creature to unequip an item
+-- @param item The item in question.
 function Creature:ForceUnequip(item)
    self:ClearAllActions(true)
    self:ActionUnequipItem(item)
@@ -60,18 +60,19 @@ function Creature:ForceUnequip(item)
    self:SetCommandable(false)
 end
 
----
---
-function Creature:GetIsWeaponEffective(oVersus, bOffHand)
-   if bOffHand == nil then bOffHand = false end
-
-   nwn.engine.StackPushInteger(bOffHand)
-   nwn.engine.StackPushObject(oVersus)
+--- Determines if weapon is effect versus a target.
+-- @param vs Attack target.
+-- @param is_offhand true if the attack is an offhand attack.
+function Creature:GetIsWeaponEffective(vs, is_offhand)
+   nwn.engine.StackPushBoolean(is_offhand)
+   nwn.engine.StackPushObject(vs)
    nwn.engine.ExecuteCommand(422, 2)
    
    return nwn.engine.StackPopBoolean()
 end
 
+--- Determines if a creature can finesse a weapon.
+-- @param weap The weapon in question.
 function Creature:GetIsWeaponFinessable(weap)
    if self:GetIsWeaponLight(weap) then
       return true
@@ -89,6 +90,8 @@ function Creature:GetIsWeaponFinessable(weap)
    return rel <= 0
 end
 
+--- Determines if a weapon is light for a creature.
+-- @param weap The weapon in question.
 function Creature:GetIsWeaponLight(weap)
    if not weap:GetIsValid() or 
       weap:GetIsUnarmedWeapon()
@@ -108,8 +111,8 @@ function Creature:GetIsWeaponLight(weap)
    return rel < 0
 end
 
----
---
+--- Gets an equipped item in creature's inventory.
+-- @param slot nwn.INVENTORY_SLOT_*
 function Creature:GetItemInSlot(slot)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushInteger(slot)
@@ -117,6 +120,8 @@ function Creature:GetItemInSlot(slot)
    return nwn.engine.StackPopObject();
 end
 
+--- Determines a weapons weapon size relative to a creature.
+-- @param weap The weapon in question.
 function Creature:GetRelativeWeaponSize(weap)
    if not self:GetIsValid() or 
       not weap:GetIsValid()
@@ -126,18 +131,33 @@ function Creature:GetRelativeWeaponSize(weap)
    return C.nwn_GetRelativeWeaponSize(self.obj, weap.obj)
 end
 
----
---
-function Creature:GiveGold(nAmount, is_direct)
-   if not is_direct then
-      nwn.engine.StackPushInteger(nAmount)
-      nwn.engine.StackPushObject(self)
-      nwn.engine.ExecuteCommand(322, 2)
+--- Gives gold to creature
+-- @param amount Amount of gold to give.
+-- @param feedback Sends feedback to creature. (Default: true)
+function Creature:GiveGold(amount, feedback, source)
+   if feedback == nil then feedback = true end
+
+   if not self:GetIsValid() 
+      or self.obj.cre_gold >= 999999999
+      or amount <= 0
+   then 
+      return 
+   end
+   self.obj.cre_gold = math.max(999999999, self.obj.cre_gold + amount)
+
+   if feedback then
+      local str
+      if source then
+         str = string.format("Lost %dGP to %s" amount, source:GetName())
+      else
+         str = string.format("Lost %dGP" amount)
+      end
+      self:SendMessage(str)
    end
 end
 
----
---
+--- Forces the item in an inventory slot to be reequiped.
+-- @param slot nwn.INVENTORY_SLOT_*
 function Creature:ReequipItemInSlot(slot)
    local item = self:GetItemInSlot(slot)
    if not item then return end
@@ -149,13 +169,28 @@ function Creature:ReequipItemInSlot(slot)
    pc:SetCommandable(false)
 end
 
----
---
-function Creature:TakeGold(nAmount, bDestroy)
-   if bDestroy == nil then bDestroy = true end
-   
-   nwn.engine.StackPushInteger(bDestroy)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(nAmount)
-   nwn.engine.ExecuteCommand(444, 3)
+--- Gives gold to creature
+-- @param amount Amount of gold to give.
+-- @param feedback Sends feedback to creature. (Default: true)
+-- @param source Source object
+function Creature:TakeGold(amount, feedback, source)
+   if feedback == nil then feedback = true end
+
+   if not self:GetIsValid() 
+      or self.obj.cre_gold == 0 
+      or amount <= 0
+   then 
+      return 
+   end
+   self.obj.cre_gold = math.max(0, self.obj.cre_gold - amount)
+
+   if feedback then
+      local str
+      if source then
+         str = string.format("Acquired %dGP from %s" amount, source:GetName())
+      else
+         str = string.format("Acquired %dGP" amount)
+      end
+      self:SendMessage(str)
+   end
 end

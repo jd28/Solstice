@@ -34,6 +34,9 @@ function Creature:GetSavingThrowBonus(save)
    return bonus
 end
 
+--- Gets maximum saving throw bonus from gear/effects.
+-- @param save nwn.SAVING_THROW_*
+-- @param save_vs nwn.SAVING_THROW_TYPE_*
 function Creature:GetMaxSaveBonus(save, save_vs)
    return 20
 end
@@ -55,13 +58,10 @@ function Creature:SetSavingThrowBonus(save, bonus)
    return bonus
 end
 
-function NSGetTotalSaveBonus(cre, vs, save, save_vs)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
-
-   return cre:GetTotalEffectSaveBonus(vs, save, save_vs)
-end
-
+--- Gets total saving throw bonus from gear/effects.
+-- @param vs Versus another creature.
+-- @param save nwn.SAVING_THROW_*
+-- @param save_vs nwn.SAVING_THROW_TYPE_*
 function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
    local function valid(eff, vs_info)
       local esave     = eff.eff_integers[1]
@@ -103,9 +103,25 @@ function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
    local info = effect_info_t(self.stats.cs_first_ability_eff, 
                               nwn.EFFECT_TRUETYPE_SAVING_THROW_DECREASE,
                               nwn.EFFECT_TRUETYPE_SAVING_THROW_INCREASE,
-                              true, false, false)
+                              NS_OPT_EFFECT_SAVE_STACK,
+                              NS_OPT_EFFECT_SAVE_STACK_GEAR,
+                              NS_OPT_EFFECT_SAVE_STACK_SPELL)
 
    return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, 
-                     self:GetMaxSaveBonus(save, save_vs))
+                     0, self:GetMaxSaveBonus(save, save_vs))
+end
+
+--------------------------------------------------------------------------------
+-- Bridge functions to/from nwnx_solstice plugin.
+
+--- Gets total saving throw bonus from gear/effects.
+-- @param cre Creature
+-- @param vs Versus other creature.
+-- @param save nwn.SAVING_THROW_*
+-- @param save_vs nwn.SAVING_THROW_TYPE_*
+function NSGetTotalSaveBonus(cre, vs, save, save_vs)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+
+   return cre:GetTotalEffectSaveBonus(vs, save, save_vs)
 end

@@ -31,6 +31,13 @@ function nwn.ZeroCombatMod(mod)
    mod.dmg_type = nwn.DAMAGE_TYPE_BASE_WEAPON
 end
 
+--- Adds parry attack.
+-- @param attacker Attacker to do parry attack against.
+function Creature:AddParryAttack(attacker)
+   C.nwn_AddParryAttack(self.obj.cre_combat_round, attacker.id)
+end
+
+---
 function Creature:DoDamageImmunity(attacker, dmg_result)
    for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
       dmg = dmg_result.damages[i]
@@ -42,6 +49,7 @@ function Creature:DoDamageImmunity(attacker, dmg_result)
    end
 end
 
+---
 function Creature:DoDamageResistance(attacker, dmg_result)
    local eff_type, amount, dmg_flg, idx
    local limit, use_eff, resist
@@ -142,317 +150,68 @@ function Creature:DoDamageReduction(attacker, dmg_result, damage_power)
    dmg_result.damages[12] = base_damage - highest_soak
 end
 
----
+--- Get creature's AC.
+-- @param for_future (Default: false)
 function Creature:GetAC(for_future)
-   ne.StackPushInteger(for_future or 0)
+   ne.StackPushBoolean(for_future)
    ne.StackPushObject(self)
    ne.ExecuteCommand(116, 2)
    return ne.StackPopInteger()
 end
 
----
-function Creature:AddParryAttack(attacker)
-   C.nwn_AddParryAttack(self.obj.cre_combat_round, attacker.id)
-end
-
----
+--- Get creature's arcane spell failure.
 function Creature:GetArcaneSpellFailure()
    ne.StackPushObject(self)
    ne.ExecuteCommand(737, 1)
    return ne.StackPopInteger()
 end
 
----
+--- Get creature's attack target
 function Creature:GetAttackTarget()
    ne.StackPushObject(self)
    ne.ExecuteCommand(316, 1)
    return ne.StackPopObject()
 end
 
----
+--- Get creature's attempted attack target
 function Creature:GetAttemptedAttackTarget()
    ne.ExecuteCommand(361, 0)
    return ne.StackPopObject()
 end
 
----
+--- Get creature's attempted spell target
 function Creature:GetAttemptedSpellTarget()
    ne.ExecuteCommand(375, 0)
    return ne.StackPopObject()
 end
 
----
+--- Get creature's base attack bonus.
 function Creature:GetBaseAttackBonus()
    ne.StackPushObject(self)
    ne.ExecuteCommand(699, 1)
    return ne.StackPopInteger()
 end
 
+--- Get creature's challenge rating
+function Creature:GetChallengeRating()
+   if not self:GetIsValid() then return 0 end
+   return self.stats.cs_cr
+end
+
+--- Get creature's combat mode
 function Creature:GetCombatMode()
    if not self:GetIsValid() then return 0 end
    return self.obj.cre_mode_combat
 end
 
+--- Get creature's damage flags.
 function Creature:GetDamageFlags()
    return C.nwn_GetDamageFlags(self.obj)
 end
 
-function Creature:GetEffectAttackBonus(target, attack_type)
-   local function valid(eff, vs_info)
-      local atk_type  = eff.eff_integers[1]
-      local race      = eff.eff_integers[2]
-      local lawchaos  = eff.eff_integers[3]
-      local goodevil  = eff.eff_integers[4]
-      local subrace   = eff.eff_integers[5]
-      local deity     = eff.eff_integers[6]
-      local target    = eff.eff_integers[7]
-      local valid     = false
-
-      if atk_type == nwn.ATTACK_BONUS_MISC or atk_type == attack_type then
-         valid = true
-      elseif attack_type == 6 and (atk_type == nwn.ATTACK_BONUS_ONHAND or nwn.ATTACK_BONUS_CWEAPON1) then
-         valid = true
-      elseif attack_type == 8 and atk_type == nwn.ATTACK_BONUS_UNARMED then
-         valid = true
-      end
-
-      if valid
-         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
-      then
-         return true
-      end
-      return false
-   end
-
-   local function range(type)
-      if type > nwn.EFFECT_TRUETYPE_ATTACK_DECREASE
-         or type < nwn.EFFECT_TRUETYPE_ATTACK_INCREASE
-      then
-         return false
-      end
-      return true
-   end
-
-
-   local function get_amount(eff)
-      return eff.eff_integers[1]
-   end
-
-   local info = effect_info_t(self.stats.cs_first_ab_eff, 
-                              nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
-                              nwn.EFFECT_TRUETYPE_ATTACK_INCREASE,
-                              true, false, false)
-
-   return math.clamp(self:GetTotalEffectBonus(target, info, range, valid, get_amount),
-                     0, 
-                     self:GetMaxAttackBonus())
-end
-
-function Creature:GetEffectArmorClassBonus(attacker, touch)
-   local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge = 0, 0, 0, 0, 0
-   local eff_nat_neg, eff_armor_neg, eff_shield_neg, eff_deflect_neg = 0, 0, 0, 0
-   local eff_type, dmg_flags
-   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
-
-   if attacker.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      trace = attacker:GetRacialType()
-      tgoodevil = attacker:GetGoodEvilValue()
-      tlawchaos = attacker:GetLawChaosValue()
-      tdeity_id = attacker:GetDeityId()
-      tsubrace_id = attacker:GetSubraceId()
-   end
-
-   local valid = false
-
-   for i = self.stats.cs_first_ac_eff, self.obj.obj.obj_effects_len - 1 do
-      eff_type = self.obj.obj.obj_effects[i].eff_type
-
-      if eff_type > nwn.EFFECT_TRUETYPE_AC_DECREASE then
-         break
-      end
-
-      ac_type  = self.obj.obj.obj_effects[i].eff_integers[0]
-      amount   = self.obj.obj.obj_effects[i].eff_integers[1]
-      race     = self.obj.obj.obj_effects[i].eff_integers[2]
-      lawchaos = self.obj.obj.obj_effects[i].eff_integers[3]
-      goodevil = self.obj.obj.obj_effects[i].eff_integers[4]
-      damage   = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace  = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity    = self.obj.obj.obj_effects[i].eff_integers[7]
-      valid    = false
-
-      if valid
-         and (race == nwn.RACIAL_TYPE_INVALID or race == trace)
-         and (lawchaos == 0 or lawchaos == tlawchaos)
-         and (goodevil == 0 or goodevil == tgoodevil)
-         and (damage == nwn.AC_VS_DAMAGE_TYPE_ALL or bit.band(dmg_flags, damage) ~= 0)
-         and (subrace == 0 or subrace == tsubrace_id)
-         and (deity == 0 or deity == tdeity_id)
-      then
-         if eff_type == nwn.EFFECT_TRUETYPE_AC_DECREASE then
-            if ac_type == nwn.AC_DODGE_BONUS then
-               eff_dodge = eff_dodge - amount
-            elseif not touch then
-               if ac_type == nwn.AC_NATURAL_BONUS then
-                  if amount > eff_nat_neg then
-                     eff_nat_neg = amount
-                  end
-               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
-                  if amount > eff_armor_neg then
-                     eff_armor_neg = amount
-                  end
-               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
-                  if amount > eff_shield_neg then
-                     eff_shield_neg = amount
-                  end
-               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
-                  if amount > eff_deflect_neg then
-                     eff_deflect_neg = amount
-                  end
-               end
-            end
-         elseif eff_type == nwn.EFFECT_TRUETYPE_AC_INCREASE then
-            if ac_type == nwn.AC_DODGE_BONUS then
-               eff_dodge = eff_dodge + amount
-            elseif not touch then
-               if ac_type == nwn.AC_NATURAL_BONUS then
-                  if amount > eff_nat then
-                     eff_nat = amount
-                  end
-               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
-                  if amount > eff_armor then
-                     eff_armor = amount
-                  end
-               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
-                  if amount > eff_shield then
-                     eff_shield = amount
-                  end
-               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
-                  if amount > eff_deflect then
-                     eff_deflect = amount
-                  end
-               end
-            end
-         end 
-      end
-   end
-   return (eff_nat - eff_nat_neg),
-          (eff_armor - eff_armor_neg),
-          (eff_shield - eff_shield_neg),
-          (eff_deflect - eff_deflect_neg),
-          eff_dodge
-end
-
----
-function Creature:GetEffectCritMultBonus(target)
-   local amount, percent, race, lawchaos, goodevil, subrace, deity
-   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
-
-   local total = 0
-
-   if target and target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      trace = target:GetRacialType()
-      tgoodevil = target:GetGoodEvilValue()
-      tlawchaos = target:GetLawChaosValue()
-      tdeity_id = target:GetDeityId()
-      tsubrace_id = target:GetSubraceId()
-   end
-
-   for i = self.ci.first_cm_effect, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
-         (self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_MULT_INCREASE and
-          self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE)
-      then
-         break
-      end
-
-      amount      = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent     = self.obj.obj.obj_effects[i].eff_integers[2]
-      race        = self.obj.obj.obj_effects[i].eff_integers[3]
-      lawchaos    = self.obj.obj.obj_effects[i].eff_integers[4]
-      goodevil    = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace     = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity       = self.obj.obj.obj_effects[i].eff_integers[7]
-
-      if (race == RACE_INVALID_RACE and lawchaos == 0 and  goodevil == 0 and  subrace == 0 and deity == 0)
-         or race == trace
-         or lawchaos == tlawchaos
-         or goodevil == tgoodevil
-         or subrace == tsubrace_id
-         or deity == tdeity_id
-      then
-         if eff_type == nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE then
-            if math.random(100) <= percent then
-               total = total - amount
-            end
-         else
-             if math.random(100) <= percent then
-               total = total - amount
-            end
-         end 
-      end
-   end
-   return total
-end
-
----
-function Creature:GetEffectCritRangeBonus(target)
-   local amount, percent, race, lawchaos, goodevil, subrace, deity
-   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
-
-   local total = 0
-
-   if target and target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      trace = target:GetRacialType()
-      tgoodevil = target:GetGoodEvilValue()
-      tlawchaos = target:GetLawChaosValue()
-      tdeity_id = target:GetDeityId()
-      tsubrace_id = target:GetSubraceId()
-   end
-
-   for i = self.ci.first_cr_effect, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
-         (self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_INCREASE and
-          self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE)
-      then
-         break
-      end
-
-      amount      = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent     = self.obj.obj.obj_effects[i].eff_integers[2]
-      race        = self.obj.obj.obj_effects[i].eff_integers[3]
-      lawchaos    = self.obj.obj.obj_effects[i].eff_integers[4]
-      goodevil    = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace     = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity       = self.obj.obj.obj_effects[i].eff_integers[7]
-
-      if (race == RACE_INVALID_RACE and lawchaos == 0 and  goodevil == 0 and  subrace == 0 and deity == 0)
-         or race == trace
-         or lawchaos == tlawchaos
-         or goodevil == tgoodevil
-         or subrace == tsubrace_id
-         or deity == tdeity_id
-      then
-         if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE then
-            if math.random(100) <= percent then
-               total = total - amount
-            end
-         else
-            if math.random(100) <= percent then
-               total = total + amount
-            end
-         end 
-      end
-   end
-   return total
-end
-
----
+--- Determines attack bonus based on target's state.
+-- See nwn.COMBAT_TARGET_STATE_*
+-- @param is_ranged true if current attack is a ranged attack.
 function Creature:GetEnemyStateAttackBonus(is_ranged)
    local ab = 0
    local mask = self.ci.target_state_mask
@@ -506,67 +265,69 @@ function Creature:GetGoingToBeAttackedBy()
    return ne.StackPopObject();
 end
 
----
-function Creature:GetChallengeRating()
-   if not self:GetIsValid() then return 0 end
-   return self.stats.cs_cr
+--- Determines if creature is immune to critical hits.
+-- @param attacker Attacker
+function Creature:GetIsImmuneToCriticalHits(attacker)
 end
 
----
+--- Determines if creature is in combat.
 function Creature:GetIsInCombat()
    ne.StackPushObject(self)
    ne.ExecuteCommand(320, 1)
    return ne.StackPopBoolean()
 end
 
----
+--- Determines if creature is visible to another creature.
+-- @param target Target to test.
 function Creature:GetIsVisibile(target)
    return C.nwn_GetIsVisible(self.obj, target.id)
 end
 
----
+--- Get's last attack type used by creature.
 function Creature:GetLastAttackType()
    ne.StackPushObject(self.id)
    ne.ExecuteCommand(317, 1)
    return ne.StackPopInteger()
 end
 
----
+--- Get's last attack mode used by creature.
 function Creature:GetLastAttackMode()
    ne.StackPushObject(self)
    ne.ExecuteCommand(318, 1)
    return ne.StackPopInteger()
 end
 
----
+--- Get's last weapon used by creature.
 function Creature:GetLastWeaponUsed()
    ne.StackPushObject(self)
    ne.ExecuteCommand(328, 1)
    return ne.StackPopObject()
 end
 
----
+--- Get's last trap detected by creature.
 function Creature:GetLastTrapDetected()
    ne.StackPushObject(self)
    ne.ExecuteCommand(486, 1)
    return ne.StackPopObject()
 end
 
----
+--- Determines creature's maximum attack bonus from gear/effects.
 function Creature:GetMaxAttackBonus()
    return 20
 end
 
----
+--- Determines creatures maximum attack range.
+-- @param target Target to attack
 function Creature:GetMaxAttackRange(target)
    return C.nwn_GetMaxAttackRange(self.obj, target.id)
 end
 
-function Creature:GetMaxDodgeAC(target)
+--- Determines creature's maximum dodge AC from gear/effects.
+function Creature:GetMaxDodgeAC()
    return 20
 end
 
----
+--- Determines creatures offhand attack penalty.
 function Creature:GetOffhandAttackPenalty()
    local on = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
    local off = self:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
@@ -627,11 +388,11 @@ function Creature:GetOffhandAttackPenalty()
    return ab_on, ab_off
 end
 
----
--- @param damage
--- @param dc
--- @param savetype
--- @param versus
+--- Determines reflex saved damage adjustment.
+-- @param damage Total damage.
+-- @param dc Difficulty class
+-- @param savetype nwn.SAVING_THROW_TYPE_*
+-- @param versus Creature to roll against.
 function Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
    ne.StackPushObject(versus)
    ne.StackPushInteger(savetype)
@@ -642,6 +403,8 @@ function Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
    return ne.StackPopInteger()
 end
 
+--- Determines attack bonus from situational factors.
+-- See nwn.SITUATION_*
 function Creature:GetSituationalAttackBonus()
    local situ_mask = self.ci.situational_flags
    local ab = 0
@@ -655,28 +418,29 @@ function Creature:GetSituationalAttackBonus()
    return ab
 end
 
----
+--- Determines turn resistance hit dice.
 function Creature:GetTurnResistanceHD()
    ne.StackPushObject(self)
    ne.ExecuteCommand(478, 1)
    ne.StackPopInteger()
 end
 
----
+--- Restores a creature's base number of attacks.
 function Creature:RestoreBaseAttackBonus()
    ne.StackPushObject(self)
    ne.ExecuteCommand(756, 1)
 end
 
----
--- @param amount
+--- Sets a creature's base number of attacks.
+-- @param amount Amount of attacks.
 function Creature:SetBaseAttackBonus(amount)
    ne.StackPushObject(self)
    ne.StackPushInteger(amount)
    ne.ExecuteCommand(755, 2)
 end
 
----
+--- Causes all creatures in a 10 meter (1 tile) radius to stop actions.
+-- Improves the creature's reputation with nearby enemies for 3 minutes. Only works for NPCs.
 function Creature:SurrenderToEnemies()
    ne.ExecuteCommand(476, 0);
 end
@@ -719,7 +483,8 @@ function Creature:PrintWeaponInfo()
    end
 end
 
----
+--- Get ranged attack bonus/penalty vs a target.
+-- @param target Creature's target.
 function Creature:GetRangedAttackMod(target)
    local ab = 0
 
@@ -745,7 +510,7 @@ function Creature:GetRangedAttackMod(target)
    return ab
 end
 
----
+--- Updates equipped weapon object IDs.
 function Creature:UpdateCombatEquips()
    self.ci.equips[0].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND).id
    self.ci.equips[1].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND).id
@@ -756,7 +521,9 @@ function Creature:UpdateCombatEquips()
 
 end
 
----
+--- Updates a creature's combat modifiers.
+-- See ConbatMod ctype.
+-- @param update_flags
 function Creature:UpdateCombatInfo(update_flags)
    update_flags = nwn.COMBAT_UPDATE_ALL
 
@@ -790,7 +557,7 @@ function Creature:UpdateCombatInfo(update_flags)
    self:UpdateCombatModifierSkill()
 end
 
----
+--- Determines creature's area combat modifiers.
 function Creature:UpdateCombatModifierArea()
    local mod = self.ci.area
    nwn.ZeroCombatMod(mod)
@@ -809,7 +576,7 @@ function Creature:UpdateCombatModifierArea()
    mod.ab = ab
 end
 
----
+--- Determines creature's class combat modifiers.
 function Creature:UpdateCombatModifierClass()
    nwn.ZeroCombatMod(self.ci.class)
    local ac = 0
@@ -825,7 +592,7 @@ function Creature:UpdateCombatModifierClass()
    self.ci.class.ac = ac
 end
 
----
+--- Determines creature's feat combat modifiers.
 function Creature:UpdateCombatModifierFeat()
    local mod = self.ci.feat
    nwn.ZeroCombatMod(mod)
@@ -843,13 +610,13 @@ function Creature:UpdateCombatModifierFeat()
    mod.ac = ac
 end
 
----
+--- Determines creature's race combat modifiers.
 function Creature:UpdateCombatModifierRace()
    local mod = self.ci.race
    nwn.ZeroCombatMod(mod)
 end
 
----
+--- Determines creature's size combat modifiers.
 function Creature:UpdateCombatModifierSize()
    local mod = self.ci.size
    nwn.ZeroCombatMod(mod)
@@ -870,20 +637,17 @@ function Creature:UpdateCombatModifierSize()
    mod.ac = ac
 end
 
----
---
+--- Determines creature's skill combat modifiers.
 function Creature:UpdateCombatModifierSkill()
    nwn.ZeroCombatMod(self.ci.skill)
 
    local ac = 0
-
    ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5
-
    self.ci.skill.ac = ac
 end
 
 
----
+--- Determines creature's weapon combat info.
 function Creature:UpdateCombatWeaponInfo()
    local weap
    for i = 0, 5 do

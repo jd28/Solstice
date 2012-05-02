@@ -1,6 +1,8 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
+--- Determines a creatures attack bonus using a particular weapon.
+-- @param weap The weapon in question.
 function Creature:GetWeaponAttackBonus(weap)
    local feat = -1
    local ab = 0
@@ -50,6 +52,9 @@ function Creature:GetWeaponAttackBonus(weap)
    return ab
 end
 
+--- Determines a creatures attack ability using a particular weapon.
+-- @param weap The weapon in question.
+-- @return nwn.ABILITY_*
 function Creature:GetWeaponAttackAbility(weap)
    local abil
    if weap:GetIsRangedWeapon() then
@@ -70,6 +75,8 @@ function Creature:GetWeaponAttackAbility(weap)
    return abil
 end
 
+--- Determines a creatures damage bonus using a particular weapon.
+-- @param weap The weapon in question.
 function Creature:GetWeaponDamageBonus(weap)
    local feat
    local bonus = 0
@@ -91,8 +98,11 @@ function Creature:GetWeaponDamageBonus(weap)
    end
 
    return bonus
+
 end
----
+
+--- Determines a weapons base damage.
+-- @param weap The weapon in question.
 -- @return dice, sides
 function Creature:GetWeaponBaseDamage(weap)
    if not weap:GetIsValid() then return 0, 0 end
@@ -123,6 +133,9 @@ function Creature:GetWeaponBaseDamage(weap)
    return dice, sides
 end
 
+--- Determines a creatures damage ability using a particular weapon.
+-- @param weap The weapon in question.
+-- @return nwn.ABILITY_*
 function Creature:GetWeaponDamageAbility(weap)
    local abil = nwn.ABILITY_STRENGTH
    local mod = self:GetAbilityModifier(abil)
@@ -139,6 +152,8 @@ function Creature:GetWeaponDamageAbility(weap)
    return abil
 end
 
+--- Determines a creatures critical hit range using a particular weapon.
+-- @param weap The weapon in question.
 function Creature:GetWeaponCritRange(weap)
    if not weap:GetIsValid() then return 0 end
 
@@ -171,6 +186,8 @@ function Creature:GetWeaponCritRange(weap)
    return cr
 end
 
+--- Determines a creatures critical hit multiplier using a particular weapon.
+-- @param weap The weapon in question.
 function Creature:GetWeaponCritMultiplier(weap)
    if not weap:GetIsValid() then return 0 end
 
@@ -191,7 +208,8 @@ function Creature:GetWeaponCritMultiplier(weap)
    return basecm
 end
 
----
+--- Determines a creatures critical hit damage bonus using a particular weapon.
+-- @param weap The weapon in question.
 -- @return dice, sides
 function Creature:GetWeaponCritDamage(weap)
    if not weap:GetIsValid() then return 0, 0 end
@@ -220,8 +238,9 @@ function Creature:GetWeaponCritDamage(weap)
    return dice, sides
 end
 
----
--- TODO: FIX!!!
+--- Determines a weapons attack iteration.
+-- I.e. default iteration is -5 per round, for monks -3.
+-- @param weap The weapon in question.
 function Creature:GetWeaponIteration(weap)
    local iter = 5
    
@@ -232,6 +251,5 @@ function Creature:GetWeaponIteration(weap)
       iter = 3
    end
       
-
    return iter
 end

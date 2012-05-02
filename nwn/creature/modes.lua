@@ -1,20 +1,22 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
+--- Notifies creature's associats of combat mode change
+-- @param mode nwn.COMBAT_MODE_*
 function Creature:NotifyAssociateActionToggle(mode)
    C.nwn_NotifyAssociateActionToggle(self.obj, mode)
 end
 
+--- Sets a creature's activity
+-- @param act
+-- @param on 
 function Creature:SetActivity(act, on)
    C.nwn_SetActivity(self.obj, act, on)
 end
 
-function NSSetCombatMode(cre, mode, change)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-
-   cre:SetCombatMode(mode, change)
-end
-
+--- Sets creature's combat mode
+-- @param mode nwn.COMBAT_MODE_*
+-- @param change If false the combat mode is already active.
 function Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
    local off = mode == nwn.COMBAT_MODE_INVALID
@@ -81,4 +83,14 @@ function Creature:SetCombatMode(mode, change)
    else
       self.obj.cre_mode_desired = mode
    end
+end
+
+--- Sets creature's combat mode
+-- @param cre Creature in question.
+-- @param mode nwn.COMBAT_MODE_*
+-- @param change If false the combat mode is already active.
+function NSSetCombatMode(cre, mode, change)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+
+   cre:SetCombatMode(mode, change)
 end

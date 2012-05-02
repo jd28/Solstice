@@ -46,11 +46,14 @@ function Creature:GetIsBlind()
    return false
 end
 
+--- Determines if a creature is flanked.
+-- @param target Attacker
 function Creature:GetIsFlanked(target)
    if not target:GetIsValid() then return false end
    return C.nwn_GetFlanked(self.obj, target.obj)
 end
 
+--- Determines if a creature is flatfooted
 function Creature:GetIsFlatfooted()
    if not self:GetIsValid() then return false end
    return C.nwn_GetFlatFooted(self.obj)

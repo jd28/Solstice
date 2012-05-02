@@ -18,6 +18,8 @@
 
 require 'nwn.class'
 
+--- Determine's if a creature can use a classes abilities.
+-- @param class nwn.CLASS_TYPE_*
 function Creature:CanUseClassAbilities(class)
    return true
 --   local f = nwn.GetClassAbilityRequirements()
@@ -26,7 +28,7 @@ function Creature:CanUseClassAbilities(class)
 --   return f(self)
 end
 
----
+--- Iterator over creature's classes
 function Creature:Classes()
    if not self:GetIsValid() then return end
    local i, count, _i = 0, self.stats.cs_classes_len
@@ -38,8 +40,8 @@ function Creature:Classes()
    end
 end
 
----
--- @param level
+--- Determines class that was chosen at a particular level.
+-- @param level Level to get class at.
 function Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
@@ -49,10 +51,14 @@ function Creature:GetClassByLevel(level)
    return ls.ls_class
 end
 
----
--- @param domain
+--- Determines a cleric's domain.
+-- @param domain Cleric's first or second domain
 function Creature:GetClericDomain(domain)
    if not self:GetIsValid() then return -1 end
+   if domain ~= 1 and domain ~= 2 then
+      error "Invalid domain."
+      return -1
+   end
 
    domain = domain or 1
    if domain ~= 1 or domain ~= 2 then
@@ -71,8 +77,8 @@ function Creature:GetClericDomain(domain)
    return -1
 end
 
----
--- @param class
+--- Get number of levels a creature by class
+-- @param class nwn.CLASS_TYPE_*
 function Creature:GetLevelByClass(class)
    for cl in self:Classes() do
       if cl_class == class then
@@ -83,8 +89,8 @@ function Creature:GetLevelByClass(class)
    return 0
 end
 
----
--- @param position
+--- Get number of levels a creature by position
+-- @param position Valid values: 0, 1, or 2
 function Creature:GetLevelByPosition(position)
    if position < 0 or position > 2 then 
       error("Invalid class position: " .. position)
@@ -98,8 +104,8 @@ function Creature:GetLevelByPosition(position)
    return cl.cl_level
 end
 
----
--- @param position
+--- Get class type by position
+-- @param position Valid values: 0, 1, or 2
 function Creature:GetClassByPosition(position)
    if position < 0 or position > 2 then 
       error("Invalid class position: " .. position)
@@ -113,7 +119,7 @@ function Creature:GetClassByPosition(position)
    return cl.cl_class
 end
 
----
+--- Gets a creature's wizard specialization.
 function Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
 
@@ -126,9 +132,9 @@ function Creature:GetWizardSpecialization()
    return -1
 end
 
----
--- @param domain
--- @param newdomain
+--- Sets a cleric's domain.
+-- @param domain Cleric's first or second domain
+-- @param newdomain See domains.2da
 function Creature:SetClericDomain(domain, newdomain)
    if not self:GetIsValid() then return -1 end
 
@@ -154,9 +160,9 @@ function Creature:SetClericDomain(domain, newdomain)
    return -1
 end
 
----
--- @param specilization
-function Creature:SetWizardSpecialization(specilization)
+--- Set a wizard's specialization.
+-- @param specilization See schools.2da
+function Creature:SetWizardSpecialization(specialization)
    if not self:GetIsValid() then return -1 end
 
    for class in self:Classes() do
@@ -169,11 +175,3 @@ function Creature:SetWizardSpecialization(specilization)
    return -1
 end
 
-function Creature:UpdateClassCombatBonus(class)
-   if not self:CanUseClassAbilities(class) then return end
-
-   local f = nwn.GetClassCombatBonus(class)
-   if not f then return end
-
-   f(self)
-end

@@ -19,7 +19,7 @@
 local ne = nwn.engine
 local ffi = require 'ffi'
 
----
+--- Activates a portal between servers.
 -- @param ip_addr DNS name or IP address (and optional port) of new server. (Default: "") 
 -- @param password Password for login to the destination server. (Default: "") 
 -- @param waypoint If set, arriving PCs will jump to this waypoint after appearing at

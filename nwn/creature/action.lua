@@ -24,7 +24,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 ---
--- @param target
+-- @param target Target to attack.
 -- @param passive
 function Creature:ActionAttack(target, passive)
    local temp = nwn.engine.GetCommandObjectId()
@@ -40,9 +40,9 @@ function Creature:ActionAttack(target, passive)
 end
 
 ---
--- @param spell
--- @param target
--- @param path_type
+-- @param spell nwn.SPELL_*
+-- @param target Object to cast fake spell at.
+-- @param path_type nwn.PROJECTILE_PATH_TYPE_*. (Default: nwn.PROJECTILE_PATH_TYPE_DEFAULT)
 function Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
    local temp = nwn.engine.GetCommandObjectId()
    nwn.engine.SetCommandObjectId(self)
@@ -58,9 +58,9 @@ function Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
 end
 
 ---
--- @param spell
--- @param target
--- @param path_type
+-- @param spell nwn.SPELL_*
+-- @param target Location to cast spell at.
+-- @param path_type nwn.PROJECTILE_PATH_TYPE_*. (Default: nwn.PROJECTILE_PATH_TYPE_DEFAULT)
 function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    local temp = nwn.engine.GetCommandObjectId()
    nwn.engine.SetCommandObjectId(self)
@@ -68,7 +68,7 @@ function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    path_type = path_type or nwn.PROJECTILE_PATH_TYPE_DEFAULT
 
    nwn.engine.StackPushInteger(path_type)
-   nwn.engine.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, target)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, target)
    nwn.engine.StackPushInteger(spell)
    nwn.engine.ExecuteCommand(502, 3)
 
@@ -76,26 +76,25 @@ function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
 end
 
 ---
--- @param spell 
--- @param target
--- @param metamagic
--- @param cheat
--- @param projectile_path
--- @param instant
+-- @param spell nwn.SPELL_*
+-- @param target Location to cast spell at.
+-- @param metamagic nwn.METAMAGIC_*. (Default: nwn.METAMAGIC_ANY)
+-- @param cheat If true cast spell even if target does not have the ability.
+-- @param projectile_path nwn.PROJECTILE_PATH_TYPE_*. (Default: nwn.PROJECTILE_PATH_TYPE_DEFAULT)
+-- @param instant If true spell can instantaneously.
 function Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, projectile_path, instant)
    local temp = nwn.engine.GetCommandObjectId()
    nwn.engine.SetCommandObjectId(self)
 
-   metamagic = metamagic or METAMAGIC_ANY
+   metamagic = metamagic or nwn.METAMAGIC_ANY
    if cheat == nil then cheat = false end
-   projectile_path = projectile_path or PROJECTILE_PATH_TYPE_DEFAULT
-   if instant == nil then instant = false end
+   projectile_path = projectile_path or nwn.PROJECTILE_PATH_TYPE_DEFAULT
 
-   nwn.engine.StackPushInteger(instant)
+   nwn.engine.StackPushBoolean(instant)
    nwn.engine.StackPushInteger(projectile_path)
    nwn.engine.StackPushInteger(cheat)
    nwn.engine.StackPushInteger(metamagic)
-   nwn.engine.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, target)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, target)
    nwn.engine.StackPushInteger(spell)
    nwn.engine.ExecuteCommand(234, 6)
 
@@ -105,8 +104,8 @@ end
 ---
 -- @param spell 
 -- @param target
--- @param metamagic
--- @param cheat
+-- @param metamagic nwn.METAMAGIC_*
+-- @param cheat If true cast spell even if target does not have the ability.
 -- @param projectile_path
 -- @param instant
 function Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, projectile_path, instant)

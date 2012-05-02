@@ -19,9 +19,19 @@
 local ffi = require("ffi")
 local C = ffi.C
 
--- TODO fix local variable functions...
+local function get_var_table(obj)
+   if obj.type == nwn.GAME_OBJECT_TYPE_MODULE then
+      return obj.obj.mod_vartable
+   elseif obj.type == nwn.GAME_OBJECT_TYPE_AREA then
+      return obj.obj.area_vartable
+   else
+      return obj.obj.obj.obj_vartable
+   end
+end
 
----
+--- Decrements local integer variable
+-- @param name Variable name
+-- @param val Amount to decrement by (Default: 1)
 function Object:DecrementLocalInt(name, val)
     val = val or 1
 
@@ -36,29 +46,34 @@ function Object:DeleteLocalBool(var_name)
    self:DeleteLocalInt(var_name)
 end
 
----
+--- Delete a local int variable
+-- @param var_name Variable to delete
 function Object:DeleteLocalInt(var_name)
-    return C.nwn_DeleteLocalInt(ffi.cast("Object*", self), var_name) 
+    return C.nwn_DeleteLocalInt(get_var_table(self), var_name) 
 end
 
----
+--- Delete a local float variable
+-- @param var_name Variable to delete
 function Object:DeleteLocalFloat(var_name)
-    return C.nwn_DeleteLocalFloat(ffi.cast("Object*", self), var_name) 
+    return C.nwn_DeleteLocalFloat(get_var_table(self), var_name) 
 end
 
----
+--- Delete a local string variable
+-- @param var_name Variable to delete
 function Object:DeleteLocalString(var_name)
-    return C.nwn_DeleteLocalString(ffi.cast("Object*", self), var_name) 
+   return C.nwn_DeleteLocalString(get_var_table(self), var_name) 
 end
 
----
+--- Delete a local object variable
+-- @param var_name Variable to delete
 function Object:DeleteLocalObject(var_name)
-    return C.nwn_DeleteLocalObject(ffi.cast("Object*", self), var_name) 
+    return C.nwn_DeleteLocalObject(get_var_table(self), var_name) 
 end
 
----
+--- Delete a local location variable
+-- @param var_name Variable to delete
 function Object:DeleteLocalLocation(var_name)
-    return C.nwn_DeleteLocalLocation(ffi.cast("Object*", self), var_name) 
+    return C.nwn_DeleteLocalLocation(get_var_table(self), var_name) 
 end
 
 --- Boolean wrapper around GetLocalInt
@@ -68,24 +83,28 @@ function Object:GetLocalBool(var_name)
    return self:GetLocalInt(var_name) ~= 0
 end
 
----
+--- Get a local int variable
+-- @param var_name Variable name
 function Object:GetLocalInt(var_name)
-    return C.nwn_GetLocalInt(ffi.cast("Object*", self), var_name) 
+    return C.nwn_GetLocalInt(get_var_table(self), var_name) 
 end
 
----
+--- Get local float variable
+-- @param var_name Variable name
 function Object:GetLocalFloat(var_name)
-   return C.nwn_GetLocalFloat(ffi.cast("Object*", self), var_name)
+   return C.nwn_GetLocalFloat(get_var_table(self), var_name)
 end
 
----
+--- Get local location variable
+-- @param var_name Variable name
 function Object:GetLocalLocation(var_name)
-   return C.nwn_GetLocalLocation(ffi.cast("Object*", self), var_name)
+   return C.nwn_GetLocalLocation(get_var_table(self), var_name)
 end
 
----
+--- Get local object variable
+-- @param var_name Variable name
 function Object:GetLocalObject(var_name)
-   return _NL_GET_CACHED_OBJECT(C.nwn_GetLocalObject(ffi.cast("Object*", self), var_name))
+   return _NL_GET_CACHED_OBJECT(C.nwn_GetLocalObject(get_var_table(self), var_name))
 end
 
 ---
@@ -97,7 +116,9 @@ function Object:GetLocalString(var_name)
    return s
 end
 
----
+--- Increment local integer variable
+-- @param var_name Variable name
+-- @param val Amount to increment. (Default: 1)
 function Object:IncrementLocalInt(var_name, val)
     val = val or 1
 
@@ -109,33 +130,45 @@ end
 --- Boolean wrapper around SetLocalInt
 -- A wrapper around GetLocalInt returning false if the result is 0, true otherwise.
 -- Int/Bool values are stored under the same var_name.
--- 
+-- @param var_name Variable name
+-- @param val Value
 function Object:SetLocalBool(var_name, val)
    self:SetLocalInt(var_name, val and 1 or 0)
 end
 
----
+--- Set local float variable
+-- @param var_name Variable name
+-- @param val Value
 function Object:SetLocalFloat(var_name, val)
-   C.nwn_SetLocalFloat(ffi.cast("Object*", self), var_name, val)
+   C.nwn_SetLocalFloat(get_var_table(self), var_name, val)
 end
 
----
+--- Set local int variable
+-- @param var_name Variable name
+-- @param val Value
 function Object:SetLocalInt(var_name, val) 
-    C.nwn_SetLocalInt(ffi.cast("Object*", self), var_name, val) 
+    C.nwn_SetLocalInt(get_var_table(self), var_name, val) 
 end
 
----
+--- Set local location variable
+-- @param var_name Variable name
+-- @param val Value
 function Object:SetLocalLocation(var_name, val)
-    C.nwn_SetLocalLocation(ffi.cast("Object*", self), var_name, val) 
+    C.nwn_SetLocalLocation(get_var_table(self), var_name, val) 
 end
 
----
+--- Set local float variable
+-- @param var_name Variable name
+-- @param val Value
+-- TODO: Redo this or NWNX won't be able to hook it.
 function Object:SetLocalString(var_name, val)
-    C.nwn_SetLocalString(ffi.cast("Object*", self), var_name, val) 
+    C.nwn_SetLocalString(get_var_table(self), var_name, val) 
 end
 
----
+--- Set local object variable
+-- @param var_name Variable name
+-- @param val Value
 function Object:SetLocalObject(var_name, val)
-    C.nwn_SetLocalObject(ffi.cast("Object*", self), var_name, val.id) 
+    C.nwn_SetLocalObject(get_var_table(self), var_name, val.id) 
 end
 

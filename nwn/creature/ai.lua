@@ -16,15 +16,15 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
----
+--- Gets creature's AI level.
 function Creature:GetAILevel()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(712, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
--- @param ai_level
+--- Sets creature's AI level.
+-- @param ai_level nwn.AI_LEVEL_*
 function Creature:SetAILevel(ai_level)
    nwn.engine.StackPushInteger(ai_level);
    nwn.engine.StackPushObject(self);

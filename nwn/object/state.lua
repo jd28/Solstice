@@ -16,12 +16,7 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
-function NSGetIsDead(obj)
-   obj = _NL_GET_CACHED_OBJECT(obj)
-   return obj:GetIsDead()
-end
-
----
+--- Get is object commandable
 function Object:GetCommandable()
    nwn.engine.StackPushObject(self);
    nwn.engine.ExecuteCommand(163, 1);
@@ -38,7 +33,7 @@ function Object:GetIsDead()
    if self.type == nwn.GAME_OBJECT_TYPE_CREATURE 
       and (self:GetIsPC() or self:GetIsPossessedFamiliar())
    then
-      if hp <= NS_SETTINGS.NS_OPT_HP_LIMIT then
+      if hp <= NS_OPT_HP_LIMIT then
          return true
       end
    else
@@ -48,11 +43,6 @@ function Object:GetIsDead()
    end
 
    return false
-end
-
-function NSGetIsPCDying(obj)
-   obj = _NL_GET_CACHED_OBJECT(obj)
-   return obj:GetIsPCDying()
 end
 
 --- Determines if a creature is dead or dying.
@@ -66,16 +56,30 @@ function Object:GetIsPCDying()
    end
 
    local hp = self:GetCurrentHitPoints()
-   if hp <= 0 and hp > NS_SETTINGS.NS_OPT_HP_LIMIT then
+   if hp <= 0 and hp > NS_OPT_HP_LIMIT then
       return true
    end
 
    return false
 end
 
----
+--- Set is object commandable
+-- @param commandable (Default: false)
 function Object:SetCommandable(commandable)
    nwn.engine.StackPushObject(self);
    nwn.engine.StackPushBoolean(commandable);
    nwn.engine.ExecuteCommand(162, 2);
+end
+
+--------------------------------------------------------------------------------
+-- Bridge functions to nwnx_solstice
+
+function NSGetIsDead(obj)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   return obj:GetIsDead()
+end
+
+function NSGetIsPCDying(obj)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   return obj:GetIsPCDying()
 end

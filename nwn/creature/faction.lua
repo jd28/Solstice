@@ -16,17 +16,17 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
----
--- @param leader
+--- Add PC to party
+-- @param leader Faction leader
 function Creature:AddToParty(leader)
    nwn.engine.StackPushObject(leader)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(572, 2)
 end
 
----
--- @param target
--- @param amount
+--- Adjust reputation
+-- @param target Target
+-- @param amount Amount to adjust
 function Creature:AdjustReputation(target, amount)
    nwn.engine.StackPushInteger(amount)
    nwn.engine.StackPushObject(target)
@@ -34,23 +34,23 @@ function Creature:AdjustReputation(target, amount)
    nwn.engine.ExecuteCommand(209, 3)
 end
 
----
+--- Changes creature to standard faction
 function Creature:ChangeToStandardFaction()
    nwn.engine.StackPushInteger(faction)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(412, 2)
 end
 
----
--- @param target
+--- Clears personal repuation
+-- @param target Target
 function Creature:ClearPersonalReputation(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
    nwn.engine.ExecuteCommand(389, 2)
 end
 
----
--- @param target
+--- Get if factions are equal.
+-- @param target Target
 function Creature:GetFactionEqual(target)
    nwn.engine.StackPushObject(target)
    nwn.engine.StackPushObject(self)
@@ -58,8 +58,8 @@ function Creature:GetFactionEqual(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
--- @param target
+--- Determine if target is an enemy
+-- @param target Target
 function Creature:GetIsEnemy(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
@@ -67,8 +67,8 @@ function Creature:GetIsEnemy(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
--- @param target
+--- Determine if target is a friend
+-- @param target Target
 function Creature:GetIsFriend(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
@@ -76,16 +76,17 @@ function Creature:GetIsFriend(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
-function Creature:GetIsNeutral()
+--- Determine if target is a neutral
+-- @param target Target
+function Creature:GetIsNeutral(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
    nwn.engine.ExecuteCommand(237, 2)
    return nwn.engine.StackPopBoolean()
 end
 
----
--- @param target
+--- Determine reaction type if friendly
+-- @param target Target
 function Creature:GetIsReactionTypeFriendly(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
@@ -93,8 +94,8 @@ function Creature:GetIsReactionTypeFriendly(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
--- @param target
+--- Determine reaction type if hostile
+-- @param target Target
 function Creature:GetIsReactionTypeHostile(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
@@ -102,8 +103,8 @@ function Creature:GetIsReactionTypeHostile(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
--- @param target
+--- Determine reaction type if neutral
+-- @param target Target
 function Creature:GetIsReactionTypeNeutral(target)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
@@ -111,7 +112,8 @@ function Creature:GetIsReactionTypeNeutral(target)
    return nwn.engine.StackPopBoolean()
 end
 
----
+--- Gets reputation of creature.
+-- @param target Target
 function Creature:GetReputation(target)
    nwn.engine.StackPushObject(target)
    nwn.engine.StackPushObject(self)
@@ -119,8 +121,8 @@ function Creature:GetReputation(target)
    return nwn.engine.StackPopInteger()
 end
 
----
--- @param faction
+--- Get standard faction reputation
+-- @param faction Faction to check
 function Creature:GetStandardFactionReputation(faction)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushInteger(nStandardFaction)
@@ -128,30 +130,30 @@ function Creature:GetStandardFactionReputation(faction)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Remove PC from party.
 function Creature:RemoveFromParty()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(573, 1)
 end
 
----
--- @param target
--- @param decays
--- @param duration
+--- Set creature as a temporary enemy
+-- @param target Target
+-- @param decays If true reactions will retrun after duration. (Default: false)
+-- @param duration Time in seconds (Default: 180.0)
 function Creature:SetIsTemporaryEnemy(target, decays, duration)
    duration = duration or 180.0
 
    nwn.engine.StackPushFloat(duration)
-   nwn.engine.StackPushInteger(decays)
+   nwn.engine.StackPushBoolean(decays)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushObject(target)
    nwn.engine.ExecuteCommand(391, 4)
 end
 
----
--- @param target
--- @param decays
--- @param duration
+--- Set creature as a temporary friend
+-- @param target Target
+-- @param decays If true reactions will retrun after duration. (Default: false)
+-- @param duration Time in seconds (Default: 180.0)
 function Creature:SetIsTemporaryFriend(target, decays, duration)
    duration = duration or 180.0
 
@@ -162,10 +164,10 @@ function Creature:SetIsTemporaryFriend(target, decays, duration)
    nwn.engine.ExecuteCommand(390, 4)
 end
 
----
--- @param target
--- @param decays
--- @param duration
+--- Set creature as a temporary neutral
+-- @param target Target
+-- @param decays If true reactions will retrun after duration. (Default: false)
+-- @param duration Time in seconds (Default: 180.0)
 function Creature:SetIsTemporaryNeutral(target, decays, duration)
    duration = duration or 180.0
 
@@ -176,9 +178,9 @@ function Creature:SetIsTemporaryNeutral(target, decays, duration)
    nwn.engine.ExecuteCommand(392, 4)
 end
 
----
--- @param faction
--- @param rep
+--- Set standard faction reputation
+-- @param faction Faction
+-- @param rep Reputaion
 function Creature:SetStandardFactionReputation(faction, rep)
    nwn.engine.StackPushObject(self)
    nwn.engine.StackPushInteger(rep)

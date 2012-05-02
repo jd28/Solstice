@@ -19,8 +19,8 @@
 local ffi = require "ffi"
 local C = ffi.C
 
-
----
+--- Gets ability score that was raised at a particular level.
+-- @return nwn_ABILITY_* or -1 on error.
 function Creature:GetAbilityIncreaseByLevel(level)
    if not self:GetIsValid() then return -1 end
 
@@ -99,11 +99,14 @@ function Creature:GetAbilityScore(ability, base)
    return result
 end
 
----
+--- Gets a creatures dexterity modifier.
+-- @param armor_check If true uses armor check penalty (Default: false)
 function Creature:GetDexMod(armor_check)
    return C.nwn_GetDexMod(self.stats, armor_check)
 end
 
+--- Gets a creatures max ability bonus from gear/effects.
+-- @param abil nwn.ABILITY_*
 function Creature:GetMaxAbilityBonus(abil)
    return 12
 end
@@ -120,7 +123,7 @@ function Creature:ModifyAbilityScore(ability, value)
     return self:SetAbilityScore(ability, abil)
 end
 
----
+--- Recalculates a creatures dexterity modifier.
 function Creature:RecalculateDexModifier()
    if not self:GetIsValid() then return -1 end
 
@@ -138,13 +141,9 @@ function Creature:SetAbilityScore(ability, value)
    return C.nwn_SetAbilityScore(self, ability, value)
 end
 
-function NSGetTotalAbilityBonus(cre, vs, abil)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
-
-   return cre:GetTotalEffectAbilityBonus(vs, abil)
-end
-
+--- Get total ability bonus from effects/gear.
+-- @param vs Versus another creature.
+-- @param abil nwn.ABILITY_*
 function Creature:GetTotalEffectAbilityBonus(vs, abil)
    local function valid(eff, vs_info)
       local eabil = eff.eff_integers[0]
@@ -171,9 +170,24 @@ function Creature:GetTotalEffectAbilityBonus(vs, abil)
    local info = effect_info_t(self.stats.cs_first_ability_eff, 
                               nwn.EFFECT_TRUETYPE_ABILITY_DECREASE,
                               nwn.EFFECT_TRUETYPE_ABILITY_INCREASE,
-                              false, false, false)
+                              NS_OPT_EFFECT_ABILITY_STACK,
+                              NS_OPT_EFFECT_ABILITY_STACK_GEAR,
+                              NS_OPT_EFFECT_ABILITY_STACK_SPELL)
 
    return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, 
-                     self:GetMaxAbilityBonus(abil))
+                     0, self:GetMaxAbilityBonus(abil))
+end
+
+--------------------------------------------------------------------------------
+-- Bridge functions to/from nwnx_solstice plugin.
+
+--- Get total ability bonus from effects/gear.
+-- @param cre Creature
+-- @param vs Versus another creature.
+-- @param abil nwn.ABILITY_*
+function NSGetTotalAbilityBonus(cre, vs, abil)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+
+   return cre:GetTotalEffectAbilityBonus(vs, abil)
 end
