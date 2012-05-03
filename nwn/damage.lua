@@ -38,6 +38,11 @@ function nwn.RegisterDamage(damage_type, index, name, dmg_color, melee_vfx)
    DAMAGES.format[index] = dmg_color .. "%d " .. name  .. color.END
 end
 
+--- Register a dice roll to a nwn.DAMAGE_BONUS_* constant.
+-- @param id nwn.DAMAGE_BONUS_*
+-- @param dice Number of dice
+-- @param side Number of sides
+-- @param bonus Bonus added to roll
 function nwn.RegisterDamageRoll(id, dice, side, bonus)
    if dice == 0 and bonus == 0 then
       error "The number of dice or a bonus amount must be specified"
@@ -49,10 +54,14 @@ function nwn.RegisterDamageRoll(id, dice, side, bonus)
    DAMAGES.roll[id] = dice_roll_t(dice, side, bonus)
 end
 
+--- Get damage format by index
+-- @param idx Value gotten by calling nwn.GetDamageIndexFromFlag on a nwn.DAMAGE_TYPE_*
 function nwn.GetDamageFormatByIndex(idx)
    return DAMAGES.format[idx]
 end
 
+--- Get damage index from flag.
+-- @param flag nwn.DAMAGE_TYPE_*
 function nwn.GetDamageIndexFromFlag(flag)
    local idx = DAMAGES.index[flag]
    if not idx then
@@ -62,10 +71,15 @@ function nwn.GetDamageIndexFromFlag(flag)
    return idx
 end
 
+--- Get damage roll from constant
+-- @param id nwn.DAMAGE_BONUS_*
 function nwn.GetDamageRollFromConstant(id)
    return DAMAGES.roll[id] or dice_roll_t(0,0,0)
 end
 
+--- Get damage vfx
+-- @param flag nwn.DAMAGE_TYPE_*
+-- @param is_ranged If true damage was done by ranged attack (Default: false)
 function nwn.GetDamageVFX(flag, is_ranged)
    if is_ranaged then
       return

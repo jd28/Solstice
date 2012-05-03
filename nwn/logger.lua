@@ -41,7 +41,7 @@ function nwn.Log(log_level, format_str, ...)
    return log
 end
 
----
+--- Write string to NWN server log file
 function nwn.WriteTimestampedLogEntry(log)
    nwn.engine.StackPushString(log)
    nwn.engine.ExecuteCommand(560, 1)

@@ -19,6 +19,7 @@
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
+local random = math.random
 
 function NSGetAttackResult(attack_info)
    local t = attack_info.attack.cad_attack_result
@@ -162,7 +163,14 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
 end
 
 --- GetAttackModifierVersus
-function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, weap, weap_num)
+function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, attack_type, weap, weap_num)
+   if from_hook then
+      attacker = _NL_GET_CACHED_OBJECT(attacker)
+      target = _NL_GET_CACHED_OBJECT(target)
+      attack_info = NSGetAttackInfo(attacker, target)
+      attack_type = attack_info.attack.cad_attack_type
+      weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
+   end
    
    local bab
 
@@ -218,7 +226,7 @@ function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, w
 
    -- Favored Enemies
    if attacker.ci.fe_mask ~= 0 
-      and target.type == nwn.nwn.GAME_OBJECT_TYPE_CREATURE
+      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
       and bit.band(attacker.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
    then
       ab = ab + attacker.ci.fe.ab
@@ -258,10 +266,18 @@ function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, w
    return ab + ab_abil + eff_ab + sit_ab
 end
 
+--- Resolve attack roll.
+-- Determines whether the attack is a hit, if the hit is critical.
+-- @param attacker
+-- @param target
+-- @param from_hook Allows the function to determine if it was called from Lua
+--    or via the NWNX plugin.
+-- @param attack_info See AttackInfo ctype.
 function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
+      attack_info = NSGetAttackInfo(attacker, target)
    end
 
    local attack_type = attack_info.attack.cad_attack_type
@@ -275,7 +291,7 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    end
 
    -- Modifier Vs
-   ab = ab + NSGetAttackModifierVersus(attacker, target, attack_info, attack_type, weap, weap_num)
+   ab = ab + NSGetAttackModifierVersus(attacker, target, false, attack_info, attack_type, weap, weap_num)
    attack_info.attack.cad_attack_mod = ab
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
@@ -290,7 +306,7 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
       return
    end
 
-   local roll = math.random(20)
+   local roll = random(20)
    attack_info.attack.cad_attack_roll = roll 
 
    local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
@@ -316,14 +332,18 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
 
 
    if roll > NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
-      attack_info.attack.cad_threat_roll = math.random(20)
+      attack_info.attack.cad_threat_roll = random(20)
       attack_info.attack.cad_critical_hit = 1
 
-      -- TODO Difficulty Settings
-      -- TODO immunity
       if attack_info.attack.cad_threat_roll + ab >= ac then
-         -- Is critical hit
-         attack_info.attack.cad_attack_result = 3
+         if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+            and not target:GetIsImmuneToCriticalHits(attacker)
+         then
+            -- Is critical hit
+            attack_info.attack.cad_attack_result = 3
+         else
+            -- Send target immune to crits.
+         end
       end
    end
 end

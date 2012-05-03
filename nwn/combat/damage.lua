@@ -132,8 +132,7 @@ function NSBroadcastDamage(attacker, target, dmg_roll)
    end
 end
 
----
---
+--- Adjusts damage done to targets damage immunity, resistance.
 function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
    local dmg, resist, imm, imm_adj
 
@@ -154,6 +153,8 @@ function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
    target:DoDamageReduction(attacker, dmg_result, damage_power)
 end
 
+--- Ctritical hit damage roll.
+-- This is solely for a weapons crit_dmg bonus.  E,g. from Overwhelming Critical.
 function NSDoCritDamageRoll(dmg_roll, mult, attacker, weap_num)
    local roll, prev, idx
 
@@ -181,10 +182,10 @@ function NSDoDamageRoll(dmg_roll, mult)
 end
 
 function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, weapon, weap_num, attack_type)
-   -- If weap is nil then we're coming from the hook.
    local cr, attack_num, attack, mult
    local from_hook = false
 
+   -- If weap is nil then we're coming from the hook.
    if not weapon then
       from_hook = true
 
@@ -202,28 +203,35 @@ function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damag
    local base = 0
    local dmg_roll = damage_roll_t()
 
+   -- Add weapons base damage to damage roll.
+   NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[weap_num].base_dmg)
 
-  -- NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[weap_num].base_dmg)
-  -- NSGetDamageBonus(attacker, target, 0, dmg_roll)
+   -- Add any damage bonuses from combat modifiers. E,g. size, race, etc.
+   NSGetDamageBonus(attacker, target, 0, dmg_roll)
 
-   -- Effects
+   -- Add Damage Bonuses from effects/item properties.
    NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type)
 
    -- situational
    -- NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
 
+   -- If this is a critical hit determine the multiplier.
    if crit then
       mult = NSGetCriticalHitMultiplier(attacker, offhand, weapon, weap_num)
    else
       mult = 1
    end
 
+   -- Roll all the damage.
    NSDoDamageRoll(dmg_roll, mult)
 
+   -- Any addition damage from the weapons crit_dmg bonus.  E,g from Overwhelming Critical.
    if crit then
       NSDoCritDamageRoll(dmg_roll, mult, attacker, weap_num)
    end
 
+   -- If the target is a creature modify the damage roll by their immunities, resistances,
+   -- soaks.
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       NSDoDamageAdjustments(attacker, target, dmg_roll.result, dmg_roll.damage_power)
    end
@@ -231,6 +239,7 @@ function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damag
    return dmg_roll
 end
 
+--- Adds all the asorted damage bonuses.
 function NSGetDamageBonus(attacker, target, int, dmg_roll)
 
    if attacker.ci.area.dmg.dice > 0 or attacker.ci.area.dmg.bonus > 0 then
@@ -255,9 +264,15 @@ function NSGetDamageBonus(attacker, target, int, dmg_roll)
       NSAddDamageBonus(dmg_roll, attacker.ci.skill.dmg_type, attacker.ci.skill.dmg)
    end
 
-   if attacker.ci.fe.dmg.dice > 0 or attacker.ci.fe.dmg.bonus > 0 then
-      -- TODO: Favored enememy
-      NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
+   -- Favored Enemies
+   if attacker.ci.fe_mask ~= 0 
+      and (attacker.ci.fe.dmg.dice > 0 or attacker.ci.fe.dmg.bonus > 0)
+   then
+      if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+         and bit.band(attacker.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
+      then
+         NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
+      end
    end
 end
 
@@ -322,6 +337,7 @@ function NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type
    end
 end
 
+---
 function NSGetTotalDamage(dmg_result, idx)
    local total = 0
    for i = idx or 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
@@ -330,6 +346,7 @@ function NSGetTotalDamage(dmg_result, idx)
    return total
 end
 
+---
 function NSGetTotalImmunityAdjustment(dmg_result)
    local total = 0
    for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
@@ -338,6 +355,7 @@ function NSGetTotalImmunityAdjustment(dmg_result)
    return total
 end
 
+---
 function NSGetTotalResistAdjustment(dmg_result)
    local total = 0
    for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
@@ -346,14 +364,16 @@ function NSGetTotalResistAdjustment(dmg_result)
    return total
 end
 
+---
 function NSResolveDamage(attacker, target, from_hook, attack_info, weap, weap_num, is_offhand)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
+      attack_info = NSGetAttackInfo(attacker, target)
+      weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
    end
 
    local attack_type = attack_info.attack.cad_attack_type
-   local weapon, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
    local ki_strike = attack_info.attack.cad_special_attack == 882
    local crit = attack_info.attack.cad_attack_result == 3
 
@@ -368,7 +388,7 @@ function NSResolveDamage(attacker, target, from_hook, attack_info, weap, weap_nu
                                        attack_info.attack.cad_sneak_attack == 1,
                                        attack_info.attack.cad_death_attack == 1,
                                        ki_strike,
-                                       weapon,
+                                       weap,
                                        weap_num,
                                        attack_type)
 
@@ -383,19 +403,20 @@ function NSResolveDamage(attacker, target, from_hook, attack_info, weap, weap_nu
       target:DecrementRemainingFeatUses(nwn.FEAT_DEFENSIVE_ROLL)
       
       if target:ReflexSave(total, nwn.SAVING_THROW_TYPE_DEATH, attacker) then
+         -- TODO: Adjust individual damages.
          total = math.floor(total / 2)
       end
    end
 
    -- Death Attack
-
+   
    -- Epic Dodge : Don't want to use it unless we take damage.
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
       and total > 0
       and attack_info.attacker_cr.cr_epic_dodge_used == 0
       and target:GetHasFeat(nwn.FEAT_EPIC_DODGE)
    then
-      -- Send Epic Dodge Message
+      -- TODO: Send Epic Dodge Message
       
       attack_info.attack.cad_attack_result = 4
       attack_info.attacker_cr.cr_epic_dodge_used = 1
@@ -414,8 +435,6 @@ function NSResolveDamage(attacker, target, from_hook, attack_info, weap, weap_nu
          NSResolveOnHitVisuals(attacker, target, attack_info.attack, damage_roll)
       end
    end
-   
---   print("Resolve Damage: ", total)
 
    return damage_roll
 end

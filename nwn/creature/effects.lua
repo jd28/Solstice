@@ -19,6 +19,14 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
+--- Versus Info ctype
+-- @name VersusInfo
+-- @field race Test
+-- @field goodevil Test
+-- @field lawchaos Test
+-- @field deity_id Test
+-- @field subrace_id Test
+-- @field obj_id Test
 ffi.cdef[[
 typedef struct VersusInfo {
    int32_t race;
@@ -28,7 +36,9 @@ typedef struct VersusInfo {
    int32_t subrace_id;
    uint32_t obj_id;
 } VersusInfo;
+]]
 
+ffi.cdef[[
 typedef struct EffectInfo {
    int32_t index;
    int32_t type_dec;
@@ -44,7 +54,8 @@ effect_info_t = ffi.typeof("EffectInfo")
 
 --- Get creatures concealment
 -- @param vs Creatures attacker, if any.
--- @param attack CNWSCombatAttackData ctype
+-- @param attack CNWSCombatAttackData ctype (Default: nil).  This parameter
+--    should only ever be passed from the combat engine.
 function Creature:GetConcealment(vs, attack)
    local race, lawchaos, goodevil, subrace, deity, target
    local amount
@@ -523,7 +534,8 @@ function Creature:GetIsImmune(immunity, versus)
 end
 
 --- Get creatures miss chance
--- @param attack CNWSCombatAttackData ctype
+-- @param attack CNWSCombatAttackData ctype (Default: nil).  This parameter
+--    should only ever be passed from the combat engine.
 function Creature:GetMissChance(attack)
    local total = 0
    local eff_type, amount, miss_type

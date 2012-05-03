@@ -80,6 +80,10 @@ require 'nwn.combat.post_damage'
 require 'nwn.combat.situation'
 require 'nwn.combat.state'
 
+--- Gets the current attack weapon and weapon index
+-- @param combat_round CNWSCombatRound ctype
+-- @param attack_type Type of attack onhand, offhand, creature, etc
+-- @param attacker Creature that's attacking.
 function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
    local weapon = C.nwn_GetCurrentAttackWeapon(combat_round, attack_type)
    local ci_weap_number = -1
@@ -99,11 +103,16 @@ function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
    return _NL_GET_CACHED_OBJECT(weapon.obj.obj_id), ci_weap_number
 end
 
+--- Get if attack is an offhand attack
+-- @param cr CNWSCombatRound ctype
 function NSGetOffhandAttack(cr)
    return cr.cr_current_attack + 1 > 
       cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
 end
 
+--- Initialize number of attacks
+-- @param cre Attacking object
+-- @param combat_round CNWSCombatRound ctype
 function NSInitializeNumberOfAttacks (cre, combat_round)
    cre = _NL_GET_CACHED_OBJECT(cre)
    if not cre:GetIsValid() then return end

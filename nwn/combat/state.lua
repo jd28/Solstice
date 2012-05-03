@@ -25,22 +25,15 @@ function NSResolveTargetState(attacker, target, attack_info)
    attacker.ci.target_state_mask = 0
    local mask = 0
 
-   if target:GetIsBlind()
-      and not target:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
-   then
-      print("Blind")
+   if target:GetIsBlind() then
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_BLIND)
    end
 
-   if attacker:GetIsInvisible(target)
-      and not target:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
-   then
+   if attacker:GetIsInvisible(target) then
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_ATTACKER_INVIS)
    end
 
-   if target:GetIsInvisible(attacker)
-      and not attacker:GetHasFeat(nwn.FEAT_BLIND_FIGHT)
-   then
+   if target:GetIsInvisible(attacker) then
       mask = bit.bor(mask, nwn.COMBAT_TARGET_STATE_INVIS)
    end
 
@@ -87,6 +80,5 @@ function NSResolveTargetState(attacker, target, attack_info)
    end
 
    attacker.ci.target_state_mask = mask
-
    attack_info.target_state = mask
 end

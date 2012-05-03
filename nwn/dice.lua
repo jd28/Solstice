@@ -73,10 +73,16 @@ function nwn.d100(count)
    return nwn.RollDice(count, 100)
 end
 
+--- Do a dice roll.
+-- @param roll DiceRoll ctype
 function nwn.DoDiceRoll(roll)
    return nwn.RollDice(roll.dice, roll.sides, roll.bonus)
 end
 
+--- Rolls dice
+-- @param dice Number of dice to roll
+-- @param sides Number of sides the dice have
+-- @param bonus Bonus added to roll
 function nwn.RollDice(dice, sides, bonus)
    bonus = bonus or 0
    local result = 0

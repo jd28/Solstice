@@ -31,17 +31,19 @@ function NSResolveSituationalModifiers(attacker, target, attack_info)
    -- Save some time by not sqrt'ing to get magnitude
    if attacker.ci.target_distance <= 100 then
       -- Coup De Grace
-      if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ASLEEP)
-         and target:GetHitDice() < 5
+      if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ASLEEP) ~= 0
+         and target:GetHitDice() < NS_SETTINGS.NS_OPT_COUPDEGRACE_MAX_LEVEL
       then
          flags = bit.bor(flags, nwn.SITUATION_COUPDEGRACE)
       end
 
-      local death = attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg.dice > 0
-         or attacker.ci.situational[nwn.SITUATION_FLAG_DEATH_ATTACK].dmg.bonus > 0
+      -- In order for a sneak attack situation to be possiblle the attacker must
+      -- be able to do some amount of sneak damage.
+      local death = attacker.ci.situational[nwn.SITUATION_DEATH_ATTACK].dmg.dice > 0
+         or attacker.ci.situational[nwn.SITUATION_DEATH_ATTACK].dmg.bonus > 0
       
-      local sneak = attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg.dice > 0
-         or attacker.ci.situational[nwn.SITUATION_FLAG_SNEAK_ATTACK].dmg.bonus > 0
+      local sneak = attacker.ci.situational[nwn.SITUATION_SNEAK_ATTACK].dmg.dice > 0
+         or attacker.ci.situational[nwn.SITUATION_SNEAK_ATTACK].dmg.bonus > 0
 
       -- Sneak Attack & Death Attack
       if (sneak or death) and

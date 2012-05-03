@@ -16,7 +16,7 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
----
+--- Get if object is listening
 function Object:GetIsListening()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(174, 1)

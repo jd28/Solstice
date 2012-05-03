@@ -16,6 +16,9 @@
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 --------------------------------------------------------------------------------
 
+-- TODO: this all needs to be redone /if/ there is going to be a proxy faction
+-- object
+
 ---
 function Faction:GetAverageGoodEvilAlignment()
    nwn.engine.StackPushObject(self)
@@ -45,26 +48,25 @@ function Faction:GetAverageReputation(target)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Get faction average XP
 function Faction:GetAverageXP()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(190, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
-function Faction:GetBestAC(bMustBeVisible)
-   if bMustBeVisible == nil then
-      bMustBeVisible = true
-   end
+--- Get faction member with best AC
+-- @param visible If true member must be visible
+function Faction:GetBestAC(visible)
+   if visible == nil then visible = true end
    
-   nwn.engine.StackPushInteger(bMustBeVisible)
+   nwn.engine.StackPushInteger(visible)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(193, 2)
    return nwn.engine.StackPopObject()
 end
 
----
+--- Get factions gold
 function Faction:GetGold()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(185, 1)

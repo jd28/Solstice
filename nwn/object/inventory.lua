@@ -25,19 +25,22 @@ function Object:GetFirstItemInInventory()
    return nwn.engine.StackPopObject()
 end
 
----
+--- Determines if object has an inventory.
 function Object:GetHasInventory()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(570, 1)
    nwn.engine.StackPopBoolean()
 end
 
----
-function Object:HasItem(sTag)
-   return self:GetItemPossessedBy(sTag) and true
+--- Determines if an object has an item by tag
+function Object:HasItem(tag)
+   local item = self:GetItemPossessedBy(tag)
+   return item:GetIsValid()
 end
 
----
+--- Determine if object has an item
+-- @param tag Object tag to search for
+-- @param is_resref If true search by reserf rather than tag.
 function Object:GetItemPossessedBy(tag, is_resref)
    if not is_resref then
       nwn.engine.StackPushString(tag)
@@ -53,7 +56,7 @@ function Object:GetItemPossessedBy(tag, is_resref)
    end
 end
 
----
+--- Iterator over items in an object's inventory
 function Object:Items()
    local obj = self:GetFirstItemInInventory()
    local prev_obj 

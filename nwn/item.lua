@@ -149,7 +149,6 @@ function Item:GetGoldValue()
    return nwn.engine.StackPopInteger()
 end
 
-
 --- Check whether an item has a given property.
 -- @param ip_type nwn.ITEM_PROPERTY_*
 function Item:GetHasItemProperty(ip_type)
@@ -166,10 +165,12 @@ function Item:GetIdentified()
    return self.obj.it_identified == 1
 end
 
+--- Determine if item is monk weapon.
 function Item:GetIsMonkWeapon()
    return nwn.GetIsMonkWeapon(self:GetBaseType())
 end
 
+--- Determine if item is ranged weapon.
 function Item:GetIsRangedWeapon()
    if not self:GetIsValid() then return false end
 
@@ -186,6 +187,8 @@ function Item:GetIsRangedWeapon()
    return false
 end
 
+--- Determine if item is unarmed weapon.
+-- TODO: Remove/Fix CEP stuff
 function Item:GetIsUnarmedWeapon()
    if not self:GetIsValid() then
       return true

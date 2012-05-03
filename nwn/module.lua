@@ -43,16 +43,16 @@ function Module:Areas()
    end
 end
 
----
+--- Get module name
 function Module:GetName()
    nwn.engine.ExecuteCommand(561, 0)
    return StackPopString()
 end
 
----
+--- Get module starting location
 function Module:GetStartingLocation()
    nwn.engine.ExecuteCommand(411, 0)
-   return StackPopEngineStructure(ENGINE_STRUCTURE_LOCATION)
+   return StackPopEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION)
 end
 
 

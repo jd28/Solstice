@@ -21,8 +21,12 @@ local ffi = require 'ffi'
 
 local vector_mt = {
    __add = function (a, b) return vector_t(a.x + b.x, a.y + b.y, a.z + a.z) end,
-   __index = Vector
+   __index = Vector,
+   __sub = function (a, b) return vector_t(a.x - b.x, a.y - b.y, a.z - a.z) end
 }
+
+vector_t = ffi.typeof("Vector")
+vector_t = ffi.metatype(vector_t, vector_mt)
 
 --- Normalizes vector
 function Vector:Normalize()
@@ -43,11 +47,6 @@ function Vector:LineOfSight(target)
    nwn.engine.ExecuteCommand(753, 2)
    nwn.engine.StackPopBoolean()
 end
-
-function Vector.__sub (a, b) return vector_t(a.x - b.x, a.y - b.y, a.z - a.z) end
-
-vector_t = ffi.typeof("Vector")
-vector_t = ffi.metatype(vector_t, vector_mt)
 
 --- Converts angle to vector
 function Vector.FromAngle(angle)

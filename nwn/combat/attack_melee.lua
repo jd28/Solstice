@@ -22,7 +22,29 @@ local bit = require 'bit'
 
 local ATTACK_ID = 1
 
-function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
+function NSGetAttackInfo(attacker, target)
+   local attack_info == attack_info_t()
+   attack_info.attacker_cr = attacker.obj.cre_combat_round
+   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
+   attack_info.attacker = attacker.id
+   attack_info.target = target.id
+   attack_info.attack_id = ATTACK_ID
+   ATTACK_ID = ATTACK_ID + 1
+   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
+   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
+   attack_info.attack.cad_target = target.id
+   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
+   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
+   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      attack_info.target_cr = target.obj.cre_combat_round
+   end
+
+   return attack_info
+end
+
+function NSResolveMeleeAttack(attacker, target, attack_count, anim, from_hook)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
@@ -30,25 +52,11 @@ function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
    if not target:GetIsValid() then return end 
 
    local attacks = {}
-   local damage_rolls = {}
 
    for i = 0, attack_count - 1 do
-      local attack_info = attack_info_t()
-      attack_info.attacker_cr = attacker.obj.cre_combat_round
-      attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
-      attack_info.attacker = attacker.id
-      attack_info.target = target.id
-      attack_info.attack_id = ATTACK_ID
-      ATTACK_ID = ATTACK_ID + 1
-      attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
-      attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
-      attack_info.attack.cad_target = target.id
-      attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-      attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
-      attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+      local attack_info = NSGetAttackInfo(attacker, target)
 
       if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-         attack_info.target_cr = target.obj.cre_combat_round
          NSResolveTargetState(attacker, target, attack_info)
          NSResolveSituationalModifiers(attacker, target, attack_info)
       end
@@ -66,12 +74,12 @@ function NSResolveMeleeAttack(attacker, target, attack_count, a, from_hook)
          end
       end
 
-      NSResolveAttackRoll(attacker, target, nil, attack_info)
+      NSResolveAttackRoll(attacker, target, false, attack_info)
       if NSGetAttackResult(attack_info) then
          attack_info.dmg_roll = NSResolveDamage(attacker, target, false, attack_info)
          NSResolvePostMeleeDamage(attacker, target, attack_info)
       end
-      C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, a)
+      C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, anim)
 
       if attack_info.attack.cad_special_attack ~= 0
          and NSGetAttackResult(attack_info) then

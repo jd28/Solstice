@@ -1,9 +1,8 @@
+local chat = require 'nwn.chat'
 
 function pl_test_lua(oPC)
-    local pc = nwn.GetFirstPC()
-    for i = 0, 5 do
-       pc:SendMessage (pc:GetAbilityScore(i))
-    end
+   local pc = nwn.GetFirstPC()
+   chat.SendChatMessage(5, pc, "Hello", pc)
 end
 
 function pl_check_lua(oSelf)

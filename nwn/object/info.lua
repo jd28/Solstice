@@ -24,33 +24,35 @@ function Object:GetColor(channel)
    return nwn.engine.StackPopInteger()
 end
 
----
-function Object:GetDescription(bOriginalDescription, bIdentifiedDescription)
-   bOriginalDescription = bOriginalDescription and 0 or 1
-   bIdentifiedDescription = bIdentifiedDescription and 1 or 0
+--- Get object's description
+-- @param original If true get original description (Default: false)
+-- @param identified If true get identified description (Default: true)
+function Object:GetDescription(original, identified)
+   if identified == nil then identified = true end
    
-   nwn.engine.StackPushInteger(bIdentifiedDescription)
-   nwn.engine.StackPushInteger(bOriginalDescription)
+   nwn.engine.StackPushBoolean(identified)
+   nwn.engine.StackPushBoolean(original)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(836, 3)
    return nwn.engine.StackPopString()
 end
 
----
+--- Get object's gold.
 function Object:GetGold()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(418, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Get object's max hitpoints
 function Object:GetMaxHitPoints()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(50, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Get object's name
+-- @param
 function Object:GetName(original)
    nwn.engine.StackPushBoolean(original)
    nwn.engine.StackPushObject(self)
@@ -58,42 +60,40 @@ function Object:GetName(original)
    return nwn.engine.StackPopString()
 end
 
----
+--- Get object's type
 function Object:GetType()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(106, 1)
-   return nwn.engine.StackPopInteger()
+   return self.type
 end
 
----
+--- Get plot flag
 function Object:GetPlotFlag()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(455, 1)
    return nwn.engine.StackPopBoolean()
 end
 
----
+--- Get portrait ID
 function Object:GetPortraitId()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(831, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Get portrait resref
 function Object:GetPortraitResRef()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(833, 1)
    return nwn.engine.StackPopString()
 end
 
----
+--- Get object's resref
 function Object:GetResRef()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(582, 1)
    return nwn.engine.StackPopString()
 end
 
----
+--- Get Object's tag
 function Object:GetTag()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(168, 1)
@@ -120,7 +120,7 @@ function Object:SetDescription(description, identified)
 end
 
 ---
-function Object:SetIsDestroyable(bDestroyable, bRaiseable, bSelectableWhenDead)
+function Object:SetIsDestroyable(destroyable, raiseable, selectable)
    bDestroyable = bDestroyable and 1 or 0
    bRaiseable = bRaiseable and 1 or 0
    bSelectableWhenDead = bSelectableWhenDead and 0 or 1
@@ -131,7 +131,8 @@ function Object:SetIsDestroyable(bDestroyable, bRaiseable, bSelectableWhenDead)
    nwn.engine.ExecuteCommand(323, 3)
 end
 
----
+--- Set object's name
+-- @param name New name (Default: "")
 function Object:SetName(name)
    name = name or ""
    
@@ -140,25 +141,26 @@ function Object:SetName(name)
    nwn.engine.ExecuteCommand(830, 2)
 end
 
----
-function Object:SetPlotFlag(bPlotFlag)
-   bPlotFlag = bPlotFlag and 1 or 0
-
-   nwn.engine.StackPushInteger(bPlotFlag)
+--- Set object's plot flag
+-- @param flag If true object is plot (Default: false)
+function Object:SetPlotFlag(flag)
+   nwn.engine.StackPushInteger(flag)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(456, 2)
 end
 
----
-function Object:SetPortraitId(nPortraitId)
-   nwn.engine.StackPushInteger(nPortraitId)
+--- Set portrait ID
+-- @param id Portrait ID
+function Object:SetPortraitId(id)
+   nwn.engine.StackPushInteger(id)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(832, 2)
 end
 
----
-function Object:SetPortraitResRef(sPortraitResRef)
-   nwn.engine.StackPushString(sPortraitResRef)
+--- Set Portrait resref
+-- @param resre Portrait resref
+function Object:SetPortraitResRef(resref)
+   nwn.engine.StackPushString(resref)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(834, 2)
 end

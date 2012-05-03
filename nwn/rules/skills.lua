@@ -47,7 +47,9 @@ table.insert(skills, {"Craft Armor", "CA"})
 table.insert(skills, {"Craft Weapon", "CW"})
 table.insert(skills, {"Ride", "Ride"})
 
----
+--- Get a skills name
+-- @param skill nwn.SKILL_*
+-- @param abbrev If true returns the skills abbreviation rather than its name.
 function nwn.GetSkillName(skill, abbrev)
    if skill < 0 or skill > #skills then
       error("Invalid Skill: " .. skill)

@@ -28,10 +28,16 @@ nwn.WEAPON_MASTERFEAT_WEAPON_OF_CHOICE = 9
 nwn.WEAPON_MASTERFEAT_SPECIALIZATION = 2
 nwn.WEAPON_MASTERFEAT_SPECIALIZATION_EPIC = 11
 
+--- Determines if base item type is a monk weapon
+-- Base item time
 function nwn.GetIsMonkWeapon(baseitem)
    return WEAPONS.monk[baseitem]
 end
 
+--- Determines which ability modifer to use for attack bonus
+-- @param cre Creature weilding the weapon.
+-- @param weap The weapon in question.
+-- @param ability nwn.ABILITY_*
 function nwn.GetWeaponAttackAbilityModifier(cre, weap, ability)
    if not WEAPONS.ab_abil or not WEAPONS.ab_abil[ability] then
       return 0
@@ -39,6 +45,11 @@ function nwn.GetWeaponAttackAbilityModifier(cre, weap, ability)
    return WEAPONS.ab_abil[ability](cre, weap, ability)
 end
 
+--- Determines which ability modifer to use for damage bonus
+-- This is no longer limited to nwn.ABILITY_STRENGTH
+-- @param cre Creature weilding the weapon.
+-- @param weap The weapon in question.
+-- @param ability nwn.ABILITY_*
 function nwn.GetWeaponDamageAbilityModifier(cre, weap, ability)
    if not WEAPONS.dmg_abil or WEAPONS.dmg_abil[ability] then
       return 0
@@ -46,6 +57,9 @@ function nwn.GetWeaponDamageAbilityModifier(cre, weap, ability)
    return WEAPONS.dmg_abil[ability](cre, weap, ability)
 end
 
+--- Get's a weapon feat.
+-- @param masterfeat nwn.WEAPON_MASTERFEAT_* (The masterfeat column in feats.2da)
+-- @param basetype The weapon's base item type
 function nwn.GetWeaponFeat(masterfeat, basetype)
    if not WEAPONS[masterfeat] then
       error "Invalid Master Feat"
@@ -59,6 +73,10 @@ function nwn.GetWeaponFeat(masterfeat, basetype)
    return feat
 end
 
+--- Determines if a weapon type is usable with a feat.
+-- This is for Zen Archery, Weapon Finesse, etc.
+-- @param feat nwn.FEAT_*
+-- @param basetype The weapon's base item type
 function nwn.GetWeaponUsableWithFeat(feat, baseitem)
    if not WEAPONS.useable or
       not WEAPONS.useable[feat] or
@@ -69,31 +87,58 @@ function nwn.GetWeaponUsableWithFeat(feat, baseitem)
    return WEAPONS.useable[feat][baseitem]
 end
 
+--- Registers monk weapon
+-- @param basetype The weapon's base item type
+-- @param level Monk level at which the weapon is usable as a
+--    monk weapon
 function nwn.RegisterMonkWeapon(baseitem, level)
    WEAPONS.monk = WEAPONS.monk or {}
    WEAPONS.monk[baseitem] = level
 end
 
+--- Registers an attack ability modifer
+-- See exampes/weapons.lua
+-- @param ability nwn.ABILITY_*
+-- @param f A function taking three arguments: the creature weilding the weapon,
+--    the weapon to test, and the ability passed in at registration.  It MUST
+--    return zero or the ability modifier for the ability.
 function nwn.RegisterWeaponAttackAbility(ability, f)
    WEAPONS.ab_abil = WEAPONS.ab_abil or {}
    WEAPONS.ab_abil[ability] = f
 end
 
+--- Registers an attack ability modifer
+-- See exampes/weapons.lua
+-- @param ability nwn.ABILITY_*
+-- @param f A function taking three arguments: the creature weilding the weapon,
+--    the weapon to test, and the ability passed in at registration.  It MUST
+--    return zero or the ability modifier for the ability.
 function nwn.RegisterWeaponDamageAbility(ability, f)
    WEAPONS.dmg_abil = WEAPONS.dmg_abil or {}
    WEAPONS.dmg_abil[ability] = f
 end
 
+--- Registers weapon feat.
+-- @param masterfeat nwn.WEAPON_MASTERFEAT_* (The masterfeat column in feats.2da)
+-- @param basetype The weapon's base item type
+-- @param feat nwn.FEAT_*
 function nwn.RegisterWeaponFeat (masterfeat, basetype, feat)
    WEAPONS[masterfeat] = WEAPONS[masterfeat] or {}
    WEAPONS[masterfeat][basetype] = feat
 end
 
+--- Registers weapon usable with a feat.
+-- See exampes/weapons.lua
+-- @param feat nwn.FEAT_*
+-- @param basetype The weapon's base item type
+-- @param val An integer value dependent on the feat passed at registration.
 function nwn.RegisterWeaponUsableWithFeat(feat, baseitem, val)
    WEAPONS.useable = WEAPONS.useable or {}
    WEAPONS.useable[feat] = WEAPONS.useable[feat] or {}
    WEAPONS.useable[feat][baseitem] = val
 end
+
+-- Weapon Feat Tables
 
 WEAPONS[nwn.WEAPON_MASTERFEAT_CRITICAL_DEVISTATING] = {
     [nwn.BASE_ITEM_BASTARDSWORD]            = nwn.FEAT_EPIC_DEVASTATING_CRITICAL_BASTARDSWORD,

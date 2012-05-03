@@ -49,24 +49,25 @@ require "nwn.object.spells"
 require "nwn.object.state"
 require "nwn.object.vars"
 
----
--- @param 
--- @return
+--- Copies an object
+-- @param location Location to copy the object to.
+-- @param owner Owner of the object
+-- @param tag Tag of new object (Default: "")
 function Object:Copy(location, owner, tag)
-   tag   = tag or ""
+   tag = tag or ""
 
    nwn.engine.StackPushString(tag)
    nwn.engine.StackPushObject(owner)
-   nwn.engine.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, location)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, location)
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(600, 4)
 
    return nwn.engine.StackPopObject()
 end
 
----
--- @param 
--- @return
+--- Begin conversation
+-- @param target Object to converse with
+-- @param conversation Dialog resref
 function Object:BeginConversation(target, conversation)
    conversation = conversation or ""
    
@@ -89,6 +90,7 @@ end
 --- Returns the Resref of an object.
 -- @return The Resref, empty string on error. 
 function Object:GetResref()
+   -- TODO: Fix
    return ffi.string(ffi.C.nl_Object_GetTag(ffi.cast("Object*", self)))
 end
 
@@ -109,7 +111,6 @@ function Object:GetIsTimerActive(var_name)
 end
 
 ---
--- NWScript: NONE
 -- @param 
 -- @return
 function Object:GetTrap()
@@ -118,7 +119,7 @@ function Object:GetTrap()
       self.type == GAME_OBJECT_TYPE_TRIGGER then
       return trap_t(self.id, self.type, ffi.cast("CGameObject*", self.obj))
    end
-
+-- TODO: Implement
    return nwn.OBJECT_INVALID
 end
 
@@ -130,7 +131,7 @@ function Object:GetIsTrapped()
    return nwn.engine.StackPopBoolean()
 end
 
----
+--- Determines if an object is valid
 function Object:GetIsValid()
    if self.id == 0x7F000000 then
       return false
@@ -139,67 +140,71 @@ function Object:GetIsValid()
    return _OBJECTS[self.id] and true or false
 end
 
----
--- @param 
--- @return
+--- Causes object to play a sound
+-- @param sound Sound to play
 function Object:PlaySound(sound)
    nwn.engine.StackPushString(sound)
    nwn.engine.ExecuteCommand(46, 1)
 end
 
----
+--- Causes object to play a sound
+-- @param strref Sound to play
+-- @param as_action Determines if this is an action that can be stacked on the action queue. 
+--    (Default: true)
 function Object:PlaySoundByStrRef(strref, as_action)
+   if as_action == nil then as_action = true end
    nwn.engine.StackPushInteger(as_action)
    nwn.engine.StackPushInteger(strref)
    nwn.engine.ExecuteCommand(720, 2)
 end
 
----
--- @param 
--- @return
-function Object:ResistSpell(oVersus)
+--- Attemp to resist a spell
+-- @param vs Attacking caster
+function Object:ResistSpell(vs)
    nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushObject(oVersus)
+   nwn.engine.StackPushObject(vs)
    nwn.engine.ExecuteCommand(169, 2)
    return nwn.engine.StackPopBoolean()
 end
 
----
-function Object:__tostring()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(272, 1)
-   return nwn.engine.StackPopString()
-end
-
----
+--- Changes an objects tag.
+-- @param tag New tag.
 function Object:SetTag(tag)
-   ffi.C.nl_Object_SetTag(ffi.cast("Object*", self), tag)
+   -- TODO: Implement
 end
 
----
-function Object:Trap(nType, nFaction, sOnDisarm, sOnTriggered)
-   nwn.engine.StackPushString(sOnTriggered)
-   nwn.engine.StackPushString(sOnDisarm)
-   nwn.engine.StackPushInteger(nFaction)
+--- Traps an objeect
+-- @param type nwn.TRAP_BASE_TYPE_*
+-- @param faction nwn.STANDARD_FACTION_*
+-- @param on_disarm OnDisarmed script (Default: "")
+-- @param on_trigger OnTriggered script (Default: "")
+function Object:Trap(type, faction, on_disarm, on_trigger)
+   nwn.engine.StackPushString(on_trigger or "")
+   nwn.engine.StackPushString(on_disarm or "")
+   nwn.engine.StackPushInteger(faction)
    nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(nType)
+   nwn.engine.StackPushInteger(type)
    nwn.engine.ExecuteCommand(810, 5)
 end
 
----
+--- Gets transition target
 function Object:GetTransitionTarget()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(198, 1)
    return nwn.engine.StackPopObject()
 end
 
----
+--- Gets the last object to open an object
 function Object:GetLastOpenedBy()
    nwn.engine.ExecuteCommand(376, 0)
    return nwn.engine.StackPopObject()
 end
 
----
+--- Sets a timer on an object
+-- @param var_name Variable name to hold the timer
+-- @param duration Duration in seconds before timer expires.
+-- @param on_expire Function which takes to arguments then object the
+--    timer was set on and the variable.
 function Object:SetTimer(var_name, duration, on_expire)
    self:SetLocalBool(var_name, true)
    self:DelayCommand(duration,

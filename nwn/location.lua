@@ -63,7 +63,14 @@ function Location:GetNearestObject(mask, nth)
    return nwn.engine.StackPopObject()
 end
 
----
+--- Gets nearest creature to location.
+-- @param type1 First criteria type
+-- @param value1 First crieria value
+-- @param nth Nth nearest.
+-- @param type2 (Default: -1)
+-- @param value2 (Default: -1)
+-- @param type3 (Default: -1)
+-- @param value3 (Default: -1)
 function Location:GetNearestCreature(type1, value1, nth, ...)
    local type2, value2, type3, value3 = ...
 
@@ -80,37 +87,48 @@ function Location:GetNearestCreature(type1, value1, nth, ...)
    return nwn.engine.StackPopObject()
 end
 
----
-function Location:Trap(nType, fSize, sTag, nFaction, sOnDisarm, sOnTriggered)
-   nwn.engine.StackPushString(sOnTriggered or "")
-   nwn.engine.StackPushString(sOnDisarm or "")
-   nwn.engine.StackPushInteger(nFaction or STANDARD_FACTION_HOSTILE)
-   nwn.engine.StackPushString(sTag or "")
-   nwn.engine.StackPushFloat(fSize or 2.0)
+--- Create square trap at location.
+-- @param type nwn.TRAP_BASE_TYPE_*
+-- @param size (Default 2.0)
+-- @param tag Trap tag (Default: "")
+-- @param faction Trap faction (Default: nwn.STANDARD_FACTION_HOSTILE)
+-- @param on_disarm OnDisarm script (Default: "")
+-- @param on_trigger OnTriggered script (Default: "")
+function Location:Trap(type, size, tag, faction, on_disarm, on_trigger)
+   nwn.engine.StackPushString(on_trigger or "")
+   nwn.engine.StackPushString(on_disarm or "")
+   nwn.engine.StackPushInteger(faction or nwn.STANDARD_FACTION_HOSTILE)
+   nwn.engine.StackPushString(tag or "")
+   nwn.engine.StackPushFloat(size or 2.0)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
-   nwn.engine.StackPushInteger(nTrapType)
+   nwn.engine.StackPushInteger(type)
    nwn.engine.ExecuteCommand(809, 7)
 
    return nwn.engine.StackPopObject()
 end
 
----
-function Location:SetTileMainLightColor(nMainLight1Color, nMainLight2Color)
-   nwn.engine.StackPushInteger(nMainLight2Color)
-   nwn.engine.StackPushInteger(nMainLight1Color)
+--- Sets the main light colors for a tile.
+-- @param color1 nwn.TILE_SOURCE_MAIN_COLOR_*
+-- @param color2 nwn.TILE_SOURCE_MAIN_COLOR_*
+function Location:SetTileMainLightColor(color1, color2)
+   nwn.engine.StackPushInteger(color2)
+   nwn.engine.StackPushInteger(color1)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(514, 3)
 end
 
----
-function Location:SetTileSourceLightColor(nSourceLight1Color, nSourceLight2Color)
-   nwn.engine.StackPushInteger(nSourceLight2Color)
-   nwn.engine.StackPushInteger(nSourceLight1Color)
+--- Sets the source light color for a tile.
+-- @param color1 nwn.TILE_SOURCE_LIGHT_COLOR_*
+-- @param color2 nwn.TILE_SOURCE_LIGHT_COLOR_*
+function Location:SetTileSourceLightColor(color1, color2)
+   nwn.engine.StackPushInteger(color2)
+   nwn.engine.StackPushInteger(color1)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(515, 3)
 end
 
----
+--- Determines the color of the first main light of a tile.
+-- @return nwn.TILE_SOURCE_MAIN_COLOR_*
 function Location:GetTileMainLight1Color()
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(517, 1)
@@ -118,7 +136,8 @@ function Location:GetTileMainLight1Color()
    return nwn.engine.StackPopInteger();
 end
 
----
+--- Determines the color of the second main light of a tile.
+-- @return nwn.TILE_SOURCE_MAIN_COLOR_*
 function Location:GetTileMainLight2Color()
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(518, 1)
@@ -126,14 +145,16 @@ function Location:GetTileMainLight2Color()
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Determines the color of the first source light of a tile.
+-- @return nwn.TILE_SOURCE_LIGHT_COLOR_*
 function Location:GetTileSourceLight1Color()
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(519, 1)
    return nwn.engine.StackPopInteger()
 end
 
----
+--- Determines the color of the second source light of a tile.
+-- @return nwn.TILE_SOURCE_LIGHT_COLOR_*
 function Location:GetTileSourceLight2Color()
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.ExecuteCommand(520, 1)

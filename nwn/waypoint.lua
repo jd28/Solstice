@@ -20,11 +20,13 @@ require 'nwn.ctypes.waypoint'
 
 local ffi = require 'ffi'
 
+
+
 ffi.cdef [[
 typedef struct Waypoint {
     uint32_t        type;
     uint32_t        id;
-    CGameObject     *obj;
+    CNWSWaypoint   *obj;
 } Waypoint;
 ]]
 

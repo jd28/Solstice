@@ -1,5 +1,8 @@
 local MODES = {}
 
+--- Internal toggle mode function
+-- @param cre Creature to toggle mode on
+-- @param mode nwn.ACTION_MODE_*
 function NSToggleMode(cre, mode)
    cre = _NL_GET_CACHED_OBJECT(cre)
    local bypass = true
@@ -133,10 +136,17 @@ function NSToggleMode(cre, mode)
    return true
 end
 
+--- Get a registered combat mode
+-- @param nwn.COMBAT_MODE_*
 function nwn.GetCombatMode(mode)
    return MODES[mode]
 end
 
+--- Register a combat mode.
+-- See examples/modes.lua
+-- @param nwn.COMBAT_MODE_*
+-- @param f A function taking object, mode, and a boolean indicating whether the mode is being 
+--    turned on or off.
 function nwn.RegisterCombatMode(mode, f)
    MODES[mode] = f
 end

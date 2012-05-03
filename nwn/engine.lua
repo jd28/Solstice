@@ -29,10 +29,12 @@ void free(void *ptr);
 
 local jit = require 'jit'
 
+--- Gets NWN stack command object
 function nwn.engine.GetCommandObject()
    return _NL_GET_CACHED_OBJECT(C.nwn_GetCommandObjectId())
 end
 
+--- Sets NWN stack command object
 function nwn.engine.SetCommandObjectId(object)
    return C.nwn_SetCommandObjectId(object.id)
 end
@@ -92,6 +94,7 @@ function nwn.engine.StackPopInteger()
    return C.nwn_StackPopInteger()
 end
 
+--- Pop object from NWScript stack
 function nwn.engine.StackPopObject()
    return _NL_GET_CACHED_OBJECT(C.nwn_StackPopObject())
 end
@@ -107,6 +110,7 @@ function nwn.engine.StackPopString()
    return t
 end
 
+--- Pop vector from NWScript stack
 function nwn.engine.StackPopVector()
    local v = C.nwn_StackPopVector()
    local temp = vector_t(v.x, v.y, v.z)
@@ -114,15 +118,22 @@ function nwn.engine.StackPopVector()
    return temp
 end
 
+--- Pushes boolean on the NWScript stack.
+-- This is a wrapper for StackPushInteger to make converting between boolean and integer values
+-- easier for Lua.
+-- @param value Boolean value
 function nwn.engine.StackPushBoolean(value)
-   if value == nil then value = false end
    C.nwn_StackPushBoolean(value)
 end
 
+--- Pushes float onto NWScript stack
+-- @param value Float value
 function nwn.engine.StackPushFloat(value)
    C.nwn_StackPushFloat(value)
 end
 
+--- Pushes integer onto NWScript stack
+-- @param value Integer value
 function nwn.engine.StackPushInteger(value)
    if not value then
       print(debug.traceback())
@@ -131,6 +142,9 @@ function nwn.engine.StackPushInteger(value)
    C.nwn_StackPushInteger(value)
 end
 
+--- Pushes engine structure onto NWScript stack
+-- @param es_type
+-- @param value Engine structure
 function nwn.engine.StackPushEngineStructure(es_type, value)
    if es_type == nwn.ENGINE_STRUCTURE_EFFECT then
       C.nwn_StackPushEngineStructure(es_type, value.eff)
@@ -139,14 +153,20 @@ function nwn.engine.StackPushEngineStructure(es_type, value)
    end
 end
 
+--- Pushes object onto NWscript stack
+-- @param object Object to push.
 function nwn.engine.StackPushObject(object)
    C.nwn_StackPushObject(object.id)
 end
 
+--- Pushes string onto NWScript stack
+-- @param value String value
 function nwn.engine.StackPushString(value)
    C.nwn_StackPushString(value)
 end
 
+--- Pushes vector onto NWScript stack
+-- @param value Vector value.
 function nwn.engine.StackPushVector(value)
    C.nwn_StackPushVector(value)
 end

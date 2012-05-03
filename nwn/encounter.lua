@@ -43,7 +43,7 @@ function Encounter:GetDifficulty()
    return self.obj.enc_difficulty
 end
 
----
+--- Get number of creatures spawned
 function Encounter:GetNumberSpawned()
    if self:GetIsValid() then return -1 end
    return self.obj.enc_number_spawned

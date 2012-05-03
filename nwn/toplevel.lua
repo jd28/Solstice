@@ -16,7 +16,7 @@ function nwn.CreateObject(object_type, template, loc, appear, newtag)
    print (object_type, template, loc, appear, newtag)
    nwn.engine.StackPushString(newtag)
    nwn.engine.StackPushInteger(appear)
-   nwn.engine.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, loc)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, loc)
    nwn.engine.StackPushString(template)
    nwn.engine.StackPushInteger(object_type)
    nwn.engine.ExecuteCommand(243, 5)
@@ -24,12 +24,16 @@ function nwn.CreateObject(object_type, template, loc, appear, newtag)
    return nwn.engine.StackPopObject()
 end
 
+--- Create a new location
+-- @param position Location's position
+-- @param orientation Location's orientation
+-- @param area Location's area
 function nwn.Location(position, orientation, area)
    nwn.engine.StackPushFloat(orientation)
    nwn.engine.StackPushVector(position)
    nwn.engine.StackPushObject(area)
    nwn.engine.ExecuteCommand(215, 3)
-   return nwn.engine.StackPopEngineStructure(ENGINE_STRUCTURE_LOCATION)
+   return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION)
 end
 
 --- Executes a script on a specified target
@@ -67,16 +71,20 @@ function nwn.GetModule()
    return nwn.engine.StackPopObject()
 end
 
-function nwn.GetFirstObjectInShape(e)
-end
-
----
+--- Gets first PC
 -- @return nwn.OBJECT_INVALID if no PCs are logged into the server.
 function nwn.GetFirstPC()
    nwn.engine.ExecuteCommand(548, 0)
    return nwn.engine.StackPopObject()
 end
 
+--- Gets first object in a shape
+-- @param shape nwn.SHAPE_*
+-- @param size The size of the shape. Dependent on shape or nwn.RADIUS_SIZE_*.
+-- @param location Shapes location
+-- @param line_of_sight This can be used to ensure that spell effects do not go through walls. (Default: false)
+-- @param mask Restrict results to this object type (nwn.OBJECT_TYPE_*). (Default: nwn.OBJECT_TYPE_CREATURE)
+-- @param origin Normally the spell-caster's position. (Default: [0.0,0.0,0.0]) 
 function nwn.GetFirstObjectInShape(shape, size, location, line_of_sight, mask, origin)
    origin = origin or vector_t(0, 0, 0)
    mask = mask or OBJECT_TYPE_CREATURE
@@ -93,6 +101,13 @@ function nwn.GetFirstObjectInShape(shape, size, location, line_of_sight, mask, o
    return nwn.engine.StackPopObject()
 end
 
+--- Gets next object in a shape
+-- @param shape nwn.SHAPE_*
+-- @param size The size of the shape. Dependent on shape or nwn.RADIUS_SIZE_*.
+-- @param location Shapes location
+-- @param line_of_sight This can be used to ensure that spell effects do not go through walls. (Default: false)
+-- @param mask Restrict results to this object type (nwn.OBJECT_TYPE_*). (Default: nwn.OBJECT_TYPE_CREATURE)
+-- @param origin Normally the spell-caster's position. (Default: [0.0,0.0,0.0]) 
 function nwn.GetNextObjectInShape(shape, size, location, line_of_sight, mask, origin)
    origin = origin or vector_t(0, 0, 0)
    mask = mask or OBJECT_TYPE_CREATURE
@@ -109,6 +124,13 @@ function nwn.GetNextObjectInShape(shape, size, location, line_of_sight, mask, or
    return nwn.engine.StackPopObject()
 end
 
+--- Iterator over objects in a shape.
+-- @param shape nwn.SHAPE_*
+-- @param size The size of the shape. Dependent on shape or nwn.RADIUS_SIZE_*.
+-- @param location Shapes location
+-- @param line_of_sight This can be used to ensure that spell effects do not go through walls. (Default: false)
+-- @param mask Restrict results to this object type (nwn.OBJECT_TYPE_*). (Default: nwn.OBJECT_TYPE_CREATURE)
+-- @param origin Normally the spell-caster's position. (Default: [0.0,0.0,0.0]) 
 function nwn.ObjectsInShape(shape, size, location, line_of_sight, mask, origin)
    origin = origin or vector_t(0, 0, 0)
    mask = mask or OBJECT_TYPE_CREATURE
@@ -129,6 +151,7 @@ function nwn.GetNextPC()
    return nwn.engine.StackPopObject()
 end
 
+--- Iterator over all PCs
 nwn.PCs = iter_first_next_isvalid(nwn.GetFirstPC, nwn.GetNextPC)
 
 --- Gets an object by tag
@@ -143,12 +166,13 @@ function nwn.GetObjectByTag(tag, nth)
    return nwn.engine.StackPopObject()
 end
 
----
+--- Gets the PC speaker.
 function nwn.GetPCSpeaker()
    nwn.engine.ExecuteCommand(238, 0)
    return nwn.engine.StackPopObject()
 end
 
+--- Get duration of a strref sound
 function nwn.GetStrRefSoundDuration(strref)
    nwn.engine.StackPushInteger(strref)
    nwn.engine.ExecuteCommand(571, 1);
@@ -163,9 +187,8 @@ function nwn.GetWaypointByTag(tag)
    return nwn.engine.StackPopObject()
 end 
 
-
 --- Generates a random name
--- @param name_type NAME_*
+-- @param name_type nwn.NAME_*
 -- @return Random Name
 function nwn.RandomName(name_type)
    name_type = name_type or NAME_FIRST_GENERIC_MALE
@@ -224,7 +247,7 @@ function nwn.GetIsDusk()
    return nwn.engine.StackPopBoolean()
 end
 
----
+--- Set calendar
 -- @param year Specific year to set calendar to from 1340 to 32001.
 -- @param month Specific month to set calendar from 1 to 12.
 -- @param day Specific day to set calendar to from 1 to 28.
@@ -289,3 +312,4 @@ function nwn.GetTimeMillisecond()
    nwn.engine.ExecuteCommand(19, 0)
    return nwn.engine.StackPopInteger()
 end
+
