@@ -9,7 +9,7 @@ if not NS_SETTINGS then
    return
 end
 
-if NS_SETTINGS.NS_OPT_USING_CEP then
+if NS_OPT_USING_CEP then
    require 'cep.preload'
 end
 

@@ -21,11 +21,11 @@ local C = ffi.C
 local bit = require 'bit'
 
 function NSResolveDevCrit(attacker, target, attack_info)
-   if NS_SETTINGS.NS_OPT_DEVCRIT_DISABLE_ALL then
+   if NS_OPT_DEVCRIT_DISABLE_ALL then
       return
    end
 
-   if NS_SETTINGS.NS_OPT_DEVCRIT_DISABLE_PC and attacker:GetIsPC() then
+   if NS_OPT_DEVCRIT_DISABLE_PC and attacker:GetIsPC() then
       return
    end
 

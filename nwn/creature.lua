@@ -101,7 +101,8 @@ typedef struct Creature {
     CNWSCreatureStats *stats;
     CombatInformation  ci;
 } Creature;
-]], "%$([%w_]+)", NS_SETTINGS))
+]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES,
+                    NS_OPT_NUM_SITUATIONS = NS_OPT_NUM_SITUATIONS}))
 
 local creature_mt = { __index = Creature }
 creature_t = ffi.metatype("Creature", creature_mt)

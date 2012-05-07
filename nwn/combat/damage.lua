@@ -26,8 +26,8 @@ local DAMAGE_ID = 0
 
 local function NSAddDamageBonus(dmg_roll, dmg_type, roll)
    local idx = dmg_roll.bonus_count
-   if idx >= NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS then
-      error("Only "..NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS.." damage bonuses can be applicable at one time.")
+   if idx >= NS_OPT_MAX_DMG_ROLL_MODS then
+      error("Only "..NS_OPT_MAX_DMG_ROLL_MODS.." damage bonuses can be applicable at one time.")
       return
    end
 
@@ -39,8 +39,8 @@ end
 
 local function NSAddDamagePenalty(dmg_roll, dmg_type, roll)
    local idx = dmg_roll.penalty_count
-   if idx >= NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS then
-      error("Only "..NS_SETTINGS.NS_OPT_MAX_DMG_ROLL_MODS.." damage penalties can be applicable at one time.")
+   if idx >= NS_OPT_MAX_DMG_ROLL_MODS then
+      error("Only "..NS_OPT_MAX_DMG_ROLL_MODS.." damage penalties can be applicable at one time.")
       return
    end
 
@@ -58,8 +58,6 @@ function NSApplyDamageRollById(target, attacker, id)
    local dmg_roll = DAMAGE_ROLLS[id]
    if dmg_roll == nil then return end
 
-   NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
-
    local eff = nwn.EffectDamage(1)
    eff.eff.eff_creator = attacker.id
    eff.eff.eff_integers[0] = 1
@@ -68,7 +66,7 @@ function NSApplyDamageRollById(target, attacker, id)
    eff.eff.eff_integers[3] = dmg_roll.damage_power
    eff.eff.eff_integers[4] = 1000
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       eff.eff.eff_integers[5 + i] = dmg_roll.result.damages[i]
    end
 
@@ -83,9 +81,9 @@ function NSBroadcastDamage(attacker, target, dmg_roll)
    local total = NSGetTotalDamage(dmg_roll.result)
    local log
 
-   if NS_SETTINGS.NS_OPT_NO_FLOAT_DAMAGE then
+   if NS_OPT_NO_FLOAT_DAMAGE then
       log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
-   elseif NS_SETTINGS.NS_OPT_NO_FLOAT_ZERO_DAMAGE and total <= 0 then
+   elseif NS_OPT_NO_FLOAT_ZERO_DAMAGE and total <= 0 then
       log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
    else
       C.nwn_PrintDamage(attacker.id, target.id, total, dmg_roll.result.damages)
@@ -136,7 +134,7 @@ end
 function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
    local dmg, resist, imm, imm_adj
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       dmg = dmg_result.damages[i]
       imm = target:GetDamageImmunity(i)
       imm_adj = math.floor((imm * dmg) / 100)
@@ -340,7 +338,7 @@ end
 ---
 function NSGetTotalDamage(dmg_result, idx)
    local total = 0
-   for i = idx or 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = idx or 0, NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.damages[i]
    end
    return total
@@ -349,7 +347,7 @@ end
 ---
 function NSGetTotalImmunityAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.immunity_adjust[i]
    end
    return total
@@ -358,22 +356,23 @@ end
 ---
 function NSGetTotalResistAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
       total = total + dmg_result.resist_adjust[i]
    end
    return total
 end
 
 ---
-function NSResolveDamage(attacker, target, from_hook, attack_info, weap, weap_num, is_offhand)
+function NSResolveDamage(attacker, target, from_hook, attack_info)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
       attack_info = NSGetAttackInfo(attacker, target)
-      weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
+
    end
 
-   local attack_type = attack_info.attack.cad_attack_type
+   local attack_type = attack_info.attack.cad_attack_type   
+   local weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
    local ki_strike = attack_info.attack.cad_special_attack == 882
    local crit = attack_info.attack.cad_attack_result == 3
 
@@ -445,7 +444,7 @@ function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
    local highest_vfx
    local vfx
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       flag = bit.lshift(1, i)
       vfx = nwn.GetDamageVFX(flag, attack.cad_ranged_attack == 1)
       if vfx and dmg_roll.result.damages[i] > highest then

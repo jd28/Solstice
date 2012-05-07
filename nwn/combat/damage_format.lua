@@ -19,15 +19,15 @@ function NSFormatDamageRoll(attacker, target, dmg_result, idx)
       table.insert(out, tostring(dmg_result.immunity_adjust[12]) .. " Physical" )
    end
 
-   for i = idx or 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = idx or 0, NS_OPT_NUM_DAMAGES - 2 do
       if dmg_result.damages[i] > 0 then
          table.insert(out, string.format(nwn.GetDamageFormatByIndex(i), dmg_result.damages[i]))
       end
    end
 
    local str = string.format(damage_format, 
-                             attacker:GetName(),
-                             target:GetName(),
+                             attacker:GetName(false),
+                             target:GetName(false),
                              NSGetTotalDamage(dmg_result, idx),
                              table.concat(out, " "))
    return str
@@ -38,7 +38,7 @@ function NSFormatDamageRollImmunities(attacker, target, dmg_result)
 
    table.insert(out, tostring(dmg_result.immunity_adjust[12]) .. " Physical" )
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
       if dmg_result.immunity_adjust[i] > 0 then
          table.insert(out, string.format(nwn.GetDamageFormatByIndex(i), dmg_result.immunity_adjust[i]))
       end
@@ -56,7 +56,7 @@ function NSFormatDamageRollResistance(attacker, target, dmg_result)
 
    table.insert(out, tostring(dmg_result.resist_adjust[12]) .. " Physical" )
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
       if dmg_result.resist_adjust[i] > 0 then
          table.insert(out, string.format(nwn.GetDamageFormatByIndex(i), dmg_result.resist_adjust[i]))
       end

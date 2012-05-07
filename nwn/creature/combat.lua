@@ -39,7 +39,7 @@ end
 
 ---
 function Creature:DoDamageImmunity(attacker, dmg_result)
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       dmg = dmg_result.damages[i]
       imm = self:GetDamageImmunity(i)
       imm_adj = math.floor((imm * dmg) / 100)
@@ -53,7 +53,7 @@ end
 function Creature:DoDamageResistance(attacker, dmg_result)
    local eff_type, amount, dmg_flg, idx
    local limit, use_eff, resist
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       -- Innate / Feat resistance.  In the case of damage reduction these stack
       -- with damage resistance effects.
       if self.ci.resist[i] > 0 then

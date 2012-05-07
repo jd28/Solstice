@@ -28,7 +28,7 @@ typedef struct DamageResult {
    int32_t    resist_adjust[$NS_OPT_NUM_DAMAGES];
    int32_t    soak_adjust;
 } DamageResult;
-]], "%$([%w_]+)", NS_SETTINGS))
+]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES }))
 
 ffi.cdef(string.gsub([[
 typedef struct DamageRoll {
@@ -44,7 +44,7 @@ typedef struct DamageRoll {
 
    DamageResult result;
 } DamageRoll;
-]], "%$([%w_]+)", NS_SETTINGS))
+]], "%$([%w_]+)", { NS_OPT_MAX_DMG_ROLL_MODS = NS_OPT_MAX_DMG_ROLL_MODS }))
 
 ffi.cdef[[
 typedef struct AttackInfo {

@@ -13,6 +13,15 @@ NS_OPT_NUM_DAMAGES = 12
 
 ------------------------------------------------------------------------------------------
 -- Effect settings
+-- If true attack bonus from effects/gear stack.
+NS_OPT_EFFECT_AB_STACK       = true
+
+-- If true multiple attack bonus of the same type on the same item will stack.
+NS_OPT_EFFECT_AB_STACK_GEAR  = false
+
+-- If true multiple attack bonus of the same type applied from the same spell.
+NS_OPT_EFFECT_AB_STACK_SPELL = false
+
 
 -- If true abilities from effects/gear stack.
 NS_OPT_EFFECT_ABILITY_STACK       = true

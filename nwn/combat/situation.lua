@@ -32,7 +32,7 @@ function NSResolveSituationalModifiers(attacker, target, attack_info)
    if attacker.ci.target_distance <= 100 then
       -- Coup De Grace
       if bit.band(attacker.ci.target_state_mask, nwn.COMBAT_TARGET_STATE_ASLEEP) ~= 0
-         and target:GetHitDice() < NS_SETTINGS.NS_OPT_COUPDEGRACE_MAX_LEVEL
+         and target:GetHitDice() < NS_OPT_COUPDEGRACE_MAX_LEVEL
       then
          flags = bit.bor(flags, nwn.SITUATION_COUPDEGRACE)
       end
