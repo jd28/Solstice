@@ -148,9 +148,9 @@ function Creature:GiveGold(amount, feedback, source)
    if feedback then
       local str
       if source then
-         str = string.format("Lost %dGP to %s" amount, source:GetName())
+         str = string.format("Lost %dGP to %s", amount, source:GetName())
       else
-         str = string.format("Lost %dGP" amount)
+         str = string.format("Lost %dGP", amount)
       end
       self:SendMessage(str)
    end
@@ -187,9 +187,9 @@ function Creature:TakeGold(amount, feedback, source)
    if feedback then
       local str
       if source then
-         str = string.format("Acquired %dGP from %s" amount, source:GetName())
+         str = string.format("Acquired %dGP from %s", amount, source:GetName())
       else
-         str = string.format("Acquired %dGP" amount)
+         str = string.format("Acquired %dGP", amount)
       end
       self:SendMessage(str)
    end

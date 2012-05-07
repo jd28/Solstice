@@ -23,7 +23,7 @@ local bit = require 'bit'
 local ATTACK_ID = 1
 
 function NSGetAttackInfo(attacker, target)
-   local attack_info == attack_info_t()
+   local attack_info = attack_info_t()
    attack_info.attacker_cr = attacker.obj.cre_combat_round
    attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
    attack_info.attacker = attacker.id

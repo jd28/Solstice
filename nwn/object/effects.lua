@@ -137,7 +137,7 @@ end
 --- Get if object has an effect applied by a spell.
 -- @param spell nwn.SPELL_* that the effect was created by.
 function Object:GetHasSpellEffect(spell)
-   if not self:GetIsValid() return false end
+   if not self:GetIsValid() then return false end
    for eff in self:EffectsDirect() do
       if eff:GetSpellId() == spell then
          return true
@@ -175,6 +175,6 @@ end
 --- Removes an effect from object by ID
 -- @param id Effect id to remove.
 function Object:RemoveEffectByID(id)
-   if not self:GetIsValid() return end
+   if not self:GetIsValid() then return end
    C.nwn_RemoveEffectById(self.obj.obj, id)
 end

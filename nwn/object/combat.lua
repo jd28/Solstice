@@ -24,7 +24,7 @@ function NSOnApplyDamage(obj, a)
    local eff = C.Local_GetLastDamageEffect()
 
    -- If target is invulnverable it can't be damaged.
-   if target.obj.obj.obj_is_invulnerable == 1 then
+   if obj.obj.obj.obj_is_invulnerable == 1 then
       return 1
    end
 

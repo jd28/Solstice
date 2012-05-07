@@ -355,7 +355,7 @@ end
 ---
 -- @param
 -- @param
-function nwn.EffectDeath(specatular, feedback)
+function nwn.EffectDeath(spectacular, feedback)
    nwn.engine.StackPushBoolean(feedback)
    nwn.engine.StackPushBoolean(spectacular)
 
