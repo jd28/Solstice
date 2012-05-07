@@ -123,7 +123,7 @@ end
 -- easier for Lua.
 -- @param value Boolean value
 function nwn.engine.StackPushBoolean(value)
-   C.nwn_StackPushBoolean(value)
+   C.nwn_StackPushInteger(value and 1 or 0)
 end
 
 --- Pushes float onto NWScript stack
