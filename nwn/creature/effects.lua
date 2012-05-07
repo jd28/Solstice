@@ -14,7 +14,7 @@
 --  You should have received a copy of the GNU General Public License
 --  along with this program; if not, write to the Free Software
 --  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------y
+--------------------------------------------------------------------------------
 
 local ffi = require 'ffi'
 local C = ffi.C
@@ -34,7 +34,7 @@ typedef struct VersusInfo {
    int32_t lawchaos;
    int32_t deity_id;
    int32_t subrace_id;
-   uint32_t obj_id;
+   uint32_t target;
 } VersusInfo;
 ]]
 
@@ -201,11 +201,12 @@ function Creature:GetEffectAttackBonus(vs, attack_type)
    local info = effect_info_t(self.stats.cs_first_ab_eff, 
                               nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
                               nwn.EFFECT_TRUETYPE_ATTACK_INCREASE,
-                              true, false, false)
+                              NS_OPT_EFFECT_AB_STACK, 
+			      NS_OPT_EFFECT_AB_STACK_GEAR, 
+			      NS_OPT_EFFECT_AB_STACK_SPELL)
 
-   return math.clamp(self:GetTotalEffectBonus(target, info, range, valid, get_amount),
-                     0, 
-                     self:GetMaxAttackBonus())
+   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+                     0, self:GetMaxAttackBonus())
 end
 
 --- Get armor class from effects/equips.
@@ -319,20 +320,9 @@ end
 
 --- Get effect bonus from critical hit multiplier.
 -- @param vs Creature's target.
-function Creature:GetEffectCritMultBonus(vs)
+function Creature:GetEffectCritMultBonus()
    local amount, percent
-   local race, lawchaos, goodevil, subrace, deity, target
    local total = 0
-
-   local vs_info
-   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      vs_info = versus_info_t(vs:GetRacialType(),
-                              vs:GetGoodEvilValue(),
-                              vs:GetLawChaosValue(),
-                              vs:GetDeityId(),
-                              vs:GetSubraceId(),
-                              vs.id)
-   end
 
    for i = self.ci.first_cm_effect, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
@@ -342,31 +332,17 @@ function Creature:GetEffectCritMultBonus(vs)
          break
       end
 
-      amount      = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent     = self.obj.obj.obj_effects[i].eff_integers[2]
-      race        = self.obj.obj.obj_effects[i].eff_integers[3]
-      lawchaos    = self.obj.obj.obj_effects[i].eff_integers[4]
-      goodevil    = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace     = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity       = self.obj.obj.obj_effects[i].eff_integers[7]
-      target      = self.obj.obj.obj_effects[i].eff_integers[8]
+      amount  = self.obj.obj.obj_effects[i].eff_integers[1]
+      percent = self.obj.obj.obj_effects[i].eff_integers[2]
 
-      if (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
-      then
-         if eff_type == nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE then
-            if math.random(100) <= percent then
-               total = total - amount
-            end
-         else
-             if math.random(100) <= percent then
-               total = total - amount
-            end
-         end 
+      if eff_type == nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE then
+	 if math.random(100) <= percent then
+	    total = total - amount
+	 end
+      else
+	 if math.random(100) <= percent then
+	    total = total - amount
+	 end
       end
    end
    return total
@@ -374,21 +350,9 @@ end
 
 --- Get effect bonus from critical range multiplier.
 -- @param vs Creature's target
-function Creature:GetEffectCritRangeBonus(vs)
+function Creature:GetEffectCritRangeBonus()
    local amount, percent
-   local race, lawchaos, goodevil, subrace, deity, target
-
    local total = 0
-
-   local vs_info
-   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      vs_info = versus_info_t(vs:GetRacialType(),
-                              vs:GetGoodEvilValue(),
-                              vs:GetLawChaosValue(),
-                              vs:GetDeityId(),
-                              vs:GetSubraceId(),
-                              vs.id)
-   end
 
    for i = self.ci.first_cr_effect, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
@@ -398,32 +362,18 @@ function Creature:GetEffectCritRangeBonus(vs)
          break
       end
 
-      amount      = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent     = self.obj.obj.obj_effects[i].eff_integers[2]
-      race        = self.obj.obj.obj_effects[i].eff_integers[3]
-      lawchaos    = self.obj.obj.obj_effects[i].eff_integers[4]
-      goodevil    = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace     = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity       = self.obj.obj.obj_effects[i].eff_integers[7]
-      target      = self.obj.obj.obj_effects[i].eff_integers[8]
+      amount  = self.obj.obj.obj_effects[i].eff_integers[1]
+      percent = self.obj.obj.obj_effects[i].eff_integers[2]
 
-      if (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
-      then
-         if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE then
-            if math.random(100) <= percent then
-               total = total - amount
-            end
-         else
-            if math.random(100) <= percent then
-               total = total + amount
-            end
-         end 
-      end
+      if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE then
+	 if math.random(100) <= percent then
+	    total = total - amount
+	 end
+      else
+	 if math.random(100) <= percent then
+	    total = total + amount
+	 end
+      end 
    end
    return total
 end
@@ -578,6 +528,10 @@ function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check,
    local total = 0
    local eff_type, vs_info, eff_creator, eff, amount
 
+   if not vs then
+      print(debug.traceback())
+   end
+
    if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       vs_info = versus_info_t(vs:GetRacialType(),
                               vs:GetGoodEvilValue(),
@@ -725,7 +679,7 @@ function Creature:UpdateDamageResistance()
    local eff_type, amount, dmg_flg, idx
    local cur_eff
 
-   for i = 0, NS_SETTINGS.NS_OPT_NUM_DAMAGES - 1 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       self.ci.eff_resist[i] = -1
    end
 
