@@ -86,7 +86,7 @@ function Object:GetSpellResistance()
    return self:GetLocalInt("SR")
 end
 
-Determine spell save DC.
+--- Determine spell save DC.
 function Object:GetSpellSaveDC(spell)
    local dc = 14
 

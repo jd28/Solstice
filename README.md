@@ -1,4 +1,6 @@
-Currently doing some major restructuring.  
+# Status
+* Currently undergoing some major resturcturing
+* Attempting to get the doc generator working.
 
 # Goals
 * Ease of modification.  Due to Lua's dynamic nature it's possible to
@@ -76,3 +78,5 @@ Currently doing some major restructuring.
   multiplier, and iteration (i.e. about a creatures base attack is
   decremented each attack) are all totaly modifiable on a
   creature-by-creature basis.
+
+
