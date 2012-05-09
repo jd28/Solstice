@@ -49,7 +49,23 @@ Currently doing some major restructuring.
   will occur, rather just base damage.  Likewise, the entire damage
   roll will be halved on a successful reflex save.
 * Almost every combat modifier (e,g AB, AC) is precalculated except
-  for those VS specific targets. 
+  for those VS specific targets.
+* Added the concept of "Situational Attacks" these abstract situations
+  like Sneak/Death attacks and Coup de Grace.  They can be extend to
+  modify combat by a number of situational factors.
+  
+# Combat Modifiers
+* 'Combat' is a slight misnomer as these adjustment are all in effect
+  outside of combat.  The only ones used only in combat are Favored
+  Enemy and situational attacks as they are dependent on attack target
+  and other factors.
+* Hitpoint adjustments are not possible versus Favored Enemy or in
+  situational attacks.
+* Modifications to AB, AC, Damage Bonus, Hitpoints can be determined
+  by area, class, feat, combat mode, race, creature size, skill,
+  versus favored enemies, and in situational attacks.
+* All functions determining adjustments to be made are fully
+  overwritable so there is no limitation on how they are determined.
 
 # Weapons
 * All weapon damages stack rather than using only the highest applying damage.

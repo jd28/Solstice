@@ -574,6 +574,7 @@ function Creature:UpdateCombatModifierArea()
    end
    
    mod.ab = ab
+   mod.hp = self:GetAreaHitPointAdj()
 end
 
 --- Determines creature's class combat modifiers.
@@ -590,6 +591,8 @@ function Creature:UpdateCombatModifierClass()
    end
 
    self.ci.class.ac = ac
+
+   self.ci.class.hp = self:GetClassHitPointAdj()
 end
 
 --- Determines creature's feat combat modifiers.
@@ -608,12 +611,15 @@ function Creature:UpdateCombatModifierFeat()
 
    mod.ab = ab
    mod.ac = ac
+   mod.hp = self:GetFeatHitPointAdj()
 end
 
 --- Determines creature's race combat modifiers.
 function Creature:UpdateCombatModifierRace()
    local mod = self.ci.race
    nwn.ZeroCombatMod(mod)
+
+   mod.hp = self:GetRaceHitPointAdj()
 end
 
 --- Determines creature's size combat modifiers.
@@ -635,6 +641,7 @@ function Creature:UpdateCombatModifierSize()
    
    mod.ab = ab
    mod.ac = ac
+   mod.hp = self:GetSizeHitPointAdj()
 end
 
 --- Determines creature's skill combat modifiers.
@@ -644,6 +651,8 @@ function Creature:UpdateCombatModifierSkill()
    local ac = 0
    ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5
    self.ci.skill.ac = ac
+
+   self.ci.skill.hp = self:GetSkillHitPointAdj()
 end
 
 

@@ -52,6 +52,7 @@ typedef struct CombatMod {
    int32_t ac;
    DiceRoll dmg;
    uint32_t dmg_type;
+   int32_t hp;
 } CombatMod;
 
 typedef struct CombatInformation {
