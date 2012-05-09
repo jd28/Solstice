@@ -322,18 +322,20 @@ end
 -- @param vs Creature's target.
 function Creature:GetEffectCritMultBonus()
    local amount, percent
+   local eff_type
    local total = 0
 
    for i = self.ci.first_cm_effect, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
+      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_CUSTOM or
          (self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_MULT_INCREASE and
           self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE)
       then
          break
       end
 
-      amount  = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent = self.obj.obj.obj_effects[i].eff_integers[2]
+      eff_type = self.obj.obj.obj_effects[i].eff_integers[0]
+      amount   = self.obj.obj.obj_effects[i].eff_integers[1]
+      percent  = self.obj.obj.obj_effects[i].eff_integers[2]
 
       if eff_type == nwn.EFFECT_CUSTOM_CRIT_MULT_DECREASE then
 	 if math.random(100) <= percent then
@@ -355,15 +357,16 @@ function Creature:GetEffectCritRangeBonus()
    local total = 0
 
    for i = self.ci.first_cr_effect, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS or
+      if self.obj.obj.obj_effects[i].eff_type > nwn.EFFECT_TRUETYPE_CUSTOM or
          (self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_INCREASE and
           self.obj.obj.obj_effects[i].eff_integers[0] ~= nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE)
       then
          break
       end
 
-      amount  = self.obj.obj.obj_effects[i].eff_integers[1]
-      percent = self.obj.obj.obj_effects[i].eff_integers[2]
+      eff_type = self.obj.obj.obj_effects[i].eff_integers[0]
+      amount   = self.obj.obj.obj_effects[i].eff_integers[1]
+      percent  = self.obj.obj.obj_effects[i].eff_integers[2]
 
       if eff_type == nwn.EFFECT_CUSTOM_CRIT_RANGE_DECREASE then
 	 if math.random(100) <= percent then
@@ -376,6 +379,21 @@ function Creature:GetEffectCritRangeBonus()
       end 
    end
    return total
+end
+
+--- Get Hitpoint bonus from effects.
+function Creature:GetEffectHitpointBonus()
+   local eff_hp = 0
+   for eff in self:EffectsDirect() do
+      local type = eff:GetTrueType()
+      if type > nwn.EFFECT_TRUETYPE_CUSTOM then
+	 break
+      end
+      if type == nwn.EFFECT_CUSTOMTYPE_HITPOINTS then
+	 eff_hp = math.max(eff_hp, eff.eff.eff_integers[1])
+      end
+   end
+   return eff_hp
 end
 
 --- Determine if creature has an immunity.

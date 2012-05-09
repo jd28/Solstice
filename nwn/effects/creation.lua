@@ -21,6 +21,7 @@ local function CreateEffect(command, args)
     return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT)
 end
 
+
 local function FakeEffect(eff_type)
    local eff = nwn.EffectVisualEffect(0)
    eff:SetTrueType(eff_type)
@@ -33,7 +34,7 @@ end
 -- @param ints A list of integers to store on the effect.
 function nwn.EffectCustom(eff_type, ints)
    local eff = nwn.EffectVisualEffect(eff_type)
-   eff:SetTrueType(nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
    if ints then
       for i, int in ipairs(ints) do
          eff:SetInt(i, int)
@@ -45,7 +46,7 @@ end
 --- Creates a Recurring Effect
 -- This effect when applied is merely a place holder.
 function nwn.EffectRecurring()
-   return nwn.EffectCustom(nwn.EFFECT_CUSTOM_RECURRING_EFFECT)
+   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT)
 end
 
 --- Creates an ability increase/decrease effect on specified ability score.
@@ -454,6 +455,11 @@ function nwn.EffectHitPointChangeWhenDying(hitpoint_change)
    return CreateEffect(387, 1)
 end
 
+--- Create a hit point effect
+function nwn.EffectHitPoints(amount)
+   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_HITPOINTS, {amount})
+end
+
 --- Creates an icon effect
 -- Source: nwnx_structs
 function nwn.EffectIcon(icon)
@@ -512,9 +518,7 @@ end
 --- Create a Modify Attacks effect that adds attacks to the target.
 -- @param attacks Maximum is 5, even with the effect stacked
 function nwn.EffectModifyAttacks(attacks)
-   nwn.engine.StackPushInteger(attacks)
-
-   return CreateEffect(485, 1)
+   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS, {attacks})
 end
 
 --- Create a Movement Speed Increase/Decrease effect to slow target.
