@@ -56,25 +56,42 @@ nwn.RegisterCombatMode(nwn.COMBAT_MODE_IMPROVED_EXPERTISE, expertise)
 local function flurry(cre)
    local result = false
    local monk = cre:GetLevelByClass(nwn.CLASS_TYPE_MONK)
-
    local rh = cre:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
-   local rh_valid = rh:GetIsValid()
-   local rh_monk_weap = not rh_valid or rh:GetIsMonkWeapon()
 
-   local lh = cre:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
-   local lh_valid = lh:GetIsValid()
-   local lh_monk_weap = not lh_valid or lh:GetIsMonkWeapon()
-
-   if rh_valid and rh:GetIsRangedWeapon() then
+   if not rh:GetIsValid() then
+      -- Creature is unarmed
+      result = true
+   elseif rh:GetIsRangedWeapon() then
+      -- Right hand is valid and is a ranged weapon.
       result = false
-   elseif not rh_valid or rh:GetIsUnarmedWeapon() then
-      result = true
-   elseif rh_monk_weap and monk >= rh_monk_weap 
-      and lh_monk_weap and monk >= lh_monk_weap
-   then
-      result = true
    else
-      result = false
+      -- Right hand weapon is valid and not ranged
+      local m = rh:GetIsMonkWeapon()
+      -- If it's a monk weapon and creature has enough levels of monk to
+      -- use it, then check if there is an offhand weapon.
+      print(monk, m)
+      if m and monk >= m then
+	 local lh = cre:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+	 if not lh:GetIsValid() then
+	    -- lefthand weapon if invalid
+	    -- righthand weapon is a monk weapon
+	    result = true
+	 else
+	    m = lh:GetIsMonkWeapon()
+	    if m and monk >= m then
+	       -- lefthand weapon is a monk weapon
+	       -- righthand weapon is a monk weapon
+	       result = true
+	    else
+	       -- lefthand weapon is not a monk weapon
+	       -- righthand weapon is a monk weapon
+	       result = false
+	    end
+	 end
+      else
+	 -- righthand weapon is not a monk weapon.
+	 result = false
+      end
    end
       
    if result then
@@ -82,7 +99,7 @@ local function flurry(cre)
       -- So only the AB needs to be set here.
       cre.ci.mode.ab = -2
    else
-      cre:SendMessageByStrRef(188)
+      cre:SendMessageByStrRef(66246)
    end
 
    return result
@@ -111,6 +128,10 @@ nwn.RegisterCombatMode(nwn.COMBAT_MODE_IMPROVED_POWER_ATTACK, power_attack)
 --Rapid Shot------------------------------------------------------------
 local function rapid_shot(cre)
    local weap = cre:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   if not weap:GetIsRangedWeapon() then
+      cre:SendMessageByStrRef(66246)
+      return false
+   end
 
    -- Addition onhand attack is dealt with in NSInitializeNumberOfAttacks.
    -- So only the AB needs to be set here.
