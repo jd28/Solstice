@@ -81,7 +81,7 @@ end
 -- @param class nwn.CLASS_TYPE_*
 function Creature:GetLevelByClass(class)
    for cl in self:Classes() do
-      if cl_class == class then
+      if cl.cl_class == class then
          return cl.cl_level
       end
    end
