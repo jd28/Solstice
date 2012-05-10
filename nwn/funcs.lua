@@ -171,6 +171,7 @@ void                  nwn_StackPushEngineStructure(uint32_t type, void * value);
 -- Solstice Functions
 ffi.cdef [[
 void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
+void ns_AddOnHitEffect(CNWSCombatAttackData *attack, nwn_objid_t creator, CGameEffect *eff);
 void ns_AddOnHitVisual(CNWSCombatAttackData *attack, nwn_objid_t creator, uint32_t vfx);
 void ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
 void ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
