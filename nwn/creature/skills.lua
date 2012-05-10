@@ -30,8 +30,8 @@ end
 --- Determines if skill check is successful
 -- @param skill nwn.SKILL_*
 -- @param dc Difficult Class
-function Creature:GetIsSkillSuccessful(skill, dc)
-   return self:GetSkillCheckResult(skill, dc) > 0
+function Creature:GetIsSkillSuccessful(skill, dc, vs, feedback, auto, delay, take, bonus)
+   return self:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus) > 0
 end
 
 --- Determine's a skill check.
