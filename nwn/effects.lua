@@ -120,6 +120,11 @@ function Effect:SetCreator(object)
     self.eff.eff_creator = object.id
 end
 
+function Effect:SetDuration(dur)
+   self.eff.eff_duration = dur
+   return self.eff.eff_duration
+end
+
 function Effect:SetDurationType(dur)
    self.eff.eff_dursubtype = bit.bor(value, bit.band(self.eff.eff_dursubtype, 0xFFF8))
    return self.eff.eff_dursubtype
