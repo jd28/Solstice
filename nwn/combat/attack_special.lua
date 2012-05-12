@@ -20,13 +20,13 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function NSResolveSpecialAttackAttackBonus(attacker, target, attack)
-   return NSMeleeSpecialAttack(attack.cad_special_attack, 1, attacker, target, attack) or 0
+function NSResolveSpecialAttackAttackBonus(attacker, target, attack_info)
+   return NSMeleeSpecialAttack(attack_info.attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_AB, attacker, target, attack_info) or 0
 end
 
-function NSResolveSpecialAttackDamageBonus(attacker, target)
+function NSResolveSpecialAttackDamageBonus(attacker, target, attack_info)
    local dice, sides, bonus = 
-      NSMeleeSpecialAttack(attack.cad_special_attack, 2, attacker, target, attack)
+      NSMeleeSpecialAttack(attack_info.attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_DAMAGE, attacker, target, attack_info)
 end
 
 function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
@@ -53,7 +53,7 @@ function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, targ
    if not nwn.GetAttackResult(attack) then return end
    
    attacker:DecrementFeatRemaintingUses(attack.cad_special_attack)
-   NSMeleeSpecialAttack(attack.cad_special_attack, 0, attacker, target, attack)
+   NSMeleeSpecialAttack(attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack)
 end
 
 function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, target, a)
@@ -80,5 +80,5 @@ function NSResolveRangedSpecialAttack(attacker, attack_in_grp, attack_count, tar
    if not nwn.GetAttackResult(attack) then return end
    
    attacker:DecrementFeatRemaintingUses(attack.cad_special_attack)
-   NSRangedSpecialAttack(attack.cad_special_attack, 0, attacker, target, attack)
+   NSRangedSpecialAttack(attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack)
 end

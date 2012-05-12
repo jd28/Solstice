@@ -151,8 +151,6 @@ end
 
 --- Bridge function to hand NWNXEvent events
 function NSHandleNWNXEvent(event_type)
-   print("Handle NWNX Event", event_type)
-   
    -- If there isn't an event handler than return 0 so that some other plugin
    -- or script can handle the event.
    local f = EVENT_HANDLERS[event_type]

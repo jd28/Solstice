@@ -21,14 +21,15 @@ local C = ffi.C
 local bit = require 'bit'
 
 -- @param weap Attack weapon, if nil then the call is coming from the plugin.
-function NSGetCriticalHitMultiplier(attacker, offhand, weap, weap_num)
+function NSGetCriticalHitMultiplier(attacker, offhand, weap_num)
    local result
-   if weap then
+   if weap_num then
       result = attacker.ci.equips[weap_num].crit_mult
    else
       local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       local cr = attacker.obj.cre_combat_round
+
       if offhand then
          weapon = attacker:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
          if not weapon:GetIsValid() then
@@ -64,10 +65,13 @@ function NSGetCriticalHitMultiplier(attacker, offhand, weap, weap_num)
    return result
 end
 
--- @param weap Attack weapon, if nil then the call is coming from the plugin.
-function NSGetCriticalHitRoll(attacker, offhand, weap, weap_num)
+--- Get critical hit range
+-- @param attacker Attacker
+-- @param offhand true if attack is an offhand attack.
+-- @param attack_info AttackInfo ctype
+function NSGetCriticalHitRange(attacker, offhand, weap_num)
    local result
-   if weap then
+   if weap_num then
       result = attacker.ci.equips[weap_num].crit_range
    else
       local weapon --= C.nwn_GetCurrentAttackWeapon(cr, 0)
@@ -105,5 +109,14 @@ function NSGetCriticalHitRoll(attacker, offhand, weap, weap_num)
    -- Effects...
    result = result + attacker:GetEffectCritRangeBonus()
 
-   return 21 - result
+   return result
+end
+
+
+--- Get critical hit roll
+-- @param attacker Attacker
+-- @param offhand true if attack is an offhand attack.
+-- @param attack_info AttackInfo ctype
+function NSGetCriticalHitRoll(attacker, offhand, weap_num)
+   return 21 - NSGetCriticalHitRange(attacker, offhand, weap_num)
 end

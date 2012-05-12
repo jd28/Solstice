@@ -163,13 +163,12 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
 end
 
 --- GetAttackModifierVersus
-function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, attack_type, weap, weap_num)
+function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, attack_type)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
       attack_info = NSGetAttackInfo(attacker, target)
       attack_type = attack_info.attack.cad_attack_type
-      weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
    end
    
    local bab
@@ -193,11 +192,11 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, att
       then
          bab = attacker.ci.bab
       else
-         bab = attacker.ci.bab - (attack_info.current_attack * attacker.ci.equips[weap_num].iter)
+         bab = attacker.ci.bab - (attack_info.current_attack * attacker.ci.equips[attack_info.weapon].iter)
       end
    end
 
-   local ab_abil = attacker:GetAbilityModifier(attacker.ci.equips[weap_num].ab_ability)
+   local ab_abil = attacker:GetAbilityModifier(attacker.ci.equips[attack_info.weapon].ab_ability)
 
    -- Base Attack Bonus
    local ab = bab
@@ -222,7 +221,9 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, att
    ab = ab + attacker.ci.mode.ab
 
    -- Special Attack Modifier
-   ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack_info.attack)
+   if attack_info.attack.cad_special_attack > 0 then
+      ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack_info)
+   end
 
    -- Favored Enemies
    if attacker.ci.fe_mask ~= 0 
@@ -244,7 +245,7 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, att
    ab = ab + attacker.ci.race.ab
 
    -- Weapon AB Mod.  i.e, WF, SWF, EWF, etc
-   ab = ab + attacker.ci.equips[weap_num].ab_mod
+   ab = ab + attacker.ci.equips[attack_info.weapon].ab_mod
 
    -- Target State
    local state = attacker:GetEnemyStateAttackBonus(attack_info.attack.cad_ranged_attack)
@@ -281,7 +282,6 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    end
 
    local attack_type = attack_info.attack.cad_attack_type
-   local weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
 
    local ab = 0
    local ac = 0
@@ -291,7 +291,7 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    end
 
    -- Modifier Vs
-   ab = ab + NSGetAttackModifierVersus(attacker, target, false, attack_info, attack_type, weap, weap_num)
+   ab = ab + NSGetAttackModifierVersus(attacker, target, false, attack_info, attack_type)
    attack_info.attack.cad_attack_mod = ab
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
@@ -331,7 +331,7 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    end
 
 
-   if roll > NSGetCriticalHitRoll(attacker, is_offhand, weap, weap_num) then
+   if roll > NSGetCriticalHitRoll(attacker, is_offhand, attack_info.weapon) then
       attack_info.attack.cad_threat_roll = random(20)
       attack_info.attack.cad_critical_hit = 1
 

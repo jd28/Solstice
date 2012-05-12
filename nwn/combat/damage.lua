@@ -179,45 +179,34 @@ function NSDoDamageRoll(dmg_roll, mult)
    end
 end
 
-function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, weapon, weap_num, attack_type)
-   local cr, attack_num, attack, mult
-   local from_hook = false
-
+function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
    -- If weap is nil then we're coming from the hook.
-   if not weapon then
-      from_hook = true
-
+   if not attack_info then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
 
-      cr = attacker.obj.cre_combat_round
-      attack_num = cr.cr_current_attack
-      attack = C.nwn_GetAttack(cr, attack_num)
-      attack_type = attack.cad_attack_type
-
-      weapon, weap_num = NSGetCurrentAttackWeapon(cr, attack_type, attacker)
+      attack_info = NSGetAttackInfo(attacker, target)
    end
 
    local base = 0
    local dmg_roll = damage_roll_t()
 
    -- Add weapons base damage to damage roll.
-   NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[weap_num].base_dmg)
+   NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[attack_info.weapon].base_dmg)
 
    -- Add any damage bonuses from combat modifiers. E,g. size, race, etc.
    NSGetDamageBonus(attacker, target, 0, dmg_roll)
 
    -- Add Damage Bonuses from effects/item properties.
-   NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type)
+   NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_info.attack.cad_attack_type)
 
    -- situational
    -- NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
 
    -- If this is a critical hit determine the multiplier.
+   local mult = 1
    if crit then
-      mult = NSGetCriticalHitMultiplier(attacker, offhand, weapon, weap_num)
-   else
-      mult = 1
+      mult = NSGetCriticalHitMultiplier(attacker, offhand, attack_info.weapon)
    end
 
    -- Roll all the damage.
@@ -225,7 +214,7 @@ function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damag
 
    -- Any addition damage from the weapons crit_dmg bonus.  E,g from Overwhelming Critical.
    if crit then
-      NSDoCritDamageRoll(dmg_roll, mult, attacker, weap_num)
+      NSDoCritDamageRoll(dmg_roll, mult, attacker, attack_info.weapon)
    end
 
    -- If the target is a creature modify the damage roll by their immunities, resistances,
@@ -368,17 +357,15 @@ function NSResolveDamage(attacker, target, from_hook, attack_info)
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
       attack_info = NSGetAttackInfo(attacker, target)
-
    end
 
-   local attack_type = attack_info.attack.cad_attack_type   
-   local weap, weap_num = NSGetCurrentAttackWeapon(attack_info.attacker_cr, attack_type, attacker)
    local ki_strike = attack_info.attack.cad_special_attack == 882
    local crit = attack_info.attack.cad_attack_result == 3
 
-   if ki_strike then
-      attack:DecrementRemainingFeatUses(882)
-   end
+   -- Following should be dealt with in special attacks.
+   --if ki_strike then
+   --   attack:DecrementRemainingFeatUses(882)
+   --end
 
    local damage_roll = NSGetDamageRoll(attacker, 
                                        target, 
@@ -387,9 +374,7 @@ function NSResolveDamage(attacker, target, from_hook, attack_info)
                                        attack_info.attack.cad_sneak_attack == 1,
                                        attack_info.attack.cad_death_attack == 1,
                                        ki_strike,
-                                       weap,
-                                       weap_num,
-                                       attack_type)
+                                       attack_info)
 
    local total = NSGetTotalDamage(damage_roll.result)
 

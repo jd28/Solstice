@@ -67,7 +67,7 @@ function NSResolveRangedAttack(attacker, target, attack_count, a, from_hook)
       if attack_info.attack.cad_special_attack ~= 0 then
          -- Special Attacks... 
          if attack_info.attack.cad_special_attack < 1115 and
-            attacker:GetRemainingFeatUses(attack.cad_special_attack) == 0
+            attacker:GetRemainingFeatUses(attack_info.attack.cad_special_attack) == 0
          then
             attack_info.attack.cad_special_attack = 0
          end
@@ -82,10 +82,43 @@ function NSResolveRangedAttack(attacker, target, attack_count, a, from_hook)
       end
       C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, a)
 
+      -- Attempt to resolve a special attack one was
+      -- a) Used
+      -- b) The attack is a hit.
       if attack_info.attack.cad_special_attack ~= 0
-         and NSGetAttackResult(attack_info) then
-         attacker:DecrementRemainingFeatUses(attack_info.attack.cad_special_attack)
-         NSRangedSpecialAttack(attack_info.attack.cad_special_attack, 0, attacker, target, attack_info.attack)
+         and NSGetAttackResult(attack_info)
+      then
+	 -- Special attacks only apply when the target is a creature
+	 -- and damage is greater than zero.
+	 if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+	    and NSGetTotalDamage(attack_info.dmg_roll.result) > 0
+	 then
+	    attacker:DecrementRemainingFeatUses(attack_info.attack.cad_special_attack)
+	    
+	    -- The resolution of Special Attacks must return a boolean value indicating success and
+	    -- and effect to be applied if any.
+	    local success, eff = NSRangedSpecialAttack(attack_info.attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_RESOLVE,
+						       attacker, target, attack_info)
+	    if success then
+	       -- Check to makes sure an effect was returned.
+	       if eff then
+		  -- Set effect to direct so that Lua will not delete the
+		  -- effect.  It will be deleted by the combat engine.
+		  eff.direct = true
+		  -- Add the effect to the onhit effect list so that it can
+		  -- be applied when damage is signaled.
+		  C.ns_AddOnHitEffect(attack_info.attack, attacker.id, eff.eff)
+	       end
+	    else
+	       -- If the special attack failed because it wasn't
+	       -- applicable or the targets skill check (for example)
+	       -- was successful set the attack result to 5.
+	       attack_info.attack.cad_attack_result = 5
+	    end
+	 else
+	    -- If the target is not a creature or no damage was dealt set attack result to 6.
+	    attack_info.attack.cad_attack_result = 6
+	 end
       end
 
       table.insert(attacks, attack_info)

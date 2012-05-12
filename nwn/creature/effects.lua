@@ -625,7 +625,7 @@ function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check,
                -- If the effect was applied by a spell and an effect from that item has already
                -- been applied then take the highest of the two.  Otherwise set the adjustment.
                if not spell_bonus[eff.eff_creator] then
-                  spell_bonus[eff.eff_spellid] = math.max(spell_bonus[eff.eff_spellid], amount)
+                  spell_bonus[eff.eff_spellid] = math.max(spell_bonus[eff.eff_spellid] or 0, amount)
                else
                   spell_bonus[eff.eff_spellid] = amount
                end

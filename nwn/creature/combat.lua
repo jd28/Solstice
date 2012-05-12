@@ -78,7 +78,7 @@ function Creature:DoDamageResistance(attacker, dmg_result)
          if eff_limit > 0 then
             if eff_limit <= resist then
                resist = eff_limit
-               self:RemoveEffectById(eff.eff_id)
+               self:RemoveEffectByID(use_eff.eff_id)
             else
                use_eff.eff_integers[2] = eff_limit - resist
             end
@@ -138,7 +138,7 @@ function Creature:DoDamageReduction(attacker, dmg_result, damage_power)
          -- Else the current limit must be adjusted by the highest soak amount.
          if eff_limit <= highest_soak then
             highest_soak = eff_limit
-            self:RemoveEffectById(eff.eff_id)
+            self:RemoveEffectByID(use_eff.eff_id)
          else
             use_eff.eff_integers[2] = eff_limit - highest_soak
          end

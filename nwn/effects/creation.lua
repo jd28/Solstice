@@ -386,6 +386,11 @@ function nwn.EffectDisappearAppear(location, animation)
    return CreateEffect(480, 2)
 end
 
+--- Create Disarm effect
+function nwn.EffectDisarm()
+   return FakeEffect(nwn.EFFECT_TRUETYPE_DISARM)
+end
+
 --- Create a Disease effect.
 -- @param disease The type of disease this effect should apply, chosen from nwn.DISEASE_*constant group.
 function nwn.EffectDisease(disease)

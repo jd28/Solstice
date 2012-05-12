@@ -126,7 +126,7 @@ function Effect:SetDuration(dur)
 end
 
 function Effect:SetDurationType(dur)
-   self.eff.eff_dursubtype = bit.bor(value, bit.band(self.eff.eff_dursubtype, 0xFFF8))
+   self.eff.eff_dursubtype = bit.bor(dur, bit.band(self.eff.eff_dursubtype, 0xFFF8))
    return self.eff.eff_dursubtype
 end
 

@@ -55,6 +55,7 @@ typedef struct AttackInfo {
    uint32_t attack_id;
    uint32_t target_state;
    uint32_t situational_flags;
+   int32_t  weapon;
    bool is_offhand;
    nwn_objid_t attacker;
    nwn_objid_t target;
@@ -80,27 +81,56 @@ require 'nwn.combat.post_damage'
 require 'nwn.combat.situation'
 require 'nwn.combat.state'
 
---- Gets the current attack weapon and weapon index
--- @param combat_round CNWSCombatRound ctype
--- @param attack_type Type of attack onhand, offhand, creature, etc
--- @param attacker Creature that's attacking.
-function NSGetCurrentAttackWeapon(combat_round, attack_type, attacker)
-   local weapon = C.nwn_GetCurrentAttackWeapon(combat_round, attack_type)
-   local ci_weap_number = -1
+--- Add feedback to attack
+function NSAddAttackFeedback(attack_info, feedback)
+   C.ns_AddAttackFeedback(attack_info.attack, feedback)
+end
 
-   if weapon == nil then
-      return nwn.OBJECT_INVALID, 3
-   end
+local ATTACK_ID = 1
 
-   if attacker then
+function NSGetAttackInfo(attacker, target)
+   local attack_info = attack_info_t()
+   attack_info.attacker_cr = attacker.obj.cre_combat_round
+   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
+   attack_info.attacker = attacker.id
+   attack_info.target = target.id
+   attack_info.attack_id = ATTACK_ID
+   ATTACK_ID = ATTACK_ID + 1
+   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
+   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
+   attack_info.attack.cad_target = target.id
+   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
+   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
+   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+
+   -- Get equip number
+   local weapon = C.nwn_GetCurrentAttackWeapon(attack_info.attacker_cr, attack_info.attack.cad_attack_type)
+   attack_info.weapon = 3
+   if weapon ~= nil then
       for i = 0, 5 do
-         if attacker.ci.equips[i].id == weapon.obj.obj_id then
-            ci_weap_number = i
-            break
-         end
+	 if attacker.ci.equips[i].id == weapon.obj.obj_id then
+	    ci_weap_number = i
+	    break
+	 end
       end
    end
-   return _NL_GET_CACHED_OBJECT(weapon.obj.obj_id), ci_weap_number
+
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      attack_info.target_cr = target.obj.cre_combat_round
+   end
+
+   return attack_info
+end
+
+--- Gets the current attack weapon
+-- @param attack_info AttackInfo ctype
+function NSGetCurrentAttackWeapon(attack_info)
+   local n = attack_info.weapon
+   if n >= 0 and n <= 5 then
+      local id = attacker.ci.equips[n]
+      return _NL_GET_CACHED_OBJECT(id)
+   end
+   return nwn.OBJECT_INVALID
 end
 
 --- Get if attack is an offhand attack

@@ -39,7 +39,7 @@ function Object:DelayCommand(delay, action)
     local count = table.maxn(cmd) + 1
     cmd[count] = { f = action, id = self.id }
          
-    C.ns_DelayCommand(ffi.cast("Object*", self), delay, count)
+    C.ns_DelayCommand(self.obj.obj, delay, count)
 end
 
 --- Repeats a command.
@@ -55,7 +55,7 @@ function Object:RepeatCommand(delay, action, step)
    step = step or 0
    cmd[count] = { f = action, d = delay, s = step, self = self }
    
-   C.ns_RepeatCommand(ffi.cast("Object*", self), delay, count)
+   C.ns_RepeatCommand(self.obj.obj, delay, count)
 end
 
 --- Inserts action into acction queue
@@ -64,5 +64,5 @@ function Object:DoCommand(action)
     local count = table.maxn(cmdS) + 1
     cmd[count] = { f = action, id = self.id }
 
-   C.ns_ActionDoCommand(ffi.cast("Object*", self), count)
+   C.ns_ActionDoCommand(self.obj.obj, count)
 end
