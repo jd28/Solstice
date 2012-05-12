@@ -44,13 +44,6 @@ function Object:GetGold()
    return nwn.engine.StackPopInteger()
 end
 
---- Get object's max hitpoints
-function Object:GetMaxHitPoints()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(50, 1)
-   return nwn.engine.StackPopInteger()
-end
-
 --- Get object's name
 -- @param
 function Object:GetName(original)

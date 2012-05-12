@@ -43,6 +43,12 @@ function Object:SetCurrentHitPoints(hp)
    return self.obj.obj.obj_hp_cur
 end
 
+--- Get object's max hitpoints
+function Object:GetMaxHitPoints()
+   if not self:GetIsValid() then return 0 end
+   return self.obj.obj.obj_hp_max
+end
+
 --- Sets an object's max hitpoints
 function Object:SetMaxHitPoints(hp)
    if not self:GetIsValid() then return -1 end
