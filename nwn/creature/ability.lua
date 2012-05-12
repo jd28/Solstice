@@ -144,8 +144,12 @@ end
 --- Get total ability bonus from effects/gear.
 -- @param vs Versus another creature.
 -- @param abil nwn.ABILITY_*
-function Creature:GetTotalEffectAbilityBonus(vs, abil)
-   local function valid(eff, vs_info)
+function Creature:GetTotalEffectAbilityBonus(abil)
+   if not self:GetIsValid() then
+      return 0
+   end
+
+   local function valid(eff)
       local eabil = eff.eff_integers[0]
 
       if eabil == abil then
@@ -174,7 +178,7 @@ function Creature:GetTotalEffectAbilityBonus(vs, abil)
                               NS_OPT_EFFECT_ABILITY_STACK_GEAR,
                               NS_OPT_EFFECT_ABILITY_STACK_SPELL)
 
-   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
+   return math.clamp(self:GetTotalEffectBonus(nwn.OBJECT_INVALID, info, range, valid, get_amount),
                      0, self:GetMaxAbilityBonus(abil))
 end
 
@@ -187,7 +191,6 @@ end
 -- @param abil nwn.ABILITY_*
 function NSGetTotalAbilityBonus(cre, vs, abil)
    cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
 
-   return cre:GetTotalEffectAbilityBonus(vs, abil)
+   return cre:GetTotalEffectAbilityBonus(abil)
 end

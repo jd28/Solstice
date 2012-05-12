@@ -88,17 +88,13 @@ function Creature:GetSkillHitPointAdj()
    return 0
 end
 
--- Bridge function between Lua and nwnx_solstice
-function NSGetMaxHitpoints(cre)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   return cre:GetMaxHitPoints()
-end
-
 --- Determines creature's maximum hitpoints.
 function Creature:GetMaxHitPoints()
+   print("NSGetMaxHitPoints", self:GetName(), dunno)
+   if not self:GetIsValid() then return 0 end
    local hp = 0
    local level = self:GetHitDice()
-   local conmod = self:GetAbilityModifier(nwn.ABILITY_CONSTITUTION)
+   local conmod = self.stats.cs_con_mod
 
    -- Constitution bonus
    hp = hp + (conmod * level)
@@ -117,10 +113,10 @@ function Creature:GetMaxHitPoints()
    hp = hp + self.ci.skill.hp
 
    -- Base Hit points
-   if self:GetIsPC() and not self:GetIsPossessedFamiliar() then
+   if self.stats.cs_is_pc == 1 and not self:GetIsPossessedFamiliar() then
       local ls
       for i = 0, level do
-	 ls = C.nwn_GetLevelStats(self.stats, i)
+	 ls = self:GetLevelStats(i)
 	 if ls ~= nil then
 	    hp = hp + ls.ls_hp
 	 end
@@ -145,7 +141,7 @@ end
 function Creature:GetMaxHitPointsByLevel(level)
    if not self:GetIsValid() then return 0 end
 
-   local ls = C.nwn_GetLevelStats(self.stats, level)
+   local ls = self:GetLevelStats(level)
    if ls == nil then return 0 end
 
    return ls.ls_hp
@@ -157,10 +153,21 @@ end
 function Creature:SetMaxHitPointsByLevel(level, hp)
    if not self:GetIsValid() then return 0 end
 
-   local ls = C.nwn_GetLevelStats(self.stats, level)
+   local ls = self:GetLevelStats(level)
    if ls == nil then return 0 end
 
    ls.ls_hp = hp
 
    return ls.ls_hp
+end
+
+--------------------------------------------------------------------------------
+-- Bridge functions to/from nwnx_solstice plugin.
+
+--- Get Maximum Hit Points
+-- @param cre Creature object ID.
+-- @param dunno A value that always seems to be 1.
+function NSGetMaxHitPoints(cre, dunno)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   return cre:GetMaxHitPoints()
 end

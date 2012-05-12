@@ -98,7 +98,9 @@ typedef struct CNWSCreatureStats {
 
     void                        *cs_original;            /* 0024 */
 
-    ArrayList                   cs_levelstat;           /* 0028 */         /* CNWSStats_Level * */
+    CNWSStats_Level           **cs_levelstat;           /* 0028 */         /* CNWSStats_Level * */
+    uint32_t                    cs_levelstat_len;
+    uint32_t                    field_30;
 
     CExoLocString               cs_firstname;           /* 0034 */
     CExoLocString               cs_lastname;            /* 003C */

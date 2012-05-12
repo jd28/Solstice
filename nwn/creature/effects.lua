@@ -383,6 +383,9 @@ end
 
 --- Get Hitpoint bonus from effects.
 function Creature:GetEffectHitpointBonus()
+   if not self:GetIsValid() then
+      return 0
+   end
    local eff_hp = 0
    for eff in self:EffectsDirect() do
       local type = eff:GetTrueType()
@@ -572,11 +575,10 @@ function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check,
       item_bonus = {}
       item_pen = {}
    end
-
    for i = eff_info.index, self.obj.obj.obj_effects_len - 1 do
       eff = self.obj.obj.obj_effects[i]
       eff_type = eff.eff_type
-
+      
       amount = get_amount(eff)
 
       -- If the effect is not in the effect type range then there is nothing left to do.

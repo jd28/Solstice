@@ -118,7 +118,7 @@ function Creature:GetSkillIncreaseByLevel(level, skill)
       return -1
    end
    
-   local ls = ffi.C.nl_GetLevelStats(self.stats, level)
+   local ls = self:GetLevelStats(level)
    if ls == nil then return -1 end
 
    return ls.ls_skilllist[skill]
@@ -209,7 +209,7 @@ function Creature:ModifySkillRank(skill, amount, level)
    end
 
    if level then
-      local ls = ffi.C.nl_GetLevelStats(level)
+      local ls = self:GetLevelStats(level)
       if ls == nil then return -1 end
       local cur = ls.ls_skilllist[skill]
       ls.ls_skilllist[skill] = cur + amount
@@ -253,5 +253,8 @@ end
 function NSGetTotalSkillBonus(cre, vs, skill)
    cre = _NL_GET_CACHED_OBJECT(cre)
    vs = _NL_GET_CACHED_OBJECT(vs)
+
+   print("NSGetTotalSkillBonus", cre:GetName())
+
    return cre:GetTotalEffectSkillBonus(vs, skill)
 end

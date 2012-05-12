@@ -45,7 +45,7 @@ end
 function Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
-   local ls = ffi.C.nl_GetLevelStats(self.stats, level)
+   local ls = self:GetLevelStats(level)
    if ls == nil then return -1 end
 
    return ls.ls_class
@@ -102,6 +102,14 @@ function Creature:GetLevelByPosition(position)
    if cl == nil then return 0 end
 
    return cl.cl_level
+end
+
+function Creature:GetLevelStats(level)
+   if level < 1 or level > self.stats.cs_levelstat_len then
+      return
+   end
+   
+   return self.stats.cs_levelstat[level - 1];
 end
 
 --- Get class type by position
