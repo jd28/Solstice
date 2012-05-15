@@ -152,11 +152,7 @@ end
 --- Check whether an item has a given property.
 -- @param ip_type nwn.ITEM_PROPERTY_*
 function Item:GetHasItemProperty(ip_type)
-   nwn.engine.StackPushInteger(ip_type)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(398, 2)
-   
-   return nwn.engine.StackPopInteger()
+   return C.nwn_HasPropertyType(self.obj, ip_type) ~= 0
 end
 
 --- Determines whether an object has been identified.
