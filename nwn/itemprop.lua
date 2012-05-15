@@ -52,10 +52,15 @@ function Itemprop:GetParam1Value()
    return self:GetInt(5)
 end
 
+--- Returns the subtype of the itemproperty
+function Itemprop:GetSubType()
+   return self:GetInt(1)
+end
+
 --- Returns the type of the itemproperty.
 -- @return nwn.ITEM_PROPERTY_* or -1.
 function Itemprop:GetType()
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY, self)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY, self.eff)
    nwn.engine.ExecuteCommand(614, 1)
 
    return nwn.engine.StackPopInteger()
@@ -113,7 +118,7 @@ end
 function nwn.ItemPropertyArcaneSpellFailure(amount)
    nwn.engine.StackPushInteger(amount)
    nwn.engine.ExecuteCommand(758, 1)
-   return nwn.engine.StackPopEngineStructure(ENGINE_STRUCTURE_ITEMPROPERTY)
+   return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY)
 end
 
 
