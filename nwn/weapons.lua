@@ -45,6 +45,22 @@ function nwn.GetWeaponAttackAbilityModifier(cre, weap, ability)
    return WEAPONS.ab_abil[ability](cre, weap, ability)
 end
 
+function nwn.GetWeaponBaseDamageType(baseitem)
+   local type, mask
+   if not WEAPONS.base_dmg_mask or not WEAPONS.base_dmg_mask[baseitem] then
+      mask = nwn.DAMAGE_TYPE_PHYSICAL
+   end
+
+   if not WEAPONS.base_dmg_type or not WEAPONS.base_dmg_type[baseitem] then
+      type = nwn.DAMAGE_TYPE_BASE_WEAPON
+   end
+
+   type = type or WEAPONS.base_dmg_type[baseitem]
+   mask = mask or WEAPONS.base_dmg_mask[baseitem]
+
+   return type, mask
+end
+
 --- Determines which ability modifer to use for damage bonus
 -- This is no longer limited to nwn.ABILITY_STRENGTH
 -- @param cre Creature weilding the weapon.
@@ -105,6 +121,18 @@ end
 function nwn.RegisterWeaponAttackAbility(ability, f)
    WEAPONS.ab_abil = WEAPONS.ab_abil or {}
    WEAPONS.ab_abil[ability] = f
+end
+
+function nwn.RegisterBaseDamageType(baseitem, dmg_type, dmg_mask)
+   if dmg_mask then
+      WEAPONS.base_dmg_mask = WEAPONS.base_dmg_mask or {}
+      WEAPONS.base_dmg_mask[baseitem] = dmg_mask
+   end
+
+   if dmg_type then
+      WEAPONS.base_dmg_type = WEAPONS.base_dmg_type or {}
+      WEAPONS.base_dmg_type[baseitem] = dmg_type
+   end
 end
 
 --- Registers an attack ability modifer
@@ -508,4 +536,52 @@ WEAPONS[nwn.WEAPON_MASTERFEAT_SPECIALIZATION_EPIC] = {
     [nwn.BASE_ITEM_TWOBLADEDSWORD]          = nwn.FEAT_EPIC_WEAPON_SPECIALIZATION_TWOBLADEDSWORD,
     [nwn.BASE_ITEM_WARHAMMER]               = nwn.FEAT_EPIC_WEAPON_SPECIALIZATION_WARHAMMER,
     [nwn.BASE_ITEM_WHIP]                    = nwn.FEAT_EPIC_WEAPON_SPECIALIZATION_WHIP
+}
+
+WEAPONS.base_dmg_type = {
+    [nwn.BASE_ITEM_BASTARDSWORD]            = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_BATTLEAXE]               = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_BRACER]                  = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_CBLUDGWEAPON]            = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_CLUB]                    = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_CPIERCWEAPON]            = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_CSLASHWEAPON]            = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_CSLSHPRCWEAP]            = nwn.DAMAGE_TYPE_PIERCE_SLASH,
+    [nwn.BASE_ITEM_DAGGER]                  = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_DART]                    = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_DIREMACE]                = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_DOUBLEAXE]               = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_DWARVENWARAXE]           = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_GLOVES]                  = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_GREATAXE]                = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_GREATSWORD]              = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_HALBERD]                 = nwn.DAMAGE_TYPE_PIERCE_SLASH,
+    [nwn.BASE_ITEM_HANDAXE]                 = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_HEAVYCROSSBOW]           = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_HEAVYFLAIL]              = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_KAMA]                    = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_KATANA]                  = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_KUKRI]                   = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_LIGHTCROSSBOW]           = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_LIGHTFLAIL]              = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_LIGHTHAMMER]             = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_LIGHTMACE]               = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_LONGBOW]                 = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_LONGSWORD]               = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_MORNINGSTAR]             = nwn.DAMAGE_TYPE_BLUDG_PIERCE,
+    [nwn.BASE_ITEM_QUARTERSTAFF]            = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_RAPIER]                  = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_SCIMITAR]                = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_SCYTHE]                  = nwn.DAMAGE_TYPE_PIERCE_SLASH,
+    [nwn.BASE_ITEM_SHORTBOW]                = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_SHORTSPEAR]              = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_SHORTSWORD]              = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_SHURIKEN]                = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_SICKLE]                  = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_SLING]                   = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_THROWINGAXE]             = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_TRIDENT]                 = nwn.DAMAGE_TYPE_PIERCING,
+    [nwn.BASE_ITEM_TWOBLADEDSWORD]          = nwn.DAMAGE_TYPE_SLASHING,
+    [nwn.BASE_ITEM_WARHAMMER]               = nwn.DAMAGE_TYPE_BLUDGEONING,
+    [nwn.BASE_ITEM_WHIP]                    = nwn.DAMAGE_TYPE_SLASHING
 }
