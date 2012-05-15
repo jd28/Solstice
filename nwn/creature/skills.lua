@@ -254,7 +254,5 @@ function NSGetTotalSkillBonus(cre, vs, skill)
    cre = _NL_GET_CACHED_OBJECT(cre)
    vs = _NL_GET_CACHED_OBJECT(vs)
 
-   print("NSGetTotalSkillBonus", cre:GetName())
-
    return cre:GetTotalEffectSkillBonus(vs, skill)
 end

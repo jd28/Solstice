@@ -90,7 +90,6 @@ end
 
 --- Determines creature's maximum hitpoints.
 function Creature:GetMaxHitPoints()
-   print("NSGetMaxHitPoints", self:GetName(), dunno)
    if not self:GetIsValid() then return 0 end
    local hp = 0
    local level = self:GetHitDice()

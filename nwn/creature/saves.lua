@@ -123,7 +123,5 @@ function NSGetTotalSaveBonus(cre, vs, save, save_vs)
    cre = _NL_GET_CACHED_OBJECT(cre)
    vs = _NL_GET_CACHED_OBJECT(vs)
 
-   print("NSGetTotalSaveBonus", cre:GetName())
-
    return cre:GetTotalEffectSaveBonus(vs, save, save_vs)
 end
