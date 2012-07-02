@@ -21,7 +21,6 @@
 require 'nwn.internal.commands'
 require 'nwn.internal.damage'
 require 'nwn.internal.inventory'
-require 'nwn.internal.specattack'
 
 --- Functions/Tables that are mainly for internal bookkeeping use.
 -- No script would even need use these.
