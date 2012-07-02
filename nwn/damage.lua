@@ -80,6 +80,15 @@ function nwn.GetDamageIndexFromFlag(flag)
    return idx
 end
 
+function nwn.GetDamageName(type)
+   local dmg = DAMAGES.name[type]
+   if not dmg then
+      return "Invalid Damage"
+   else
+      return dmg
+   end
+end
+
 --- Get damage roll from constant
 -- @param id nwn.DAMAGE_BONUS_*
 function nwn.GetDamageRollFromConstant(id)
