@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 require 'nwn.ctypes.effect'
 require 'nwn.effects.creation'
 require 'nwn.effects.custom'
@@ -140,7 +122,9 @@ function Effect:SetInt(index, value)
    return self.eff.eff_integers[index]
 end
 
----
+--- Set number of integers stored on an effect.
+-- Calling this on an effect will erase any integers already stored on the effect.
+-- @param num Number of integers.
 function Effect:SetNumIntegers(num)
    C.nwn_EffectSetNumIntegers(self.eff, num)
 end
@@ -151,7 +135,9 @@ function Effect:SetSpellId (spellid)
    self.eff.eff_spellid = spellid
 end
 
----
+--- Sets a string on an effect.
+-- @param idx Index to store the string.  [0, 5]
+-- @param str String to store.
 function Effect:SetString(index, str)
    if index < 0 or index > 5 then
       error "Effect:SetString must be between 0 and 5"
@@ -175,6 +161,9 @@ function Effect:SetTrueType(value)
    return self.eff.eff_type
 end
 
+--- Sets an effect versus a specified alignment
+-- @param lawchaos (Default: nwn.ALIGNMENT_ALL)
+-- @param goodevil (Default: nwn.ALIGNMENT_ALL)
 function Effect:SetVersusAlignment(lawchaos, goodevil)
    local lcidx
    local geidx
@@ -207,6 +196,10 @@ function Effect:SetVersusAlignment(lawchaos, goodevil)
    self:SetInt(geidx, goodevil)
 end
 
+--- Set an effect versus a specified deity.
+-- @param subrace An integer value indicating a deity id.
+--    This value is server dependent.
+-- @see Creature:GetDeityId()
 function Effect:SetVersusDeity(deity)
    local idx
    local type = self.eff.eff_type
@@ -233,6 +226,30 @@ function Effect:SetVersusDeity(deity)
    self:SetInt(idx, deity)
 end
 
+--- Sets an effect 'versus' a percentage.
+-- That is the effect has a specified % of being applicable.
+-- A value of 60% would mean that the creature must roll a 1d100 <= 60.
+-- @param perc Percent: [0, 100).  Value 0 is always applicable.
+function Effect:SetVersusPercentage(perc)
+   if perc < 0 or perc >= 100 then
+      error "Versus percentage takes a value [0, 100)"
+   end
+
+   local idx
+   local type = self.eff.eff_type
+
+   if type == nwn.EFFECT_TRUETYPE_IMMUNITY then
+      idx = 1
+   else
+      error(string.format("Effect Type (%d) does not support versus subrace", type))
+      return
+   end
+
+   self:SetInt(idx, subrace)
+end
+
+--- Sets an effect versus a race
+-- @param race nwn.RACIAL_TYPE_*
 function Effect:SetVersusRace(race)
    local idx
    local type = self.eff.eff_type
@@ -260,6 +277,10 @@ function Effect:SetVersusRace(race)
    self:SetInt(idx, race)
 end
 
+--- Set an effect versus a specified subrace.
+-- @param subrace An integer value indicating a subrace id.
+--    This value is server dependent.
+-- @see Creature:GetSubraceId()
 function Effect:SetVersusSubrace(subrace)
    local idx
    local type = self.eff.eff_type
@@ -286,6 +307,8 @@ function Effect:SetVersusSubrace(subrace)
    self:SetInt(idx, subrace)
 end
 
+--- Sets an effect versus a particular target.
+-- @param target Target creature.
 function Effect:SetVersusTarget(target)
    if not target:GetIsValid() then return end
 
@@ -312,3 +335,47 @@ function Effect:SetVersusTarget(target)
 
    self:SetInt(idx, target.id)
 end
+
+--- Determine which of two damage reduction effects are better.
+-- The effects are assumed to have the same damage power.
+-- @param eff1 An effect.
+-- @param eff2 An effect.
+function nwn.DetermineBestReductionEffect(eff1, eff2)
+   local amount = eff1.eff.eff_integers[0]
+   local limit = eff1.eff.eff_integers[2]
+
+   local amount2 = eff1.eff.eff_integers[0]
+   local limit2 = eff1.eff.eff_integers[2]
+   
+   -- If the soak amount is higher or if they are equal prefer the one
+   -- with the highest damage limit.
+   if amount > amount2
+      or (amount == amount2 and limit > limit2)
+   then
+      return eff1
+   else
+      return eff2
+   end
+end
+
+--- Determine which of two damage resistance effects are better.
+-- @param eff1 An effect.
+-- @param eff2 An effect.
+function nwn.DetermineBestResistEffect(eff1, eff2)
+   local amount = eff1.eff.eff_integers[1]
+   local limit = eff1.eff.eff_integers[2]
+
+   local amount2 = eff2.eff.eff_integers[1]
+   local limit2 = eff2.eff.eff_integers[2]
+   
+   -- If the resist amount is higher, set the resist effect list to the effect index.
+   -- If they are equal prefer the one with the highest damage limit.
+   if amount > amount2
+      or (amount == amount2 and limit > limit2)
+   then
+      return eff1
+   else
+      return eff2
+   end
+end
+
