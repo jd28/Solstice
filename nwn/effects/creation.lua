@@ -475,13 +475,9 @@ end
 
 --- Create an Immunity effect.
 -- @param immunity One of the nwn.IMMUNITY_TYPE_* constants.
-function nwn.EffectImmunity(immunity, percent)
-   percent = percent or 100
+function nwn.EffectImmunity(immunity)
    nwn.engine.StackPushInteger(immunity)
-   local eff = CreateEffect(273, 1)
-   eff:SetInt(1, percent)
-
-   return eff
+   return CreateEffect(273, 1)
 end
 
 --- Create an Invisibility effect.
