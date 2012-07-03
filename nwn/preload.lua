@@ -19,7 +19,7 @@
 nwn = {}
 
 require "nwn.constants"
-
+require 'lua.lua_preload'
 
 --- Main NWN Table...
 nwn.engine = {}
