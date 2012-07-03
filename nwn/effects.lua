@@ -336,6 +336,18 @@ function Effect:SetVersusTarget(target)
    self:SetInt(idx, target.id)
 end
 
+function nwn.CreateEffectAmountFunc(index)
+   return function (eff)
+             return eff:GetInt(index)
+	  end
+end
+
+function nwn.CreateEffectRangeFunc(start, stop)
+   return function range(type)
+             return type == start or type == stop
+	  end
+end
+
 --- Determine which of two damage reduction effects are better.
 -- The effects are assumed to have the same damage power.
 -- @param eff1 An effect.
