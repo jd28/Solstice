@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 require 'nwn.funcs'
 local ffi = require 'ffi'
 local C = ffi.C
@@ -43,6 +25,24 @@ function Creature:GetClassHitPointAdj()
    end
 
    return pm
+end
+
+--- Get Hitpoint bonus from effects.
+function Creature:GetEffectHitpointBonus()
+   if not self:GetIsValid() then
+      return 0
+   end
+   local eff_hp = 0
+   for eff in self:EffectsDirect() do
+      local type = eff:GetTrueType()
+      if type > nwn.EFFECT_TRUETYPE_CUSTOM then
+	 break
+      end
+      if type == nwn.EFFECT_CUSTOMTYPE_HITPOINTS then
+	 eff_hp = math.max(eff_hp, eff.eff.eff_integers[1])
+      end
+   end
+   return eff_hp
 end
 
 --- Determines adjustment to maximum hitpoints by feat.
@@ -166,7 +166,7 @@ end
 --- Get Maximum Hit Points
 -- @param cre Creature object ID.
 -- @param dunno A value that always seems to be 1.
-function NSGetMaxHitPoints(cre, dunno)
+function NSGetMaxHitpoints(cre, dunno)
    cre = _NL_GET_CACHED_OBJECT(cre)
    return cre:GetMaxHitPoints()
 end
