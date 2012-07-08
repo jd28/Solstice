@@ -3,41 +3,46 @@ require 'nwn.effects'
 
 local ffi = require 'ffi'
 
+-- Effect accumulator locals
 local bonus = ffi.new("uint32_t[?]", 10)
 local penalty = ffi.new("uint32_t[?]", 10)
 local ab_amount = nwn.CreateEffectAmountFunc(0)
 local ab_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
 					   nwn.EFFECT_TRUETYPE_ATTACK_INCREASE)
 
-function Creature:DebugAttackBonus(vs)
-   self:UpdateCombatInfo()
+--- Create a debug string for attack bonus.
+-- @param vs Attack target.  (Default: nwn.OBJECT_INVALID)
+function Creature:CreateAttackBonusDebugString(vs)
    vs = vs or nwn.OBJECT_INVALID
-   local fmt_table = {}
-   local fmt = "BAB: %d, Size: %d, Area: %d, Feat: %d, Mode: %d\n\n"
-   local wfmt = "Weapon: %s, Ability: %d, Ability Mod: %d, Effects: %d\n"
 
-   local vs_name
-   if not vs:GetIsValid() then
-      vs_name = "Invalid Object"
-   else
-      vs_name = vs:GetName()
-   end
+   -- Make sure all info is current/
+   self:UpdateCombatInfo()
+
+   local fmt_table = {}
+   local fmt = "BAB: %d, Area: %d, Class: %d, Feat: %d, Mode: %d, Race: %d, Size: %d, Skill: %d \n\n"
+   local wfmt = "Weapon: %s, Ability Mod: %d (%s), Weapon AB Mod: %d, Effects: %d\n"
+
+   local vs_name = vs:GetIsValid() and vs:GetName() or "Invalid Object"
 
    table.insert(fmt_table, string.format("Versus: %s\n", vs_name))
    table.insert(fmt_table, string.format(fmt, self.ci.bab, 
-					 self.ci.size.ab,
 					 self.ci.area.ab,
+					 self.ci.class.ab,
 					 self.ci.feat.ab,
-					 self.ci.mode.ab))
+					 self.ci.mode.ab,
+					 self.ci.race.ab,
+					 self.ci.size.ab,
+					 self.ci.skill.ab))
 
    for i = 0, 5 do
       local weap
-      if self.ci.equips[i].id ~= 0 then
+      if self.ci.equips[i].id ~= nwn.OBJECT_INVALID.id then
 	 weap = _NL_GET_CACHED_OBJECT(self.ci.equips[i].id)
 	 table.insert(fmt_table, string.format(wfmt,
 					       weap:GetName(),
-					       self.ci.equips[i].ab_ability,
 					       self:GetAbilityModifier(self.ci.equips[i].ab_ability),
+					       nwn.GetAbilityName(self.ci.equips[i].ab_ability),
+					       self.ci.equips[i].ab_mod,
 					       self:GetEffectAttackBonus(vs,
 									 nwn.GetAttackTypeFromEquipNum(i))))
       end
@@ -46,12 +51,20 @@ function Creature:DebugAttackBonus(vs)
    return table.concat(fmt_table)
 end
 
+--- Determine creature's BAB.
+function Creature:GetBaseAttackBonus()
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(699, 1)
+   return nwn.engine.StackPopInteger()
+end
+
 --- Get creatures attack bonus from effects/weapons.
 -- @param vs Creatures target
 -- @param attack_type Current attack type.  See nwn.ATTACK_TYPE_*
 function Creature:GetEffectAttackBonus(vs, attack_type)
    local function valid(eff, vs_info)
-      if attack_type ~= eff:GetInt(1) then
+      local type = eff:GetInt(1)
+      if not (type == nwn.ATTACK_TYPE_MISC or attack_type == type) then
 	 return false
       end
 
@@ -103,13 +116,15 @@ function Creature:GetEffectAttackBonus(vs, attack_type)
       end
    end
 
-   return math.clamp(bon_total - pen_total, self:GetMinAttackBonus(), self:GetMaxAttackBonus())
+   return math.clamp(bon_total - pen_total, self:GetMinAttackBonusMod(), self:GetMaxAttackBonusMod())
 end
 
-function Creature:GetMaxAttackBonus()
+--- Determines maximum attack bonus modifier.
+function Creature:GetMaxAttackBonusMod()
    return 20
 end
 
-function Creature:GetMinAttackBonus()
+--- Determines minimum attack bonus modifier.
+function Creature:GetMinAttackBonusMod()
    return -20
 end
