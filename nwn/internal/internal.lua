@@ -55,7 +55,6 @@ function _NL_GET_CACHED_OBJECT(id)
    end
 
    local type = ffi.cast("CGameObject*", obj).type
-   --print (obj, type, id)
 
    local object
    if type == nwn.GAME_OBJECT_TYPE_CREATURE then
@@ -71,16 +70,21 @@ function _NL_GET_CACHED_OBJECT(id)
       obj = ffi.cast("CNWSTrigger*", obj)
       object = trigger_t(type, id, obj)
    elseif type == nwn.GAME_OBJECT_TYPE_PLACEABLE then 
+      obj = ffi.cast("CNWSPlaceable*", obj)
       object = placeable_t(type, id, obj)
-   elseif type == nwn.GAME_OBJECT_TYPE_DOOR then 
+   elseif type == nwn.GAME_OBJECT_TYPE_DOOR then
+      obj = ffi.cast("CNWSDoor*", obj)
       object = door_t(type, id, obj)
    elseif type == nwn.GAME_OBJECT_TYPE_AREA_OF_EFFECT then 
+      obj = ffi.cast("CNWSAreaOfEffectObject*", obj)
       object = aoe_t(type, id, obj)
    elseif type == nwn.GAME_OBJECT_TYPE_WAYPOINT then 
-      object = waypoint_t(type, id, obj)
-   elseif type == nwn.GAME_OBJECT_TYPE_ENCOUNTER then 
+      object = waypoint_t(type, id, C.nwn_GetWaypointById(id))
+   elseif type == nwn.GAME_OBJECT_TYPE_ENCOUNTER then
+      obj = ffi.cast("CNWSEncounter*", obj)
       object = encounter_t(type, id, obj)
-   elseif type == nwn.GAME_OBJECT_TYPE_STORE then 
+   elseif type == nwn.GAME_OBJECT_TYPE_STORE then
+      obj = ffi.cast("CNWSStore*", obj)
       object = store_t(type, id, obj)
    end
 
