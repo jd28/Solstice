@@ -73,10 +73,27 @@ function nwn.d100(count)
    return nwn.RollDice(count, 100)
 end
 
+--- Determines the highest maximum roll
+function nwn.DetermineBestDiceRoll(roll1, roll2)
+   local r1 = (roll1.dice * roll1.sides) + roll1.bonus
+   local r2 = (roll2.dice * roll2.sides) + roll2.bonus
+
+   if r1 >= r2 then
+      return roll1
+   else
+      return roll2
+   end
+end
+
 --- Do a dice roll.
 -- @param roll DiceRoll ctype
 function nwn.DoDiceRoll(roll)
    return nwn.RollDice(roll.dice, roll.sides, roll.bonus)
+end
+
+--- Converts a dice roll to formatted string.
+function nwn.DiceRollToString(roll)
+   return string.format("%dd%d + %d", roll.dice, roll.sides, roll.bonus)
 end
 
 --- Rolls dice
