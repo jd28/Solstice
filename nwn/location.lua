@@ -16,15 +16,9 @@ location_t = ffi.metatype("CScriptLocation", location_mt)
 --- Applies an effect to a location
 -- @param eff Effect to apply.
 -- @param duration Duration of an effect. (Default: 0.0)
-function Location:ApplyEffect(eff, duration)
+function Location:ApplyEffect(durtype, eff, duration)
    duration = duration or 0.0
-   
-   if(duration > 0.0) then
-      durtype = nwn.DURATION_TYPE_TEMPORARY
-   else
-      durtype = nwn.DURATION_TYPE_INSTANT
-   end
-   
+      
    nwn.engine.StackPushFloat(duration)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
    nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, eff.eff)
@@ -32,21 +26,14 @@ function Location:ApplyEffect(eff, duration)
    nwn.engine.ExecuteCommand(216, 4)
 end
 
---- Applies a permenant effect to a location
--- @param eff Effect to apply.
-function Location:ApplyPermenantEffect(eff)
-   nwn.engine.StackPushFloat(0.0)
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_LOCATION, self)
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, eff.eff)
-   nwn.engine.StackPushInteger(nwn.DURATION_TYPE_PERMENANT)
-   nwn.engine.ExecuteCommand(216, 4)
-end
-
 --- Applies a visual effect to a location
 -- @param vfx nwn.VFX_*
-function Location:ApplyVisual(vfx)
+function Location:ApplyVisual(vfx, duration)
+   local durtype = duration and nwn.DURATION_TYPE_TEMPORARY or nwn.DURATION_TYPE_INSTANT
+   duration = duration or 0
+
    local eff = nwn.EffectVisualEffect(vfx)
-   self:ApplyEffect(eff)
+   self:ApplyEffect(durtype, eff)
 end
 
 --- Gets nearest object to location
