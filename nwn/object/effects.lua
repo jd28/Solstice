@@ -2,19 +2,19 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 --- Applies an effect to an object.
+-- @param dur_type nwn.DURATION_TYPE_*
 -- @param effect Effect to apply.
 -- @param duration Time in seconds for effect to last. (Default: 0.0)
---    If duration is not passed effect will have nwn.DURATION_TYPE_INSTANT,
---    otherwise nwn.DURATION_TYPE_TEMPORARY
-function Object:ApplyEffect(effect, duration)
-   dur_type = duration and nwn.DURATION_TYPE_TEMPORARY or nwn.DURATION_TYPE_INSTANT
+function Object:ApplyEffect(dur_type, effect, duration)
+   if not self:GetIsValid() then return end
+
    duration = duration or 0.0
 
-   nwn.engine.StackPushFloat(duration)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, effect)
-   nwn.engine.StackPushInteger(dur_type)
-   nwn.engine.ExecuteCommand(220, 4)
+   effect:SetDurationType(dur_type)
+   effect:SetDuration(duration)
+   
+   -- TODO: check object type
+   C.nwn_ApplyEffect(self.obj.obj, effect.eff, 0, 1)
 end
 
 --- Applies visual effect to object.
@@ -22,7 +22,10 @@ end
 -- @param duration Duration in seconds.  If not passed effect will be of 
 --    duration type nwn.DURATION_TYPE_INSTANT
 function Object:ApplyVisual(vfx, duration)
-   self:ApplyEffect(nwn.EffectVisualEffect(vfx), duration)
+   local dur_type = duration and nwn.DURATION_TYPE_TEMPORARY or nwn.DURATION_TYPE_INSTANT
+   duration = duration or 0.0
+
+   self:ApplyEffect(dur_type, nwn.EffectVisualEffect(vfx), duration)
 end
 
 --- Recurringly applies a custom effect
@@ -48,35 +51,22 @@ function Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_r
 
    print(id, eff_type, duration, dur_type, interval)
 
-   if dur_type == nwn.DURATION_TYPE_TEMPORARY then
-      self:ApplyEffect(eff_recur, duration)
-   elseif dur_type == nwn.DURATION_TYPE_PERMANENT then
-      self:ApplyPermenantEffect(eff_recur, duration)
-   else
+   if dur_type == nwn.DURATION_TYPE_INSTANT then
       error "Recurring effects must have a duration type temporary or permanent"
       return
+   else
+      self:ApplyEffect(dur_type, eff_recur, duration)
    end
-   self:ApplyEffect(effect)
+
    self:RepeatCommand(interval,
                       function()
                          if not self:GetHasEffectById(id) then
                             return false
                          end
-                         self:ApplyEffect(effect)
+                         self:ApplyEffect(nwn.DURATION_TYPE_INSTANT, effect)
                          return true
                       end)
                          
-end
-
---- Applies a permenant effect.
--- As defined by nwn.DURATION_TYPE_PERMANENT
--- @param effect Effect to apply.
-function Object:ApplyPermenantEffect(effect)
-   nwn.engine.StackPushFloat(0.0)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, effect)
-   nwn.engine.StackPushInteger(nwn.DURATION_TYPE_PERMANENT)
-   nwn.engine.ExecuteCommand(220, 4)
 end
 
 --- An iterator that iterates directly over applied effects
@@ -156,6 +146,21 @@ function Object:GetNextEffect()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(86, 1)
    return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT)
+end
+
+--- Logs debug strings for all effects applied to object.
+function Object:LogEffects()
+   if not self:GetIsValid() then return end
+
+   local t = {}
+   
+   table.insert(t, string.format("Effects - %s", self:GetName()))
+
+   for eff in self:EffectsDirect() do
+      table.insert(t, eff:ToString())
+   end
+
+   nwn.WriteTimestampedLogEntry(table.concat(t, '\n\n'))
 end
 
 --- Removes an effect from object
