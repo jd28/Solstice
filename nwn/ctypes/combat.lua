@@ -75,19 +75,7 @@ typedef struct CNWSCombatAttackData {
     uint32_t cad_attack_mod;          /* 0010 */
     uint8_t  cad_missed;              /* 0014 */
     uint8_t  field_15;                /* 0015 */
-    uint16_t cad_dmg_bludge;          /* 0016 */
-    uint16_t cad_dmg_pierce;          /* 0018 */
-    uint16_t cad_dmg_slash;           /* 001A */
-    uint16_t cad_dmg_magical;         /* 001C */
-    uint16_t cad_dmg_acid;            /* 001E */
-    uint16_t cad_dmg_cold;            /* 0020 */
-    uint16_t cad_dmg_divine;          /* 0022 */
-    uint16_t cad_dmg_electrical;      /* 0024 */
-    uint16_t cad_dmg_Fire;            /* 0026 */
-    uint16_t cad_dmg_negative;        /* 0028 */
-    uint16_t cad_dmg_positive;        /* 002A */
-    uint16_t cad_dmg_sonic;           /* 002C */
-    uint16_t cad_base_damage;         /* 002E */
+    uint16_t cad_damage[13];          /* 0016 */
     uint8_t cad_attack_type;          /* 0030 */
     uint8_t cad_attack_mode;          /* 0031 */
     uint8_t cad_concealment;          /* 0032 */
