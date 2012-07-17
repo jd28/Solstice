@@ -1,30 +1,40 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
+require 'nwn.effects'
 
-local ne = nwn.engine
+local ffi = require 'ffi'
+
+-- Accumulator locals
+local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local skill_amount = nwn.CreateEffectAmountFunc(1)
+local skill_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_SKILL_DECREASE,
+					      nwn.EFFECT_TRUETYPE_SKILL_INCREASE)
+
+
+--- Creatues a skill debug string
+function Creature:CreateSkillDebugString()
+   local base = {}
+   local eff  = {}
+   local fmt  = "%s: Base %d, Effect: %d\n"
+
+   table.insert(base, "Base:\n")
+
+   for i = 0, nwn.SKILL_LAST do
+      table.insert(base, string.format(fmt, 
+				       nwn.GetSkillName(i), 
+				       self:GetSkillRank(i, true),
+				       self:GetTotalEffectSkillBonus(nwn.OBJECT_INVALID, i)))
+   end
+
+   return table.concat(base)
+end
 
 --- Determines if a creature has a skill
 -- @param skill nwn.SKILL_*
 function Creature:GetHasSkill(skill)
-   ne.StackPushObject(self)
-   ne.StackPushInteger(skill)
-   ne.ExecuteCommand(286, 2)
-   return ne.StackPopBoolean()
+   nwn.engine.StackPushObject(self)
+   nwn.engine.StackPushInteger(skill)
+   nwn.engine.ExecuteCommand(286, 2)
+   return nwn.engine.StackPopBoolean()
 end
 
 --- Determines if skill check is successful
@@ -103,8 +113,14 @@ end
 
 --- Determines maximum skill bonus from effects/gear.
 -- @param skill nwn.SKILL_*
-function Creature:GetMaxSkillBonus(skill)
+function Creature:GetMaxSkillMod(skill)
    return 20
+end
+
+--- Determines minimum skill bonus from effects/gear.
+-- @param skill nwn.SKILL_*
+function Creature:GetMinSkillMod(skill)
+   return -20
 end
 
 --- Gets the amount a skill was increased at a level.
@@ -134,11 +150,11 @@ end
 --- Gets creature's skill rank.
 -- @param skill nwn.SKILL_*
 function Creature:GetSkillRank(skill, base)
-   ne.StackPushBoolean(base)
-   ne.StackPushObject(self)
-   ne.StackPushInteger(skill)
-   ne.ExecuteCommand(315, 3)
-   return ne.StackPopInteger()
+   nwn.engine.StackPushBoolean(base)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.StackPushInteger(skill)
+   nwn.engine.ExecuteCommand(315, 3)
+   return nwn.engine.StackPopInteger()
 end
 
 --- Determines total skill bonus from effects/gear.
@@ -146,16 +162,18 @@ end
 -- @param skill nwn.SKILL_*
 function Creature:GetTotalEffectSkillBonus(vs, skill)
    local function valid(eff, vs_info)
-      local eskill    = eff.eff_integers[0]
-      local race      = eff.eff_integers[2]
-      local lawchaos  = eff.eff_integers[3]
-      local goodevil  = eff.eff_integers[4]
-      local subrace   = eff.eff_integers[5]
-      local deity     = eff.eff_integers[6]
-      local target    = eff.eff_integers[7]
+      if skill ~= eff:GetInt(0) then
+	 return false
+      end
 
-      if eskill == skill 
-         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
+      local race      = eff:GetInt(2)
+      local lawchaos  = eff:GetInt(3)
+      local goodevil  = eff:GetInt(4)
+      local subrace   = eff:GetInt(5)
+      local deity     = eff:GetInt(6)
+      local target    = eff:GetInt(7)
+
+      if (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
          and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
          and (goodevil == 0 or goodevil == vs_info.goodevil)
          and (subrace == 0 or subrace == vs_info.subrace_id)
@@ -167,28 +185,36 @@ function Creature:GetTotalEffectSkillBonus(vs, skill)
       return false
    end
 
-   local function range(type)
-      if type > nwn.EFFECT_TRUETYPE_SKILL_DECREASE
-         or type < nwn.EFFECT_TRUETYPE_SKILL_INCREASE
-      then
-         return false
+   local vs_info = nwn.GetVersusInfo(vs)
+   local bon_idx, pen_idx = self:GetEffectArrays(bonus,
+						 penalty,
+						 vs_info,
+						 SKILL_EFF_INFO,
+						 skill_range,
+						 valid,
+						 skill_amount,
+						 math.max,
+						 self.stats.cs_first_skill_eff)
+
+   local bon_total, pen_total = 0, 0
+   
+   for i = 0, bon_idx - 1 do
+      if SKILL_EFF_INFO.stack then
+	 bon_total = bon_total + bonus[i]
+      else
+	 bon_total = math.max(bon_total, bonus[i])
       end
-      return true
    end
 
-   local function get_amount(eff)
-      return eff.eff_integers[1]
+   for i = 0, pen_idx - 1 do
+      if SKILL_EFF_INFO.stack then
+	 pen_total = pen_total + penalty[i]
+      else
+	 pen_total = math.max(pen_total, penalty[i])
+      end
    end
 
-   local info = effect_info_t(self.stats.cs_first_skill_eff, 
-                              nwn.EFFECT_TRUETYPE_SKILL_DECREASE,
-                              nwn.EFFECT_TRUETYPE_SKILL_INCREASE,
-                              NS_OPT_EFFECT_SKILL_STACK,
-                              NS_OPT_EFFECT_SKILL_STACK_GEAR,
-                              NS_OPT_EFFECT_SKILL_STACK_SPELL)
-
-   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, self:GetMaxSkillBonus(skill))
+   return math.clamp(bon_total - pen_total, self:GetMinSkillMod(skill), self:GetMaxSkillMod(skill))
 end
 
 --- Modifies skill rank.
@@ -247,7 +273,7 @@ function Creature:SetSkillRank(skill, amount)
    return self.stats.cs_skills[skill]
 end
 
-
+---------------------------------------------------------------------------------------------------
 
 
 function NSGetTotalSkillBonus(cre, vs, skill)

@@ -1,23 +1,38 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
+require 'nwn.effects'
 
 local ffi = require "ffi"
 local C = ffi.C
+
+-- Accumulator functions
+local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local abil_amount = nwn.CreateEffectAmountFunc(1)
+local abil_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_ABILITY_DECREASE,
+					      nwn.EFFECT_TRUETYPE_ABILITY_INCREASE)
+
+
+function Creature:DebugAbilityScores()
+   local fmt_table = {}
+   local fmt = "Str: %d, Dex: %d, Con: %d, Wis: %d, Cha: %d\n"
+
+   table.insert(fmt_table, "Base: ")
+   table.insert(fmt_table, string.format(fmt,
+					 self:GetAbilityScore(nwn.ABILITY_STRENGTH, true),
+					 self:GetAbilityScore(nwn.ABILITY_DEXTERITY, true),
+					 self:GetAbilityScore(nwn.ABILITY_CONSTITUTION, true),
+					 self:GetAbilityScore(nwn.ABILITY_WISDOM, true),
+					 self:GetAbilityScore(nwn.ABILITY_CHARISMA, true)))
+
+   table.insert(fmt_table, "Effects: ")
+   table.insert(fmt_table, string.format(fmt,
+					 self:GetTotalEffectAbilityMod(nwn.ABILITY_STRENGTH),
+					 self:GetTotalEffectAbilityMod(nwn.ABILITY_DEXTERITY),
+					 self:GetTotalEffectAbilityMod(nwn.ABILITY_CONSTITUTION),
+					 self:GetTotalEffectAbilityMod(nwn.ABILITY_WISDOM),
+					 self:GetTotalEffectAbilityMod(nwn.ABILITY_CHARISMA)))
+
+   return table.concat(fmt_table)
+end
 
 --- Gets ability score that was raised at a particular level.
 -- @return nwn_ABILITY_* or -1 on error.
@@ -105,10 +120,16 @@ function Creature:GetDexMod(armor_check)
    return C.nwn_GetDexMod(self.stats, armor_check)
 end
 
---- Gets a creatures max ability bonus from gear/effects.
+--- Gets a creatures max ability modifier from gear/effects.
 -- @param abil nwn.ABILITY_*
-function Creature:GetMaxAbilityBonus(abil)
+function Creature:GetMaxAbilityMod(abil)
    return 12
+end
+
+--- Gets a creatures minimum ability modifier from gear/effects.
+-- @param abil nwn.ABILITY_*
+function Creature:GetMinAbilityMod(abil)
+   return -12
 end
 
 --- Modifies the ability score of a specific type for a creature. 
@@ -141,45 +162,45 @@ function Creature:SetAbilityScore(ability, value)
    return C.nwn_SetAbilityScore(self, ability, value)
 end
 
---- Get total ability bonus from effects/gear.
+--- Get total ability modifier from effects/gear.
 -- @param vs Versus another creature.
 -- @param abil nwn.ABILITY_*
-function Creature:GetTotalEffectAbilityBonus(abil)
-   if not self:GetIsValid() then
-      return 0
-   end
-
+function Creature:GetTotalEffectAbilityMod(abil)
    local function valid(eff)
-      local eabil = eff.eff_integers[0]
+      return abil == eff:GetInt(0)
+   end
 
-      if eabil == abil then
-         return true
+   local vs_info = nwn.GetVersusInfo(nwn.OBJECT_INVALID, abil)
+   local bon_idx, pen_idx = self:GetEffectArrays(bonus,
+						 penalty,
+						 vs_info,
+						 ABILITY_EFF_INFO,
+						 abil_range,
+						 valid,
+						 abil_amount,
+						 math.max,
+						 self.stats.cs_first_ability_eff)
+   local bon_total, pen_total = 0, 0
+   
+   for i = 0, bon_idx - 1 do
+      if ABILITY_EFF_INFO.stack then
+	 bon_total = bon_total + bonus[i]
+      else
+	 bon_total = math.max(bon_total, bonus[i])
       end
-      return false
    end
 
-   local function range(type)
-      if type > nwn.EFFECT_TRUETYPE_ABILITY_DECREASE
-         or type < nwn.EFFECT_TRUETYPE_ABILITY_INCREASE
-      then
-         return false
+   for i = 0, pen_idx - 1 do
+      if ABILITY_EFF_INFO.stack then
+	 pen_total = pen_total + penalty[i]
+      else
+	 pen_total = math.max(pen_total, penalty[i])
       end
-      return true
    end
 
-   local function get_amount(eff)
-      return eff.eff_integers[1]
-   end
-
-   local info = effect_info_t(self.stats.cs_first_ability_eff, 
-                              nwn.EFFECT_TRUETYPE_ABILITY_DECREASE,
-                              nwn.EFFECT_TRUETYPE_ABILITY_INCREASE,
-                              NS_OPT_EFFECT_ABILITY_STACK,
-                              NS_OPT_EFFECT_ABILITY_STACK_GEAR,
-                              NS_OPT_EFFECT_ABILITY_STACK_SPELL)
-
-   return math.clamp(self:GetTotalEffectBonus(nwn.OBJECT_INVALID, info, range, valid, get_amount),
-                     0, self:GetMaxAbilityBonus(abil))
+   return math.clamp(bon_total - pen_total, 
+		     self:GetMinAbilityMod(abil), 
+		     self:GetMaxAbilityMod(abil))
 end
 
 --------------------------------------------------------------------------------
@@ -187,10 +208,9 @@ end
 
 --- Get total ability bonus from effects/gear.
 -- @param cre Creature
--- @param vs Versus another creature.
 -- @param abil nwn.ABILITY_*
-function NSGetTotalAbilityBonus(cre, vs, abil)
+function NSGetTotalEffectAbilityMod(cre, abil)
    cre = _NL_GET_CACHED_OBJECT(cre)
 
-   return cre:GetTotalEffectAbilityBonus(abil)
+   return cre:GetTotalEffectAbilityMod(abil)
 end

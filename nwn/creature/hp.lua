@@ -2,6 +2,13 @@ require 'nwn.funcs'
 local ffi = require 'ffi'
 local C = ffi.C
 
+-- Accumulator locals
+local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local hp_amount = nwn.CreateEffectAmountFunc(1)
+local hp_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_CUSTOMTYPE_HP_DECREASE,
+					   nwn.EFFECT_CUSTOMTYPE_HP_INCREASE)
+
 --- Determines adjustment to maximum hitpoints by area
 function Creature:GetAreaHitPointAdj()
    return 0
@@ -29,20 +36,37 @@ end
 
 --- Get Hitpoint bonus from effects.
 function Creature:GetEffectHitpointBonus()
-   if not self:GetIsValid() then
-      return 0
-   end
-   local eff_hp = 0
-   for eff in self:EffectsDirect() do
-      local type = eff:GetTrueType()
-      if type > nwn.EFFECT_TRUETYPE_CUSTOM then
-	 break
+   local function valid() return true end
+
+   local bon_idx, pen_idx = self:GetEffectArrays(bonus,
+						 penalty,
+						 nil,
+						 HP_EFF_INFO,
+						 hp_range,
+						 valid,
+						 hp_amount,
+						 math.max,
+						 self.first_custom_eff)
+
+   local bon_total, pen_total = 0, 0
+   
+   for i = 0, bon_idx - 1 do
+      if HP_EFF_INFO.stack then
+	 bon_total = bon_total + bonus[i]
+      else
+	 bon_total = math.max(bon_total, bonus[i])
       end
-      if type == nwn.EFFECT_CUSTOMTYPE_HITPOINTS then
-	 eff_hp = math.max(eff_hp, eff.eff.eff_integers[1])
+   end
+
+   for i = 0, pen_idx - 1 do
+      if HP_EFF_INFO.stack then
+	 pen_total = pen_total + penalty[i]
+      else
+	 pen_total = math.max(pen_total, penalty[i])
       end
    end
-   return eff_hp
+
+   return math.clamp(bon_total - pen_total, self:GetMinHPMod(), self:GetMaxHPMod())
 end
 
 --- Determines adjustment to maximum hitpoints by feat.
@@ -165,8 +189,7 @@ end
 
 --- Get Maximum Hit Points
 -- @param cre Creature object ID.
--- @param dunno A value that always seems to be 1.
-function NSGetMaxHitpoints(cre, dunno)
+function NSGetMaxHitPoints(cre)
    cre = _NL_GET_CACHED_OBJECT(cre)
    return cre:GetMaxHitPoints()
 end

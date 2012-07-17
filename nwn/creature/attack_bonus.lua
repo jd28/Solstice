@@ -4,8 +4,8 @@ require 'nwn.effects'
 local ffi = require 'ffi'
 
 -- Effect accumulator locals
-local bonus = ffi.new("uint32_t[?]", 10)
-local penalty = ffi.new("uint32_t[?]", 10)
+local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
 local ab_amount = nwn.CreateEffectAmountFunc(0)
 local ab_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
 					   nwn.EFFECT_TRUETYPE_ATTACK_INCREASE)

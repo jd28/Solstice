@@ -1,20 +1,17 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
+require 'nwn.effects'
+
+local ffi = require 'ffi'
+
+-- Effect accumulator locals
+local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
+local save_amount = nwn.CreateEffectAmountFunc(0)
+local save_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_SAVING_THROW_DECREASE,
+					     nwn.EFFECT_TRUETYPE_SAVING_THROW_INCREASE)
+
+function Creature:DebugSaves()
+   return ""
+end
 
 --- Gets creatures saving throw bonus
 -- @param save nwn.SAVING_THROW_*
@@ -37,8 +34,15 @@ end
 --- Gets maximum saving throw bonus from gear/effects.
 -- @param save nwn.SAVING_THROW_*
 -- @param save_vs nwn.SAVING_THROW_TYPE_*
-function Creature:GetMaxSaveBonus(save, save_vs)
+function Creature:GetMaxSaveMod(save, save_vs)
    return 20
+end
+
+--- Gets minimum saving throw bonus from gear/effects.
+-- @param save nwn.SAVING_THROW_*
+-- @param save_vs nwn.SAVING_THROW_TYPE_*
+function Creature:GetMinSaveMod(save, save_vs)
+   return -20
 end
 
 --- Sets creatures saving throw bonus
@@ -64,51 +68,62 @@ end
 -- @param save_vs nwn.SAVING_THROW_TYPE_*
 function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
    local function valid(eff, vs_info)
-      local esave     = eff.eff_integers[1]
-      local esave_vs  = eff.eff_integers[2]
-      local race      = eff.eff_integers[3]
-      local lawchaos  = eff.eff_integers[4]
-      local goodevil  = eff.eff_integers[5]
-      local subrace   = eff.eff_integers[6]
-      local deity     = eff.eff_integers[7]
-      local target    = eff.eff_integers[8]
+      if eff:GetInt(1) ~= save then
+	 return false
+      end
 
-      if (esave == 0 or esave == save)
-         and (esave_type == 0 or esave_type == save_type)
-         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
+      local esave_vs  = eff:GetInt(2)
+      local race      = eff:GetInt(3)
+      local lawchaos  = eff:GetInt(4)
+      local goodevil  = eff:GetInt(5)
+      local subrace   = eff:GetInt(6)
+      local deity     = eff:GetInt(7)
+      local target    = eff:GetInt(8)
+
+      if (esave_type == 0 or esave_type == save_type)
+	 and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
+	 and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
+	 and (goodevil == 0 or goodevil == vs_info.goodevil)
+	 and (subrace == 0 or subrace == vs_info.subrace_id)
+	 and (deity == 0 or deity == vs_info.deity_id)
+	 and (target == 0 or target == vs_info.target)
       then
-         return true
+	 return true
       end
       return false
    end
 
-   local function range(type)
-      if type > nwn.EFFECT_TRUETYPE_SAVING_THROW_DECREASE
-         or type < nwn.EFFECT_TRUETYPE_SAVING_THROW_INCREASE
-      then
-         return false
+   local vs_info = nwn.GetVersusInfo(vs)
+   local bon_idx, pen_idx = self:GetEffectArrays(bonus,
+						 penalty,
+						 vs_info,
+						 SAVE_EFF_INFO,
+						 save_range,
+						 valid,
+						 save_amount,
+						 math.max,
+						 self.stats.cs_first_save_eff)
+   local bon_total, pen_total = 0, 0
+   
+   for i = 0, bon_idx - 1 do
+      if SAVE_EFF_INFO.stack then
+	 bon_total = bon_total + bonus[i]
+      else
+	 bon_total = math.max(bon_total, bonus[i])
       end
-      return true
    end
 
-   local function get_amount(eff)
-      return eff.eff_integers[0]
+   for i = 0, pen_idx - 1 do
+      if SAVE_EFF_INFO.stack then
+	 pen_total = pen_total + penalty[i]
+      else
+	 pen_total = math.max(pen_total, penalty[i])
+      end
    end
 
-   local info = effect_info_t(self.stats.cs_first_ability_eff, 
-                              nwn.EFFECT_TRUETYPE_SAVING_THROW_DECREASE,
-                              nwn.EFFECT_TRUETYPE_SAVING_THROW_INCREASE,
-                              NS_OPT_EFFECT_SAVE_STACK,
-                              NS_OPT_EFFECT_SAVE_STACK_GEAR,
-                              NS_OPT_EFFECT_SAVE_STACK_SPELL)
-
-   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, self:GetMaxSaveBonus(save, save_vs))
+   return math.clamp(bon_total - pen_total,
+		     self:GetMinSaveMod(save, save_vs),
+		     self:GetMaxSaveMod(save, save_vs))
 end
 
 --------------------------------------------------------------------------------
