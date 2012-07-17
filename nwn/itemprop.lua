@@ -1,24 +1,8 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
-local ffi = require 'ffi'
 require 'nwn.ctypes.effect'
 require 'nwn.ctypes.itemprop'
+
+local ffi = require 'ffi'
+local C = ffi.C
 
 ffi.cdef [[
 typedef struct Itemprop {
@@ -29,6 +13,20 @@ typedef struct Itemprop {
 
 local itemprop_mt = { __index = Itemprop }
 itemprop_t = ffi.metatype("Itemprop", itemprop_mt)
+
+--- Convert itemprop effect to formatted string.
+-- Override Effect:ToString
+function Itemprop:ToString()
+   local fmt = "Item Property: Type: %d, SubType: %d, Cost Table: %d, Cost Table Value: %d, Param1: %d, Param1 Value: %d"
+
+   return string.format(fmt,
+			self:GetPropertyType(),
+			self:GetPropertySubType(),
+			self:GetCostTable(),
+			self:GetCostTableValue(),
+			self:GetParam1(),
+			self:GetParam1Value())
+end
 
 --- Returns the cost table number of the itemproperty.
 -- See the 2DA files for value definitions.
@@ -53,17 +51,28 @@ function Itemprop:GetParam1Value()
 end
 
 --- Returns the subtype of the itemproperty
-function Itemprop:GetSubType()
+function Itemprop:GetPropertySubType()
    return self:GetInt(1)
 end
 
---- Returns the type of the itemproperty.
--- @return nwn.ITEM_PROPERTY_* or -1.
-function Itemprop:GetType()
-   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY, self.eff)
-   nwn.engine.ExecuteCommand(614, 1)
+--- Returns the subtype of the itemproperty
+function Itemprop:GetPropertyType()
+   return self:GetInt(0)
+end
 
-   return nwn.engine.StackPopInteger()
+function Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val)
+   subtype = subtype or -1
+   cost = cost or -1
+   cost_val = cost_val or -1
+   param1 = param1 or -1
+   param1_val = param1_val or -1
+
+   self:SetInt(0, type)
+   self:SetInt(1, subtype)
+   self:SetInt(2, cost)
+   self:SetInt(3, cost_val)
+   self:SetInt(4, param1)
+   self:SetInt(5, param1_val)
 end
 
 -------------------------------------------------------------------------------
@@ -74,20 +83,40 @@ EFFECT_VS_ALIGN_GRP = 2
 EFFECT_VS_RACE      = 3
 EFFECT_VS_DMG_TYPE  = 4
 
+function nwn.engine.CreateItemPropery(command, args)
+    nwn.engine.ExecuteCommand(command, args)
+    return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY)
+end
+
+local function create_itemprop_eff(show_icon)
+   show_icon = show_icon or 0
+   local eff = itemprop_t(C.nwn_CreateEffect(show_icon), false)
+
+   eff:SetCreator(nwn.engine.GetCommandObject())
+   eff:SetNumIntegers(9)
+   eff:SetAllInts(-1)
+   eff:SetInt(7, 100)
+   eff:SetInt(8, 1)
+   eff:SetSubType(0)
+   eff:SetDurationType(nwn.DURATION_TYPE_PERMANENT)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_ITEMPROPERTY)
+
+   return eff
+end
+
 ---
 -- @param
 -- @param
 function nwn.ItemPropertyAbilityScore(ability, bonus)
-   local cmd = 616
+   local eff = create_itemprop_eff()
 
    if bonus < 0 then
-      cmd = 641
-      bonus = -bonus
+      eff:SetValues(27, ability, 21, -bonus)
+   else
+      eff:SetValues(0, ability, 1, bonus)	    
    end
    
-   nwn.engine.StackPushInteger(bonus)
-   nwn.engine.StackPushInteger(ability)
-   return nwn.engine.CreateItemPropery(cmd, 2)
+   return eff
 end
 
 ---
