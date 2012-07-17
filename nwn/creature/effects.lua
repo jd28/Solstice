@@ -1,23 +1,7 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 local ffi = require 'ffi'
 local C = ffi.C
+
+
 
 --- Versus Info ctype
 -- @name VersusInfo
@@ -35,12 +19,14 @@ typedef struct VersusInfo {
    int32_t deity_id;
    int32_t subrace_id;
    uint32_t target;
+   int32_t type;
+   int32_t subtype;
+   uint32_t dmg_flags;
 } VersusInfo;
 ]]
 
 ffi.cdef[[
 typedef struct EffectInfo {
-   int32_t index;
    int32_t type_dec;
    int32_t type_inc;
    bool stack;
@@ -51,6 +37,61 @@ typedef struct EffectInfo {
 
 versus_info_t = ffi.typeof("VersusInfo")
 effect_info_t = ffi.typeof("EffectInfo")
+
+local eff_bonus
+local eff_penalty
+local eff_bonus_idx = 0
+local eff_penalty_idx = 0
+
+
+function nwn.GetVersusInfo(vs, type, subtype, dmg_flags)
+   if not vs:GetIsValid() or vs.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
+      return versus_info_t(nwn.RACIAL_TYPE_INVALID,
+			   0,
+			   0,
+			   0,
+			   0,
+			   nwn.OBJECT_INVALID.id,
+			   type or -1,
+			   subtype or -1,
+			   dmg_flags or 0)
+   else
+      return versus_info_t(vs:GetRacialType(),
+			   vs:GetGoodEvilValue(),
+			   vs:GetLawChaosValue(),
+			   vs:GetDeityId(),
+			   vs:GetSubraceId(),
+			   vs.id,
+			   type or -1,
+			   subtype or -1,
+			   dmg_flags or 0)
+   end
+end
+
+function Creature:CreateEffectDebugString()
+   local function int_string(eff)
+      local t = {}
+      for i = 0, eff.eff.eff_num_integers - 1 do
+	 table.insert(t, eff:GetInt(i))
+      end
+      return table.concat(t, ", ")
+   end
+
+   local t = {}
+   local fmt = "Id: %x, Type: %d, Dur: %d, Subtype: %d Ints: %s"
+
+   for eff in self:EffectsDirect() do
+      table.insert(t, string.format(fmt, 
+				    eff:GetId(),
+				    eff:GetTrueType(),
+				    eff:GetDurationType(),
+				    eff:GetSubType(),
+				    int_string(eff)))
+		    
+   end
+
+   return table.concat(t, "\n")
+end
 
 --- Get creatures concealment
 -- @param vs Creatures attacker, if any.
@@ -149,175 +190,6 @@ function Creature:GetConcealment(vs, attack)
    return total
 end
 
---- Get creatures attack bonus from effects/weapons.
--- @param vs Creatures target
--- @param attack_type Current attack type.  See nwn.ATTACK_TYPE_*
-function Creature:GetEffectAttackBonus(vs, attack_type)
-   local function valid(eff, vs_info)
-      local atk_type  = eff.eff_integers[1]
-      local race      = eff.eff_integers[2]
-      local lawchaos  = eff.eff_integers[3]
-      local goodevil  = eff.eff_integers[4]
-      local subrace   = eff.eff_integers[5]
-      local deity     = eff.eff_integers[6]
-      local vs        = eff.eff_integers[7]
-      local valid     = false
-
-      if atk_type == nwn.ATTACK_BONUS_MISC or atk_type == attack_type then
-         valid = true
-      elseif attack_type == 6 and (atk_type == nwn.ATTACK_BONUS_ONHAND or nwn.ATTACK_BONUS_CWEAPON1) then
-         valid = true
-      elseif attack_type == 8 and atk_type == nwn.ATTACK_BONUS_UNARMED then
-         valid = true
-      end
-
-      if valid
-         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (vs == 0 or vs == vs_info.target)
-      then
-         return true
-      end
-      return false
-   end
-
-   local function range(type)
-      if type > nwn.EFFECT_TRUETYPE_ATTACK_DECREASE
-         or type < nwn.EFFECT_TRUETYPE_ATTACK_INCREASE
-      then
-         return false
-      end
-      return true
-   end
-
-
-   local function get_amount(eff)
-      return eff.eff_integers[1]
-   end
-
-   local info = effect_info_t(self.stats.cs_first_ab_eff, 
-                              nwn.EFFECT_TRUETYPE_ATTACK_DECREASE,
-                              nwn.EFFECT_TRUETYPE_ATTACK_INCREASE,
-                              NS_OPT_EFFECT_AB_STACK, 
-			      NS_OPT_EFFECT_AB_STACK_GEAR, 
-			      NS_OPT_EFFECT_AB_STACK_SPELL)
-
-   return math.clamp(self:GetTotalEffectBonus(vs, info, range, valid, get_amount),
-                     0, self:GetMaxAttackBonus())
-end
-
---- Get armor class from effects/equips.
--- @oaran vs Creatures attacker
--- @param touch Is touch attack (Default: false).
-function Creature:GetEffectArmorClassBonus(vs, touch)
-   local race, lawchaos, goodevil, subrace, deity, target
-   local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge = 0, 0, 0, 0, 0
-   local eff_nat_neg, eff_armor_neg, eff_shield_neg, eff_deflect_neg = 0, 0, 0, 0
-   local eff_type, damage, ac_type
-
-   local dmg_flags = 0
-
-   local vs_info
-   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      vs_info = versus_info_t(vs:GetRacialType(),
-                              vs:GetGoodEvilValue(),
-                              vs:GetLawChaosValue(),
-                              vs:GetDeityId(),
-                              vs:GetSubraceId(),
-                              vs.id)
-      dmg_flags = vs:GetDamageFlags()
-   end
-
-   local valid = false
-   for i = self.stats.cs_first_ac_eff, self.obj.obj.obj_effects_len - 1 do
-      eff_type = self.obj.obj.obj_effects[i].eff_type
-
-      if eff_type > nwn.EFFECT_TRUETYPE_AC_DECREASE then
-         break
-      end
-
-      ac_type  = self.obj.obj.obj_effects[i].eff_integers[0]
-      amount   = self.obj.obj.obj_effects[i].eff_integers[1]
-      race     = self.obj.obj.obj_effects[i].eff_integers[2]
-      lawchaos = self.obj.obj.obj_effects[i].eff_integers[3]
-      goodevil = self.obj.obj.obj_effects[i].eff_integers[4]
-      damage   = self.obj.obj.obj_effects[i].eff_integers[5]
-      subrace  = self.obj.obj.obj_effects[i].eff_integers[6]
-      deity    = self.obj.obj.obj_effects[i].eff_integers[7]
-      target   = self.obj.obj.obj_effects[i].eff_integers[8]
-      valid    = false
-
-      if damage == nwn.AC_VS_DAMAGE_TYPE_ALL 
-         or bit.band(dmg_flags, damage) ~= 0
-      then
-         valid = true
-      end
-
-      if valid
-         and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
-      then
-         if eff_type == nwn.EFFECT_TRUETYPE_AC_DECREASE then
-            if ac_type == nwn.AC_DODGE_BONUS then
-               eff_dodge = eff_dodge - amount
-            elseif not touch then
-               if ac_type == nwn.AC_NATURAL_BONUS then
-                  if amount > eff_nat_neg then
-                     eff_nat_neg = amount
-                  end
-               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
-                  if amount > eff_armor_neg then
-                     eff_armor_neg = amount
-                  end
-               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
-                  if amount > eff_shield_neg then
-                     eff_shield_neg = amount
-                  end
-               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
-                  if amount > eff_deflect_neg then
-                     eff_deflect_neg = amount
-                  end
-               end
-            end
-         elseif eff_type == nwn.EFFECT_TRUETYPE_AC_INCREASE then
-            if ac_type == nwn.AC_DODGE_BONUS then
-               eff_dodge = eff_dodge + amount
-            elseif not touch then
-               if ac_type == nwn.AC_NATURAL_BONUS then
-                  if amount > eff_nat then
-                     eff_nat = amount
-                  end
-               elseif ac_type == nwn.AC_ARMOUR_ENCHANTMENT_BONUS then
-                  if amount > eff_armor then
-                     eff_armor = amount
-                  end
-               elseif ac_type == nwn.AC_SHIELD_ENCHANTMENT_BONUS then
-                  if amount > eff_shield then
-                     eff_shield = amount
-                  end
-               elseif ac_type == nwn.AC_DEFLECTION_BONUS then
-                  if amount > eff_deflect then
-                     eff_deflect = amount
-                  end
-               end
-            end
-         end 
-      end
-   end
-   return (eff_nat - eff_nat_neg),
-          (eff_armor - eff_armor_neg),
-          (eff_shield - eff_shield_neg),
-          (eff_deflect - eff_deflect_neg),
-          eff_dodge
-end
-
 --- Get effect bonus from critical hit multiplier.
 -- @param vs Creature's target.
 function Creature:GetEffectCritMultBonus()
@@ -381,24 +253,6 @@ function Creature:GetEffectCritRangeBonus()
    return total
 end
 
---- Get Hitpoint bonus from effects.
-function Creature:GetEffectHitpointBonus()
-   if not self:GetIsValid() then
-      return 0
-   end
-   local eff_hp = 0
-   for eff in self:EffectsDirect() do
-      local type = eff:GetTrueType()
-      if type > nwn.EFFECT_TRUETYPE_CUSTOM then
-	 break
-      end
-      if type == nwn.EFFECT_CUSTOMTYPE_HITPOINTS then
-	 eff_hp = math.max(eff_hp, eff.eff.eff_integers[1])
-      end
-   end
-   return eff_hp
-end
-
 --- Determine if creature has an immunity.
 -- @param vs Creature's attacker.
 -- @param imm_type nwn.IMMUNITY_TYPE_*
@@ -409,15 +263,7 @@ function Creature:GetEffectImmunity(vs, imm_type)
    local total = 0
    local eff_type
 
-   local vs_info
-   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      vs_info = versus_info_t(vs:GetRacialType(),
-                              vs:GetGoodEvilValue(),
-                              vs:GetLawChaosValue(),
-                              vs:GetDeityId(),
-                              vs:GetSubraceId(),
-                              vs.id)
-   end
+   local vs_info = nwn.GetVersusInfo(vs)
 
    for i = self.stats.cs_first_imm_eff, self.obj.obj.obj_effects_len - 1 do
       eff_type = self.obj.obj.obj_effects[i].eff_type
@@ -537,7 +383,7 @@ function Creature:GetMissChance(attack)
 end
 
 --- Deterimines total effect bonus for a particular type.
--- @param vs Versus target, if any.
+-- @param vs_info ...
 -- @param eff_info EffectInfo ctype
 -- @param range_check Function that takes effect type and determines if the current effect
 --    is in the proper range.
@@ -545,21 +391,12 @@ end
 --    effect is applicable versus the target passed in vs.
 -- @param get_amount Function which takes the effect and returns it's respective 'amount' which 
 --    differs depending on effect type.
-function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check, get_amount)
+function Creature:GetTotalEffectBonus(vs_info, eff_info, range_check, validity_check, get_amount, index)
    local total = 0
-   local eff_type, vs_info, eff_creator, eff, amount
+   local eff_type, eff_creator, eff, amount
 
-   if not vs then
+   if not vs_info then
       print(debug.traceback())
-   end
-
-   if vs:GetIsValid() and vs.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      vs_info = versus_info_t(vs:GetRacialType(),
-                              vs:GetGoodEvilValue(),
-                              vs:GetLawChaosValue(),
-                              vs:GetDeityId(),
-                              vs:GetSubraceId(),
-                              vs.id)
    end
 
    local bonus = {}
@@ -575,7 +412,7 @@ function Creature:GetTotalEffectBonus(vs, eff_info, range_check, validity_check,
       item_bonus = {}
       item_pen = {}
    end
-   for i = eff_info.index, self.obj.obj.obj_effects_len - 1 do
+   for i = index, self.obj.obj.obj_effects_len - 1 do
       eff = self.obj.obj.obj_effects[i]
       eff_type = eff.eff_type
       
@@ -750,7 +587,7 @@ function Creature:UpdateDamageReduction()
    for i = self.stats.cs_first_dred_eff, self.obj.obj.obj_effects_len - 1 do
       eff_type = self.obj.obj.obj_effects[i].eff_type
 
-      -- 
+      -- Only check damage reduction effects.
       if eff_type ~= nwn.EFFECT_TRUETYPE_DAMAGE_REDUCTION then
          break
       end
@@ -802,4 +639,137 @@ function NSSetDamageImmunity(obj, dmg_flag, amount)
    if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       obj.ci.immunity[idx] = amount
    end
+end
+
+
+
+
+
+
+
+--- Deterimines total effect bonus for a particular type.
+-- @param vs_info ...
+-- @param eff_info EffectInfo ctype
+-- @param range_check Function that takes effect type and determines if the current effect
+--    is in the proper range.
+-- @param validity_check Function that takes the effect and a VersusInfo ctype to determine if the
+--    effect is applicable versus the target passed in vs.
+-- @param get_amount Function which takes the effect and returns it's respective 'amount' which 
+--    differs depending on effect type.
+function Creature:GetEffectArrays(bonus, penalty, vs_info, eff_info, range_check, validity_check, get_amount, effect_max, index)
+   local eff_type, eff, amount
+
+   local bon_idx = 0
+   local pen_idx = 0
+
+   if not vs_info then
+      print(debug.traceback())
+   end
+
+   -- Tables for spell bonus/penalities.
+   -- Key: Spell ID, Value: Index into bonus/penalty arrays
+   local spell_bonus, spell_pen
+   if not spell_stack then
+      spell_bonus = {}
+      spell_pen = {}
+   end
+
+   -- Tables for item bonus/penalities.
+   -- Key: Object ID, Value: Index into bonus/penalty arrays
+   local item_bonus, item_pen
+   if not item_stack then
+      item_bonus = {}
+      item_pen = {}
+   end
+
+   for i = index, self:GetEffectCount() do
+      eff = self:GetEffectAtIndex(i)
+      eff_type = eff:GetTrueType()
+      
+      amount = get_amount(eff)
+
+      -- If the effect is not in the effect type range then there is nothing left to do.
+      if not range_check(eff_type) then break end
+
+      -- Check if this effect is applicable versus the target.
+      if validity_check(eff, vs_info) then
+	 local add_effect = false
+
+	 -- Don't call Effect:GetCreator because we only want the ID, not the object.
+	 local eff_cre = eff.eff.eff_creator
+	 local sp_id = eff:GetSpellId()
+
+         if eff_type == eff_info.type_dec then
+            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then
+	       -- If effects from items do not stack and the effect was applied by an item,
+	       -- find the highest applying
+
+	       local item_idx = item_pen[eff_cre]
+
+	       if not item_pen[eff.eff_creator] then
+		  -- If a item already has an effect in the array then replace it with
+		  -- the max of the two.
+		  penalty[item_idx] = effect_max(penalty[item_idx], amount)
+	       else
+		  item_pen[eff_cre] = pen_idx
+		  add_effect = true
+	       end
+	    elseif not spell_stack and sp_id ~= -1 then
+	       local sp_idx = spell_pen[sp_id]
+	       if sp_idx then
+		  -- If a spell already has an effect in the array then replace it with
+		  -- the max of the two.
+		  penalty[sp_idx] = effect_max(penalty[sp_idx], amount)
+	       else
+		  -- No effect from a spell.  Added it to the array and set the spell table.
+		  spell_pen[sp_id] = pen_idx
+		  add_effect = true
+	       end
+	    else
+	       add_effect = true
+	    end
+	    
+	    if add_effect then
+	       penalty[pen_idx] = amount
+	       pen_idx = pen_idx + 1
+	    end
+      elseif eff_type == eff_info.type_inc then
+            -- If effects from items do not stack and the effect was applied by an item,
+            -- find the highest applying
+            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then 
+	       local item_idx = item_bonus[eff_cre]
+
+               -- If the effect was applied by an item and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if item_idx then
+                  bonus[item_idx] = effect_max(bonus[item_idx], amount)
+               else
+		  bonus[item_idx] = bon_idx
+		  add_effect = true
+               end
+            -- If spells do not stack and the effect was applied via a spell, find the hightest
+            -- applying
+            elseif not spell_stack and sp_id ~= -1 then
+	       local sp_idx = spell_pen[sp_id]
+               -- If the effect was applied by a spell and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if sp_idx then
+                  spell_bonus[sp_idx] = math.max(bonus[sp_idx], amount)
+               else
+                  spell_bonus[sp_id] = bon_idx
+		  add_effect = true
+               end
+	    else
+	       add_effect = true
+	    end
+	    
+	    if add_effect then
+	       bonus[bon_idx] = amount
+	       bon_idx = bon_idx + 1
+	    end
+         end
+      end
+   end
+
+   return bon_idx, pen_idx
 end
