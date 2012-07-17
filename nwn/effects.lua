@@ -22,6 +22,43 @@ local effect_mt = { __index = Effect,
 
 effect_t = ffi.metatype("Effect", effect_mt)
 
+local function create_effect(show_icon)
+   show_icon = show_icon or 0
+   local eff = effect_t(C.nwn_CreateEffect(show_icon), false)
+
+   eff:SetCreator(nwn.engine.GetCommandObject())
+   eff:SetNumIntegers(10)
+   eff:SetAllInts(0)
+   eff:SetSubType(0)
+   eff:SetDurationType(nwn.DURATION_TYPE_PERMANENT)
+
+   return eff
+end
+
+--- Converts an effect to a formatted string.
+function Effect:ToString()
+   local t = {}
+   local fmt = "Id: %d, Type: %d, Subtype: %d, Duration Type: %d, Duration %.2f Integers: "
+
+   table.insert(t, string.format("Id: %d", self:GetId()))
+   local cre = self:GetCreator()
+   table.insert(t, string.format("Creator: %X", cre.id))
+   table.insert(t, string.format("Spell Id: %d", self:GetSpellId()))
+   table.insert(t, string.format("Type: %d", self:GetTrueType()))
+   table.insert(t, string.format("Subtype: %d", self:GetSubType()))
+   table.insert(t, string.format("Duration Type: %d", self:GetDurationType()))
+   table.insert(t, string.format("Duration: %.2f", self:GetDuration()))
+
+   ints = {}
+   for i = 0, self.eff.eff_num_integers - 1 do
+      table.insert(ints, string.format("%d: %d", i, self:GetInt(i)))
+   end
+
+   table.insert(t, string.format("Integers: %s", table.concat(ints, ", ")))
+
+   return table.concat(t, "\n")
+end
+
 --- Returns effect's creator.
 function Effect:GetCreator()
     return _NL_GET_CACHED_OBJECT(self.eff.eff_creator)
@@ -40,7 +77,7 @@ end
 -- of this is undefined for effects which are not of
 -- nwn.DURATION_TYPE_TEMPORARY. Source: nwnx_structs by Acaos
 function Effect:GetDurationRemaining ()
-   local current = ffi.C.nwn_GetWorldTime(nil, nil)
+   local current = C.nwn_GetWorldTime(nil, nil)
    local expire = self.eff.eff_expire_time
    expire = (expire * 2880000LL) + self.eff.eff_expire_time
    return expire - current / 1000.0
@@ -68,7 +105,8 @@ end
 -- @param index The index is limited to being between 0 and 15, and which index contains what
 -- value depends entirely on the type of effect.  Source: nwnx_structs by Acaos
 function Effect:GetInt(index)
-   if index < 0 or index > self.eff.eff_num_integers then
+   if index < 0 or index >= self.eff.eff_num_integers then
+      print(debug.traceback())
       error "Effect integer index is out of bounds."
       return -1
    end
@@ -83,7 +121,7 @@ end
 --- Get the subtype of the effect.
 -- @return nwn.SUBTYPE_*
 function Effect:GetSubType()
-   return bit.band(self.eff.eff_dursubtype, 0xFFF8)
+   return bit.band(self.eff.eff_dursubtype, 0x18)
 end
 
 --- Gets effects internal 'true' type.
@@ -96,10 +134,21 @@ function Effect:GetTrueType()
    return self.eff.eff_type
 end
 
+--- Set all integers to a specified value
+function Effect:SetAllInts(val)
+   for i = 0, self.eff.eff_num_integers - 1 do
+      self:SetInt(i, val)
+   end
+end
+
 --- Sets the effects creator
 -- @param object 
 function Effect:SetCreator(object)
-    self.eff.eff_creator = object.id
+   if type(object) == "number" then
+      self.eff.eff_creator = object
+   else
+      self.eff.eff_creator = object.id
+   end
 end
 
 function Effect:SetDuration(dur)
@@ -108,7 +157,7 @@ function Effect:SetDuration(dur)
 end
 
 function Effect:SetDurationType(dur)
-   self.eff.eff_dursubtype = bit.bor(dur, bit.band(self.eff.eff_dursubtype, 0xFFF8))
+   self.eff.eff_dursubtype = bit.bor(dur, self:GetSubType())
    return self.eff.eff_dursubtype
 end
 
@@ -150,7 +199,9 @@ end
 --- Set the subtype of the effect.
 -- @param value nwn.SUBTYPE_*
 function Effect:SetSubType(value)
-   self.eff.eff_dursubtype = bit.bor(value, bit.band(self.eff.eff_dursubtype, 0x7))
+   self.eff.eff_dursubtype = bit.bor(value, self:GetDurationType())
+   assert(value == self:GetSubType(), string.format("Set Effect:SetSubType() is broken: %d vs %d", value, self:GetSubType()))
+
    return self.eff.eff_dursubtype
 end
 
@@ -343,7 +394,7 @@ function nwn.CreateEffectAmountFunc(index)
 end
 
 function nwn.CreateEffectRangeFunc(start, stop)
-   return function range(type)
+   return function (type)
              return type == start or type == stop
 	  end
 end
