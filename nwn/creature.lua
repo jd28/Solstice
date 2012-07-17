@@ -13,7 +13,7 @@ require 'nwn.dice'
 
 local ffi = require 'ffi'
 
-ffi.cdef (string.gsub([[
+ffi.cdef[[
 typedef struct CombatWeapon {
    uint32_t id;
    uint32_t base_type;
@@ -37,7 +37,9 @@ typedef struct CombatMod {
    uint32_t dmg_type;
    int32_t hp;
 } CombatMod;
+]]
 
+local s = string.gsub([[
 typedef struct CombatInformation {
    uint32_t attacker;
    uint32_t target;
@@ -77,16 +79,21 @@ typedef struct CombatInformation {
    uint32_t first_cr_effect;
    uint32_t first_cm_effect;
 } CombatInformation;
+]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES,
+                    NS_OPT_NUM_SITUATIONS = NS_OPT_NUM_SITUATIONS } )
 
+ffi.cdef (s)
+
+ffi.cdef[[
 typedef struct Creature {
     uint32_t           type;
     uint32_t           id;
     CNWSCreature      *obj;
     CNWSCreatureStats *stats;
     CombatInformation  ci;
+    uint32_t           first_custom_eff;
 } Creature;
-]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES,
-                    NS_OPT_NUM_SITUATIONS = NS_OPT_NUM_SITUATIONS}))
+]]
 
 local creature_mt = { __index = Creature }
 creature_t = ffi.metatype("Creature", creature_mt)
