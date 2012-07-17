@@ -65,6 +65,26 @@ function nwn.Get2DAString(twoda, column, row)
    return nwn.engine.StackPopString()
 end
 
+function nwn.GetAbilityName(ability)
+   local result = "Invalid Ability"
+
+   if ability == nwn.ABILITY_STRENGTH then
+      result = "Strength"
+   elseif ability == nwn.ABILITY_DEXTERITY then
+      result = "Dexterity"
+   elseif ability == nwn.ABILITY_CONSTITUTION then
+      result = "Constituion"
+   elseif ability == nwn.ABILITY_INTELLIGENCE then
+      result = "Intelligence"
+   elseif ability == nwn.ABILITY_WISDOM then
+      result = "Wisdom"
+   elseif ability == nwn.ABILITY_CHARISMA then
+      result = "Charisma"
+   end
+   
+   return result
+end
+
 --- Get module
 function nwn.GetModule()
    nwn.engine.ExecuteCommand(242, 0)
