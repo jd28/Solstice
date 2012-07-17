@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 require 'nwn.ctypes.foundation'
 require 'nwn.ctypes.vector'
 require 'nwn.ctypes.location'
@@ -64,8 +46,10 @@ void                  nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObj
 int                   nwn_AddKnownFeat(CNWSCreature *cre, uint16_t feat, uint32_t level);
 void                  nwn_AddParryAttack(CNWSCombatRound *cr, nwn_objid_t target);
 void                  nwn_AddParryIndex(CNWSCombatRound *cr);
+void                  nwn_ApplyEffect(CNWSObject *, CGameEffect *, int a, int b);
 int                   nwn_CalculateOffHandAttacks(CNWSCombatRound *cr);
 uint32_t              nwn_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
+CGameEffect          *nwn_CreateEffect(int32_t show_icon);
 void                  nwn_DelayCommand(uint32_t obj_id, double delay, void *vms);
 void                  nwn_DeleteLocalFloat(CNWSScriptVarTable *vt, const char *var_name);
 void                  nwn_DeleteLocalInt(CNWSScriptVarTable *vt, const char *var_name);
@@ -124,6 +108,7 @@ int                   nwn_GetTotalDamage(CNWSCombatAttackData *data, int a);
 int                   nwn_GetTotalEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                          const int eff_spellid, const int eff_type, const int eff_int0);
 int                   nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
+CNWSWaypoint         *nwn_GetWaypointById(uint32_t id);
 int8_t                nwn_GetWeaponAttackType(CNWSCombatRound *cr);
 void                  nwn_NotifyAssociateActionToggle(CNWSCreature *cre, int32_t mode);
 void                  nwn_PrintDamage(nwn_objid_t attacker, nwn_objid_t target, int32_t total_damage, int32_t *damages);
