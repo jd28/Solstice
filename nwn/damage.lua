@@ -80,8 +80,12 @@ function nwn.GetDamageIndexFromFlag(flag)
    return idx
 end
 
+function nwn.GetDamageFlagFromIndex(idx)
+   return bit.lshift(1, idx)
+end
+
 function nwn.GetDamageName(type)
-   local dmg = DAMAGES.name[type]
+   local dmg = DAMAGES[type].name
    if not dmg then
       return "Invalid Damage"
    else
@@ -93,6 +97,16 @@ end
 -- @param id nwn.DAMAGE_BONUS_*
 function nwn.GetDamageRollFromConstant(id)
    return DAMAGES.roll[id] or dice_roll_t(0,0,0)
+end
+
+--- Get damage roll from constant
+-- @param id nwn.DAMAGE_BONUS_*
+function nwn.GetDamageRollFromRange(start, stop)
+   if start > stop then
+      error "Damage Range start is greater than it's end"
+      return dice_roll_t(0,0,0)
+   end
+   return dice_roll_t(1, stop - start, start)
 end
 
 --- Get damage vfx
