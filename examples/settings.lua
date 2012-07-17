@@ -9,46 +9,13 @@
 NS_OPT_USING_CEP = 23
 
 -- Number of damage types
-NS_OPT_NUM_DAMAGES = 12
+NS_OPT_NUM_DAMAGES = 13
 
 ------------------------------------------------------------------------------------------
 -- Effect settings
--- If true attack bonus from effects/gear stack.
-NS_OPT_EFFECT_AB_STACK       = true
 
--- If true multiple attack bonus of the same type on the same item will stack.
-NS_OPT_EFFECT_AB_STACK_GEAR  = false
-
--- If true multiple attack bonus of the same type applied from the same spell.
-NS_OPT_EFFECT_AB_STACK_SPELL = false
-
-
--- If true abilities from effects/gear stack.
-NS_OPT_EFFECT_ABILITY_STACK       = true
-
--- If true multiple abilities of the same type on the same item will stack.
-NS_OPT_EFFECT_ABILITY_STACK_GEAR  = false
-
--- If true multiple abilities of the same type applied from the same spell.
-NS_OPT_EFFECT_ABILITY_STACK_SPELL = false
-
--- If true saves from effects/gear stack.
-NS_OPT_EFFECT_SAVE_STACK       = true
-
--- If true multiple saves of the same type on the same item will stack.
-NS_OPT_EFFECT_SAVE_STACK_GEAR  = false
-
--- If true multiple saves of the same type applied from the same spell.
-NS_OPT_EFFECT_SAVE_STACK_SPELL = false
-
--- If true skills from effects/gear stack.
-NS_OPT_EFFECT_SKILL_STACK       = true
-
--- If true multiple skills of the same type on the same item will stack.
-NS_OPT_EFFECT_SKILL_STACK_GEAR  = false
-
--- If true multiple skills of the same type applied from the same spell.
-NS_OPT_EFFECT_SKILL_STACK_SPELL = false
+-- Maximum number of effects to consider when calculating bonuses/penalties
+NS_OPT_MAX_EFFECT_MODS = 20
 
 ------------------------------------------------------------------------------------------
 -- Combat Settings
