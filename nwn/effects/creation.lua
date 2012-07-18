@@ -265,26 +265,119 @@ function nwn.EffectDamage(amount, damage_type, power)
    return CreateEffect(79, 3)
 end
 
----
--- @param
+--- Effect Damage Decrease
+-- @param amount 
 -- @param damage_type DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
-function nwn.EffectDamageBonus(amount, damage_type)
-   cmd = 120
+function nwn.EffectDamageDecrease(amount, damage_type, attack_type)
+   local eff  = create_effect()
+   eff:SetSubType(nwn.SUBTYPE_MAGICAL)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE)
+   
    damage_type = damage_type or nwn.DAMAGE_TYPE_MAGICAL
+   attack_type = attack_type or nwn.ATTACK_TYPE_MISC
+   
+   eff:SetInt(0, amount)
+   eff:SetInt(1, damage_type)
+   eff:SetInt(2, nwn.RACIAL_TYPE_INVALID)
+   -- Default initialization is fine for the following Ints.
+   -- Int 3: lawchaos
+   -- Int 4: goodevil
+   eff:SetInt(5, attack_type)
+   -- Int 6: subrace
+   -- Int 7: deity
+   -- Int 8: vs
+   
+   return eff
+end
 
-   if amount < 0 then
-      amount = -amount
-      cmd = 448
-   end
 
-   nwn.engine.StackPushInteger(damage_type)
-   nwn.engine.StackPushInteger(amount)
+--- Effect Damage Increase
+-- @param amount 
+-- @param damage_type DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
+function nwn.EffectDamageIncrease(amount, damage_type, attack_type)
+   local eff  = create_effect()
+   eff:SetSubType(nwn.SUBTYPE_MAGICAL)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE)
+   
+   damage_type = damage_type or nwn.DAMAGE_TYPE_MAGICAL
+   attack_type = attack_type or nwn.ATTACK_TYPE_MISC
+   
+   eff:SetInt(0, amount)
+   eff:SetInt(1, damage_type)
+   eff:SetInt(2, nwn.RACIAL_TYPE_INVALID)
+   -- Default initialization is fine for the following Ints.
+   -- Int 3: lawchaos
+   -- Int 4: goodevil
+   eff:SetInt(5, attack_type)
+   -- Int 6: subrace
+   -- Int 7: deity
+   -- Int 8: vs
+   
+   return eff
+end
 
-   return CreateEffect(cmd, 2)
+--- Effect Damage Range Decrease
+-- @param start Start of damage range.
+-- @param stop Start of damage range.
+-- @param damage_type nwn.DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
+-- @param attack_type nwn.ATTACK_TYPE_*
+function nwn.EffectDamageRangeDecrease(start, stop, damage_type, attack_type)
+   local eff = create_effect()
+   eff:SetSubType(nwn.SUBTYPE_MAGICAL)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE)
+   
+   damage_type = damage_type or nwn.DAMAGE_TYPE_MAGICAL
+   attack_type = attack_type or nwn.ATTACK_TYPE_MISC
+   
+   eff:SetInt(0, amount)
+   eff:SetInt(1, damage_type)
+   eff:SetInt(2, nwn.RACIAL_TYPE_INVALID)
+   -- Default initialization is fine for the following Ints.
+   -- Int 3: lawchaos
+   -- Int 4: goodevil
+   eff:SetInt(5, attack_type)
+   -- Int 6: subrace
+   -- Int 7: deity
+   -- Int 8: vs
+
+   eff:SetInt(9, 1) -- flags that this is a damage range effect.
+   eff:SetInt(10, stop)
+   
+   return eff
+end
+
+--- Effect Damage Range Increase
+-- @param start Start of damage range.
+-- @param stop Start of damage range.
+-- @param damage_type nwn.DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
+-- @param attack_type nwn.ATTACK_TYPE_*
+function nwn.EffectDamageRangeIncrease(start, stop, damage_type, attack_type)
+   local eff = create_effect()
+   eff:SetSubType(nwn.SUBTYPE_MAGICAL)
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE)
+   
+   damage_type = damage_type or nwn.DAMAGE_TYPE_MAGICAL
+   attack_type = attack_type or nwn.ATTACK_TYPE_MISC
+   
+   eff:SetInt(0, amount)
+   eff:SetInt(1, damage_type)
+   eff:SetInt(2, nwn.RACIAL_TYPE_INVALID)
+   -- Default initialization is fine for the following Ints.
+   -- Int 3: lawchaos
+   -- Int 4: goodevil
+   eff:SetInt(5, attack_type)
+   -- Int 6: subrace
+   -- Int 7: deity
+   -- Int 8: vs
+
+   eff:SetInt(9, 1) -- flags that this is a damage range effect.
+   eff:SetInt(10, stop)
+   
+   return eff
 end
 
 ---
--- @param damage_type DAMAGE_TYPE_*
+-- @param damage_type nwn.DAMAGE_TYPE_*
 -- @param
 function nwn.EffectDamageImmunity(damage_type, percent)
    cmd = 275
