@@ -1,6 +1,7 @@
 package.path = package.path .. ";./lua/?.lua;Solstice/?.lua"
 
-local lfs = require "lfs"
+local lfs = require 'lfs'
+local ffi = require 'ffi'
 
 NS_SETTINGS = require 'settings'
 
@@ -20,7 +21,7 @@ for f in lfs.dir("./Solstice") do
    if f ~= "preload.lua" and
       string.find(f:lower(), ".lua", -4) then
       local file = lfs.currentdir() .. "/Solstice/" .. f
-      print("Loading: " .. file)
+      ffi.C.Local_NWNXLog(0, "Loading: " .. file .. "\n")
       dofile(file)
    end
 end

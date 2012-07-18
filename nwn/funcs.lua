@@ -169,4 +169,5 @@ void ns_SignalMiss(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* att
 void ns_SignalOnHitEffects(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 
 CGameEffect *Local_GetLastDamageEffect();
+void Local_NWNXLog(int level, const char* log);
 ]]
