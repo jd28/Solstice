@@ -105,7 +105,8 @@ nwn.EFFECT_TRUETYPE_DEFENSIVESTANCE                       =  95
 nwn.EFFECT_TRUETYPE_IMMUNITY_DECREASE                     =  96
 
 -- Custom Effects.
-nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS                  =  0
-nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT                    =  1
-nwn.EFFECT_CUSTOMTYPE_HITPOINTS                           =  2
+nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS                  = 0
+nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT                    = 1
+nwn.EFFECT_CUSTOMTYPE_HP_DECREASE                         = 2
+nwn.EFFECT_CUSTOMTYPE_HP_INCREASE                         = 3
 

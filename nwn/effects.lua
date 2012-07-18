@@ -21,7 +21,7 @@ local effect_mt = { __index = Effect,
 
 effect_t = ffi.metatype("Effect", effect_mt)
 
-local function create_effect(show_icon)
+function nwn.CreateEffect(show_icon)
    show_icon = show_icon or 0
    local eff = effect_t(C.nwn_CreateEffect(show_icon), false)
 

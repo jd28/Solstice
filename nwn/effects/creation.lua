@@ -21,32 +21,19 @@ local function CreateEffect(command, args)
     return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT)
 end
 
-
 local function FakeEffect(eff_type)
    local eff = nwn.EffectVisualEffect(0)
    eff:SetTrueType(eff_type)
    return eff
 end
 
---- Creates a Custom Effect
--- @param eff_type Effect Type.  This value is returned by Effect:GetCustomType()
---    see nwn.EFFECT_CUSTOM_* to see which constants are already in use.
--- @param ints A list of integers to store on the effect.
-function nwn.EffectCustom(eff_type, ints)
-   local eff = nwn.EffectVisualEffect(eff_type)
-   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
-   if ints then
-      for i, int in ipairs(ints) do
-         eff:SetInt(i, int)
-      end
-   end
-   return eff
-end
-
 --- Creates a Recurring Effect
 -- This effect when applied is merely a place holder.
 function nwn.EffectRecurring()
-   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT)
+   local eff = nwn.CreateEffect()
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
+   eff:SetInt(0, nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT)
+   return eff
 end
 
 --- Creates an ability increase/decrease effect on specified ability score.
@@ -166,25 +153,6 @@ function nwn.EffectCharmed()
    return CreateEffect(156, 0)
 end
 
----
--- @param damages An array containing the damages to be applied
---    in order of index.
--- @param unblockable (Default: false)
-function nwn.EffectCombatDamage(dmg_power, damages, unblockable)
-   local eff = nwn.EffectCustom(nwn.EFFECT_CUSTOM_COMBAT_DAMAGE)
-   local num_dmgs = table.maxn(damages)
-
-   eff:SetInt(1, dmg_power)
-   eff:SetInt(2, unblockable)
-   eff:SetNumIntegers(num_dmgs + 3)
-   
-   for i = 1, num_dmgs do
-      eff:SetInt(i+2, damages[i] or 0)
-   end
-
-   return eff
-end
-
 --- Creates a concealment effect.
 -- @param percent 1-100 inclusive
 -- @param
@@ -269,7 +237,7 @@ end
 -- @param amount 
 -- @param damage_type DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
 function nwn.EffectDamageDecrease(amount, damage_type, attack_type)
-   local eff  = create_effect()
+   local eff  = nwn.CreateEffect()
    eff:SetSubType(nwn.SUBTYPE_MAGICAL)
    eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE)
    
@@ -295,7 +263,7 @@ end
 -- @param amount 
 -- @param damage_type DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
 function nwn.EffectDamageIncrease(amount, damage_type, attack_type)
-   local eff  = create_effect()
+   local eff  = nwn.CreateEffect()
    eff:SetSubType(nwn.SUBTYPE_MAGICAL)
    eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE)
    
@@ -322,7 +290,7 @@ end
 -- @param damage_type nwn.DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
 -- @param attack_type nwn.ATTACK_TYPE_*
 function nwn.EffectDamageRangeDecrease(start, stop, damage_type, attack_type)
-   local eff = create_effect()
+   local eff = nwn.CreateEffect()
    eff:SetSubType(nwn.SUBTYPE_MAGICAL)
    eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE)
    
@@ -352,7 +320,7 @@ end
 -- @param damage_type nwn.DAMAGE_TYPE_* (Default: nwn.DAMAGE_TYPE_MAGICAL) 
 -- @param attack_type nwn.ATTACK_TYPE_*
 function nwn.EffectDamageRangeIncrease(start, stop, damage_type, attack_type)
-   local eff = create_effect()
+   local eff = nwn.CreateEffect()
    eff:SetSubType(nwn.SUBTYPE_MAGICAL)
    eff:SetTrueType(nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE)
    
@@ -554,8 +522,21 @@ function nwn.EffectHitPointChangeWhenDying(hitpoint_change)
 end
 
 --- Create a hit point effect
-function nwn.EffectHitPoints(amount)
-   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_HITPOINTS, {amount})
+function nwn.EffectHitPointDecrease(amount)
+   local eff = nwn.CreateEffect()
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
+   eff:SetInt(0, nwn.EFFECT_CUSTOMTYPE_HP_DECREASE)
+   eff:SetInt(1, amount)
+   return eff
+end
+
+--- Create a hit point effect
+function nwn.EffectHitPointIncrease(amount)
+   local eff = nwn.CreateEffect()
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
+   eff:SetInt(0, nwn.EFFECT_CUSTOMTYPE_HP_INCREASE)
+   eff:SetInt(1, amount)
+   return eff
 end
 
 --- Creates an icon effect
@@ -612,7 +593,15 @@ end
 --- Create a Modify Attacks effect that adds attacks to the target.
 -- @param attacks Maximum is 5, even with the effect stacked
 function nwn.EffectModifyAttacks(attacks)
-   return nwn.EffectCustom(nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS, {attacks})
+   if attacks < 0 or attacks > 5 then
+      error "nwn.EffectModifyAttacks: Invalid argument must be [1,5]"
+   end
+
+   local eff = nwn.CreateEffect()
+   eff:SetTrueType(nwn.EFFECT_TRUETYPE_CUSTOM)
+   eff:SetInt(0, nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS)
+   eff:SetInt(1, attacks)
+   return eff
 end
 
 --- Create a Movement Speed Increase/Decrease effect to slow target.
