@@ -92,6 +92,16 @@ function Creature:GetFeatHitPointAdj()
    return hp
 end
 
+--- Determine maximum hitpoint modifier from effects
+function Creature:GetMaxHPMod()
+   return 200
+end
+
+--- Determine minimum hitpoint modifier from effects
+function Creature:GetMinHPMod()
+   return -200
+end
+
 --- Determines adjustment to maximum hitpoints by combat mode
 function Creature:GetModeHitPointAdj()
    return 0
