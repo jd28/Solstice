@@ -1,5 +1,6 @@
 require 'nwn.object'
 require 'nwn.effects'
+require 'nwnx'
 
 -- See nwn/constants/effects.lua and nwn.EFFECT_CUSTOMTYPE_* for values already
 -- in use.
@@ -17,7 +18,7 @@ end
 -- This particular effect assumes you have a spell system that can adjust spell DCs
 -- by local variables set on the caster.  I believe the one in the Community Patch 
 -- can do this, tho it uses different variable names.
-nwn.RegisterCustomEffect(
+nwn.RegisterCustomEffectHandler(
    -- The custom effect type.
    nwn.EFFECT_CUSTOMTYPE_DECREASE_DC,
    -- When the function is called it is passed three arguments,
@@ -49,7 +50,7 @@ nwn.RegisterCustomEffect(
 -- permenant hitpoints as an effect.  I.e. unlike temporary hitpoints they are fully healable.
 -- Since it's kind of annoying to have the effect applied but not to have those HP usable this
 -- will heal the target amount for the additional hitpoints that it receives.
-nwn.RegisterCustomEffect(
+nwn.RegisterCustomEffectHandler(
    nwn.EFFECT_CUSTOMTYPE_HITPOINTS,
    function (effect, target, is_apply)
       local amount = effect:GetInt(1)
