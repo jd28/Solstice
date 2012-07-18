@@ -34,8 +34,6 @@ nwn.RegisterDamageRoll(nwn.DAMAGE_BONUS_18,   0, 0, 18)
 nwn.RegisterDamageRoll(nwn.DAMAGE_BONUS_19,   0, 0, 19)
 nwn.RegisterDamageRoll(nwn.DAMAGE_BONUS_20,   0, 0, 20)
 
-print(cep)
-
 if NS_OPT_USING_CEP and NS_OPT_USING_CEP >= 23
 then
    nwn.RegisterDamageRoll(cep.DAMAGE_BONUS_3d4,    3, 4, 0)
