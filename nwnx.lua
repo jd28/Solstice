@@ -3,6 +3,7 @@ nwnx = nwnx or {}
 require "nwnx.areas"
 require "nwnx.database"
 require "nwnx.dmactions"
+require "nwnx.effects"
 require "nwnx.events"
 require "nwnx.haks"
 require "nwnx.levels"
