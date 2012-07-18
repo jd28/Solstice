@@ -1,8 +1,6 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
-
-
 --- Versus Info ctype
 -- @name VersusInfo
 -- @field race Test
@@ -69,25 +67,8 @@ function nwn.GetVersusInfo(vs, type, subtype, dmg_flags)
 end
 
 function Creature:CreateEffectDebugString()
-   local function int_string(eff)
-      local t = {}
-      for i = 0, eff.eff.eff_num_integers - 1 do
-	 table.insert(t, eff:GetInt(i))
-      end
-      return table.concat(t, ", ")
-   end
-
-   local t = {}
-   local fmt = "Id: %x, Type: %d, Dur: %d, Subtype: %d Ints: %s"
-
    for eff in self:EffectsDirect() do
-      table.insert(t, string.format(fmt, 
-				    eff:GetId(),
-				    eff:GetTrueType(),
-				    eff:GetDurationType(),
-				    eff:GetSubType(),
-				    int_string(eff)))
-		    
+      table.insert(t, eff:ToString())
    end
 
    return table.concat(t, "\n")
@@ -188,6 +169,130 @@ function Creature:GetConcealment(vs, attack)
       end
    end
    return total
+end
+
+--- Deterimines total effect bonus for a particular type.
+-- @param vs_info ...
+-- @param eff_info EffectInfo ctype
+-- @param range_check Function that takes effect type and determines if the current effect
+--    is in the proper range.
+-- @param validity_check Function that takes the effect and a VersusInfo ctype to determine if the
+--    effect is applicable versus the target passed in vs.
+-- @param get_amount Function which takes the effect and returns it's respective 'amount' which 
+--    differs depending on effect type.
+function Creature:GetEffectArrays(bonus, penalty, vs_info, eff_info, range_check, validity_check, get_amount, effect_max, index)
+   vs_info = vs_info or nwn.GetVersusInfo(nwn.OBJECT_INVALID)
+
+   local eff_type, eff, amount
+   local bon_idx = 0
+   local pen_idx = 0
+
+   -- Tables for spell bonus/penalities.
+   -- Key: Spell ID, Value: Index into bonus/penalty arrays
+   local spell_bonus, spell_pen
+   if not spell_stack then
+      spell_bonus = {}
+      spell_pen = {}
+   end
+
+   -- Tables for item bonus/penalities.
+   -- Key: Object ID, Value: Index into bonus/penalty arrays
+   local item_bonus, item_pen
+   if not item_stack then
+      item_bonus = {}
+      item_pen = {}
+   end
+
+   for i = index, self:GetEffectCount() do
+      eff = self:GetEffectAtIndex(i)
+      eff_type = eff:GetTrueType()
+      
+      amount = get_amount(eff)
+
+      -- If the effect is not in the effect type range then there is nothing left to do.
+      if not range_check(eff_type) then break end
+
+      -- Check if this effect is applicable versus the target.
+      if validity_check(eff, vs_info) then
+	 local add_effect = false
+
+	 -- Don't call Effect:GetCreator because we only want the ID, not the object.
+	 local eff_cre = eff.eff.eff_creator
+	 local sp_id = eff:GetSpellId()
+
+         if eff_type == eff_info.type_dec then
+            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then
+	       -- If effects from items do not stack and the effect was applied by an item,
+	       -- find the highest applying
+
+	       local item_idx = item_pen[eff_cre]
+
+	       if not item_pen[eff.eff_creator] then
+		  -- If a item already has an effect in the array then replace it with
+		  -- the max of the two.
+		  penalty[item_idx] = effect_max(penalty[item_idx], amount)
+	       else
+		  item_pen[eff_cre] = pen_idx
+		  add_effect = true
+	       end
+	    elseif not spell_stack and sp_id ~= -1 then
+	       local sp_idx = spell_pen[sp_id]
+	       if sp_idx then
+		  -- If a spell already has an effect in the array then replace it with
+		  -- the max of the two.
+		  penalty[sp_idx] = effect_max(penalty[sp_idx], amount)
+	       else
+		  -- No effect from a spell.  Added it to the array and set the spell table.
+		  spell_pen[sp_id] = pen_idx
+		  add_effect = true
+	       end
+	    else
+	       add_effect = true
+	    end
+	    
+	    if add_effect then
+	       penalty[pen_idx] = amount
+	       pen_idx = pen_idx + 1
+	    end
+      elseif eff_type == eff_info.type_inc then
+            -- If effects from items do not stack and the effect was applied by an item,
+            -- find the highest applying
+            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then 
+	       local item_idx = item_bonus[eff_cre]
+
+               -- If the effect was applied by an item and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if item_idx then
+                  bonus[item_idx] = effect_max(bonus[item_idx], amount)
+               else
+		  bonus[item_idx] = bon_idx
+		  add_effect = true
+               end
+            -- If spells do not stack and the effect was applied via a spell, find the hightest
+            -- applying
+            elseif not spell_stack and sp_id ~= -1 then
+	       local sp_idx = spell_pen[sp_id]
+               -- If the effect was applied by a spell and an effect from that item has already
+               -- been applied then take the highest of the two.  Otherwise set the adjustment.
+               if sp_idx then
+                  spell_bonus[sp_idx] = math.max(bonus[sp_idx], amount)
+               else
+                  spell_bonus[sp_id] = bon_idx
+		  add_effect = true
+               end
+	    else
+	       add_effect = true
+	    end
+	    
+	    if add_effect then
+	       bonus[bon_idx] = amount
+	       bon_idx = bon_idx + 1
+	    end
+         end
+      end
+   end
+
+   return bon_idx, pen_idx
 end
 
 --- Get effect bonus from critical hit multiplier.
@@ -382,153 +487,6 @@ function Creature:GetMissChance(attack)
    return total
 end
 
---- Deterimines total effect bonus for a particular type.
--- @param vs_info ...
--- @param eff_info EffectInfo ctype
--- @param range_check Function that takes effect type and determines if the current effect
---    is in the proper range.
--- @param validity_check Function that takes the effect and a VersusInfo ctype to determine if the
---    effect is applicable versus the target passed in vs.
--- @param get_amount Function which takes the effect and returns it's respective 'amount' which 
---    differs depending on effect type.
-function Creature:GetTotalEffectBonus(vs_info, eff_info, range_check, validity_check, get_amount, index)
-   local total = 0
-   local eff_type, eff_creator, eff, amount
-
-   if not vs_info then
-      print(debug.traceback())
-   end
-
-   local bonus = {}
-   local pen = {}
-
-   local spell_bonus, item_bonus, spell_pen, item_pen
-   if not spell_stack then
-      spell_bonus = {}
-      spell_pen = {}
-   end
-
-   if not item_stack then
-      item_bonus = {}
-      item_pen = {}
-   end
-   for i = index, self.obj.obj.obj_effects_len - 1 do
-      eff = self.obj.obj.obj_effects[i]
-      eff_type = eff.eff_type
-      
-      amount = get_amount(eff)
-
-      -- If the effect is not in the effect type range then there is nothing left to do.
-      if not range_check(eff_type) then break end
-
-      -- Check if this effect is applicable versus the target.
-      if validity_check(eff, vs_info) then
-         if eff_type == eff_info.type_dec then
-            -- If effects from items do not stack and the effect was applied by an item,
-            -- find the highest applying
-            if not item_stack and not C.nwn_GetItemById(eff.eff_creator) == nil then
-               -- If the effect was applied by an item and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the bonus.
-               if not item_pen[eff.eff_creator] then
-                  item_pen[eff.eff_creator] = math.max(item_pen[eff.eff_creator], amount)
-               else
-                  item_pen[eff.eff_creator] = amount
-               end
-            -- If spells do not stack and the effect was applied via a spell, find the hightest
-            -- applying
-            elseif not spell_stack and eff.eff_spellid ~= -1 then
-               -- If the effect was applied by an item and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the bonus.
-               if not spell_pen[eff.eff_creator] then
-                  spell_pen[eff.eff_spellid] = math.max(spell_pen[eff.eff_spellid], amount)
-               else
-                  spell_pen[eff.eff_spellid] = amount
-               end
-            else
-               table.insert(pen, amount)
-            end
-         elseif eff_type == eff_info.type_inc then
-            -- If effects from items do not stack and the effect was applied by an item,
-            -- find the highest applying
-            if not item_stack and not C.nwn_GetItemById(eff.eff_creator) == nil then 
-               -- If the effect was applied by an item and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the adjustment.
-               if not item_bonus[eff.eff_creator] then
-                  item_bonus[eff.eff_creator] = math.max(item_bonus[eff.eff_creator], amount)
-               else
-                  item_bonus[eff.eff_creator] = amount
-               end
-            -- If spells do not stack and the effect was applied via a spell, find the hightest
-            -- applying
-            elseif not spell_stack and eff.eff_spellid ~= -1 then
-               -- If the effect was applied by a spell and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the adjustment.
-               if not spell_bonus[eff.eff_creator] then
-                  spell_bonus[eff.eff_spellid] = math.max(spell_bonus[eff.eff_spellid] or 0, amount)
-               else
-                  spell_bonus[eff.eff_spellid] = amount
-               end
-            else
-               table.insert(bonus, amount)
-            end
-         end
-      end
-   end
-
-   local total = 0
-   local total_pen = 0
-
-   for _, amount in ipairs(bonus) do
-      if eff_info.stack then
-         total = total + amount
-      else
-         total = math.max(total, amount)
-      end
-   end
-   
-   for _, amount in ipairs(spell_bonus) do
-      if eff_info.stack then
-         total = total + amount
-      else
-         total = math.max(total, amount)
-      end
-   end
-
-   for _, amount in ipairs(item_bonus) do
-      if eff_info.stack then
-         total = total + amount
-      else
-         total = math.max(total, amount)
-      end
-   end
-
-   for _, amount in ipairs(pen) do
-      if eff_info.stack then
-         total_pen = total_pen + amount
-      else
-         total_pen = math.max(total_pen, amount)
-      end
-   end
-
-   for _, amount in ipairs(spell_pen) do
-      if eff_info.stack then
-         total_pen = total_pen + amount
-      else
-         total_pen = math.max(total_pen, amount)
-      end
-   end
-
-   for _, amount in ipairs(item_pen) do
-      if eff_info.stack then
-         total_pen = total_pen + amount
-      else
-         total_pen = math.max(total_pen, amount)
-      end
-   end
-   
-   return total - total_pen
-end
-
 --- Update creature's damage resistance
 -- Loops through creatures resistance effects and determines what the highest
 -- applying effect is vs any particular damage.
@@ -639,137 +597,4 @@ function NSSetDamageImmunity(obj, dmg_flag, amount)
    if obj.type == nwn.GAME_OBJECT_TYPE_CREATURE then
       obj.ci.immunity[idx] = amount
    end
-end
-
-
-
-
-
-
-
---- Deterimines total effect bonus for a particular type.
--- @param vs_info ...
--- @param eff_info EffectInfo ctype
--- @param range_check Function that takes effect type and determines if the current effect
---    is in the proper range.
--- @param validity_check Function that takes the effect and a VersusInfo ctype to determine if the
---    effect is applicable versus the target passed in vs.
--- @param get_amount Function which takes the effect and returns it's respective 'amount' which 
---    differs depending on effect type.
-function Creature:GetEffectArrays(bonus, penalty, vs_info, eff_info, range_check, validity_check, get_amount, effect_max, index)
-   local eff_type, eff, amount
-
-   local bon_idx = 0
-   local pen_idx = 0
-
-   if not vs_info then
-      print(debug.traceback())
-   end
-
-   -- Tables for spell bonus/penalities.
-   -- Key: Spell ID, Value: Index into bonus/penalty arrays
-   local spell_bonus, spell_pen
-   if not spell_stack then
-      spell_bonus = {}
-      spell_pen = {}
-   end
-
-   -- Tables for item bonus/penalities.
-   -- Key: Object ID, Value: Index into bonus/penalty arrays
-   local item_bonus, item_pen
-   if not item_stack then
-      item_bonus = {}
-      item_pen = {}
-   end
-
-   for i = index, self:GetEffectCount() do
-      eff = self:GetEffectAtIndex(i)
-      eff_type = eff:GetTrueType()
-      
-      amount = get_amount(eff)
-
-      -- If the effect is not in the effect type range then there is nothing left to do.
-      if not range_check(eff_type) then break end
-
-      -- Check if this effect is applicable versus the target.
-      if validity_check(eff, vs_info) then
-	 local add_effect = false
-
-	 -- Don't call Effect:GetCreator because we only want the ID, not the object.
-	 local eff_cre = eff.eff.eff_creator
-	 local sp_id = eff:GetSpellId()
-
-         if eff_type == eff_info.type_dec then
-            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then
-	       -- If effects from items do not stack and the effect was applied by an item,
-	       -- find the highest applying
-
-	       local item_idx = item_pen[eff_cre]
-
-	       if not item_pen[eff.eff_creator] then
-		  -- If a item already has an effect in the array then replace it with
-		  -- the max of the two.
-		  penalty[item_idx] = effect_max(penalty[item_idx], amount)
-	       else
-		  item_pen[eff_cre] = pen_idx
-		  add_effect = true
-	       end
-	    elseif not spell_stack and sp_id ~= -1 then
-	       local sp_idx = spell_pen[sp_id]
-	       if sp_idx then
-		  -- If a spell already has an effect in the array then replace it with
-		  -- the max of the two.
-		  penalty[sp_idx] = effect_max(penalty[sp_idx], amount)
-	       else
-		  -- No effect from a spell.  Added it to the array and set the spell table.
-		  spell_pen[sp_id] = pen_idx
-		  add_effect = true
-	       end
-	    else
-	       add_effect = true
-	    end
-	    
-	    if add_effect then
-	       penalty[pen_idx] = amount
-	       pen_idx = pen_idx + 1
-	    end
-      elseif eff_type == eff_info.type_inc then
-            -- If effects from items do not stack and the effect was applied by an item,
-            -- find the highest applying
-            if not item_stack and not C.nwn_GetItemById(eff_cre) == nil then 
-	       local item_idx = item_bonus[eff_cre]
-
-               -- If the effect was applied by an item and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the adjustment.
-               if item_idx then
-                  bonus[item_idx] = effect_max(bonus[item_idx], amount)
-               else
-		  bonus[item_idx] = bon_idx
-		  add_effect = true
-               end
-            -- If spells do not stack and the effect was applied via a spell, find the hightest
-            -- applying
-            elseif not spell_stack and sp_id ~= -1 then
-	       local sp_idx = spell_pen[sp_id]
-               -- If the effect was applied by a spell and an effect from that item has already
-               -- been applied then take the highest of the two.  Otherwise set the adjustment.
-               if sp_idx then
-                  spell_bonus[sp_idx] = math.max(bonus[sp_idx], amount)
-               else
-                  spell_bonus[sp_id] = bon_idx
-		  add_effect = true
-               end
-	    else
-	       add_effect = true
-	    end
-	    
-	    if add_effect then
-	       bonus[bon_idx] = amount
-	       bon_idx = bon_idx + 1
-	    end
-         end
-      end
-   end
-
-   return bon_idx, pen_idx
 end
