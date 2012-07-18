@@ -1,95 +1,106 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------y
-
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 local color = require 'nwn.color'
 
-local DAMAGE_ROLLS = {}
+local DAMAGE_RESULTS = {}
 local DAMAGE_ID = 0
 
-local function NSAddDamageBonus(dmg_roll, dmg_type, roll)
-   local idx = dmg_roll.bonus_count
-   if idx >= NS_OPT_MAX_DMG_ROLL_MODS then
-      error("Only "..NS_OPT_MAX_DMG_ROLL_MODS.." damage bonuses can be applicable at one time.")
-      return
-   end
+local s = string.gsub([[
+typedef struct DamageResult {
+   int32_t    damages[$NS_OPT_NUM_DAMAGES];
+   int32_t    immunity_adjust[$NS_OPT_NUM_DAMAGES];
+   int32_t    resist_adjust[$NS_OPT_NUM_DAMAGES];
+   int32_t    soak_adjust;
+} DamageResult;
 
-   dmg_roll.bonus[idx] = roll
-   dmg_roll.bonus_type[idx] = nwn.GetDamageIndexFromFlag(dmg_type)
+typedef struct {
+   DiceRoll rolls[$NS_OPT_NUM_DAMAGES][50];
+   int32_t  idxs[$NS_OPT_NUM_DAMAGES];
+} DamageRoll;
+]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES })
 
-   dmg_roll.bonus_count = idx + 1
+ffi.cdef (s)
+
+damage_roll_t = ffi.typeof('DamageRoll')
+damage_result_t = ffi.typeof("DamageResult")
+
+local function NSAddDamageToRoll(dmg, dmg_type, roll)
+   local idx = nwn.GetDamageIndexFromFlag(dmg_type)
+   local n = dmg.idxs[idx]
+
+   --print("NSAddDamageToRoll", dmg, dmg_type, idx, n)
+
+   dmg.rolls[idx][n] = roll
+   dmg.idxs[idx] = n + 1
 end
 
-local function NSAddDamagePenalty(dmg_roll, dmg_type, roll)
-   local idx = dmg_roll.penalty_count
-   if idx >= NS_OPT_MAX_DMG_ROLL_MODS then
-      error("Only "..NS_OPT_MAX_DMG_ROLL_MODS.." damage penalties can be applicable at one time.")
-      return
+function NSAddDamageResultToAttack(attack_info, dmg_result)
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      if i < 13 then
+	 if dmg_result.damages[i] <= 0 then
+	    attack_info.attack.cad_damage[i] = 65535
+	 else
+	    attack_info.attack.cad_damage[i] = dmg_result.damages[i]
+	 end
+      else 
+	 if dmg_result.damages[i] > 0 then
+	    local flag = bit.lshift(1, i)
+	    local eff = nwn.EffectDamage(flag, dmg_result.damages[i])
+	    -- Set effect to direct so that Lua will not delete the
+	    -- effect.  It will be deleted by the combat engine.
+	    eff.direct = true
+	    -- Add the effect to the onhit effect list so that it can
+	    -- be applied when damage is signaled.
+	    C.ns_AddOnHitEffect(attack_info.attack, attack_info.attacker, eff.eff)
+	 end
+      end
    end
-
-   dmg_roll.penalty[idx] = roll
-   dmg_roll.penalty_type[idx] = dmg_type
-
-   dmg_roll.penalty_count = idx + 1
 end
 
+--[[
 function NSApplyDamageRollById(target, attacker, id)
-
+   print("NSApplyDamageRollById")
    attacker = _NL_GET_CACHED_OBJECT(attacker)
    target = _NL_GET_CACHED_OBJECT(target)
 
-   local dmg_roll = DAMAGE_ROLLS[id]
-   if dmg_roll == nil then return end
+   local dmg_result = DAMAGE_RESULTS[id]
+   if dmg_result == nil then return end
 
    local eff = nwn.EffectDamage(1)
    eff.eff.eff_creator = attacker.id
    eff.eff.eff_integers[0] = 1
    eff.eff.eff_integers[1] = 1
    eff.eff.eff_integers[2] = 0
-   eff.eff.eff_integers[3] = dmg_roll.damage_power
+   eff.eff.eff_integers[3] = 1 --dmg_roll.damage_power
    eff.eff.eff_integers[4] = 1000
 
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
-      eff.eff.eff_integers[5 + i] = dmg_roll.result.damages[i]
+      eff.eff.eff_integers[5 + i] = dmg_result.damages[i]
    end
 
-   target:ApplyEffect(eff)
+   target:ApplyEffect(nwn.DURATION_TYPE_INSTANT, eff)
 
-   NSBroadcastDamage(attacker, target, dmg_roll)
+   NSBroadcastDamage(attacker, target, dmg_result)
 
-   DAMAGE_ROLLS[id] = nil
+   DAMAGE_RESULTS[id] = nil
 end
+--]]
 
-function NSBroadcastDamage(attacker, target, dmg_roll)
-   local total = NSGetTotalDamage(dmg_roll.result)
+function NSBroadcastDamage(attacker, target, dmg_result)
+   --print("NSBroadcastDamage")
+   local total = NSGetTotalDamage(dmg_result)
    local log
 
    if NS_OPT_NO_FLOAT_DAMAGE then
-      log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
+      log = NSFormatDamageRoll(attacker, target, dmg_result)
    elseif NS_OPT_NO_FLOAT_ZERO_DAMAGE and total <= 0 then
-      log = NSFormatDamageRoll(attacker, target, dmg_roll.result)
+      log = NSFormatDamageRoll(attacker, target, dmg_result)
    else
-      C.nwn_PrintDamage(attacker.id, target.id, total, dmg_roll.result.damages)
-      local extra = NSGetTotalDamage(dmg_roll.result, 13)
+      C.nwn_PrintDamage(attacker.id, target.id, total, dmg_result.damages)
+      local extra = NSGetTotalDamage(dmg_result, 13)
       if extra > 0 then
-         log = NSFormatDamageRoll(attacker, target, dmg_roll.result, 13)
+         log = NSFormatDamageRoll(attacker, target, dmg_result, 13)
       end
    end
 
@@ -97,18 +108,18 @@ function NSBroadcastDamage(attacker, target, dmg_roll)
    local ploc
 
    local imm
-   if NSGetTotalImmunityAdjustment(dmg_roll.result) > 0 then
-      imm = NSFormatDamageRollImmunities(attacker, target, dmg_roll.result)
+   if NSGetTotalImmunityAdjustment(dmg_result) > 0 then
+      imm = NSFormatDamageRollImmunities(attacker, target, dmg_result)
    end
 
    local resist
    if NSGetTotalResistAdjustment(dmg_roll.result) > 0 then
-      resist = NSFormatDamageRollResistance(attacker, target, dmg_roll.result)
+      resist = NSFormatDamageRollResistance(attacker, target, dmg_result)
    end
 
    local dr 
-   if dmg_roll.result.soak_adjust > 0 then
-      dr = NSFormatDamageRollReduction(attacker, target, dmg_roll.result)
+   if dmg_result.soak_adjust > 0 then
+      dr = NSFormatDamageRollReduction(attacker, target, dmg_result)
    end
 
    for pc in nwn.PCs() do
@@ -131,56 +142,76 @@ function NSBroadcastDamage(attacker, target, dmg_roll)
 end
 
 --- Adjusts damage done to targets damage immunity, resistance.
-function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power)
+function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power, attack_info)
    local dmg, resist, imm, imm_adj
 
+   local weap = NSGetCurrentAttackWeapon(attacker, attack_info)
+   local basetype, basemask = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
+
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      -- When the index is the base weapon damage type, use the weapons base type
+      -- to determine what immunity applies
+      if i == 12 then
+	 imm = target:GetDamageImmunity(nwn.GetDamageIndexFromFlag(basetype))
+      else
+	 imm = target:GetDamageImmunity(i)
+      end
+
       dmg = dmg_result.damages[i]
-      imm = target:GetDamageImmunity(i)
-      imm_adj = math.floor((imm * dmg) / 100)
-      -- Immunity
-      dmg_result.immunity_adjust[i] = imm_adj
-      dmg_result.damages[i] = dmg - imm_adj
-      
+      if dmg ~= 0 then
+	 imm_adj = math.floor((imm * dmg) / 100)
+	 -- Immunity
+	 dmg_result.immunity_adjust[i] = imm_adj
+	 dmg_result.damages[i] = dmg - imm_adj
+      end
    end
 
    -- Resist
-   target:DoDamageResistance(attacker, dmg_result)
+   target:DoDamageResistance(attacker, dmg_result, attack_info)
    
    -- Damage Reduction
    target:DoDamageReduction(attacker, dmg_result, damage_power)
 end
 
---- Ctritical hit damage roll.
--- This is solely for a weapons crit_dmg bonus.  E,g. from Overwhelming Critical.
-function NSDoCritDamageRoll(dmg_roll, mult, attacker, weap_num)
+---
+function NSDoDamageRoll(bonus, penalty, mult)
+   --print("NSDoDamageRoll", bonus, penalty, mult)
    local roll, prev, idx
+   local res = damage_result_t()
 
    for i = 1, mult do
-      roll = nwn.DoDiceRoll(attacker.ci.equips[weap_num].crit_dmg)
-      
-      prev = dmg_roll.result.damages[12]
-      dmg_roll.result.damages[12] = prev + roll
-   end
-end
+      for j = 0, NS_OPT_NUM_DAMAGES - 1 do
+	 --print("bonus", j)
+	 for k = 0, bonus.idxs[j] - 1 do
+	    res.damages[j] = res.damages[j] + nwn.DoDiceRoll(bonus.rolls[j][k])
+	    --print(k, nwn.FormatDiceRoll(bonus.rolls[j][k]))
+	 end
 
----
--- TODO: Ki Strike
-function NSDoDamageRoll(dmg_roll, mult)
-   local roll, prev, idx
-   for j = 1, mult do
-      for i = 0, dmg_roll.bonus_count do
-         idx = dmg_roll.bonus_type[i]
-         roll = nwn.DoDiceRoll(dmg_roll.bonus[i])
-         
-         prev = dmg_roll.result.damages[idx]
-         dmg_roll.result.damages[idx] = prev + roll
+	 --print("penalty", j)
+	 for k = 0, penalty.idxs[j] - 1 do
+	    res.damages[j] = res.damages[j] - nwn.DoDiceRoll(penalty.rolls[j][k])
+	    --print(k, nwn.FormatDiceRoll(bonus.rolls[j][k]))
+	 end
+
+	 if res.damages[j] < 0 then
+	    res.damages[j] = 0
+	 end
       end
    end
+   
+   return res
+end
+
+function NSCompactPhysicalDamageResult(dmg_result)
+   dmg_result.damages[12] = dmg_result.damages[12] + dmg_result.damages[0] + 
+      dmg_result.damages[1] + dmg_result.damages[2]
+
+   dmg_result.damages[0], dmg_result.damages[1], dmg_result.damages[2] = 0, 0, 0
 end
 
 function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
-   -- If weap is nil then we're coming from the hook.
+   --print("NSGetDamageRoll", attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
+   -- If attack_info is nil then we're coming from the hook.
    if not attack_info then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
@@ -189,66 +220,72 @@ function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damag
    end
 
    local base = 0
-   local dmg_roll = damage_roll_t()
+   local attack_type
+
+   if offhand then 
+      attack_type = nwn.ATTACK_TYPE_OFFHAND
+   else
+      attack_type = nwn.GetAttackTypeFromEquipNum(attack_info.weapon)
+   end
+
+   -- Determine Damage Bonuses/Penalties from effects/item properties.
+   local bonus, penalty = attacker:GetEffectDamageBonus(target, attack_type)
 
    -- Add weapons base damage to damage roll.
-   NSAddDamageBonus(dmg_roll, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[attack_info.weapon].base_dmg)
+   NSAddDamageToRoll(bonus, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[attack_info.weapon].base_dmg)
 
    -- Add any damage bonuses from combat modifiers. E,g. size, race, etc.
-   NSGetDamageBonus(attacker, target, 0, dmg_roll)
-
-   -- Add Damage Bonuses from effects/item properties.
-   NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_info.attack.cad_attack_type)
-
-   -- situational
-   -- NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
+   NSGetDamageBonus(attacker, target, bonus)
 
    -- If this is a critical hit determine the multiplier.
    local mult = 1
    if crit then
+      -- Add any addition damage from the weapons crit_dmg bonus.  E,g from Overwhelming Critical.
+      NSAddDamageToRoll(bonus, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[attack_info.weapon].crit_dmg)
       mult = NSGetCriticalHitMultiplier(attacker, offhand, attack_info.weapon)
    end
 
    -- Roll all the damage.
-   NSDoDamageRoll(dmg_roll, mult)
+   local dmg_result = NSDoDamageRoll(bonus, penalty, mult)
+   NSCompactPhysicalDamageResult(dmg_result)
 
-   -- Any addition damage from the weapons crit_dmg bonus.  E,g from Overwhelming Critical.
-   if crit then
-      NSDoCritDamageRoll(dmg_roll, mult, attacker, attack_info.weapon)
-   end
+   local damage_power = 1 -- TODO: FIX THIS!!
+
+   -- situational
 
    -- If the target is a creature modify the damage roll by their immunities, resistances,
    -- soaks.
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      NSDoDamageAdjustments(attacker, target, dmg_roll.result, dmg_roll.damage_power)
+      NSDoDamageAdjustments(attacker, target, dmg_result, damage_power, attack_info)
    end
 
-   return dmg_roll
+   --print(NSCreateDamageResultDebugString(attacker, target, dmg_result))
+
+   return dmg_result
 end
 
 --- Adds all the asorted damage bonuses.
-function NSGetDamageBonus(attacker, target, int, dmg_roll)
-
+function NSGetDamageBonus(attacker, target, dmg_roll)
    if attacker.ci.area.dmg.dice > 0 or attacker.ci.area.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.area.dmg_type, attacker.ci.area.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.area.dmg_type, attacker.ci.area.dmg)
    end
    if attacker.ci.class.dmg.dice > 0 or attacker.ci.class.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.class.dmg_type, attacker.ci.class.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.class.dmg_type, attacker.ci.class.dmg)
    end
    if attacker.ci.feat.dmg.dice > 0 or attacker.ci.feat.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.feat.dmg_type, attacker.ci.feat.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.feat.dmg_type, attacker.ci.feat.dmg)
    end   
    if attacker.ci.mode.dmg.dice > 0 or attacker.ci.mode.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.mode.dmg_type, attacker.ci.mode.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.mode.dmg_type, attacker.ci.mode.dmg)
    end
    if attacker.ci.race.dmg.dice > 0 or attacker.ci.race.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.race.dmg_type, attacker.ci.race.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.race.dmg_type, attacker.ci.race.dmg)
    end
    if attacker.ci.size.dmg.dice > 0 or attacker.ci.size.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.size.dmg_type, attacker.ci.size.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.size.dmg_type, attacker.ci.size.dmg)
    end
    if attacker.ci.skill.dmg.dice > 0 or attacker.ci.skill.dmg.bonus > 0 then
-      NSAddDamageBonus(dmg_roll, attacker.ci.skill.dmg_type, attacker.ci.skill.dmg)
+      NSAddDamageToRoll(dmg_roll, attacker.ci.skill.dmg_type, attacker.ci.skill.dmg)
    end
 
    -- Favored Enemies
@@ -258,76 +295,16 @@ function NSGetDamageBonus(attacker, target, int, dmg_roll)
       if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
          and bit.band(attacker.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
       then
-         NSAddDamageBonus(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
-      end
-   end
-end
-
-function NSGetEffectDamageBonus(attacker, target, offhand, dmg_roll, attack_type)
-   local atk_type, race, lawchaos, goodevil, subrace, deity, amount
-   local trace, tgoodevil, tlawchaos, tdeity_id, tsubrace_id
-
-   local total = 0
-   local eff_type
-
-   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      trace = target:GetRacialType()
-      tgoodevil = target:GetGoodEvilValue()
-      tlawchaos = target:GetLawChaosValue()
-      tdeity_id = target:GetDeityId()
-      tsubrace_id = target:GetSubraceId()
-   end
-
-   local valid = false
-
-   for i = attacker.stats.cs_first_dmg_eff, attacker.obj.obj.obj_effects_len - 1 do
-      eff_type = attacker.obj.obj.obj_effects[i].eff_type
-
-      if eff_type > nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE 
-         or eff_type < nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE 
-      then
-         break
-      end
-
-      amount   = attacker.obj.obj.obj_effects[i].eff_integers[0]
-      dmg_flag = attacker.obj.obj.obj_effects[i].eff_integers[1]
-      race     = attacker.obj.obj.obj_effects[i].eff_integers[2]
-      lawchaos = attacker.obj.obj.obj_effects[i].eff_integers[3]
-      goodevil = attacker.obj.obj.obj_effects[i].eff_integers[4]
-      atk_type = attacker.obj.obj.obj_effects[i].eff_integers[5]
-      subrace  = attacker.obj.obj.obj_effects[i].eff_integers[6]
-      deity    = attacker.obj.obj.obj_effects[i].eff_integers[7]
-      valid    = false
-
-      if atk_type == nwn.ATTACK_BONUS_MISC or atk_type == attack_type then
-         valid = true
-      elseif attack_type == 6 and (atk_type == nwn.ATTACK_BONUS_ONHAND or nwn.ATTACK_BONUS_CWEAPON1) then
-         -- TODO: This is double counting damage bonuses if both onhand and cweapon1 are equipped.
-         valid = true
-      elseif attack_type == 8 and atk_type == nwn.ATTACK_BONUS_UNARMED then
-         valid = true
-      end
-
-      if valid
-         and (race == nwn.RACIAL_TYPE_INVALID or race == trace)
-         and (lawchaos == 0 or lawchaos == tlawchaos)
-         and (goodevil == 0 or goodevil == tgoodevil)
-         and (subrace == 0 or subrace == tsubrace_id)
-         and (deity == 0 or deity == tdeity_id)
-      then
-         if eff_type == nwn.EFFECT_TRUETYPE_DAMAGE_DECREASE then
-            NSAddDamagePenalty(dmg_roll, dmg_flag, nwn.GetDamageRollFromConstant(amount))
-         elseif eff_type == nwn.EFFECT_TRUETYPE_DAMAGE_INCREASE then
-            NSAddDamageBonus(dmg_roll, dmg_flag, nwn.GetDamageRollFromConstant(amount))
-         end 
+         NSAddDamageToRoll(dmg_roll, attacker.ci.fe.dmg_type, attacker.ci.fe.dmg)
       end
    end
 end
 
 ---
-function NSGetTotalDamage(dmg_result, idx)
+function NSGetTotalDamage(dmg_result)
+   --print("NSGetTotalDamage", dmg_result)
    local total = 0
-   for i = idx or 0, NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       total = total + dmg_result.damages[i]
    end
    return total
@@ -336,7 +313,7 @@ end
 ---
 function NSGetTotalImmunityAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       total = total + dmg_result.immunity_adjust[i]
    end
    return total
@@ -345,7 +322,7 @@ end
 ---
 function NSGetTotalResistAdjustment(dmg_result)
    local total = 0
-   for i = 0, NS_OPT_NUM_DAMAGES - 2 do
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       total = total + dmg_result.resist_adjust[i]
    end
    return total
@@ -353,6 +330,7 @@ end
 
 ---
 function NSResolveDamage(attacker, target, from_hook, attack_info)
+   --print("NSResolveDamage", attacker, target, from_hook, attack_info)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
@@ -367,16 +345,16 @@ function NSResolveDamage(attacker, target, from_hook, attack_info)
    --   attack:DecrementRemainingFeatUses(882)
    --end
 
-   local damage_roll = NSGetDamageRoll(attacker, 
-                                       target, 
-                                       attack_info.is_offhand,
-                                       crit,
-                                       attack_info.attack.cad_sneak_attack == 1,
-                                       attack_info.attack.cad_death_attack == 1,
-                                       ki_strike,
-                                       attack_info)
+   local damage_result = NSGetDamageRoll(attacker, 
+					 target, 
+					 attack_info.is_offhand,
+					 crit,
+					 attack_info.attack.cad_sneak_attack == 1,
+					 attack_info.attack.cad_death_attack == 1,
+					 ki_strike,
+					 attack_info)
 
-   local total = NSGetTotalDamage(damage_roll.result)
+   local total = NSGetTotalDamage(damage_result)
 
    --Defensive Roll
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
@@ -393,7 +371,11 @@ function NSResolveDamage(attacker, target, from_hook, attack_info)
    end
 
    -- Death Attack
-   
+
+   -- Add the damage result info to the CNWSCombatAttackData and
+   -- and EffectDamages for any custom damage
+   NSAddDamageResultToAttack(attack_info, damage_result)
+  
    -- Epic Dodge : Don't want to use it unless we take damage.
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
       and total > 0
@@ -415,15 +397,15 @@ function NSResolveDamage(attacker, target, from_hook, attack_info)
 
       C.nwn_ResolveItemCastSpell(attacker.obj, target.obj.obj)
 
-      if total >= 0 then
-         NSResolveOnHitVisuals(attacker, target, attack_info.attack, damage_roll)
+      if total > 0 then
+         NSResolveOnHitVisuals(attacker, target, attack_info.attack, damage_result)
       end
    end
 
-   return damage_roll
+   return damage_result
 end
 
-function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
+function NSResolveOnHitVisuals(attacker, target, attack, dmg_result)
    local flag
    local highest = 0
    local highest_vfx
@@ -432,9 +414,9 @@ function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       flag = bit.lshift(1, i)
       vfx = nwn.GetDamageVFX(flag, attack.cad_ranged_attack == 1)
-      if vfx and dmg_roll.result.damages[i] > highest then
+      if vfx and dmg_result.damages[i] > highest then
          highest_vfx = vfx
-         highest = dmg_roll.result.damages[i]
+         highest = dmg_result.damages[i]
       end
    end
 
@@ -442,65 +424,3 @@ function NSResolveOnHitVisuals(attacker, target, attack, dmg_roll)
       C.ns_AddOnHitVisual(attack, attacker.id, highest_vfx)
    end
 end
-
-function NSSignalMeleeDamage(attacker, target, attack_count, attacks)
-   local attack_anim --v35
-   local target_anim = 0 --v36
-   local dmg_id
-
-   for i, attack_info in ipairs(attacks) do
-      if not attack_anim then
-         attack_anim = bit.rshift(attack_info.attack.cad_anim_length, 1) --v35
-      end
-
-      C.ns_SignalAttack(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
-      C.ns_SignalAOO(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
-      
---      print("NSSignalMeleeDamage", attack_info.attack_id, string.format("%x, %x", attacker.id, target.id), attack_info.dmg_roll, DAMAGE_ID, NSGetAttackResult(attack_info))
-
-      if NSGetAttackResult(attack_info) then
-         dmg_id = DAMAGE_ID
-         DAMAGE_ROLLS[dmg_id] = attack_info.dmg_roll
-         DAMAGE_ID = DAMAGE_ID + 1
-
-         C.ns_SignalDamage(attacker.obj, target.obj.obj, dmg_id, attack_anim)
-         C.ns_SignalOnHitEffects(attacker.obj, target.obj.obj, attack_info.attack, attack_anim)
-      else
-         C.ns_SignalMiss(attacker.obj, target.obj.obj, attack_info.attack, attack_anim)
-      end
-
-      attack_anim = attack_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
-      target_anim = target_anim + target_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
-   end
-end
-
-function NSSignalRangedDamage(attacker, target, attack_count, attacks)
-   local attack_anim --v35
-   local target_anim = 0 --v36
-   local dmg_id
-
-   for i, attack_info in ipairs(attacks) do
-      if not attack_anim then
-         attack_anim = bit.rshift(attack_info.attack.cad_anim_length, 1) --v35
-      end
-
-      C.ns_SignalAttack(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
-      C.ns_SignalAOO(attacker.obj, target.obj.obj, attack_info.attack, target_anim)
-      C.nwn_ResolveSafeProjectile(attacker.obj, bit.rshift(attack_info.attack.cad_anim_length, 1), i-1)
-      C.nwn_ResolveAmmunition(attacker.obj, attack_anim + 1);
---      print("NSSignalMeleeDamage", attack_info.attack_id, string.format("%x, %x", attacker.id, target.id), attack_info.dmg_roll, DAMAGE_ID, NSGetAttackResult(attack_info))
-
-      if NSGetAttackResult(attack_info) then
-         dmg_id = DAMAGE_ID
-         DAMAGE_ROLLS[dmg_id] = attack_info.dmg_roll
-         DAMAGE_ID = DAMAGE_ID + 1
-
-         C.ns_SignalDamage(attacker.obj, target.obj.obj, dmg_id, attack_anim)
-         C.ns_SignalOnHitEffects(attacker.obj, target.obj.obj, attack_info.attack, attack_anim)
-      end
-
-      attack_anim = attack_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
-      target_anim = target_anim + target_anim + bit.rshift(attack_info.attack.cad_react_anim_len, 1)
-   end
-end
-

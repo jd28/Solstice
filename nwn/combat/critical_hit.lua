@@ -45,7 +45,7 @@ function NSGetCriticalHitMultiplier(attacker, offhand, weap_num)
    -- Effects...
    result = result + attacker:GetEffectCritMultBonus()
 
-   print("NSGetCriticalHitMultiplier", attacker, offhand, weap_num, result)
+   --print("NSGetCriticalHitMultiplier", attacker, offhand, weap_num, result)
 
    return result
 end
@@ -95,7 +95,7 @@ function NSGetCriticalHitRange(attacker, offhand, weap_num)
    -- Effects...
    result = result + attacker:GetEffectCritRangeBonus()
 
-   print("NSGetCriticalHitRange", attacker, offhand, weap_num, result)
+   --print("NSGetCriticalHitRange", attacker, offhand, weap_num, result)
 
    return result
 end

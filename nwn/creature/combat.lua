@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 require 'nwn.creature.weapons'
 local ffi = require 'ffi'
 local C = ffi.C
@@ -38,49 +20,114 @@ function Creature:AddParryAttack(attacker)
 end
 
 ---
-function Creature:DoDamageImmunity(attacker, dmg_result)
+function Creature:DoDamageImmunity(attacker, dmg_result, attack_info)
+   local imm, dmg, imm_adj
+
+   -- We can safely loop over all damages because
+   -- a) Base damage at index 12 is handled specially.
+   -- b) doesn't apply to non-combat situations, and
+   -- c) Any base damage types in the damage result will be zero.
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       dmg = dmg_result.damages[i]
-      imm = self:GetDamageImmunity(i)
-      imm_adj = math.floor((imm * dmg) / 100)
-      -- Immunity
-      dmg_result.immunity_adjust[i] = imm_adj
-      dmg_result.damages[i] = dmg - imm_adj
+      -- No need to apply immunity to a damage that is zero.
+      if dmg > 0 then
+	 -- If attack info ctype is passed in then we're in a combat situation.
+	 if i == 12 and attack_info then
+	    -- Get the weapons base damage type(s)
+	    local base_damage = attacker.ci.equips[attack_info.weapon].base_type
+	    
+	    -- Immunity favors the attacker, so find the target's minimum immunity versus
+	    -- the base damage flags.
+	    imm = self:GetMinimumDamageImmunityVsFlags(base_damage)
+	 elseif i ~= 12 then
+	    imm = self:GetDamageImmunity(i)
+	 end
+
+	 imm_adj = math.floor((imm * dmg) / 100)
+	 -- Immunity
+	 dmg_result.immunity_adjust[i] = imm_adj
+	 dmg_result.damages[i] = dmg - imm_adj
+      end
    end
 end
 
 ---
-function Creature:DoDamageResistance(attacker, dmg_result)
-   local eff_type, amount, dmg_flg, idx
-   local limit, use_eff, resist
-   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
-      -- Innate / Feat resistance.  In the case of damage reduction these stack
-      -- with damage resistance effects.
-      if self.ci.resist[i] > 0 then
-         resist = math.min(dmg_result.damages[i], self.ci.resist[i])
-         dmg_result.resist_adjust[i] = resist
-         dmg_result.damages[i] = dmg_result.damages[i] - resist
-      end
-      -- If there is any damage left to be resisted by effects.
-      if dmg_result.damages[i] > 0 then
-         local eff = self.ci.eff_resist[i]
+function Creature:DoDamageResistance(attacker, dmg_result, attack_info)
+   local eff_type, amount, dmg_flg, idx, dmg
+   local limit, use_eff, resist, eff
 
-         -- If there is a resist effect for this damage, use it.
-         if eff >= 0 then
-            use_eff = self.obj.obj.obj_effects[eff]
-         end
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      -- Base damage is at index 12
+      dmg = dmg_result.damages[i]
+      -- If damage is not greater than zero there is nothing to resist.
+      if dmg > 0 then
+	 -- If the damage index is 12 and attack info was passed to the function
+	 -- then this is a combat situation.
+	 if i == 12 and attack_info then
+	    -- Get the weapons base damage type(s)
+	    local base_damage = attacker.ci.equips[attack_info.weapon].base_type
+
+	    -- Damage resistance favors the defender.  It will return the maximum innate resistance
+	    -- and the highest applicable resistance effect.  It doesn't return a resist effect index
+	    -- but the actual effect that applies as an effect_t ctype.
+	    resist, eff = self:GetMaximumDamageResistVsFlags(base_damage)
+	    
+	    -- Innate / Feat resistance.  In the case of damage reduction these stack
+	    -- with damage resistance effects.
+	    -- If the resistance is greater than zero, use it.
+	    if resist > 0 then
+	       -- Take the minimum of damage and resistance, since you can't resist
+	       -- more damage than you take.
+	       resist = math.min(dmg_result.damages[i], resist)
+	       dmg_result.resist_adjust[i] = resist
+	       dmg_result.damages[i] = dmg_result.damages[i] - resist
+	    end
+
+	    -- If there is any damage left to be resisted by effects and
+	    -- if there is an applicable resist effect, use it.
+	    if dmg_result.damages[12] > 0 and eff then
+	       use_eff = eff
+	    end
+	  
+	 -- Ignore index 12 since it's either handled above or not applicable.
+	 elseif i ~= 12 then
+	    -- Innate / Feat resistance.  In the case of damage reduction these stack
+	    -- with damage resistance effects.
+	    if self.ci.resist[i] > 0 then
+	       -- Take the minimum of damage and resistance, since you can't resist
+	       -- more damage than you take.
+	       resist = math.min(dmg_result.damages[i], self.ci.resist[i])
+	       dmg_result.resist_adjust[i] = resist
+	       dmg_result.damages[i] = dmg_result.damages[i] - resist
+	    end
+	    
+	    -- If there is any damage left to be resisted by effects.
+	    if dmg_result.damages[i] > 0 then
+	       local eff = self.ci.eff_resist[i]
+	       
+	       -- If there is a resist effect for this damage, use it.
+	       if eff >= 0 then
+		  use_eff = self:GetEffectAtIndex(eff)
+	       end
+	    end
+	 end
       end
 
       -- If using a resist effect determine if the effect has a limit and adjust it if so.
       if use_eff then
-         resist = math.min(use_eff.eff_integers[1], dmg_result.damages[i])
-         local eff_limit = use_eff.eff_integers[2]
+	 -- Take the minimum of damage and resistance, since you can't resist
+	 -- more damage than you take.
+         resist = math.min(use_eff.eff.eff_integers[1], dmg_result.damages[i])
+         local eff_limit = use_eff.eff.eff_integers[2]
          if eff_limit > 0 then
+	    -- If the remain damage limit is less than the amount to resist.
+	    -- then resist only what is left and remove the effect.
+	    -- Else modifiy the effects damage limit by the resist amount.
             if eff_limit <= resist then
                resist = eff_limit
-               self:RemoveEffectByID(use_eff.eff_id)
+               self:RemoveEffectByID(use_eff.eff.eff_id)
             else
-               use_eff.eff_integers[2] = eff_limit - resist
+               use_eff.eff.eff_integers[2] = eff_limit - resist
             end
          end
 
@@ -173,6 +220,24 @@ function Creature:GetAttackTarget()
    return ne.StackPopObject()
 end
 
+function nwn.GetAttackTypeFromEquipNum(num)
+   if num == 0 then
+      return nwn.ATTACK_BONUS_ONHAND
+   elseif num == 1 then
+      return nwn.ATTACK_BONUS_OFFHAND
+   elseif num == 2 then
+      return nwn.ATTACK_BONUS_UNARMED
+   elseif num == 3 then
+      return nwn.ATTACK_BONUS_CWEAPON1
+   elseif num == 4 then
+      return nwn.ATTACK_BONUS_CWEAPON2
+   elseif num == 5 then
+      return nwn.ATTACK_BONUS_CWEAPON3
+   else
+      error "Invalid Equip Number"
+   end
+end
+
 --- Get creature's attempted attack target
 function Creature:GetAttemptedAttackTarget()
    ne.ExecuteCommand(361, 0)
@@ -183,13 +248,6 @@ end
 function Creature:GetAttemptedSpellTarget()
    ne.ExecuteCommand(375, 0)
    return ne.StackPopObject()
-end
-
---- Get creature's base attack bonus.
-function Creature:GetBaseAttackBonus()
-   ne.StackPushObject(self)
-   ne.ExecuteCommand(699, 1)
-   return ne.StackPopInteger()
 end
 
 --- Get creature's challenge rating
@@ -311,11 +369,6 @@ function Creature:GetLastTrapDetected()
    return ne.StackPopObject()
 end
 
---- Determines creature's maximum attack bonus from gear/effects.
-function Creature:GetMaxAttackBonus()
-   return 20
-end
-
 --- Determines creatures maximum attack range.
 -- @param target Target to attack
 function Creature:GetMaxAttackRange(target)
@@ -325,6 +378,55 @@ end
 --- Determines creature's maximum dodge AC from gear/effects.
 function Creature:GetMaxDodgeAC()
    return 20
+end
+
+function Creature:GetMaximumDamageImmunityVsFlags(flags)
+   local result = 0
+   local idx = 1
+
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      if bit.band(flags, idx) ~= 0 then
+	 result = math.max(result, self:GetDamageImmunity(nwn.GetDamageIndexFromFlag(idx)))
+      end
+      idx = bit.lshift(idx, 1)
+   end
+   return result
+end
+
+function Creature:GetMaximumDamageResistVsFlags(flags)
+   local result = 0
+   local idx = 1
+   local eff
+   local dmg_idx
+
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      if bit.band(flags, idx) ~= 0 then
+	 dmg_idx = nwn.GetDamageIndexFromFlag(idx)
+	 result = math.max(result, self:GetInnateDamageResistance(dmg_idx))
+	 
+	 -- If there is no effect yet, use the first one found.
+	 if not eff then
+	    eff = self:GetEffectAtIndex(self.ci.eff_resist[i])
+	 else
+	    eff = nwn.DetermineBestResistEffect(eff, self:GetEffectAtIndex(self.ci.eff_resist[i]))
+	 end
+      end
+      idx = bit.lshift(idx, 1)
+   end
+   return result, eff
+end
+
+function Creature:GetMinimumDamageImmunityVsFlags(flags)
+   local result = 0
+   local idx = 1
+
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      if bit.band(flags, idx) ~= 0 then
+	 result = math.min(result, self:GetDamageImmunity(nwn.GetDamageIndexFromFlag(idx)))
+      end
+      idx = bit.lshift(idx, 1)
+   end
+   return result
 end
 
 --- Determines creatures offhand attack penalty.
@@ -459,28 +561,6 @@ function Creature:PrintCombatInformation()
    --table.insert(info, string.format("AB Area Modifier: %d", self.ci.ab_feat))
    table.concat(info, ",\n")
 
-end
-
----
-function Creature:PrintWeaponInfo()
-   local fmt = "Id: %X, AB: %d, AB Ability: %d, "
-      .. "Dmg Ability: %d, Base Damage: %dd%d + %d, "
-      .. "Crit Range: %d, Crit Multiplier: %d, Crit Damage: %dd%d\n\n"
-   
-   for i = 0, 5 do
-      print(string.format(fmt,
-                          self.ci.equips[i].id,
-                          self.ci.equips[i].ab_mod,
-                          self.ci.equips[i].ab_ability,
-                          self.ci.equips[i].dmg_ability,
-                          self.ci.equips[i].dmg_dice,
-                          self.ci.equips[i].dmg_sides,
-                          self.ci.equips[i].dmg_mod,
-                          self.ci.equips[i].crit_range,
-                          self.ci.equips[i].crit_mult,
-                          self.ci.equips[i].crit_dice,
-                          self.ci.equips[i].crit_sides))
-   end
 end
 
 --- Get ranged attack bonus/penalty vs a target.
@@ -668,6 +748,23 @@ function Creature:UpdateCombatWeaponInfo()
 
          self.ci.equips[i].iter = self:GetWeaponIteration(weap)
 
+	 self.ci.equips[i].base_type,
+	 self.ci.equips[i].base_mask = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
+
+	 local extra_type
+	 if weap:GetIsRangedWeapon() then
+	    extra_type = nwn.ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE
+	 else
+	    extra_type = nwn.ITEM_PROPERTY_EXTRA_MELEE_DAMAGE_TYPE
+	 end
+
+	 for ip in weap:ItemProperties() do
+	    if ip:GetPropertyType() == extra_type then
+	       self.ci.equips[i].base_type = bit.bor(self.ci.equips[i].base_type,
+						     nwn.GetDamageFlagFromIPConst(ip:GetSubType()))
+	    end
+	 end
+
          self.ci.equips[i].base_dmg.dice,
          self.ci.equips[i].base_dmg.sides = self:GetWeaponBaseDamage(weap)
          self.ci.equips[i].base_dmg.bonus = self:GetWeaponDamageBonus(weap)
@@ -683,6 +780,8 @@ function Creature:UpdateCombatWeaponInfo()
          self.ci.equips[i].base_dmg.dice = 0
          self.ci.equips[i].base_dmg.sides = 0
          self.ci.equips[i].base_dmg.bonus = 0
+	 self.ci.equips[i].base_type = 0
+	 self.ci.equips[i].base_mask = 0
          self.ci.equips[i].crit_range = 0
          self.ci.equips[i].crit_mult = 0
          self.ci.equips[i].crit_dmg.dice = 0

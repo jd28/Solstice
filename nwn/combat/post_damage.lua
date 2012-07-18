@@ -12,7 +12,7 @@ function NSResolveDevCrit(attacker, target, attack_info)
    end
 
    local dc = 10 + math.floor(attacker:GetHitDice() / 2) + attacker:GetAbilityModifier(nwn.ABILITY_STRENGTH)
-   --print("NSResolveDevCrit", dc)
+
    if target:FortitudeSave(dc, nwn.SAVING_THROW_TYPE_DEATH, attacker) == 0 then
       local eff = nwn.EffectDeath(true, true)
       eff:SetSubType(nwn.SUBTYPE_SUPERNATURAL)

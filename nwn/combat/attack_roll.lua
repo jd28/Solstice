@@ -1,21 +1,3 @@
------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------y
-
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
@@ -163,8 +145,8 @@ function NSGetArmorClassVersus(target, attacker, touch, from_hook, attack)
 end
 
 --- GetAttackModifierVersus
-function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, attack_type)
-   if from_hook then
+function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type)
+   if not attack_info then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
       attack_info = NSGetAttackInfo(attacker, target)
@@ -258,9 +240,6 @@ function NSGetAttackModifierVersus(attacker, target, from_hook, attack_info, att
    end
    
    local eff_ab = attacker:GetEffectAttackBonus(target, attack_type)
-   if eff_ab > 20 then
-      eff_ab = 20
-   end
 
    local sit_ab = attacker:GetSituationalAttackBonus()
 
@@ -291,7 +270,7 @@ function NSResolveAttackRoll(attacker, target, from_hook, attack_info)
    end
 
    -- Modifier Vs
-   ab = ab + NSGetAttackModifierVersus(attacker, target, false, attack_info, attack_type)
+   ab = ab + NSGetAttackModifierVersus(attacker, target, attack_info, attack_type)
    attack_info.attack.cad_attack_mod = ab
 
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then

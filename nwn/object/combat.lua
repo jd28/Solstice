@@ -20,8 +20,12 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 function NSOnApplyDamage(obj, a)
+   print("NSOnApplyDamage")
    obj = _NL_GET_CACHED_OBJECT(obj)
    local eff = C.Local_GetLastDamageEffect()
+   local effect = effect_t(eff, true)
+
+   print(effect:ToString())
 
    -- If target is invulnverable it can't be damaged.
    if obj.obj.obj.obj_is_invulnerable == 1 then
@@ -39,18 +43,18 @@ function NSOnApplyDamage(obj, a)
       return 1
    end
 
-   local is_combat = eff.eff_integers[0]   
-   local is_melee  = eff.eff_integers[1]
-   local is_ranged = eff.eff_integers[2]
-   local dmg_power = eff.eff_integers[3]
-   local delay     = eff.eff_integers[4]
+   local is_combat = eff.eff_integers[17]   
+   local is_ranged = eff.eff_integers[18]
+   local base_dmg  = eff.eff_integers[15]
+   local delay     = eff.eff_integers[14]
+   local dmg_power = eff.eff_integers[16]
 
    local attacker = _NL_GET_CACHED_OBJECT(eff.eff_creator)
    
    local dmg = damage_result_t()
    
    for i = 0, 12 do
-      dmg.damages[i] = eff.eff_integers[5 + i]
+      dmg.damages[i] = eff.eff_integers[i]
    end
 
    if is_combat ~= 1 then
@@ -61,6 +65,7 @@ function NSOnApplyDamage(obj, a)
    end
 
    local total = NSGetTotalDamage(dmg)
+   print("Damage Total:", total)
 
    obj:DoDamage(total)
    -- OnDamagedEvent
@@ -94,12 +99,13 @@ function NSOnApplyDamage(obj, a)
    local death = nwn.EffectDeath(true, true)
    death:SetCreator(attacker)
    
-   obj:ApplyEffect(death)
+   obj:ApplyEffect(nwn.DURATION_TYPE_INSTANT, death)
 end
 
 ---
 function Object:DoDamage(amount)
-   return C.nwn_DoDamage(self.obj, self.type, amount)
+   print("Object:DoDamage")
+   return C.nwn_DoDamage(self.obj.obj, self.type, amount)
 end
 
 ---

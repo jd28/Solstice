@@ -1,50 +1,6 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
-
-ffi.cdef (string.gsub([[
-
-typedef struct DamageResult {
-   int32_t    damages[$NS_OPT_NUM_DAMAGES];
-   int32_t    immunity_adjust[$NS_OPT_NUM_DAMAGES];
-   int32_t    resist_adjust[$NS_OPT_NUM_DAMAGES];
-   int32_t    soak_adjust;
-} DamageResult;
-]], "%$([%w_]+)", { NS_OPT_NUM_DAMAGES = NS_OPT_NUM_DAMAGES }))
-
-ffi.cdef(string.gsub([[
-typedef struct DamageRoll {
-   uint32_t    damage_power;
-
-   DiceRoll    bonus[$NS_OPT_MAX_DMG_ROLL_MODS];
-   uint32_t    bonus_type[$NS_OPT_MAX_DMG_ROLL_MODS];
-   uint32_t    bonus_count;
-
-   DiceRoll    penalty[$NS_OPT_MAX_DMG_ROLL_MODS];
-   uint32_t    penalty_type[$NS_OPT_MAX_DMG_ROLL_MODS];
-   uint32_t    penalty_count;
-
-   DamageResult result;
-} DamageRoll;
-]], "%$([%w_]+)", { NS_OPT_MAX_DMG_ROLL_MODS = NS_OPT_MAX_DMG_ROLL_MODS }))
 
 ffi.cdef[[
 typedef struct AttackInfo {
@@ -59,14 +15,10 @@ typedef struct AttackInfo {
    bool is_offhand;
    nwn_objid_t attacker;
    nwn_objid_t target;
-   DamageRoll *dmg_roll;
 } AttackInfo;
 ]]
 
-damage_result_t = ffi.typeof("DamageResult")
 attack_info_t = ffi.typeof("AttackInfo")
-damage_roll_t = ffi.typeof("DamageRoll")
-
 
 require 'nwn.combat.attack_melee'
 require 'nwn.combat.attack_ranged'
@@ -109,7 +61,7 @@ function NSGetAttackInfo(attacker, target)
    if weapon ~= nil then
       for i = 0, 5 do
 	 if attacker.ci.equips[i].id == weapon.obj.obj_id then
-	    ci_weap_number = i
+	    attack_info.weapon = i
 	    break
 	 end
       end
@@ -122,13 +74,43 @@ function NSGetAttackInfo(attacker, target)
    return attack_info
 end
 
+function NSUpdateAttackInfo(attack_info, attacker, target)
+   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
+   attack_info.attack_id = ATTACK_ID
+   ATTACK_ID = ATTACK_ID + 1
+   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
+   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
+   attack_info.attack.cad_target = target.id
+   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
+   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
+   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+
+   -- Get equip number
+   local weapon = C.nwn_GetCurrentAttackWeapon(attack_info.attacker_cr, attack_info.attack.cad_attack_type)
+   attack_info.weapon = 3
+   if weapon ~= nil then
+      for i = 0, 5 do
+	 if attacker.ci.equips[i].id == weapon.obj.obj_id then
+	    attack_info.weapon = i
+	    break
+	 end
+      end
+   end
+end
 --- Gets the current attack weapon
 -- @param attack_info AttackInfo ctype
-function NSGetCurrentAttackWeapon(attack_info)
+function NSGetCurrentAttackWeapon(attacker, attack_info)
+   if not attack_info then
+      error(debug.traceback())
+   end
    local n = attack_info.weapon
    if n >= 0 and n <= 5 then
-      local id = attacker.ci.equips[n]
-      return _NL_GET_CACHED_OBJECT(id)
+      local id = attacker.ci.equips[n].id
+      if id == 0 then
+	 return nwn.OBJECT_INVALID
+      else
+	 return _NL_GET_CACHED_OBJECT(id)
+      end
    end
    return nwn.OBJECT_INVALID
 end
