@@ -1,6 +1,5 @@
 require 'nwn.ctypes.effect'
 require 'nwn.effects.creation'
-require 'nwn.effects.custom'
 
 local ffi = require 'ffi'
 local C = ffi.C
@@ -200,8 +199,6 @@ end
 -- @param value nwn.SUBTYPE_*
 function Effect:SetSubType(value)
    self.eff.eff_dursubtype = bit.bor(value, self:GetDurationType())
-   assert(value == self:GetSubType(), string.format("Set Effect:SetSubType() is broken: %d vs %d", value, self:GetSubType()))
-
    return self.eff.eff_dursubtype
 end
 
