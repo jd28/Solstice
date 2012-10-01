@@ -43,7 +43,7 @@ function NSResolveMeleeSpecialAttack(attacker, attack_in_grp, attack_count, targ
       attack.cad_special_attack = 0
    end
 
-   ResolveAttackRoll(attacker, target, attack)
+   NSResolveAttackRoll(attacker, target, attack)
    if NSGetAttackResult(attack) then
       NSResolveDamage(attacker, target)
       NSResolvePostMeleeDamage(attacker, target)

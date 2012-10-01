@@ -87,10 +87,25 @@ function NSResolveParry(attacker, target, hit, attack_info)
       if roll - 10 >= attack_info.attack.cad_attack_roll + attack_info.attack.cad_attack_mod then
          target:AddParryAttack(attacker)
       end
-      attack_info.attack.cad_attack_result = 2
+      NSSetAttackResult(attack_info, 2)
       return true
    end
 
    C.nwn_AddParryIndex(attack_info.target_cr)
+   return false
+end
+
+-- probably broken.
+function NSResolveEpicDodge(attack_info)
+   -- Epic Dodge : Don't want to use it unless we take damage.
+   if attack_info.attacker_cr.cr_epic_dodge_used == 0
+      and target:GetHasFeat(nwn.FEAT_EPIC_DODGE)
+   then
+      -- TODO: Send Epic Dodge Message
+      NSSetAttackResult(attack_info, 4)
+      attack_info.attacker_cr.cr_epic_dodge_used = 1
+      return true
+   end
+
    return false
 end

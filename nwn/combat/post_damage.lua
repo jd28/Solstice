@@ -3,11 +3,10 @@ local C = ffi.C
 local bit = require 'bit'
 
 function NSResolveDevCrit(attacker, target, attack_info)
-   if NS_OPT_DEVCRIT_DISABLE_ALL then
-      return
-   end
-
-   if NS_OPT_DEVCRIT_DISABLE_PC and attacker:GetIsPC() then
+   if not NSGetIsCriticalHit(attack_info) 
+      or NS_OPT_DEVCRIT_DISABLE_ALL 
+      or (NS_OPT_DEVCRIT_DISABLE_PC and attacker:GetIsPC())
+   then
       return
    end
 
@@ -18,26 +17,6 @@ function NSResolveDevCrit(attacker, target, attack_info)
       eff:SetSubType(nwn.SUBTYPE_SUPERNATURAL)
       target:ApplyEffect(nwn.DURATION_TYPE_INSTANT, eff)
 
-      attack_info.attack.cad_attack_result = 10
+      NSSetAttackResult(attack_info, 10)
    end
-end
-
-function NSResolvePostMeleeDamage(attacker, target, attack_info)
-   if not target:GetIsValid() 
-      or target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE 
-   then 
-      return 
-   end
-
-   NSResolveDevCrit(attacker, target, attack_info)
-end
-
-function NSResolvePostRangedDamage(attacker, target, attack_data)
-   if not target:GetIsValid() 
-      or target.type ~= nwn.GAME_OBJECT_TYPE_CREATURE
-   then 
-      return
-   end
-
-   local cr = attacker.obj.cre_combat_round
 end
