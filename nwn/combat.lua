@@ -31,7 +31,7 @@ require 'nwn.combat.situation'
 require 'nwn.combat.state'
 
 local dc = require 'nwn.combat.default_combat'
-NSLoadCombatEngine(dc)
+
 
 --- Add feedback to attack
 function NSAddAttackFeedback(attack_info, feedback)
