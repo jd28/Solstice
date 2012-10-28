@@ -43,6 +43,8 @@ void nwn_ExecuteScript (const char *scr, nwn_objid_t oid);
 -- NWN ext Functions
 ffi.cdef [[
 void                  nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObject *target, CNWSArea* area, CScriptLocation *loc, int prop);
+void                  nwn_AddCombatMessageData(CNWSCombatAttackData *attack, uint32_t type, uint32_t num_objs, uint32_t obj1, uint32_t obj2, 
+					       uint32_t num_ints, int32_t i1, int32_t i2, int32_t i3, int32_t i4);
 int                   nwn_AddKnownFeat(CNWSCreature *cre, uint16_t feat, uint32_t level);
 void                  nwn_AddParryAttack(CNWSCombatRound *cr, nwn_objid_t target);
 void                  nwn_AddParryIndex(CNWSCombatRound *cr);
@@ -127,6 +129,7 @@ void                  nwn_ResolveRangedMiss(CNWSCreature *attacker, CNWSObject *
 void                  nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
 uint8_t               nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
 void                  nwn_SetActivity(CNWSCreature *cre, int32_t a, int32_t b);
+void                  nwn_SetAnimation(CNWSCreature *cre, uint32_t anim);
 void                  nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
 uint32_t              nwn_SetCommandObjectId(uint32_t obj);
 void                  nwn_SetFactionId(nwn_objid_t id, int32_t faction);
@@ -135,8 +138,14 @@ void                  nwn_SetLocalInt(CNWSScriptVarTable *vt, const char *var_na
 void                  nwn_SetLocalLocation(CNWSScriptVarTable *vt, const char *var_name, CScriptLocation * value);
 void                  nwn_SetLocalObject(CNWSScriptVarTable *vt, const char *var_name, uint32_t id);
 void                  nwn_SetLocalString(CNWSScriptVarTable *vt, const char *var_name, const char *value);
+int                   nwn_SetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_id);
+int                   nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_spell, uint32_t sp_meta, uint32_t sp_flags);
+void                  nwn_SetPauseTimer(CNWSCombatRound *cr, uint32_t a, uint32_t b);
+int                   nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
+void                  nwn_SetRoundPaused(CNWSCombatRound *cr, uint32_t a, uint32_t b);
 void                  nwn_SetTag(CNWSObject *obj, const char *);
 void                  nwn_SignalMeleeDamage(CNWSCreature *cre, CNWSObject *target, int32_t attack_count);
+void                  nwn_SignalRangedDamage(CNWSCreature *cre, CNWSObject *target, int32_t attack_count);
 bool                  nwn_StackPopBoolean();
 int                   nwn_StackPopInteger();
 float                 nwn_StackPopFloat();

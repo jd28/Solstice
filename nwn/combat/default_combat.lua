@@ -1,4 +1,4 @@
-local ffi = require 'ffi'
+Slocal ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 local random = math.random
@@ -12,7 +12,11 @@ function DefaultCombat.DoDamageAdjustments(attacker, target, dmg_result, damage_
    local dmg, resist, imm, imm_adj
 
    local weap = NSGetCurrentAttackWeapon(attacker, attack_info)
-   local basetype, basemask = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
+   
+   local basetype, basemask = nwn.DAMAGE_TYPE_BLUDGEONING, nwn.DAMAGE_TYPE_BLUDGEONING
+   if weap:GetIsValid() then
+      basetype, basemask = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
+   end
 
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       -- When the index is the base weapon damage type, use the weapons base type
@@ -230,7 +234,7 @@ function DefaultCombat.GetAttackModifierVersus(attacker, target, attack_info, at
       then
          bab = attacker.ci.bab
       else
-         bab = attacker.ci.bab - (attack_info.current_attack * attacker.ci.equips[attack_info.weapon].iter)
+	 bab = attacker.ci.bab - (attack_info.current_attack * attacker.ci.equips[attack_info.weapon].iter)
       end
    end
 
@@ -264,18 +268,12 @@ function DefaultCombat.GetAttackModifierVersus(attacker, target, attack_info, at
    end
 
    -- Favored Enemies
-   if attacker.ci.fe_mask ~= 0 
-      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
-      and bit.band(attacker.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
-   then
+   if attacker:GetIsFavoredEnemy(target) then
       ab = ab + attacker.ci.fe.ab
    end
 
    -- +1 Offensive Training Vs.
-   if attacker.ci.training_vs_mask ~= 0 
-      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
-      and bit.band(attacker.ci.training_vs_mask, bit.lshift(1, target:GetRacialType())) ~= 0
-   then
+   if attacker:GetHasOffensiveTrainingVs(target)
       ab = ab + 1
    end
 
@@ -651,6 +649,7 @@ function DefaultCombat.ResolveAttackRoll(attacker, target, from_hook, attack_inf
 	    NSSetAttackResult(attack_info, 3)
          else
             -- Send target immune to crits.
+	    NSAddCombatMessageData(attack_info, nil, { target.id }, { 126 })
          end
       end
    end
@@ -678,16 +677,15 @@ function DefaultCombat.ResolveMeleeAttack(attacker, target, attack_count, anim, 
    end
 
    for i = 0, attack_count - 1 do
-      if attack_info.attack.cad_coupdegrace == 0 then
-         C.nwn_ResolveCachedSpecialAttacks(attacker.obj)
+      if not NSGetIsCoupDeGrace(attack_info) then
+         NSResolveCachedSpecialAttacks(attacker)
       end
 
-      if attack_info.attack.cad_special_attack ~= 0 then
-         -- Special Attacks... 
-         if attack_info.attack.cad_special_attack < 1115 and
-            attacker:GetRemainingFeatUses(attack_info.attack.cad_special_attack) == 0
-         then
-            attack_info.attack.cad_special_attack = 0
+      -- Determine if able to use special attack (if one has been used).
+      if NSGetIsSpecialAttack(attack_info) then
+	 local sa = NSGetSpecialAttack(attack_info)
+         if sa < 1115 and attacker:GetRemainingFeatUses(sa) == 0 then
+            NSClearSpecialAttack(attack_info)
          end
       end
 
@@ -696,12 +694,12 @@ function DefaultCombat.ResolveMeleeAttack(attacker, target, attack_count, anim, 
          damage_result = NSResolveDamage(attacker, target, false, attack_info)
          NSResolvePostDamage(attacker, target, attack_info, false)
       end
-      C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, anim)
+      NSResolveMeleeAnimations(attacker, i, attack_count, target, anim)
 
       -- Attempt to resolve a special attack one was
       -- a) Used
       -- b) The attack is a hit.
-      if attack_info.attack.cad_special_attack ~= 0
+      if NSGetIsSpecialAttack(attack_info)
          and NSGetAttackResult(attack_info)
       then
 	 -- Special attacks only apply when the target is a creature
@@ -713,7 +711,7 @@ function DefaultCombat.ResolveMeleeAttack(attacker, target, attack_count, anim, 
 	    
 	    -- The resolution of Special Attacks will return an effect to be applied
 	    -- or nil.
-	    local success, eff = NSMeleeSpecialAttack(attack_info.attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_RESOLVE,
+	    local success, eff = NSMeleeSpecialAttack(NSGetSpecialAttack(attack_info), nwn.SPECIAL_ATTACK_EVENT_RESOLVE,
 						      attacker, target, attack_info)
 	    if success then
 	       -- Check to makes sure an effect was returned.
@@ -723,30 +721,30 @@ function DefaultCombat.ResolveMeleeAttack(attacker, target, attack_count, anim, 
 		  eff.direct = true
 		  -- Add the effect to the onhit effect list so that it can
 		  -- be applied when damage is signaled.
-		  C.ns_AddOnHitEffect(attack_info.attack, attacker.id, eff.eff)
+		  NSAddOnHitEffect(attack_info, attacker, eff)
 	       end
 	    else
 	       -- If the special attack failed because it wasn't
 	       -- applicable or the targets skill check (for example)
 	       -- was success full set the attack result to 5.
-	       attack_info.attack.cad_attack_result = 5
+	       NSSetAttackResult(attack_info, 5)
 	    end
 	 else
 	    -- If the target is not a creature or no damage was dealt set attack result to 6.
-	    attack_info.attack.cad_attack_result = 6
+	    NSSetAttackResult(attack_info, 6)
 	 end
       end
 
-      attack_info.attacker_cr.cr_current_attack = attack_info.attacker_cr.cr_current_attack + 1
       NSUpdateAttackInfo(attack_info, attacker, target)
    end
-   C.nwn_SignalMeleeDamage(attacker.obj, target.obj.obj, attack_count)
+
+   NSSignalMeleeDamage(attacker, target, attack_count)
 
    local stop  = socket.gettime() * 1000
    print("NSResolveMeleeAttack", stop - start)
 end
 
-function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, a, from_hook)
+function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, anim, from_hook)
    if from_hook then
       attacker = _NL_GET_CACHED_OBJECT(attacker)
       target = _NL_GET_CACHED_OBJECT(target)
@@ -758,9 +756,7 @@ function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, a, fr
 
    -- TODO
    if not target:GetIsValid() or attack_count == 0 then
-      --CNWSCombatRound__SetRoundPaused(*(_DWORD *)(a1 + 0xACC), 0, 0x7F000000u);
-      --CNWSCombatRound__SetPauseTimer(*(_DWORD *)(a1 + 0xACC), 0, 0);
-      --return (*(int (__cdecl **)(int, signed int))(*(_DWORD *)(a1 + 0xC) + 0x88))(a1, 1);
+      NSResolveOutOfAmmo(attacker)
       return
    end
 
@@ -776,48 +772,41 @@ function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, a, fr
    end
 
    for i = 0, attack_count - 1 do
-      if attack_info.attack.cad_coupdegrace == 0 then
-         C.nwn_ResolveCachedSpecialAttacks(attacker.obj)
+      if not NSGetIsCoupDeGrace(attack_info) then
+	 NSResolveCachedSpecialAttacks(attacker)
       end
 
-      if attack_info.attack.cad_special_attack ~= 0 then
-         -- Special Attacks... 
-         if attack_info.attack.cad_special_attack < 1115 and
-            attacker:GetRemainingFeatUses(attack_info.attack.cad_special_attack) == 0
-         then
-            attack_info.attack.cad_special_attack = 0
-         end
+      -- Special Attack
+      local spec_atk = NSGetSpecialAttack(attack_info)
+
+      -- Determine if able to use special attack (if one has been used).
+      if spec_atk ~= 0 and spec_atk < 1115 and attacker:GetRemainingFeatUses(spec_atk) == 0 then
+	 NSClearSpecialAttack(attack_info)
       end
 
-      -- Determmine if attack is a hit.
-      NSResolveAttackRoll(attacker, target, attack_info)
-
+      NSResolveAttackRoll(attacker, target, false, attack_info)
       if NSGetAttackResult(attack_info) then
-         dmg_result = NSResolveDamage(attacker, target, attack_info)
-         NSResolvePostDamage(attacker, target, attack_info, true)
+         damage_result = NSResolveDamage(attacker, target, false, attack_info)
+         NSResolvePostDamage(attacker, target, attack_info, false)
       else
-         C.nwn_ResolveRangedMiss(attacker.obj, target.obj.obj)
+         NSResolveRangedMiss(attacker, target)
       end
-
-      C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, a)
+      NSResolveRangedAnimations(attacker, target, anim)
 
       -- Attempt to resolve a special attack one was
       -- a) Used
       -- b) The attack is a hit.
-      if attack_info.attack.cad_special_attack ~= 0
-         and NSGetAttackResult(attack_info)
-      then
+      if spec_atk ~= 0 and NSGetAttackResult(attack_info) then
 	 -- Special attacks only apply when the target is a creature
 	 -- and damage is greater than zero.
 	 if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
-	    and NSGetTotalDamage(dmg_result) > 0
+	    and NSGetTotalDamage(damage_result) > 0
 	 then
-	    attacker:DecrementRemainingFeatUses(attack_info.attack.cad_special_attack)
+	    attacker:DecrementRemainingFeatUses(spec_atk)
 	    
-	    -- The resolution of Special Attacks must return a boolean value indicating success and
-	    -- and effect to be applied if any.
-	    local success, eff = NSRangedSpecialAttack(attack_info.attack.cad_special_attack, nwn.SPECIAL_ATTACK_EVENT_RESOLVE,
-						       attacker, target, attack_info)
+	    -- The resolution of Special Attacks will return an effect to be applied
+	    -- or nil.
+	    local success, eff = NSMeleeSpecialAttack(spec_atk, nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack_info)
 	    if success then
 	       -- Check to makes sure an effect was returned.
 	       if eff then
@@ -831,7 +820,7 @@ function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, a, fr
 	    else
 	       -- If the special attack failed because it wasn't
 	       -- applicable or the targets skill check (for example)
-	       -- was successful set the attack result to 5.
+	       -- was success full set the attack result to 5.
 	       NSSetAttackResult(attack_info, 5)
 	    end
 	 else
@@ -840,10 +829,12 @@ function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, a, fr
 	 end
       end
 
-      attack_info.attacker_cr.cr_current_attack = attack_info.attacker_cr.cr_current_attack + 1
       NSUpdateAttackInfo(attack_info, attacker, target)
    end
    NSSignalRangedDamage(attacker, target, attack_count)
+
+   local stop  = socket.gettime() * 1000
+   print("NSResolveRangedAttack", stop - start)
 end
 
 function DefaultCombat.ResolveDamage(attacker, target, from_hook, attack_info)
@@ -901,7 +892,7 @@ function DefaultCombat.ResolveDamage(attacker, target, from_hook, attack_info)
    then
       -- TODO: Send Epic Dodge Message
       
-      attack_info.attack.cad_attack_result = 4
+      NSSetAttackResult(attack_info, 4)
       attack_info.attacker_cr.cr_epic_dodge_used = 1
    else
       if target.obj.obj.obj_is_invulnerable == 1 then
@@ -909,17 +900,22 @@ function DefaultCombat.ResolveDamage(attacker, target, from_hook, attack_info)
       end
 
       if total > 0 then
-         C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, attack_info.is_offhand, crit)
-      end
-
-      C.nwn_ResolveItemCastSpell(attacker.obj, target.obj.obj)
-
-      if total > 0 then
+	 NSResolveOnHitEffect(attacker, target, attack_info, crit)
          NSResolveOnHitVisuals(attacker, target, attack_info.attack, damage_result)
       end
+
+      NSResolveItemCastSpell(attacker, target)
    end
 
    return damage_result
+end
+
+function DefaultCombat.ResolveOnHitEffect(attacker, target, attack_info, crit)
+   C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, attack_info.is_offhand, crit)
+end
+
+function DefaultCombat.ResolveItemCastSpell(attacker, target)
+   C.nwn_ResolveItemCastSpell(attacker.obj, target.obj.obj)
 end
 
 -- This is not default behavior.

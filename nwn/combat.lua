@@ -33,6 +33,11 @@ require 'nwn.combat.state'
 local dc = require 'nwn.combat.default_combat'
 
 
+function NSAddCombatMessageData(attack_info, type, objs, ints)
+   C.nwn_AddCombatMessageData(attack_info.attack, type or 0, #objs, obj[1] or 0, obj[2] or 0, 
+			      #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0)
+end
+
 --- Add feedback to attack
 function NSAddAttackFeedback(attack_info, feedback)
    C.ns_AddAttackFeedback(attack_info.attack, feedback)
@@ -75,6 +80,7 @@ function NSGetAttackInfo(attacker, target)
 end
 
 function NSUpdateAttackInfo(attack_info, attacker, target)
+   attack_info.attacker_cr.cr_current_attack = attack_info.attacker_cr.cr_current_attack + 1
    attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
    attack_info.attack_id = ATTACK_ID
    ATTACK_ID = ATTACK_ID + 1
@@ -136,12 +142,20 @@ function NSGetAttackResult(attack_info)
    return t == 1 or t == 3 or t == 5 or t == 6 or t == 7 or t == 10
 end
 
+function NSSignalMeleeDamage(attacker, target, attack_count)
+   C.nwn_SignalMeleeDamage(attacker.obj, target.obj.obj, attack_count)
+end
+
 function NSSignalRangedDamage(attacker, target, attack_count)
    C.nwn_SignalRangedDamage(attacker.obj, target.obj.obj, attack_count)
 end
 
 function NSSetAttackResult(attack_info, result)
    attack_info.attack.cad_attack_result = result
+end
+
+function NSResolveCachedSpecialAttacks(attacker)
+   C.nwn_ResolveCachedSpecialAttacks(attacker.obj)
 end
 
 function NSResolveItemCastSpell(attacker, target)
@@ -153,9 +167,39 @@ function NSResolveOnHitEffects(attacker, target, attack_info, crit)
 end
 
 function NSResolveMeleeAnimations(attacker, i, attack_count, target, anim)
-   C.nwn_ResolveMeleeAnimations(attacker, i, attack_count, target, anim)
+   C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, anim)
+end
+
+function NSResolveOutOfAmmo(attacker)
+   C.nwn_SetRoundPaused(attacker.cre_combat_round, 0, 0x7F000000)
+   C.nwn_SetPauseTimer(attacker.cre_combat_round, 0, 0)
+   C.nwn_SetAnimation(attacker.obj, 1)
+end
+
+function NSResolveRangedAnimations(attacker, target, anim)
+   C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, anim)
+end
+
+function NSResolveRangedMiss(attacker, target)
+   C.nwn_ResolveRangedMiss(attacker.obj, target.obj.obj)
+end
+
+function NSGetIsCoupDeGrace(attack_info)
+   return attack_info.attack.cad_coupdegrace ~= 0
 end
 
 function NSGetIsCriticalHit(attack_info)
    return attack_info.attack.cad_attack_result == 3
+end
+
+function NSGetIsSpecialAttack(attack_info)
+   return attack_info.attack.cad_special_attack ~= 0
+end
+
+function NSGetSpecialAttack(attack_info)
+   return attack_info.attack.cad_special_attack
+end
+
+function NSClearSpecialAttack(attack_info)
+   attack_info.attack.cad_special_attack = 0
 end

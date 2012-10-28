@@ -315,6 +315,18 @@ function Creature:GetEnemyStateAttackBonus(is_ranged)
    return ab
 end
 
+function Creature:GetHasOffensiveTrainingVs(target)
+   return self.ci.training_vs_mask ~= 0 
+      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+      and bit.band(self.ci.training_vs_mask, bit.lshift(1, target:GetRacialType())) ~= 0
+end
+
+function Creature:GetIsFavoredEnemy(target)
+   return self.ci.fe_mask ~= 0 
+      and target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+      and bit.band(self.ci.fe_mask, bit.lshift(1, target:GetRacialType())) ~= 0
+end
+
 ---Determines the creature that is going to attack another creature in the current combat round.
 -- @return Returns the creature that is going to attack and nil if there is no attacker or self is not valid.
 function Creature:GetGoingToBeAttackedBy()
@@ -326,6 +338,13 @@ end
 --- Determines if creature is immune to critical hits.
 -- @param attacker Attacker
 function Creature:GetIsImmuneToCriticalHits(attacker)
+   if self:GetRacialType() == nwn.RACIAL_TYPE_UNDEAD
+      or self:GetEffectImmunity(attacker, nwn.IMMUNITY_TYPE_CRITICAL_HIT)
+      or self:GetHasFeat(nwn.FEAT_DEATHLESS_MASTERY)
+   then
+      return true
+   end
+   return false
 end
 
 --- Determines if creature is in combat.

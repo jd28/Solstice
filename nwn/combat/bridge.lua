@@ -57,6 +57,14 @@ function NSLoadCombatEngine(engine)
       NSResolveDamage = engine.ResolveDamage
    end
 
+   if engine.ResolveItemCastSpell then
+      NSResolveItemCastSpell = engine.ResolveItemCastSpell
+   end
+
+   if engine.ResolveOnHitEffect then
+      NSResolveOnHitEffect = engine.ResolveOnHitEffect
+   end
+
    if engine.ResolveOnHitVisuals then
       NSResolveOnHitVisuals = engine.ResolveOnHitVisuals
    end
@@ -136,6 +144,14 @@ end
 
 function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
    error "NSGetDamageRoll unimplemented."
+end
+
+function NSResolveItemCastSpell(attacker, target, attack_info)
+   error "NSResolveItemCastSpell unimplemented."
+end
+
+function NSResolveOnHitEffect(attacker, target, attack_info, crit)
+   error "NSResolveItemCastSpell unimplemented."
 end
 
 function NSResolvePostDamage(attacker, target, attack_info, is_ranged)
