@@ -161,7 +161,7 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
    local feat_sk = nwn.GetSkillFeatBonus(skill, self)
    local abil_sk = self:GetAbilityModifier(nwn.GetSkillAbility(skill))
 
-   if cre:GetIsBlind() then
+   if self:GetIsBlind() then
       base_sk = base_sk - 4
    end
 
