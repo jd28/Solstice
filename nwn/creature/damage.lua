@@ -135,6 +135,9 @@ function Creature:GetEffectDamageBonus(target, attack_type)
 	 return false
       end
 
+      -- If using versus info is globally disabled return true.
+      if not NS_OPT_USE_VERSUS_INFO then return true end
+
       local race      = eff:GetInt(2)
       local lawchaos  = eff:GetInt(3)
       local goodevil  = eff:GetInt(4)
@@ -161,7 +164,14 @@ function Creature:GetEffectDamageBonus(target, attack_type)
    zero_damage_roll(bonus)
    zero_damage_roll(penalty)
 
-   local vs_info = nwn.GetVersusInfo(target)
+   local vs_info
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(target)
+   else
+      -- In this case even if using versus info is globally disabled we still need
+      -- the struct to carry damage type.
+      vs_info = nwn.GetVersusInfo(nwn.OBJECT_INVALID)
+   end
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       vs_info.type = i
       local bon_idx, pen_idx = self:GetEffectArrays(bonus.rolls[i],

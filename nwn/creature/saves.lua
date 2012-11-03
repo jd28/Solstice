@@ -68,11 +68,15 @@ end
 -- @param save_vs nwn.SAVING_THROW_TYPE_*
 function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
    local function valid(eff, vs_info)
-      if eff:GetInt(1) ~= save then
+      if eff:GetInt(1) ~= save 
+	 or (save_vs ~= 0 and save_vs ~= eff:GetInt(2))
+      then
 	 return false
       end
 
-      local esave_vs  = eff:GetInt(2)
+      -- If using versus info is globally disabled return true.
+      if not NS_OPT_USE_VERSUS_INFO then return true end
+
       local race      = eff:GetInt(3)
       local lawchaos  = eff:GetInt(4)
       local goodevil  = eff:GetInt(5)
@@ -80,8 +84,7 @@ function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
       local deity     = eff:GetInt(7)
       local target    = eff:GetInt(8)
 
-      if (esave_type == 0 or esave_type == save_type)
-	 and (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
+      if (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
 	 and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
 	 and (goodevil == 0 or goodevil == vs_info.goodevil)
 	 and (subrace == 0 or subrace == vs_info.subrace_id)
@@ -93,7 +96,10 @@ function Creature:GetTotalEffectSaveBonus(vs, save, save_vs)
       return false
    end
 
-   local vs_info = nwn.GetVersusInfo(vs)
+   local vs_info
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(vs)
+   end
    local bon_idx, pen_idx = self:GetEffectArrays(bonus,
 						 penalty,
 						 vs_info,

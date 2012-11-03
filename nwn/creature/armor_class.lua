@@ -47,6 +47,14 @@ function Creature:DebugArmorClass(vs, touch)
    return table.concat(fmt_table)
 end
 
+function Creature:GetArmorCheckPenalty()
+   if not self:GetIsValid() then
+      return 0
+   end
+
+   return self.stats.cs_acp_armor + self.stats.cs_acp_shield
+end
+
 --- Get Creatures total Armor Class bonus / penalty
 -- @param vs Attacking creature. (Default: nwn.OBJECT_INVALID)
 -- @param touch True if touch attack, false if not. (Default: false)
@@ -55,8 +63,10 @@ function Creature:GetArmorClassBonus(vs, touch)
    vs = vs or nwn.OBJECT_INVALID
 
    local dmg_flags = 0
-
-   local vs_info = nwn.GetVersusInfo(vs)
+   local vs_info
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(vs)
+   end
 
    if touch then
       local dodg = math.clamp(self.stats.cs_ac_natural_bonus - self.stats.cs_ac_natural_penalty 
@@ -104,7 +114,10 @@ function Creature:GetEffectArmorClassBonus(vs, touch)
    vs = vs or nwn.OBJECT_INVALID
 
    local dmg_flags = 0
-   local vs_info = nwn.GetVersusInfo(vs)
+   local vs_info 
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(vs)
+   end
 
    if touch then
       return 0, 0, 0, 0, self:GetEffectArmorClassBonusByType(vs_info, nwn.AC_DODGE_BONUS, AC_DODGE_EFF_INFO)
@@ -128,6 +141,9 @@ function Creature:GetEffectArmorClassBonusByType(vs_info, type, ac_info)
       if type ~= eff:GetInt(0) then
 	 return false
       end
+      
+      -- If using versus info is disabled globally, return true
+      if not NS_OPT_USE_VERSUS_INFO then return true end
 
       -- Check to make sure this effect is applicable vs the
       -- damages that may be dealt.
@@ -157,7 +173,9 @@ function Creature:GetEffectArmorClassBonusByType(vs_info, type, ac_info)
       end
    end
 
-   vs_info = vs_info or nwn.GetVersusInfo(vs)
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = vs_info or nwn.GetVersusInfo(vs)
+   end
    local bon_idx, pen_idx = self:GetEffectArrays(bonus,
 						penalty,
 						vs_info,

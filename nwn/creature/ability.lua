@@ -170,10 +170,9 @@ function Creature:GetTotalEffectAbilityMod(abil)
       return abil == eff:GetInt(0)
    end
 
-   local vs_info = nwn.GetVersusInfo(nwn.OBJECT_INVALID, abil)
    local bon_idx, pen_idx = self:GetEffectArrays(bonus,
 						 penalty,
-						 vs_info,
+						 nil,
 						 ABILITY_EFF_INFO,
 						 abil_range,
 						 valid,

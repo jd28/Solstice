@@ -68,6 +68,9 @@ function Creature:GetEffectAttackBonus(vs, attack_type)
 	 return false
       end
 
+      -- If using versus info is globably disabled return true.
+      if not NS_OPT_USE_VERSUS_INFO then return true end
+
       local race      = eff:GetInt(2)
       local lawchaos  = eff:GetInt(3)
       local goodevil  = eff:GetInt(4)
@@ -86,8 +89,13 @@ function Creature:GetEffectAttackBonus(vs, attack_type)
       end
       return false
    end
+   
+   
 
-   local vs_info = nwn.GetVersusInfo(vs)
+   local vs_info
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(vs)
+   end
    local bon_idx, pen_idx = self:GetEffectArrays(bonus,
 						 penalty,
 						 vs_info,

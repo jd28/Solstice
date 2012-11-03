@@ -17,6 +17,9 @@ NS_OPT_NUM_DAMAGES = 13
 -- Maximum number of effects to consider when calculating bonuses/penalties
 NS_OPT_MAX_EFFECT_MODS = 20
 
+-- Use Versus info
+NS_OPT_USE_VERSUS_INFO = true
+
 ------------------------------------------------------------------------------------------
 -- Combat Settings
 
@@ -54,7 +57,7 @@ NS_OPT_SNEAKATT_IGNORE_CRIT_IMM = false
 
 -- If true Devistating Critical insta-kill is disabled for all
 -- creatures
-NS_OPT_DEVCRIT_DISABLE_ALL = false
+NS_OPT_DEVCRIT_DISABLE_ALL = true
 
 -- If true Devistating Critical insta-kill is disabled for PCs
 -- only.  If the NS_OPT_DEVCRIT_DISABLE_ALL is true this setting

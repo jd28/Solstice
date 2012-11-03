@@ -157,9 +157,9 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
    local base_sk = self.stats.cs_skills[skill]
    if base then return base_sk end
 
-   local eff_sk = cre:GetTotalEffectSkillBonus(vs, skill)
+   local eff_sk = self:GetTotalEffectSkillBonus(vs, skill)
    local feat_sk = nwn.GetSkillFeatBonus(skill, self)
-   local abil_sk = cre:GetAbilityModifier(nwn.GetSkillAbility(skill))
+   local abil_sk = self:GetAbilityModifier(nwn.GetSkillAbility(skill))
 
    if cre:GetIsBlind() then
       base_sk = base_sk - 4
@@ -189,6 +189,9 @@ function Creature:GetTotalEffectSkillBonus(vs, skill)
 	 return false
       end
 
+      -- If using versus info is globally disabled return true.
+      if not NS_OPT_USE_VERSUS_INFO then return true end
+
       local race      = eff:GetInt(2)
       local lawchaos  = eff:GetInt(3)
       local goodevil  = eff:GetInt(4)
@@ -208,7 +211,11 @@ function Creature:GetTotalEffectSkillBonus(vs, skill)
       return false
    end
 
-   local vs_info = nwn.GetVersusInfo(vs)
+   local vs_info
+   if NS_OPT_USE_VERSUS_INFO then
+      vs_info = nwn.GetVersusInfo(vs)
+   end
+
    local bon_idx, pen_idx = self:GetEffectArrays(bonus,
 						 penalty,
 						 vs_info,
