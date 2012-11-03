@@ -149,12 +149,29 @@ end
 
 --- Gets creature's skill rank.
 -- @param skill nwn.SKILL_*
-function Creature:GetSkillRank(skill, base)
-   nwn.engine.StackPushBoolean(base)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.StackPushInteger(skill)
-   nwn.engine.ExecuteCommand(315, 3)
-   return nwn.engine.StackPopInteger()
+function Creature:GetSkillRank(skill, vs, base, no_scale)
+   if skill < 0 or skill > nwn.SKILL_LAST then
+      error(string.format("ERROR: Creature:GetSkillRank invalid skill: %d", skill))
+   end
+
+   local base_sk = self.stats.cs_skills[skill]
+   if base then return base_sk end
+
+   local eff_sk = cre:GetTotalEffectSkillBonus(vs, skill)
+   local feat_sk = nwn.GetSkillFeatBonus(skill)
+   local abil_sk = cre:GetAbilityModifier(nwn.GetSkillAbility(skill))
+
+   if cre:GetIsBlind() then
+      base_sk = base_sk - 4
+   end
+
+   -- TODO ArmorCheck PENALTY
+
+   local total = base_sk + eff_sk + feat_sk + abil_sk
+
+   -- TODO SCALE SHIT HERE.
+
+   return total
 end
 
 --- Determines total skill bonus from effects/gear.
@@ -275,6 +292,12 @@ end
 
 ---------------------------------------------------------------------------------------------------
 
+function NSGetSkillRank(cre, skill, vs, base, no_scale)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
+
+   return cre:GetSkillRank(skill, vs, base, no_scale)
+end
 
 function NSGetTotalSkillBonus(cre, vs, skill)
    cre = _NL_GET_CACHED_OBJECT(cre)
