@@ -38,6 +38,12 @@ function Creature:DecrementRemainingFeatUses(feat)
    nwn.engine.ExecuteCommand(580, 2)
 end
 
+--- Determine maximum number of feats uses.
+-- NOTE: Values greater than or equal to 100 are considered infinite uses.
+function Creature:GetMaximumFeatUses(feat)
+   return nwn.GetMaximumFeatUses(self, feat)
+end
+
 --- Determine if creature has a feat
 -- @param feat nwn.FEAT_*
 function Creature:GetHasFeat(feat)
@@ -170,4 +176,13 @@ function Creature:SetKnownFeatByLevel(level, index, feat)
    ls.ls_featlist.data[index] = feat
 
    return ls.ls_featlist.data[index]
+end
+
+function NSGetMaximumFeatUses(cre, feat)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   if not cre:GetIsValid() then
+      return 0
+   end
+
+   return nwn.GetMaximumFeatUses(cre, feat)
 end
