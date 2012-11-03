@@ -1,6 +1,7 @@
 require 'nwn.effects'
 
 local ffi = require 'ffi'
+local color = require 'nwn.color'
 
 -- Accumulator locals
 local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
@@ -63,7 +64,7 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    bonus = bonus or 0
 
    local ret
-   local rank = self:GetSkillRank(skill) + bonus
+   local rank = self:GetSkillRank(skill, vs) + bonus
    local roll = take > 0 and take or nwn.d20()
    local sign = rank >= 0 and " + " or " - "
 
@@ -93,8 +94,9 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    end
 
    if feedback and (self:GetIsPC() or vs:GetIsPC()) then
-      local msg = string.format("<> %s <> : %s : %s : (%d %s %d = %d vs. DC: %d)</c>", self:GetName(),
-                                nwn.GetSkillName(skill), success, roll, sign, math.abs(rank), roll + rank, dc)
+      local msg = string.format("%s%s%s : %s : %s : (%d %s %d = %d vs. DC: %d)</c>", color.LIGHT_BLUE,
+				self:GetName(), color.BLUE, nwn.GetSkillName(skill), success, roll, 
+				sign, math.abs(rank), roll + rank, dc)
       
       if vs:GetIsValid() and self.id ~= vs.id then
          vs:DelayCommand(delay, function () vs:SendMessage(msg) end)
@@ -153,6 +155,8 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
    if skill < 0 or skill > nwn.SKILL_LAST then
       error(string.format("ERROR: Creature:GetSkillRank invalid skill: %d", skill))
    end
+
+   vs = vs or nwn.OBJECT_INVALID
 
    local base_sk = self.stats.cs_skills[skill]
    if base then return base_sk end
