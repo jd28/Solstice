@@ -47,6 +47,10 @@ function Creature:DoDamageImmunity(attacker, dmg_result, attack_info)
 	 -- Immunity
 	 dmg_result.immunity_adjust[i] = imm_adj
 	 dmg_result.damages[i] = dmg - imm_adj
+
+	 if not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and imm_adj > 0 then
+	    NSAddCombatMessageData(attack_info, nil, { self.id }, { 62, imm_adj, bit.lshift(1, i) })
+	 end
       end
    end
 end
@@ -136,11 +140,15 @@ function Creature:DoDamageResistance(attacker, dmg_result, attack_info)
          dmg_result.resist_adjust[i] = dmg_result.resist_adjust[i] + resist
          dmg_result.damages[i] = dmg_result.damages[i] - resist
       end
+
+      if not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and dmg_result.resist_adjust[i] > 0 then
+	 NSAddCombatMessageData(attack_info, nil, { self.id }, { 63, dmg_result.resist_adjust[i] })
+      end
    end
 end
 
 --- Modifies damage roll by highest applicable soak, if any.
-function Creature:DoDamageReduction(attacker, dmg_result, damage_power)
+function Creature:DoDamageReduction(attacker, dmg_result, damage_power, attack_info)
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.
    local highest_soak = self.ci.soak
@@ -195,6 +203,10 @@ function Creature:DoDamageReduction(attacker, dmg_result, damage_power)
    -- Set the soak amount and adjust the base damage result
    dmg_result.soak_adjust = highest_soak
    dmg_result.damages[12] = base_damage - highest_soak
+   
+   if not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and highest_soak > 0 then
+      NSAddCombatMessageData(attack_info, nil, { self.id }, { 64, highest_soak })
+   end
 end
 
 --- Get creature's AC.
@@ -340,6 +352,19 @@ end
 function Creature:GetIsImmuneToCriticalHits(attacker)
    if self:GetRacialType() == nwn.RACIAL_TYPE_UNDEAD
       or self:GetEffectImmunity(attacker, nwn.IMMUNITY_TYPE_CRITICAL_HIT)
+      or self:GetHasFeat(nwn.FEAT_DEATHLESS_MASTERY)
+   then
+      return true
+   end
+   return false
+end
+
+--- Determines if creature is immune to sneak/death attacks.
+--    Ignores immunity to critical hits.
+-- @param attacker Attacker
+function Creature:GetIsImmuneToSneakAttack(attacker)
+   if self:GetRacialType() == nwn.RACIAL_TYPE_UNDEAD
+      or self:GetEffectImmunity(attacker, nwn.IMMUNITY_TYPE_BACKSTAB)
       or self:GetHasFeat(nwn.FEAT_DEATHLESS_MASTERY)
    then
       return true
@@ -748,7 +773,7 @@ function Creature:UpdateCombatModifierSkill()
    nwn.ZeroCombatMod(self.ci.skill)
 
    local ac = 0
-   ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, true) / 5
+   ac = ac + self:GetSkillRank(nwn.SKILL_TUMBLE, nwn.OBJECT_INVALID, true) / 5
    self.ci.skill.ac = ac
 
    self.ci.skill.hp = self:GetSkillHitPointAdj()

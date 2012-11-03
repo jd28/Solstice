@@ -40,6 +40,10 @@ NS_OPT_NO_FLOAT_ZERO_DAMAGE = false
 -- to choose their own preference.
 NS_OPT_NO_FLOAT_DAMAGE = false
 
+-- If true no feedback from damage reduction, resistance, and immunity
+-- will be printed in the combat log.
+NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK = true
+
 -- Number of situational atatcks.
 NS_OPT_NUM_SITUATIONS = 3
 
