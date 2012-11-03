@@ -91,6 +91,7 @@ typedef struct Creature {
     CNWSCreature      *obj;
     CNWSCreatureStats *stats;
     CombatInformation  ci;
+    uint32_t           effective_level;
     uint32_t           first_custom_eff;
 } Creature;
 ]]
@@ -117,6 +118,7 @@ require 'nwn.creature.hp'
 require 'nwn.creature.info'
 require 'nwn.creature.internal'
 require 'nwn.creature.inventory'
+require 'nwn.creature.level'
 require 'nwn.creature.logger'
 require 'nwn.creature.modes'
 require 'nwn.creature.pc'
