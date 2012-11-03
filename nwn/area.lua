@@ -30,6 +30,11 @@ typedef struct Area {
 local area_mt = { __index = Area }
 area_t = ffi.metatype("Area", area_mt)
 
+function Area:GetType()
+   if not self:GetIsValid() then return 0 end
+   return self.obj.area_type
+end
+
 function Area:GetPlayerCount()
    if not self:GetIsValid() then return -1 end
    return self.obj.area_num_players
