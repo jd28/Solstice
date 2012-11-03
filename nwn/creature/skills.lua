@@ -158,20 +158,26 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
    if base then return base_sk end
 
    local eff_sk = cre:GetTotalEffectSkillBonus(vs, skill)
-   local feat_sk = nwn.GetSkillFeatBonus(skill)
+   local feat_sk = nwn.GetSkillFeatBonus(skill, self)
    local abil_sk = cre:GetAbilityModifier(nwn.GetSkillAbility(skill))
 
    if cre:GetIsBlind() then
       base_sk = base_sk - 4
    end
 
-   -- TODO ArmorCheck PENALTY
+   -- ArmorCheck PENALTY
+   if nwn.GetSkillHasArmorCheckPenalty(skill) then
+      base_sk = base_sk + self:GetArmorCheckPenalty()
+   end
+
+   -- Negative Levels.
+   base_sk = base_sk - self:GetTotalNegativeLevels()
 
    local total = base_sk + eff_sk + feat_sk + abil_sk
 
-   -- TODO SCALE SHIT HERE.
+   -- TODO: Scale by Effective Level
 
-   return total
+   return math.clamp(total, -127, 127)
 end
 
 --- Determines total skill bonus from effects/gear.
