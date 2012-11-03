@@ -26,6 +26,8 @@ damage_roll_t = ffi.typeof('DamageRoll')
 damage_result_t = ffi.typeof("DamageResult")
 
 function NSAddDamageToRoll(dmg, dmg_type, roll)
+   if not dmg_type then return end
+
    local idx = nwn.GetDamageIndexFromFlag(dmg_type)
    local n = dmg.idxs[idx]
 

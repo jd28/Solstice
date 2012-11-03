@@ -21,7 +21,6 @@ typedef struct AttackInfo {
 attack_info_t = ffi.typeof("AttackInfo")
 
 require 'nwn.combat.bridge'
-require 'nwn.combat.attack_special'
 require 'nwn.combat.damage_format'
 require 'nwn.combat.damage'
 require 'nwn.combat.defensive_abilities'
@@ -34,7 +33,7 @@ local dc = require 'nwn.combat.default_combat'
 
 
 function NSAddCombatMessageData(attack_info, type, objs, ints)
-   C.nwn_AddCombatMessageData(attack_info.attack, type or 0, #objs, obj[1] or 0, obj[2] or 0, 
+   C.nwn_AddCombatMessageData(attack_info.attack, type or 0, #objs, objs[1] or 0, objs[2] or 0, 
 			      #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0)
 end
 
@@ -140,6 +139,14 @@ function NSGetAttackResult(attack_info)
    local t = attack_info.attack.cad_attack_result
 
    return t == 1 or t == 3 or t == 5 or t == 6 or t == 7 or t == 10
+end
+
+function NSGetAttackRoll(attack_info)
+   return attack_info.attack.cad_attack_roll + attack_info.attack.cad_attack_mod
+end
+
+function NSGetIsRangedAttack(attack_info)
+   return attack_info.attack.cad_ranged_attack == 1
 end
 
 function NSSignalMeleeDamage(attacker, target, attack_count)

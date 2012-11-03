@@ -1,4 +1,4 @@
-Slocal ffi = require 'ffi'
+local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 local random = math.random
@@ -18,29 +18,14 @@ function DefaultCombat.DoDamageAdjustments(attacker, target, dmg_result, damage_
       basetype, basemask = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
    end
 
-   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
-      -- When the index is the base weapon damage type, use the weapons base type
-      -- to determine what immunity applies
-      if i == 12 then
-	 imm = target:GetDamageImmunity(nwn.GetDamageIndexFromFlag(basetype))
-      else
-	 imm = target:GetDamageImmunity(i)
-      end
-
-      dmg = dmg_result.damages[i]
-      if dmg ~= 0 then
-	 imm_adj = math.floor((imm * dmg) / 100)
-	 -- Immunity
-	 dmg_result.immunity_adjust[i] = imm_adj
-	 dmg_result.damages[i] = dmg - imm_adj
-      end
-   end
+   -- Immunity
+   target:DoDamageImmunity(attacker, dmg_result, attack_info)
 
    -- Resist
    target:DoDamageResistance(attacker, dmg_result, attack_info)
    
    -- Damage Reduction
-   target:DoDamageReduction(attacker, dmg_result, damage_power)
+   target:DoDamageReduction(attacker, dmg_result, damage_power, attack_info)
 end
 
 
@@ -263,8 +248,8 @@ function DefaultCombat.GetAttackModifierVersus(attacker, target, attack_info, at
    ab = ab + attacker.ci.mode.ab
 
    -- Special Attack Modifier
-   if attack_info.attack.cad_special_attack > 0 then
-      ab = ab + NSResolveSpecialAttackAttackBonus(attacker, target, attack_info)
+   if NSGetIsSpecialAttack(attack_info) then
+      ab = ab + NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_AB, attacker, target, attack_info)
    end
 
    -- Favored Enemies
@@ -273,7 +258,7 @@ function DefaultCombat.GetAttackModifierVersus(attacker, target, attack_info, at
    end
 
    -- +1 Offensive Training Vs.
-   if attacker:GetHasOffensiveTrainingVs(target)
+   if attacker:GetHasOffensiveTrainingVs(target) then
       ab = ab + 1
    end
 
@@ -284,11 +269,11 @@ function DefaultCombat.GetAttackModifierVersus(attacker, target, attack_info, at
    ab = ab + attacker.ci.equips[attack_info.weapon].ab_mod
 
    -- Target State
-   local state = attacker:GetEnemyStateAttackBonus(attack_info.attack.cad_ranged_attack)
+   local state = attacker:GetEnemyStateAttackBonus(NSGetIsRangedAttack(attack_info))
    ab = ab + state
 
    -- Ranged Attacker Modifications
-   if attack_info.attack.cad_ranged_attack == 1 then
+   if NSGetIsRangedAttack(attack_info) then
       local r = attacker:GetRangedAttackMod(target)
       ab = ab + r
    end
@@ -397,7 +382,7 @@ function DefaultCombat.GetCriticalHitRoll(attacker, offhand, weap_num)
    return 21 - NSGetCriticalHitRange(attacker, offhand, weap_num)
 end
 
-function DefaultCombat.GetDamageBonus(attacker, target, dmg_roll)
+function DefaultCombat.GetDamageBonus(attacker, target, dmg_roll, attack_info)
    if attacker.ci.area.dmg.dice > 0 or attacker.ci.area.dmg.bonus > 0 then
       NSAddDamageToRoll(dmg_roll, attacker.ci.area.dmg_type, attacker.ci.area.dmg)
    end
@@ -418,6 +403,10 @@ function DefaultCombat.GetDamageBonus(attacker, target, dmg_roll)
    end
    if attacker.ci.skill.dmg.dice > 0 or attacker.ci.skill.dmg.bonus > 0 then
       NSAddDamageToRoll(dmg_roll, attacker.ci.skill.dmg_type, attacker.ci.skill.dmg)
+   end
+   
+   if NSGetIsSpecialAttack(attack_info) then
+      NSAddDamageToRoll(dmg_roll, NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_DAMAGE, attacker, target, attack_info))
    end
 
    -- Favored Enemies
@@ -458,7 +447,7 @@ function DefaultCombat.GetDamageRoll(attacker, target, offhand, crit, sneak, dea
    NSAddDamageToRoll(bonus, nwn.DAMAGE_TYPE_BASE_WEAPON, attacker.ci.equips[attack_info.weapon].base_dmg)
 
    -- Add any damage bonuses from combat modifiers. E,g. size, race, etc.
-   NSGetDamageBonus(attacker, target, bonus)
+   NSGetDamageBonus(attacker, target, bonus, attack_info)
 
    -- If this is a critical hit determine the multiplier.
    local mult = 1
@@ -711,8 +700,7 @@ function DefaultCombat.ResolveMeleeAttack(attacker, target, attack_count, anim, 
 	    
 	    -- The resolution of Special Attacks will return an effect to be applied
 	    -- or nil.
-	    local success, eff = NSMeleeSpecialAttack(NSGetSpecialAttack(attack_info), nwn.SPECIAL_ATTACK_EVENT_RESOLVE,
-						      attacker, target, attack_info)
+	    local success, eff = NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack_info)
 	    if success then
 	       -- Check to makes sure an effect was returned.
 	       if eff then
@@ -806,7 +794,7 @@ function DefaultCombat.ResolveRangedAttack(attacker, target, attack_count, anim,
 	    
 	    -- The resolution of Special Attacks will return an effect to be applied
 	    -- or nil.
-	    local success, eff = NSMeleeSpecialAttack(spec_atk, nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack_info)
+	    local success, eff = NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack_info)
 	    if success then
 	       -- Check to makes sure an effect was returned.
 	       if eff then
@@ -952,6 +940,29 @@ function DefaultCombat.ResolvePostDamage(attacker, target, attack_info, is_range
    else
       NSResolveDevCrit(attacker, target, attack_info)
    end
+end
+
+function DefaultCombat.SavingThrowRoll(cre, save_type, dc, save_vs_type, vs, send_feedback, feat, from_combat, from_hook)
+   if from_hook then
+      cre = _NL_GET_CACHED_OBJECT(cre)
+      vs = _NL_GET_CACHED_OBJECT(vs)
+   end
+   
+   local save = 0
+   local save_eff = 0
+
+   if save_type == nwn.SAVING_THROW_FORT then
+      save = cre:GetFortitudeSavingThrow()
+   elseif save_type == nwn.SAVING_THROW_REFLEX then
+      save = cre:GetReflexSavingThrow()
+   elseif save_type == nwn.SAVING_THROW_WILL then
+      save = cre:GetWillSavingThrow()
+   else
+      -- Invalid save type
+      return false
+   end
+
+   save_eff = cre:GetTotalEffectSaveBonus(vs, save_type, save_vs_type)
 end
 
 return DefaultCombat

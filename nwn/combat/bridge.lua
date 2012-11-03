@@ -72,6 +72,10 @@ function NSLoadCombatEngine(engine)
    if engine.ResolvePostDamage then
       NSResolvePostDamage = engine.ResolvePostDamage
    end
+
+   if engine.SavingThrowRoll then
+      NSSavingThrowRoll = engine.SavingThrowRoll
+   end
 end
 
 function NSDoDamageAdjustments(attacker, target, dmg_result, damage_power, attack_info)
@@ -160,4 +164,8 @@ end
 
 function NSResolveOnHitVisuals(attacker, target, attack, dmg_result)
    error "NSResolveOnHitVisuals unimplemented."
+end
+
+function NSSavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat, from_hook)
+   error "NSSavingThrowRoll unimplemented."
 end
