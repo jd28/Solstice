@@ -60,12 +60,13 @@ function Itemprop:GetPropertyType()
    return self:GetInt(0)
 end
 
-function Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val)
+function Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val, chance)
    subtype = subtype or -1
    cost = cost or -1
    cost_val = cost_val or -1
    param1 = param1 or -1
    param1_val = param1_val or -1
+   chance = chance or 100
 
    self:SetInt(0, type)
    self:SetInt(1, subtype)
@@ -73,6 +74,9 @@ function Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val)
    self:SetInt(3, cost_val)
    self:SetInt(4, param1)
    self:SetInt(5, param1_val)
+   self:SetInt(6, uses_per_day or 1)
+   self:SetInt(7, chance) -- Chance
+   self:SetInt(8, 1) -- Useable
 end
 
 -------------------------------------------------------------------------------
