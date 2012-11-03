@@ -41,7 +41,7 @@ local eff_penalty
 local eff_bonus_idx = 0
 local eff_penalty_idx = 0
 
-function nwn.GetVersusInfo(vs, type, subtype, dmg_flags)
+function nwn.GetVersusInfo(vs, typ, subtype, dmg_flags)
    if not vs:GetIsValid() or vs.type ~= nwn.GAME_OBJECT_TYPE_CREATURE then
       return versus_info_t(nwn.RACIAL_TYPE_INVALID,
 			   0,
@@ -49,7 +49,7 @@ function nwn.GetVersusInfo(vs, type, subtype, dmg_flags)
 			   0,
 			   0,
 			   nwn.OBJECT_INVALID.id,
-			   type or -1,
+			   typ or -1,
 			   subtype or -1,
 			   dmg_flags or 0)
    else
@@ -59,7 +59,7 @@ function nwn.GetVersusInfo(vs, type, subtype, dmg_flags)
 			   vs:GetDeityId(),
 			   vs:GetSubraceId(),
 			   vs.id,
-			   type or -1,
+			   typ or -1,
 			   subtype or -1,
 			   dmg_flags or 0)
    end

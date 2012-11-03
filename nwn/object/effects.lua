@@ -6,6 +6,20 @@ local C = ffi.C
 -- @param effect Effect to apply.
 -- @param duration Time in seconds for effect to last. (Default: 0.0)
 function Object:ApplyEffect(dur_type, effect, duration)
+   duration = duration or 0.0
+
+   nwn.engine.StackPushFloat(duration)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.StackPushEngineStructure(nwn.ENGINE_STRUCTURE_EFFECT, effect)
+   nwn.engine.StackPushInteger(dur_type)
+   nwn.engine.ExecuteCommand(220, 4)
+end
+--[[
+--- Applies an effect to an object.
+-- @param dur_type nwn.DURATION_TYPE_*
+-- @param effect Effect to apply.
+-- @param duration Time in seconds for effect to last. (Default: 0.0)
+function Object:ApplyEffect(dur_type, effect, duration)
    if not self:GetIsValid() then return end
 
    duration = duration or 0.0
@@ -16,7 +30,7 @@ function Object:ApplyEffect(dur_type, effect, duration)
    -- TODO: check object type
    C.nwn_ApplyEffect(self.obj.obj, effect.eff, 0, 1)
 end
-
+   --]]
 --- Applies visual effect to object.
 -- @param vfx nwn.VFX_*
 -- @param duration Duration in seconds.  If not passed effect will be of 
