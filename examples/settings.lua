@@ -3,6 +3,9 @@
 ----------------------------------------------------------------------
 -- Module Settings
 
+-- Preload file for server specific lua files.
+NS_OPT_SERVER_PRELOAD = "ta.preload"
+
 -- If set to false all CEP specific variables, baseitems, etc
 -- will be ignored.  If set to a CEP version number without dots (e,g 2.3 -> 23)
 -- CEP resources will be available.
