@@ -71,8 +71,11 @@ end
 -- @param idx Index in the spawn poing list.
 function Encounter:GetSpawnPointByIndex(idx)
    if not self:GetIsValid() then return end
-   if idx < 0 or idx > self.obj.enc_spawn_points_len then return end
+   if idx < 0 or idx >= self.obj.enc_spawn_points_len then return end
    local sp = self.obj.enc_spawn_points[idx]
+   
+   if sp.position.z < 0 then sp.position.z = 0 end
+
    return nwn.Location(sp.position, sp.orientation, self:GetArea())
 end
 
