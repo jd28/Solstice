@@ -52,7 +52,7 @@ nwn.EFFECT_TRUETYPE_HEAL                                  =  39
 nwn.EFFECT_TRUETYPE_LINK                                  =  40
 nwn.EFFECT_TRUETYPE_HASTE_INTERNAL                        =  41
 nwn.EFFECT_TRUETYPE_SLOW_INTERNAL                         =  42
-nwn.EFFECT_TRUETYPE_CUSTOM                                =  44
+nwn.EFFECT_TRUETYPE_MODIFY_NUM_ATTACKS                    =  44
 nwn.EFFECT_TRUETYPE_CURSE                                 =  45
 nwn.EFFECT_TRUETYPE_SILENCE                               =  46
 nwn.EFFECT_TRUETYPE_INVISIBILITY                          =  47
@@ -103,10 +103,3 @@ nwn.EFFECT_TRUETYPE_CUTSCENEGHOST                         =  93
 nwn.EFFECT_TRUETYPE_CUTSCENEIMMOBILE                      =  94
 nwn.EFFECT_TRUETYPE_DEFENSIVESTANCE                       =  95
 nwn.EFFECT_TRUETYPE_IMMUNITY_DECREASE                     =  96
-
--- Custom Effects.
-nwn.EFFECT_CUSTOMTYPE_MODIFY_NUM_ATTACKS                  = 0
-nwn.EFFECT_CUSTOMTYPE_RECURRING_EFFECT                    = 1
-nwn.EFFECT_CUSTOMTYPE_HP_DECREASE                         = 2
-nwn.EFFECT_CUSTOMTYPE_HP_INCREASE                         = 3
-

@@ -21,14 +21,15 @@ local effect_mt = { __index = Effect,
 
 effect_t = ffi.metatype("Effect", effect_mt)
 
-function nwn.CreateEffect(show_icon)
+function nwn.CreateEffect(ints, show_icon)
+   ints = ints or 10
    show_icon = show_icon or 0
    local eff = effect_t(C.nwn_CreateEffect(show_icon), false)
 
    eff:SetCreator(nwn.engine.GetCommandObject())
-   eff:SetNumIntegers(10)
+   eff:SetNumIntegers(ints)
    eff:SetAllInts(0)
-   eff:SetSubType(0)
+   eff:SetSubType(nwn.SUBTYPE_MAGICAL)
    eff:SetDurationType(nwn.DURATION_TYPE_PERMANENT)
 
    return eff
@@ -126,10 +127,6 @@ end
 --- Gets effects internal 'true' type.
 -- Source: nwnx_structs by Acaos
 function Effect:GetTrueType()
-   if self.eff.eff_type == nwn.EFFECT_TRUETYPE_MODIFYNUMATTACKS then
-      return self:GetInt(0)
-   end
-
    return self.eff.eff_type
 end
 
