@@ -1,23 +1,6 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 require 'nwn.ctypes.area'
 local ffi = require 'ffi'
+local C = ffi.C
 
 ffi.cdef[[
 typedef struct Area {
@@ -29,6 +12,14 @@ typedef struct Area {
 
 local area_mt = { __index = Area }
 area_t = ffi.metatype("Area", area_mt)
+
+-- Determines if there is a clear line of sight between two objects
+-- @param loc1 Location A
+-- @param loc2 Location B
+function Area:ClearLineOfSight(loc1, loc2)
+   local result = C.nwn_ClearLineOfSight(self.obj, loc1.position, loc2.position)
+   return result
+end
 
 function Area:GetType()
    if not self:GetIsValid() then return 0 end
