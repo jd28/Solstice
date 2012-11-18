@@ -112,19 +112,27 @@ int GetSystemTime () {
 
 local mod
 
-function nwnx.GetTMILimit ()
+NWNXSystem = {}
+
+function NWNXSystem.GetTMILimit ()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!GETTMILIMIT", "          ")
    return tonumber(mod:GetLocalString("NWNX!SYSTEM!GETTMILIMIT"))
 end
 
-function nwnx.SetTMILimit (nLimit)
+function NWNXSystem.SetTMILimit (nLimit)
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!SETTMILIMIT", tostring(nLimit))
 end
 
-function nwnx.ShutdownServer (nForce)
+function NWNXSystem.ShutdownServer (nForce)
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!SHUTDOWNSERVER", tostring(nForce))
 end
 
+-- NWNX functions cannot be JITed.
+for name, func in pairs(NWNXSystem) do
+   if type(func) == "function" then
+      jit.off(func)
+   end
+end

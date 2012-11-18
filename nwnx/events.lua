@@ -1,52 +1,38 @@
-nwnx.EVENT_TYPE_ALL               = 0
-nwnx.EVENT_TYPE_SAVE_CHAR         = 1
-nwnx.EVENT_TYPE_PICKPOCKET        = 2
-nwnx.EVENT_TYPE_ATTACK            = 3
-nwnx.EVENT_TYPE_USE_ITEM          = 4
-nwnx.EVENT_TYPE_QUICKCHAT         = 5
-nwnx.EVENT_TYPE_EXAMINE           = 6
-nwnx.EVENT_TYPE_USE_SKILL         = 7
-nwnx.EVENT_TYPE_USE_FEAT          = 8
-nwnx.EVENT_TYPE_TOGGLE_MODE       = 9
-nwnx.EVENT_TYPE_CAST_SPELL        = 10
-nwnx.EVENT_TYPE_TOGGLE_PAUSE      = 11
-nwnx.EVENT_TYPE_POSSESS_FAMILIAR  = 12
-
-nwnx.NODE_TYPE_STARTING_NODE      = 0
-nwnx.NODE_TYPE_ENTRY_NODE         = 1
-nwnx.NODE_TYPE_REPLY_NODE         = 2
-
-nwnx.LANGUAGE_ENGLISH             = 0
-nwnx.LANGUAGE_FRENCH              = 1
-nwnx.LANGUAGE_GERMAN              = 2
-nwnx.LANGUAGE_ITALIAN             = 3
-nwnx.LANGUAGE_SPANISH             = 4
-nwnx.LANGUAGE_POLISH              = 5
-nwnx.LANGUAGE_KOREAN              = 128
-nwnx.LANGUAGE_CHINESE_TRADITIONAL = 129
-nwnx.LANGUAGE_CHINESE_SIMPLIFIED  = 130
-nwnx.LANGUAGE_JAPANESE            = 131
-
+NWNXEvents = {}
 local mod
 local EVENT_HANDLERS = {}
+local EXAMINE_HANDLERS = {}
 local ffi = require 'ffi'
 local C = ffi.C
 
-ffi.cdef [[
-typedef struct {
-    int      type;
-    int      subtype;
-    uint32_t object;
-    uint32_t target;
-    uint32_t item;
-    Vector   loc;
-    bool     bypass;
-    bool     use_result;
-    int32_t  result;
-} Event;
+NWNXEvents.EVENT_TYPE_ALL               = 0
+NWNXEvents.EVENT_TYPE_SAVE_CHAR         = 1
+NWNXEvents.EVENT_TYPE_PICKPOCKET        = 2
+NWNXEvents.EVENT_TYPE_ATTACK            = 3
+NWNXEvents.EVENT_TYPE_USE_ITEM          = 4
+NWNXEvents.EVENT_TYPE_QUICKCHAT         = 5
+NWNXEvents.EVENT_TYPE_EXAMINE           = 6
+NWNXEvents.EVENT_TYPE_USE_SKILL         = 7
+NWNXEvents.EVENT_TYPE_USE_FEAT          = 8
+NWNXEvents.EVENT_TYPE_TOGGLE_MODE       = 9
+NWNXEvents.EVENT_TYPE_CAST_SPELL        = 10
+NWNXEvents.EVENT_TYPE_TOGGLE_PAUSE      = 11
+NWNXEvents.EVENT_TYPE_POSSESS_FAMILIAR  = 12
 
-Event *Local_GetLastNWNXEvent();
-]]
+NWNXEvents.NODE_TYPE_STARTING_NODE      = 0
+NWNXEvents.NODE_TYPE_ENTRY_NODE         = 1
+NWNXEvents.NODE_TYPE_REPLY_NODE         = 2
+
+NWNXEvents.LANGUAGE_ENGLISH             = 0
+NWNXEvents.LANGUAGE_FRENCH              = 1
+NWNXEvents.LANGUAGE_GERMAN              = 2
+NWNXEvents.LANGUAGE_ITALIAN             = 3
+NWNXEvents.LANGUAGE_SPANISH             = 4
+NWNXEvents.LANGUAGE_POLISH              = 5
+NWNXEvents.LANGUAGE_KOREAN              = 128
+NWNXEvents.LANGUAGE_CHINESE_TRADITIONAL = 129
+NWNXEvents.LANGUAGE_CHINESE_SIMPLIFIED  = 130
+NWNXEvents.LANGUAGE_JAPANESE            = 131
 
 --- Event Info Table
 -- @class table NWNXEventInfo
@@ -57,8 +43,8 @@ Event *Local_GetLastNWNXEvent();
 -- @field pos Event location vector
 
 --- Gets information about the current event.
--- @return see Table type NWNXEventInfo
-function nwnx.GetEventInfo()
+-- @return see table type NWNXEventInfo
+function NWNXEvents.GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
    if e == nil then return end
 
@@ -73,8 +59,8 @@ end
 
 --- Bypass current event.
 -- @param use_return_val If true this tells the plugin to use a value 
---    passed via nwnx.SetEventReturnValue. (Default: false)
-function nwnx.BypassEvent(use_return_val)
+--    passed via NWNXEvents.SetEventReturnValue. (Default: false)
+function NWNXEvents.BypassEvent(use_return_val)
    if not mod then mod = nwn.GetModule() end
 
    if not use_return_val then
@@ -85,78 +71,107 @@ function nwnx.BypassEvent(use_return_val)
 end
 
 --- Register NWNXEvent event handler.
--- @param event_type nwnx.EVENT_TYPE_*
+-- @param event_type NWNXEvents.EVENT_TYPE_*
 -- @param f A function to handle the event.  When the event fires the function will
 --    be called with one paramenter a NWNXEventInfo table.
-function nwnx.RegisterEventHandler(event_type, f)
+function NWNXEvents.RegisterEventHandler(event_type, f)
    EVENT_HANDLERS[event_type] = f
 end
 
+--- Register NWNXEvent examine event handler.
+-- @param obj_type nwn.GAME_OBJECT_TYPE_*
+-- @param f A function to handle the event.  When the event fires the function will
+--    be called with two parameters the object and a boolean indicating whether the object
+--    is identified or not..
+function NWNXEvents.RegisterExamineEventHandler(obj_type, f)
+   EXAMINE_HANDLERS[obj_type] = f
+end
+
+
 --- Sets a value for NWNX Events to return from a hook.
 -- @param val Must be an integer value.
-function nwnx.SetEventReturnValue(val)
+function NWNXEvents.SetEventReturnValue(val)
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!RETURN", tostring(val));
 end
 
-function nwnx.GetCurrentNodeType()
+function NWNXEvents.GetCurrentNodeType()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_TYPE", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_TYPE"))
 end
 
-function nwnx.GetCurrentNodeID()
+function NWNXEvents.GetCurrentNodeID()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_ID"))
 end
 
-function nwnx.GetCurrentAbsoluteNodeID()
+function NWNXEvents.GetCurrentAbsoluteNodeID()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID"))
 end
 
-function nwnx.GetSelectedNodeID()
+function NWNXEvents.GetSelectedNodeID()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID"))
 end
 
-function nwnx.GetSelectedAbsoluteNodeID()
+function NWNXEvents.GetSelectedAbsoluteNodeID()
    if not mod then mod = nwn.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID"))
 end
 
-function nwnx.GetSelectedNodeText(nLangID, nGender)
+function NWNXEvents.GetSelectedNodeText(nLangID, nGender)
    if not mod then mod = nwn.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT", tostring(nLangID*2 + nGender))
    return mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT")
 end
 
-function nwnx.GetCurrentNodeText(nLangID, nGender)
+function NWNXEvents.GetCurrentNodeText(nLangID, nGender)
    if not mod then mod = nwn.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_TEXT", tostring(nLangID*2 + nGender))
    return mod:GetLocalString("NWNX!EVENTS!GET_NODE_TEXT")
 end
 
-function nwnx.SetCurrentNodeText(sText, nLangID, nGender)
+function NWNXEvents.SetCurrentNodeText(sText, nLangID, nGender)
    if not mod then mod = nwn.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "¬" ..sText)
 end
 
+for name, func in pairs(NWNXEvents) do
+   if type(func) == "function" then
+      print("Turning off JIT:", name)
+      -- This must absolutely be set, if the call here is JITed
+      -- the plugin will crash constantly.
+      jit.off(func)
+   end
+end
+
 --- Bridge function to hand NWNXEvent events
-function NSHandleNWNXEvent(event_type)
+function NWNXEvents_HandleEvent(event_type)
    -- If there isn't an event handler than return 0 so that some other plugin
    -- or script can handle the event.
    local f = EVENT_HANDLERS[event_type]
-   if not f then return 0 end
+   if not f then return false end
    
-   f(nwnx.GetEventInfo())
-   
-   return 1
+   return f(NWNXEvents.GetEventInfo())
 end
+
+function NWNXEvents_HandleExamineEvent(obj, identified)
+   obj = _NL_GET_CACHED_OBJECT(obj)
+   identified = identified or true
+
+   if not obj:GetIsValid() then return "" end
+
+   local f = EXAMINE_HANDLERS[obj.type]
+   if not f or not identified then return obj:GetDescription() end
+   return f(obj, identified)
+end
+

@@ -2,22 +2,12 @@ require 'nwn.ctypes.effect'
 local ffi = require 'ffi'
 local C = ffi.C
 
+NWNXEffects = {}
+
 local IP_HANDLERS = {}
-local CUSTOM_EFFECTS = {}
+local EFF_HANDLERS = {}
 
-ffi.cdef[[
-typedef struct {
-    CNWSCreature    *obj;
-    CNWSItem        *item;
-    CNWItemProperty *ip;
-    bool             remove;
-} EventItemprop;
-
-EventItemprop *Local_GetLastNWNXEventItemprop();
-CGameEffect * nl_GetLastCustomEffect();
-]]
-
-function nwnx.GetItempropInfo()
+function NWNXEffects.GetItempropInfo()
    local e = C.Local_GetLastNWNXEventItemprop()
    if e == nil then return end
 
@@ -27,50 +17,55 @@ function nwnx.GetItempropInfo()
           }
 end
 
----
-function NSCustomEffectImpact(obj, is_apply)
-   -- Treat last custome effect as direct, it will be deleted
-   -- by the game engine.
-   local eff = effect_t(C.nl_GetLastCustomEffect(), true)
-   obj = _NL_GET_CACHED_OBJECT(obj)
-
-   local eff_type = eff:GetTrueType()
-   local h = CUSTOM_EFFECTS[eff_type]
-   if not h then
-      return true
-   end
-
-   return h(eff, obj, is_apply)
-end
-
-function nwn.GetIsCustomEffectRegistered(eff_type)
-   local h = CUSTOM_EFFECTS[eff_type]
+function NWNXEffects.GetIsEffectHandlerRegistered(eff_type)
+   local h = EFF_HANDLERS[eff_type]
    if not h then
       return false
    end
    return true
 end
 
---- Adds a custom effect.
--- @param effect_type The type of the effect.  Essentially any integer value can
---      be used to differentiate custom effects.  They have no overlap with EFFECT_TYPE_*.
--- @param on_apply Function to call on object when effect is applied.  Function will be
---      called with two parameters: the effect being applied and the target it is being applied to.
--- @param on_remove Function to call on object when effect is removed.  Function will be
---      called with two parameters: the effect being applied and the target it is being applied to.
-function nwn.RegisterCustomEffectHandler(effect_type, handler)
-   CUSTOM_EFFECTS[effect_type] = handler
+--- Register an effect handler.
+-- @param effect_type EFFECT_TRUETYPE_* or some other custom event type.
+-- @param handler Function to call on object when effect is applied or removed.
+--    It will be called with three parameters: an effect, an object, and boolean value
+--    indicating whether the effect is being applied (false) or removed (true)
+function NWNXEffects.RegisterEffectHandler(effect_type, handler)
+   if not effect_type then
+      print(debug.traceback())
+   end
+   EFF_HANDLERS[effect_type] = handler
 end
 
 --- Register NWNXEvent event handler.
 -- @param ip_type
 -- @param f A function
-function nwnx.RegisterItempropHandler(ip_type, f)
+function NWNXEffects.RegisterItempropHandler(ip_type, f)
    IP_HANDLERS[ip_type] = f
 end
 
+---
+function NWNXEffects_HandleEffectEvent()
+   local ev = C.Local_GetLastEffectEvent()
+   if ev == nil then return 0 end
+
+   obj = _NL_GET_CACHED_OBJECT(ev.obj.obj_id)
+
+   -- The effect should be treated as a direct effect.  So Lua doesn't delete it.
+   local eff = effect_t(ev.eff, true)
+   local eff_type = eff:GetTrueType()
+
+   local h = EFF_HANDLERS[eff_type]
+   if not h then return 0 end
+
+   ev.suppress = true
+   ev.delete_eff = h(eff, obj, ev.is_remove) or false
+
+   return 1
+end
+
 --- Bridge function to hand NWNXEvent events
-function NSHandleNWNXItemPropEvent(ip_type)
+function NWNXEffects_HandleItemPropEvent(ip_type)
    -- If there isn't an event handler than return 0 so that some other plugin
    -- or script can handle the event.
    local f = IP_HANDLERS[ip_type]
