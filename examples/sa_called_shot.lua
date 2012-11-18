@@ -1,14 +1,21 @@
 require 'nwn.constants'
 require 'nwn.specattack'
 
+local function called_shot_ab() return -4 end
+
+----------------------------------------------------------------------------------------
 -- Called Shot Arm
-local function csarm_resolve(attacker, target, attack)
-   -- Determine attack roll from attack ctype
-   local ab = attack.cad_attack_roll + attack.cad_attack_mod
-   -- If target fails a skill check versus attacker apply knockdown for 1 round.
-   if not target:GetIsSkillSuccessful(nwn.SKILL_DISCIPLINE, ab, attacker) then
+-- Skill Check: Attack Roll vs Discipline.
+-- Event:
+--    Resolve: -2 AB to target for 4 rounds.
+--    Resolve AB: -4 to attack roll.
+--    Resolve Damage: NONE
+
+local function csarm_resolve(attacker, target, attack_info)
+   if not target:GetIsSkillSuccessful(nwn.SKILL_DISCIPLINE, NSGetAttackRoll(attack_info), attacker) then
       local eff = nwn.EffectAttackBonus(-2)
-      target:ApplyEffect(eff, nwn.RoundToSeconds(4))
+      eff:SetDuration(nwn.RoundToSeconds(4))
+      return true, eff
    end
 end
 
@@ -17,49 +24,28 @@ nwn.RegisterMeleeSpecialAttack(
    nwn.SPECIAL_ATTACK_TRUE_CALLED_SHOT_ARM,
    csarm_resolve,
    -- Attack Bonus modifier.
-   function(attacker, target, attack)
-      -- Called shots are made at a -4 attack penalty
-      return -4
-   end,
-   -- Damage bonus modifier
-   function(attacker, target, attack)
-      local dice, sides, bonus = 0, 0, 0
-      local type = nwn.DAMAGE_TYPE_BASE_WEAPON
-      -- No damage bonus modification
-      -- This function need not be passed to nwn.RegisterMeleeSpecialAttack
-      -- It is here for illustrative purposes only.
-      return dice, sides, bonus, type
-   end)
+   called_shot_ab)
 
 -- Register the range version, which happens to be identical
 nwn.RegisterRangedSpecialAttack(
    nwn.SPECIAL_ATTACK_TRUE_CALLED_SHOT_ARM,
    csarm_resolve,
    -- Attack Bonus modifier.
-   function(attacker, target, attack)
-      -- Called shots are made at a -4 attack penalty
-      return -4
-   end,
-   -- Damage bonus modifier
-   function(attacker, target, attack)
-      local dice, sides, bonus = 0, 0, 0
-      local type = nwn.DAMAGE_TYPE_BASE_WEAPON
-      -- No damage bonus modification on Improved Knockdown
-      -- This function need not be passed to nwn.RegisterMeleeSpecialAttack
-      -- It is here for illustrative purposes only.
-      return dice, sides, bonus, type
-   end)
+   called_shot_ab)
 
 ----------------------------------------------------------------------------------------
 -- Called Shot Leg
+-- Skill Check: Attack Roll vs Discipline.
+-- Event:
+--    Resolve: -20% Movement Rate, -2 Dexterity to target for 4 rounds.
+--    Resolve AB: -4 to attack roll.
+--    Resolve Damage: NONE
 local function csleg_resolve(attacker, target, attack)
-   -- Determine attack roll from attack ctype
-   local ab = attack.cad_attack_roll + attack.cad_attack_mod
-   -- If target fails a skill check versus attacker apply knockdown for 1 round.
-   if not target:GetIsSkillSuccessful(nwn.SKILL_DISCIPLINE, ab, attacker) then
+   if not target:GetIsSkillSuccessful(nwn.SKILL_DISCIPLINE, NSGetAttackRoll(attack_info), attacker) then
       local eff = nwn.EffectMovementSpeed(-20)
       eff = nwn.EffectLinkEffects(eff, nwn.EffectAbility(nwn.ABILITY_DEXTERITY, -2))
-      target:ApplyEffect(eff, nwn.RoundToSeconds(4))
+      eff:SetDuration(nwn.RoundToSeconds(4))
+      return true, eff
    end
 end
 
@@ -68,35 +54,11 @@ nwn.RegisterMeleeSpecialAttack(
    nwn.SPECIAL_ATTACK_TRUE_CALLED_SHOT_LEG,
    csleg_resolve,
    -- Attack Bonus modifier.
-   function(attacker, target, attack)
-      -- Called shots are made at a -4 attack penalty
-      return -4
-   end,
-   -- Damage bonus modifier
-   function(attacker, target, attack)
-      local dice, sides, bonus = 0, 0, 0
-      local type = nwn.DAMAGE_TYPE_BASE_WEAPON
-      -- No damage bonus modification on Improved Knockdown
-      -- This function need not be passed to nwn.RegisterMeleeSpecialAttack
-      -- It is here for illustrative purposes only.
-      return dice, sides, bonus, type
-   end)
+   called_shot_ab)
 
 -- Register the range version, which happens to be identical
 nwn.RegisterRangedSpecialAttack(
    nwn.SPECIAL_ATTACK_TRUE_CALLED_SHOT_LEG,
    csleg_resolve,
    -- Attack Bonus modifier.
-   function(attacker, target, attack)
-      -- Called shots are made at a -4 attack penalty
-      return -4
-   end,
-   -- Damage bonus modifier
-   function(attacker, target, attack)
-      local dice, sides, bonus = 0, 0, 0
-      local type = nwn.DAMAGE_TYPE_BASE_WEAPON
-      -- No damage bonus modification
-      -- This function need not be passed to nwn.RegisterMeleeSpecialAttack
-      -- It is here for illustrative purposes only.
-      return dice, sides, bonus, type
-   end)
+   called_shot_ab)

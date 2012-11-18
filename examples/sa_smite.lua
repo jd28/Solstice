@@ -40,7 +40,7 @@ local function smite_dmg_good(attacker, target, attack_info)
       dmg = dmg + (level * (great - nwn.FEAT_EPIC_GREAT_SMITING_1 + 1))
    end
 
-   return 0, 0, dmg, nwn.DAMAGE_TYPE_DIVINE
+   return nwn.DAMAGE_TYPE_NEGATIVE, dice_roll_t(0, 0, dmg) 
 end
 
 nwn.RegisterMeleeSpecialAttack(
@@ -91,7 +91,7 @@ local function smite_dmg_evil(attacker, target, attack_info)
       dmg = dmg + (level * (great - nwn.FEAT_EPIC_GREAT_SMITING_1 + 1))
    end
 
-   return 0, 0, dmg, nwn.DAMAGE_TYPE_DIVINE
+   return nwn.DAMAGE_TYPE_DIVINE, dice_roll_t(0, 0, dmg) 
 end
 
 nwn.RegisterMeleeSpecialAttack(
