@@ -1,3 +1,5 @@
+--- 
+
 require 'nwn.ctypes.effect'
 require 'nwn.ctypes.itemprop'
 
@@ -60,6 +62,7 @@ function Itemprop:GetPropertyType()
    return self:GetInt(0)
 end
 
+-- Sets the item property effect values directly.
 function Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val, chance)
    subtype = subtype or -1
    cost = cost or -1
@@ -92,15 +95,13 @@ function nwn.engine.CreateItemPropery(command, args)
     return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY)
 end
 
-local function create_itemprop_eff(show_icon)
+function nwn.CreateItempropEffect(show_icon)
    show_icon = show_icon or 0
    local eff = itemprop_t(C.nwn_CreateEffect(show_icon), false)
 
    eff:SetCreator(nwn.engine.GetCommandObject())
    eff:SetNumIntegers(9)
    eff:SetAllInts(-1)
-   eff:SetInt(7, 100)
-   eff:SetInt(8, 1)
    eff:SetSubType(0)
    eff:SetDurationType(nwn.DURATION_TYPE_PERMANENT)
    eff:SetTrueType(nwn.EFFECT_TRUETYPE_ITEMPROPERTY)
@@ -112,12 +113,12 @@ end
 -- @param
 -- @param
 function nwn.ItemPropertyAbilityScore(ability, bonus)
-   local eff = create_itemprop_eff()
+   local eff = nwn.CreateItempropEffect()
 
    if bonus < 0 then
-      eff:SetValues(27, ability, 21, -bonus)
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_ABILITY_SCORE, ability, 21, math.clamp(-bonus, 1, 12))
    else
-      eff:SetValues(0, ability, 1, bonus)	    
+      eff:SetValues(nwn.ITEM_PROPERTY_ABILITY_BONUS, ability, 1, math.clamp(bonus, 1, 12))
    end
    
    return eff
@@ -126,575 +127,503 @@ end
 ---
 -- @param
 -- @param
-function nwn.ItemPropertyAC(bonus, vs_type, vs)
-   local args = 1
-   local cmd = 617
+function nwn.ItemPropertyAC(bonus, ac_type)
+   ac_type = ac_type or nwn.AC_DODGE_BONUS
+   local eff = nwn.CreateItempropEffect()
    
-   nwn.engine.StackPushInteger(bonus)
-   if vs_type and vs and vs_type ~= EFFECT_VS_INVALID then
-      if vs_type == EFFECT_VS_ALIGN_GRP then
-         cmd = 618 
-      elseif vs_type == EFFECT_VS_ALIGN then
-         cmd = 621
-      elseif vs_type == EFFECT_VS_RACE then
-         cmd = 620
-      elseif vs_type == EFFECT_VS_DMG_TYPE then
-         cmd = 619 
-      end
-      nwn.engine.StackPushInteger(nVS)
-      args = 2
+   if bonus < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_AC, ac_type, 20, math.clamp(-bonus, 1, 20))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_AC_BONUS, ac_type, 2, math.clamp(bonus, 1, 20))
    end
-
-   return nwn.engine.CreateItemPropery(cmd, args) 
+   
+   return eff
 end
+
+function nwn.ItemPropertyACVsAligmentGroup() end
+function nwn.ItemPropertyACVsDamage() end
+function nwn.ItemPropertyACVsRace() end
+function nwn.ItemPropertyACVsAligment() end
 
 function nwn.ItemPropertyArcaneSpellFailure(amount)
-   nwn.engine.StackPushInteger(amount)
-   nwn.engine.ExecuteCommand(758, 1)
-   return nwn.engine.StackPopEngineStructure(nwn.ENGINE_STRUCTURE_ITEMPROPERTY)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ARCANE_SPELL_FAILURE, nil, 27, amount)
+   return eff
 end
 
 
----
--- @param
--- @param
-function nwn.ItemPropertyEnhancementBonus(bonus, vs_type, vs)
-   local cmd  = 622
-   local args = 1
-   nwn.engine.StackPushInteger(bonus)
-
-   if vs_type and vs and vs_type ~= EFFECT_VS_INVALID then
-      if vs_type == EFFECT_VS_ALIGN_GRP then
-         cmd = 623 
-      elseif vs_type == EFFECT_VS_ALIGN then
-         cmd = 625
-      elseif vs_type == EFFECT_VS_RACE then
-         cmd = 624
-      end
-      nwn.engine.StackPushInteger(nVS)
-      args = 2
+--- Item Property Enhancement Bonus
+-- @param bonus If greater than 0 enhancment bonus, else penalty
+function nwn.ItemPropertyEnhancementModifier(bonus)
+   local eff = nwn.CreateItempropEffect()
+   
+   if bonus < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_ENHANCEMENT_MODIFIER, nil, 20, math.clamp(-bonus, 1, 20))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS, nil, 2, math.clamp(bonus, 1, 20))
    end
    
-   return nwn.engine.CreateItemPropery(cmd, args) 
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyEnhancementPenalty(nPenalty)
-   nwn.engine.StackPushInteger(nPenalty)
-   return nwn.engine.CreateItemPropery( 626, 1) 
+function nwn.ItemPropertyEnhancementModifierVsAlignmentGroup(bonus) end
+function nwn.ItemPropertyEnhancementModifierVsRace(bonus) end
+function nwn.ItemPropertyEnhancementModifierVsAlignmentGroup(bonus) end
+
+--- Item Property Weight Increase
+-- @param amount nwn.IP_CONST_WEIGHTINCREASE_*
+function nwn.ItemPropertyWeightIncrease(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_WEIGHT_INCREASE, nil, 0, nil, 11, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyWeightReduction(nReduction)
-   nwn.engine.StackPushInteger(nReduction)
-   return nwn.engine.CreateItemPropery( 627, 1) 
+--- Item Property Weight Reuction
+-- @param amount nwn.IP_CONST_REDUCEDWEIGHT_*
+function nwn.ItemPropertyWeightReduction(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_BASE_ITEM_WEIGHT_REDUCTION, nil, 10, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyBonusFeat(nFeat)
-   nwn.engine.StackPushInteger(nFeat)
 
-   return nwn.engine.CreateItemPropery( 628, 1) 
+--- Item Property Bonus Feat
+-- @param feat nwn.IP_CONST_FEAT_*
+function nwn.ItemPropertyBonusFeat(feat)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_BONUS_FEAT, nil, 0, feat)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyBonusLevelSpell(class, nSpellLevel)
-   nwn.engine.StackPushInteger(nSpellLevel)
-   nwn.engine.StackPushInteger(class)
-
-   return nwn.engine.CreateItemPropery( 629, 2 ) 
+--- Creates a "bonus spell of a specified level" itemproperty.
+-- @param class nwn.IP_CONST_CLASS_*
+-- @param level [0, 9]
+function nwn.ItemPropertyBonusLevelSpell(class, level)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_BONUS_SPELL_SLOT_OF_LEVEL_N, class, 13, level)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyCastSpell(nSpell, nNumUses)
-   nwn.engine.StackPushInteger(nNumUses)
-   nwn.engine.StackPushInteger(nSpell)
-
-   return nwn.engine.CreateItemPropery( 630, 2) 
+--- Creates a "cast spell" itemproperty.
+-- @param spell nwn.IP_CONST_CASTSPELL_*
+-- @param uses nwn.IP_CONST_CASTSPELL_NUMUSES_*
+function nwn.ItemPropertyCastSpell(spell, uses)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_CAST_SPELL, spell, 3, uses)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDamageBonus(damage_type, damage, vs_type, vs)
-   local cmd  = 631
-   local args = 2
-   
-   nwn.engine.StackPushInteger(damage)
-   nwn.engine.StackPushInteger(damageType)
-
-   if vs_type and vs and vs_type ~= EFFECT_VS_INVALID then
-      if vs_type == EFFECT_VS_ALIGN_GRP then
-         cmd = 632
-      elseif vs_type == EFFECT_VS_ALIGN then
-         cmd = 634
-      elseif vs_type == EFFECT_VS_RACE then
-         cmd = 633
-      end
-      nwn.engine.StackPushInteger(nVS)
-      args = 3
-   end
-   
-   return nwn.engine.CreateItemPropery( cmd, args) 
+--- Creates a damage bonus itemproperty.
+-- @param damage_type nwn.IP_CONST_DAMAGETYPE_*
+-- @param damage nwn.IP_CONST_DAMAGEBONUS_*
+function nwn.ItemPropertyDamageBonus(damage_type, damage)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DAMAGE_BONUS, damage_type, 4, damage)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDamageImmunity(nImmuneBonus, damageType)
-   nwn.engine.StackPushInteger(nImmuneBonus)
-   nwn.engine.StackPushInteger(damageType)
+function nwn.ItemPropertyDamageBonusVsAlignmentGroup(damage_type, damage) end
+function nwn.ItemPropertyDamageBonusVsRace(damage_type, damage) end
+function nwn.ItemPropertyDamageBonusVsAlignment(damage_type, damage) end
 
-   return nwn.engine.CreateItemPropery( 635, 2) 
+--- Creates a damage immunity itemproperty.
+-- @param damage_type nwn.IP_CONST_DAMAGETYPE_*
+-- @param amount 
+function nwn.ItemPropertyDamageImmunity(damage_type, amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
+   return eff
 end
 
-function nwn.ItemPropertyDamagePenalty(nPenalty)
-   nwn.engine.StackPushInteger(nPenalty)
-
-   return nwn.engine.CreateItemPropery( 636, 1) 
+--- Creatses a damage penalty itemproperty.
+-- @param penalty [1,5]
+function nwn.ItemPropertyDamagePenalty(penalty)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_DAMAGE, nil, 20, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDamageReduction(nEnhancement, nSoak)
-   nwn.engine.StackPushInteger(nHPSoak)
-   nwn.engine.StackPushInteger(nEnhancement)
-
-   return nwn.engine.CreateItemPropery( 637, 2) 
+--- Creates a damage reduction itemproperty.
+-- @param enhancement nwn.IP_CONST_DAMAGEREDUCTION_*
+-- @param soak nwn.IP_CONST_DAMAGESOAK_*
+function nwn.ItemPropertyDamageReduction(enhancement, soak)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DAMAGE_REDUCTION, enhancement, 6, soak)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDamageResistance(damageType, nResist)
-   nwn.engine.StackPushInteger(nResist)
-   nwn.engine.StackPushInteger(damageType)
-   return nwn.engine.CreateItemPropery( 638, 2) 
+--- Creates damage resistance item property.
+-- @param damage_type nwn.IP_CONST_DAMAGETYPE_*
+-- @param amount nwn.IP_CONST_DAMAGERESIST_*
+function nwn.ItemPropertyDamageResistance(damage_type, amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DAMAGE_RESISTANCE, damage_type, 7, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDamageVulnerability(damageType, nVulnerability)
-   nwn.engine.StackPushInteger(nVulnerability)
-   nwn.engine.StackPushInteger(damageType)
-   return nwn.engine.CreateItemPropery( 639, 2) 
+--- Creates damage vulnerability item property.
+-- @param damage_type nwn.IP_CONST_DAMAGETYPE_*
+-- @param amount nwn.IP_CONST_DAMAGEVULNERABILITY_*
+function nwn.ItemPropertyDamageVulnerability(damage_type, amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DAMAGE_VULNERABILITY, damage_type, 22, amount)
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates Darkvision Item Property
 function nwn.ItemPropertyDarkvision()
-   return nwn.engine.CreateItemPropery( 640, 0) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_DARKVISION, nil, 0)
+   return eff
 end
 
-
----
--- @param
--- @param
-function nwn.ItemPropertyDecreaseAC(modifierType, nPenalty)
-   nwn.engine.StackPushInteger(nPenalty)
-   nwn.engine.StackPushInteger(modifierType)
-
-   return nwn.engine.CreateItemPropery( 642, 2) 
+--- Creates skill modifier item property
+-- @param skill nwn.SKILL_*
+-- @param amount [1, 50] or [-10, -1]
+function nwn.ItemPropertySkillModifier(skill, amount)
+   local eff = nwn.CreateItempropEffect()
+   
+   if amount < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_SKILL_MODIFIER, skill, 21, math.clamp(-amount, 1, 10))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_SKILL_BONUS, skill, 25, math.clamp(amount, 1, 50))
+   end
+   
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyDecreaseSkill(nSkill, nPenalty)
-   nwn.engine.StackPushInteger(nPenalty)
-   nwn.engine.StackPushInteger(nSkill)
-   return nwn.engine.CreateItemPropery( 643, 2) 
+--- Create a "reduced weight container" itemproperty.
+-- @param container_type nwn.IP_CONST_CONTAINERWEIGHTRED_*
+function nwn.ItemPropertyContainerReducedWeight(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ENHANCED_CONTAINER_REDUCED_WEIGHT, nil, 15, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyContainerReducedWeight(nContainerType)
-   nwn.engine.StackPushInteger(nContainerType)
+--- Creates an "extra damage type" item property.
+-- @param damage_type IP_CONST_DAMAGETYPE_*
+-- @param is_ranged ExtraRangedDamge if true, melee if false (Default: false)
+function nwn.ItemPropertyExtraDamageType(damage_type, is_ranged)
+   local eff = nwn.CreateItempropEffect()
 
-   return nwn.engine.CreateItemPropery( 644, 1) 
+   if is_ranged then
+      eff:SetValues(nwn.ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE, damage_type, 0)
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_EXTRA_MELEE_DAMAGE_TYPE, damage_type, 0)
+   end
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyExtraDamageType(damageType, bRanged)
-   local cmd = bRanged and 646 or 645
-
-   nwn.engine.StackPushInteger(damageType)
-   return nwn.engine.CreateItemPropery( cmd, 1) 
-end
-
----
--- @param
--- @param
+--- Creates haste item property.
 function nwn.ItemPropertyHaste()
    return nwn.engine.CreateItemPropery( 647, 0) 
 end
 
----
--- @param
--- @param
+--- Creates Holy Avenger item propety.
 function nwn.ItemPropertyHolyAvenger()
-   return nwn.engine.CreateItemPropery( 648, 0) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_HOLY_AVENGER, nil, 0)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyImmunityMisc(nImmunityType)
-   nwn.engine.StackPushInteger(nImmunityType)
-   return nwn.engine.CreateItemPropery( 649, 1) 
+--- Creates immunity item property
+-- @param immumity_type nwn.IP_CONST_IMMUNITYMISC_*
+function nwn.ItemPropertyImmunityMisc(immumity_type)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMMUNITY_MISCELLANEOUS, immumity_type, 0)
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates Improved evasion item property.
 function nwn.ItemPropertyImprovedEvasion()
-   return nwn.engine.CreateItemPropery( 650, 0) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMPROVED_EVASION, nil, 0)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyBonusSpellResistance(bonus)
-   nwn.engine.StackPushInteger(bonus)
-   return nwn.engine.CreateItemPropery( 651, 1) 
+--- Creates a spell resistince item property
+-- @param amount nwn.IP_CONST_SPELLRESISTANCEBONUS_*
+function nwn.ItemPropertyBonusSpellResistance(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_SPELL_RESISTANCE, nil, 11, amount)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertySavingThrowVsX(bonus_type, value)
-   local cmd = 652
-
-   if value < 0 then
-      cmd = 659
-      value = -value
-   end
-
-   nwn.engine.StackPushInteger(value)
-   nwn.engine.StackPushInteger(bonus_type)
-
-   return nwn.engine.CreateItemPropery( cmd, 2) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyBonusSavingThrow(save_type, value)
-   local cmd = 653
-
-   if value < 0 then
-      cmd = 660
-      value = -value
-   end
-
-   nwn.engine.StackPushInteger(value)
-   nwn.engine.StackPushInteger(save_type)
-
-   return nwn.engine.CreateItemPropery( cmd, 2) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyKeen()
-   return nwn.engine.CreateItemPropery( 654, 0) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyLight(nBrightness, nColor)
-   nwn.engine.StackPushInteger(nColor)
-   nwn.engine.StackPushInteger(nBrightness)
-   return nwn.engine.CreateItemPropery( 655, 2) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyMighty(modifier)
-   nwn.engine.StackPushInteger(modifier)
-   return nwn.engine.CreateItemPropery(656, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyNoDamage()
-   return nwn.engine.CreateItemPropery(657, 0) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyOnHitProps(nProperty, nSaveDC, nSpecial)
-   nwn.engine.StackPushInteger(nSpecial)
-   nwn.engine.StackPushInteger(nSaveDC)
-   nwn.engine.StackPushInteger(nProperty)
-   return nwn.engine.CreateItemPropery(658, 3) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyRegeneration(nRegenAmount)
-   nwn.engine.StackPushInteger(nRegenAmount)
-   return nwn.engine.CreateItemPropery(661, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertySkillBonus(nSkill, bonus)
-   nwn.engine.StackPushInteger(bonus)
-   nwn.engine.StackPushInteger(nSkill)
-   return nwn.engine.CreateItemPropery(662, 2) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertySpellImmunitySpecific(nSpell)
-   nwn.engine.StackPushInteger(nSpell)
-   return nwn.engine.CreateItemPropery(663, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertySpellImmunitySchool(nSchool)
-   nwn.engine.StackPushInteger(nSchool)
-   return nwn.engine.CreateItemPropery(664, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyThievesTools(modifier)
-   nwn.engine.StackPushInteger(modifier)
-   return nwn.engine.CreateItemPropery(655, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyAttackBonus(bonus, vs_type, vs)
-   local cmd = 666
-   local args = 1
-   nwn.engine.StackPushInteger(bonus)
-
-   if vs_type and vs and vs_type ~= EFFECT_VS_INVALID then
-      if vs_type == EFFECT_VS_ALIGN_GRP then
-         cmd = 667
-      elseif vs_type == EFFECT_VS_ALIGN then
-         cmd = 669 
-      elseif vs_type == EFFECT_VS_RACE then
-         cmd = 668
-      end
-      nwn.engine.StackPushInteger(nVS)
-      args = 2
-   end
-
-   return nwn.engine.CreateItemPropery(cmd, args) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyAttackPenalty(nPenalty)
-   nwn.engine.StackPushInteger(nPenalty)
-   return nwn.engine.CreateItemPropery( 670, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyUnlimitedAmmo(nAmmoDamage)
-   nwn.engine.StackPushInteger(nAmmoDamage or IP_CONST_UNLIMITEDAMMO_BASIC)
-   return nwn.engine.CreateItemPropery(671, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyLimitUseByAlign(align_group)
-   nwn.engine.StackPushInteger(align_group)
-   return nwn.engine.CreateItemPropery(672, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyLimitUseByClass(class)
-   nwn.engine.StackPushInteger(class)
-   return nwn.engine.CreateItemPropery(673, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyLimitUseByRace(nRace)
-   nwn.engine.StackPushInteger(nRace)
-   return nwn.engine.CreateItemPropery(674, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyLimitUseBySAlign(nAlignment)
-   nwn.engine.StackPushInteger(nAlignment)
-   return nwn.engine.CreateItemPropery(675, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyVampiricRegeneration(nRegenAmount)
-   nwn.engine.StackPushInteger(nRegenAmount)
-   return nwn.engine.CreateItemPropery(677, 1) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyTrap(nTrapType, nTrapLevel)
-   nwn.engine.StackPushInteger(nTrapType)
-   nwn.engine.StackPushInteger(nTrapLevel)
-   lua_pushlightuserdata(L, pRetVal)
-   return nwn.engine.CreateItemPropery( 678, 2) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyTrueSeeing()
-   return nwn.engine.CreateItemPropery(679, 0) 
-end
-
----
--- @param
--- @param
-function nwn.ItemPropertyOnMonsterHitProperties(nProperty, nSpecial)
-   nSpecial = nSpecial or 0
+--- Creates saving throw bonus vs item property
+-- @param save_type nwn.IP_CONST_SAVEVS_*
+-- @param amount [1,20] or [-20, -1]
+function nwn.ItemPropertySavingThrowVsX(save_type, amount)
+   local eff = nwn.CreateItempropEffect()
    
-   nwn.engine.StackPushInteger(nSpecial)
-   nwn.engine.StackPushInteger(nProperty)
-   return nwn.engine.CreateItemPropery(680, 2) 
+   if amount < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_SAVING_THROWS, save_type, 20, math.clamp(-amount, 1, 20))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_SAVING_THROW_BONUS, save_type, 2, math.clamp(amount, 1, 20))
+   end
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates saving throw bonus item property
+-- @param save_type nwn.IP_CONST_SAVEBASETYPE_*
+-- @param amount [1,20] or [-20, -1]
+function nwn.ItemPropertyBonusSavingThrow(save_type, amount)
+   local eff = nwn.CreateItempropEffect()
+   
+   if amount < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_SAVING_THROWS_SPECIFIC, save_type, 20, math.clamp(-amount, 1, 10))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_SAVING_THROW_BONUS_SPECIFIC, save_type, 2, math.clamp(amount, 1, 50))
+   end
+   
+   return eff
+end
+
+--- Creates keen item property
+function nwn.ItemPropertyKeen()
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_KEEN, nil, 0)
+   return eff
+end
+
+--- Creates a light item property.
+-- @param brightness nwn.IP_CONST_LIGHTBRIGHTNESS_*
+-- @param color nwn.IP_CONST_LIGHTCOLOR_*
+function nwn.ItemPropertyLight(brightness, color)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_LIGHT, nil, 18, brightness, 9, color)
+   return eff
+end
+
+--- Creates a mighty item property.
+-- @param modifier [1,20]
+function nwn.ItemPropertyMighty(modifier)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_MIGHTY, nil, 2, math.clamp(modifier, 1, 20))
+   return eff
+end
+
+--- Creates no damage item property
+function nwn.ItemPropertyNoDamage()
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_NO_DAMAGE, nil, 0)
+   return eff
+end
+
+--- Creates an OnHit itemproperty.
+-- @param prop nwn.IP_CONST_ONHIT_*
+-- @param dc nwn.IP_CONST_ONHIT_SAVEDC_*
+-- @param special Meaning varies with type. (Default: 0)
+function nwn.ItemPropertyOnHitProps(prop, dc, special)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ON_HIT_PROPERTIES, prop, 24, dc, 0, special)
+   return eff
+end
+
+--- Creates a regeneration item property.
+-- @param amount [1, 20]
+function nwn.ItemPropertyRegeneration(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_REGENERATION, nil, 2, math.clamp(amount, 1, 20))
+   return eff
+end
+
+--- Creates an "immunity to specific spell" itemproperty.
+-- @param spell nwn.IP_CONST_IMMUNITYSPELL_*
+function nwn.ItemPropertySpellImmunitySpecific(spell)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMMUNITY_SPECIFIC_SPELL, nil, 16, spell)
+   return eff
+end
+
+--- Creates an "immunity against spell school" itemproperty.
+-- @param school nwn.IP_CONST_SPELLSCHOOL_*
+function nwn.ItemPropertySpellImmunitySchool(school)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMMUNITY_SPECIFIC_SPELL, school, 0)
+   return eff
+end
+
+--- Creates a thieves tool item property
+-- @param modifier [1, 12]
+function nwn.ItemPropertyThievesTools(modifier)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_THIEVES_TOOLS, nil, 25, math.clamp(modifier, 1, 12))
+   return eff
+end
+
+--- Creatures attack modifier item property
+-- @param bonus [1,20] or [-5, -1]
+function nwn.ItemPropertyAttackModifier(bonus)
+   local eff = nwn.CreateItempropEffect()
+   
+   if bonus < 0 then
+      eff:SetValues(nwn.ITEM_PROPERTY_DECREASED_ATTACK_MODIFIER, nil, 25, math.clamp(bonus, 1, 5))
+   else
+      eff:SetValues(nwn.ITEM_PROPERTY_ATTACK_BONUS, nil, 20, math.clamp(bonus, 1, 20))
+   end
+   return eff
+end
+
+function nwn.ItemPropertyAttackModifierVsAlignmentGroup(bonus) end
+function nwn.ItemPropertyAttackModifierVsRace(bonus) end
+function nwn.ItemPropertyAttackModifierVsAlignment(bonus) end
+
+--- Creates an unlimited ammo itemproperty.
+-- @param ammo nwn.IP_CONST_UNLIMITEDAMMO_* (Default: nwn.IP_CONST_UNLIMITEDAMMO_BASIC)
+function nwn.ItemPropertyUnlimitedAmmo(ammo)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_UNLIMITED_AMMUNITION, ammo or nwn.IP_CONST_UNLIMITEDAMMO_BASIC, 14)
+   return eff
+end
+
+function nwn.ItemPropertyLimitUseByAlign(align_group) end
+
+--- Creates a class use limitation item property
+-- @param class nwn.IP_CONST_CLASS_*
+function nwn.ItemPropertyLimitUseByClass(class)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_USE_LIMITATION_CLASS, class, 0)
+   return eff
+end
+
+--- Creates a race use limitation item property
+-- @param race Racial type
+function nwn.ItemPropertyLimitUseByRace(race)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_USE_LIMITATION_RACIAL_TYPE, race, 0)
+   return eff
+end
+
+function nwn.ItemPropertyLimitUseBySAlign(nAlignment) end
+
+--- Creates vampiric regeneration effect.
+-- @param amount [1,20]
+function nwn.ItemPropertyVampiricRegeneration(amount)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_REGENERATION_VAMPIRIC, nil, 2, math.clamp(amount, 1, 20))
+   return eff
+end
+
+--- Creates a trap item property
+-- @param level nwn.IP_CONST_TRAPSTRENGTH_*
+-- @param trap_type nwn.IP_CONST_TRAPTYPE_*
+function nwn.ItemPropertyTrap(level, trap_type)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_TRAP, trap_type, 17, level)
+   return eff
+end
+
+--- Creates true seeing item property
+function nwn.ItemPropertyTrueSeeing()
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_TRUE_SEEING, nil, 0)
+   return eff
+end
+
+--- Creates on monster hit item property.
+-- NOTE: Item property is bugged.  See NWN Lexicon.
+-- @param prop nwn.IP_CONST_ONMONSTERHIT_*
+-- @param special ???
+function nwn.ItemPropertyOnMonsterHitProperties(prop, special)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ON_MONSTER_HIT, prop, 0, special)
+   return eff
+end
+
+--- Creates a turn resistance item property.
+-- @param modifier [1, 50]
 function nwn.ItemPropertyTurnResistance(modifier)
-   nwn.engine.StackPushInteger(modifier)
-   return nwn.engine.CreateItemPropery(681, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_TURN_RESISTANCE, nil, 25, math.clamp(modifier, 1, 50))
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates a massive criticals item property.
+-- @param damage nwn.IP_CONST_DAMAGEBONUS_*
 function nwn.ItemPropertyMassiveCritical(damage)
-   return nwn.engine.CreateItemPropery(682, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_MASSIVE_CRITICALS, nil, 4, damage)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyFreeAction()
-   return nwn.engine.CreateItemPropery(683, 0) 
+--- Creates a free action (freedom of movement) itemproperty.
+function nwn.ItemPropertyFreedom()
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_FREEDOM_OF_MOVEMENT, nil, 0)
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates Monster Damage effect.
+-- @param damage nwn.IP_CONST_MONSTERDAMAGE_*
 function nwn.ItemPropertyMonsterDamage(damage)
-   nwn.engine.StackPushInteger(damage)
-   return nwn.engine.CreateItemPropery(684, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_MONSTER_DAMAGE, nil, 19, damage)
+   return eff
 end
 
----
--- @param
--- @param
+--- Create an "immunity to spell level" item property.
+-- @param level Spell level [1,9]
 function nwn.ItemPropertyImmunityToSpellLevel(level)
-   nwn.engine.StackPushInteger(level)
-   return nwn.engine.CreateItemPropery(685, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_IMMUNITY_SPELLS_BY_LEVEL, nil, 23, level)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertySpecialWalk(nWalkType)
-   nwn.engine.StackPushInteger(nWalkType)
-   return nwn.engine.CreateItemPropery(686, 1) 
+--- Creates a special walk itemproperty.
+-- @param walk Only 0 is a valid argument (Default: 0)
+function nwn.ItemPropertySpecialWalk(walk)
+   walk = 0
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_SPECIAL_WALK, walk)
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates a healers' kit item property.
+-- @param modifier [1,12]
 function nwn.ItemPropertyHealersKit(modifier)
-   nwn.engine.StackPushInteger(modifier)
-   return nwn.engine.CreateItemPropery(687, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_HEALERS_KIT, nil, 25, modifier)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyWeightIncrease(weight)
-   nwn.engine.StackPushInteger(weight)
-   return nwn.engine.CreateItemPropery(688, 1) 
+--- Creates material item property
+-- @param material The material type should be [0, 77] based on 
+--    iprp_matcost.2da.
+function nwn.ItemPropertyMaterial(material)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_MATERIAL, nil, 28, material)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyMaterial(nMaterialType)
-   nwn.engine.StackPushInteger(nMaterialType)
-   return nwn.engine.CreateItemPropery( 845, 1) 
-end
-
+--- Creates an "on hit cast spell" item property.
+-- @param spell nwn.IP_CONST_ONHIT_CASTSPELL_*
+-- @param level Level spell is cast at.
 function nwn.ItemPropertyOnHitCastSpell(spell, level)
-   nwn.engine.StackPushInteger(level)
-   nwn.engine.StackPushInteger(spell)
-   nwn.engine.ExecuteCommand(733, 2)
-   return nwn.engine.StackPopEngineStructure(ENGINE_STRUCTURE_ITEMPROPERTY)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ONHITCASTSPELL, spell, 26, level)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyQuality(nQuality)
-   nwn.engine.StackPushInteger(nQuality)
-   return nwn.engine.CreateItemPropery(846, 1) 
+--- Creates quality item property
+-- @param quality nwn.IP_CONST_QUALITY_*
+function nwn.ItemPropertyQuality(quality)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_QUALITY, nil, 29, quality)
+   return eff
 end
 
----
--- @param
--- @param
-function nwn.ItemPropertyAdditional(nAdditionalProperty)
-   nwn.engine.StackPushInteger(nAdditionalProperty)
-   return nwn.engine.CreateItemPropery( 847, 1) 
+--- Creates additional item property
+-- @param addition nwn.IP_CONST_ADDITIONAL_* 
+function nwn.ItemPropertyAdditional(addition)
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_ADDITIONAL, nil, 30, addition)
+   return eff
 end
 
----
--- @param
--- @param
+--- Creates a visual effect item property
+-- @param effect nwn.ITEM_VISUAL_*
 function nwn.ItemPropertyVisualEffect(effect)
-   nwn.engine.StackPushInteger(effect)
-   return nwn.engine.CreateItemPropery(739, 1) 
+   local eff = nwn.CreateItempropEffect()
+   eff:SetValues(nwn.ITEM_PROPERTY_VISUALEFFECT, effect)
+   return eff
 end

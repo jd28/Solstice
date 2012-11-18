@@ -56,7 +56,6 @@ nwn.ITEM_PROPERTY_DECREASED_ENHANCEMENT_MODIFIER           = 10
 nwn.ITEM_PROPERTY_BASE_ITEM_WEIGHT_REDUCTION               = 11
 nwn.ITEM_PROPERTY_BONUS_FEAT                               = 12
 nwn.ITEM_PROPERTY_BONUS_SPELL_SLOT_OF_LEVEL_N              = 13
-
 nwn.ITEM_PROPERTY_CAST_SPELL                               = 15
 nwn.ITEM_PROPERTY_DAMAGE_BONUS                             = 16
 nwn.ITEM_PROPERTY_DAMAGE_BONUS_VS_ALIGNMENT_GROUP          = 17
@@ -67,13 +66,10 @@ nwn.ITEM_PROPERTY_DECREASED_DAMAGE                         = 21
 nwn.ITEM_PROPERTY_DAMAGE_REDUCTION                         = 22
 nwn.ITEM_PROPERTY_DAMAGE_RESISTANCE                        = 23
 nwn.ITEM_PROPERTY_DAMAGE_VULNERABILITY                     = 24
-
 nwn.ITEM_PROPERTY_DARKVISION                               = 26
 nwn.ITEM_PROPERTY_DECREASED_ABILITY_SCORE                  = 27
 nwn.ITEM_PROPERTY_DECREASED_AC                             = 28
 nwn.ITEM_PROPERTY_DECREASED_SKILL_MODIFIER                 = 29
-
-
 nwn.ITEM_PROPERTY_ENHANCED_CONTAINER_REDUCED_WEIGHT        = 32
 nwn.ITEM_PROPERTY_EXTRA_MELEE_DAMAGE_TYPE                  = 33
 nwn.ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE                 = 34
@@ -109,27 +105,20 @@ nwn.ITEM_PROPERTY_USE_LIMITATION_RACIAL_TYPE               = 64
 nwn.ITEM_PROPERTY_USE_LIMITATION_SPECIFIC_ALIGNMENT        = 65
 nwn.ITEM_PROPERTY_USE_LIMITATION_TILESET                   = 66
 nwn.ITEM_PROPERTY_REGENERATION_VAMPIRIC                    = 67
-
 nwn.ITEM_PROPERTY_TRAP                                     = 70
 nwn.ITEM_PROPERTY_TRUE_SEEING                              = 71
 nwn.ITEM_PROPERTY_ON_MONSTER_HIT                           = 72
 nwn.ITEM_PROPERTY_TURN_RESISTANCE                          = 73
 nwn.ITEM_PROPERTY_MASSIVE_CRITICALS                        = 74
 nwn.ITEM_PROPERTY_FREEDOM_OF_MOVEMENT                      = 75
-
--- no longer working, poison is now a on_hit subtype
-nwn.ITEM_PROPERTY_POISON                                   = 76
-
 nwn.ITEM_PROPERTY_MONSTER_DAMAGE                           = 77
 nwn.ITEM_PROPERTY_IMMUNITY_SPELLS_BY_LEVEL                 = 78
-
 nwn.ITEM_PROPERTY_SPECIAL_WALK                             = 79
 nwn.ITEM_PROPERTY_HEALERS_KIT                              = 80
 nwn.ITEM_PROPERTY_WEIGHT_INCREASE                          = 81
 nwn.ITEM_PROPERTY_ONHITCASTSPELL                           = 82
 nwn.ITEM_PROPERTY_VISUALEFFECT                             = 83
 nwn.ITEM_PROPERTY_ARCANE_SPELL_FAILURE                     = 84
-
 nwn.ITEM_PROPERTY_MATERIAL                                 = 85
 nwn.ITEM_PROPERTY_QUALITY                                  = 86
 nwn.ITEM_PROPERTY_ADDITIONAL                               = 87
