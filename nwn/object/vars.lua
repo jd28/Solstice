@@ -104,7 +104,12 @@ end
 --- Get local object variable
 -- @param var_name Variable name
 function Object:GetLocalObject(var_name)
-   return _NL_GET_CACHED_OBJECT(C.nwn_GetLocalObject(get_var_table(self), var_name))
+   nwn.engine.StackPushString(var_name)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(54, 2)
+   return nwn.engine.StackPopObject()
+
+   --   return _NL_GET_CACHED_OBJECT(C.nwn_GetLocalObject(get_var_table(self), var_name))
 end
 
 ---
@@ -157,18 +162,26 @@ function Object:SetLocalLocation(var_name, val)
     C.nwn_SetLocalLocation(get_var_table(self), var_name, val) 
 end
 
---- Set local float variable
+--- Set local string variable
 -- @param var_name Variable name
 -- @param val Value
--- TODO: Redo this or NWNX won't be able to hook it.
 function Object:SetLocalString(var_name, val)
-    C.nwn_SetLocalString(get_var_table(self), var_name, val) 
+   nwn.engine.StackPushString(val)
+   nwn.engine.StackPushString(var_name)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(57, 3)
+
+--  C.nwn_SetLocalString(get_var_table(self), var_name, val) 
 end
 
 --- Set local object variable
 -- @param var_name Variable name
 -- @param val Value
 function Object:SetLocalObject(var_name, val)
-    C.nwn_SetLocalObject(get_var_table(self), var_name, val.id) 
+   nwn.engine.StackPushObject(val)
+   nwn.engine.StackPushString(var_name)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(58, 3)
+--    C.nwn_SetLocalObject(get_var_table(self), var_name, val.id) 
 end
 

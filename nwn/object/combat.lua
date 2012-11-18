@@ -30,6 +30,13 @@ function Object:GetLastDamager()
    return _NL_GET_CACHED_OBJECT(actor)
 end
 
+function Object:GetKiller()
+   if not self:GetIsValid() then return nwn.OBJECT_INVALID end
+
+   local actor = self.obj.obj.obj_killer
+   return _NL_GET_CACHED_OBJECT(actor)
+end
+
 --- Gets the last living, non plot creature that performed a
 -- hostile act against the object.
 function Object:GetLastHostileActor()

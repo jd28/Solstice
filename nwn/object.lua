@@ -87,23 +87,6 @@ function Object:Destroy(delay)
    nwn.engine.ExecuteCommand(241, 2)
 end
 
---- Returns the Resref of an object.
--- @return The Resref, empty string on error. 
-function Object:GetResref()
-   -- TODO: Fix
-   return ffi.string(ffi.C.nl_Object_GetTag(ffi.cast("Object*", self)))
-end
-
---- Determine the tag associated with an object.
--- @return Tag of the object, empty string on error.
-function Object:GetTag()
-   if self.type == GAME_OBJECT_TYPE_AREA then
-      return ffi.string(self.obj.area_tag.text)
-   end
-   local o = ffi.cast("Object*", self)
-   return ffi.string(o.obj.tag)
-end
-
 --- Determine if named timer is still active.
 -- @return true if the timer is active
 function Object:GetIsTimerActive(var_name)
