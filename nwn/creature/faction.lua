@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 --- Add PC to party
 -- @param leader Faction leader
 function Creature:AddToParty(leader)
@@ -186,4 +168,39 @@ function Creature:SetStandardFactionReputation(faction, rep)
    nwn.engine.StackPushInteger(rep)
    nwn.engine.StackPushInteger(faction)
    nwn.engine.ExecuteCommand(523, 3)
+end
+
+--- Faction Member First Iterator
+-- @param pc_only if true NPCs will be ignored
+function Creature:GetFirstFactionMember(pc_only)
+   if pc_only == nil then pc_only = true end
+   
+   nwn.engine.StackPushBoolean(pc_only)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(380, 2)
+
+   return nwn.engine.StackPopObject()
+end
+
+--- Faction Member Next Iterator
+-- @param pc_only if true NPCs will be ignored
+function Creature:GetNextFactionMember(pc_only)
+   if pc_only == nil then pc_only = true end
+   
+   nwn.engine.StackPushBoolean(pc_only)
+   nwn.engine.StackPushObject(self)
+   nwn.engine.ExecuteCommand(381, 2)
+   return nwn.engine.StackPopObject()
+end
+
+--- Faction Member Iterator
+-- @param pc_only if true NPCs will be ignored
+function Creature:FactionMembers(pc_only)
+   local obj, _obj = self:GetFirstFactionMember(pc_only)
+   return function ()
+      while obj and obj:GetIsValid() do
+         _obj, obj = obj, self:GetNextFactionMember(pc_only)
+         return _obj
+      end
+   end
 end

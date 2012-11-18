@@ -32,6 +32,7 @@ function Creature:GetEffectiveLevelDifference()
    return hd - self.effective_level
 end
 
+--- Gets total negative levels
 function Creature:GetTotalNegativeLevels()
    if not self:GetIsValid() then return 0 end
    return C.nwn_GetTotalNegativeLevels(self.stats)

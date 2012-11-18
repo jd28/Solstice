@@ -30,7 +30,7 @@ end
 
 --- Determine boss creature.
 function Creature:GetIsBoss()
-   return target:GetLocalInt("Boss") ~= 0
+   return self:GetLocalInt("Boss") ~= 0
 end
 
 --- Gets creature's size
@@ -59,7 +59,7 @@ end
 
 --- Get if creature was spawned by encounter.
 function Creature:GetIsEncounterCreature()
-   if not self:GeIsValid() then return false end
+   if not self:GetIsValid() then return false end
    return self.obj.cre_encounter_obj ~= nwn.OBJECT_INVALID.id
 end
 
