@@ -10,16 +10,12 @@ function string:starts(start)
    return string.find(self, "^" .. start)
 end
 
-function string:color(nRed, nGreen, nBlue)
-  return string.format("<c%c%c%c>%s</c>", nRed, nGreen, nBlue, self)
-end
-
-function string:tolocation()
-  local t = self:split()
-  if #t < 5 then return end
-  local oArea, x, y, z, facing = GetObjectByTag(t[1]), tonumber(t[2]),tonumber(t[3]),tonumber(t[4]),tonumber(t[5])
-  if not GetIsObjectValid(oArea) then return end
-  return Location(oArea, Vector(x,y,z), facing)
+function string:strip_margin (header)
+   local pat = "\n%s+|"
+   if header then
+      pat = string.format("\n%%s+%s", header)
+   end
+   return string.gsub(str, pat, "\n")
 end
 
 function string:trim()
