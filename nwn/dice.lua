@@ -85,6 +85,10 @@ function nwn.DetermineBestDiceRoll(roll1, roll2)
    end
 end
 
+function nwn.GetDiceRollValid(roll)
+   return roll.dice > 0 or roll.bonus > 0
+end
+
 --- Do a dice roll.
 -- @param roll DiceRoll ctype
 function nwn.DoDiceRoll(roll)
