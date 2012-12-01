@@ -41,8 +41,8 @@ end
 --    it is identical to a function call
 -- @param target Object to run the script on.
 function nwn.ExecuteScript(script, target)
-   nwn.engine.StackPushObject(oTarget)
-   nwn.engine.StackPushString(sScript)
+   nwn.engine.StackPushObject(target)
+   nwn.engine.StackPushString(script)
    nwn.engine.ExecuteCommand(8, 2)
 end
 
@@ -83,6 +83,45 @@ function nwn.GetAbilityName(ability)
    end
    
    return result
+end
+
+function nwn.GetArmorClassName(ac_type)
+   if ac_type == nwn.AC_DODGE then
+      return "Dodge"
+   elseif ac_type == nwn.AC_NATURAL then
+      return "Natural"
+   elseif ac_type == nwn.AC_ARMOUR then
+      return "Armor"
+   elseif ac_type == nwn.AC_SHIELD then
+      return "Shield"
+   elseif ac_type == nwn.AC_DEFLECTION then 
+      return "Deflection"
+   else
+      return "Invalid AC"
+   end
+end
+
+function nwn.GetMetaMagicName(meta)
+   local t = {}
+   if meta == 255 then
+      return "Metamagic: All"
+   elseif meta == 0 then
+      return "Metamagic: None"
+   elseif bit.band(meta, nwn.METAMAGIC_EMPOWER) then
+      t[#t+1] = "Empowered"
+   elseif bit.band(meta, nwn.METAMAGIC_EXTEND) then
+      t[#t+1] = "Extended"
+   elseif bit.band(meta, nwn.METAMAGIC_MAXIMIZE) then
+      t[#t+1] = "Maximized"
+   elseif bit.band(meta, nwn.METAMAGIC_SILENT) then
+      t[#t+1] = "Silent"
+   elseif bit.band(meta, nwn.METAMAGIC_STILL) then
+      t[#t+1] = "Stilled"
+   else
+      return "Metamagic: Invalid"
+   end   
+
+   return "Metamagic: " .. table.concat(t, ', ')
 end
 
 --- Get module
@@ -178,10 +217,10 @@ nwn.PCs = iter_first_next_isvalid(nwn.GetFirstPC, nwn.GetNextPC)
 -- @param tag Tag of object
 -- @param nth 
 function nwn.GetObjectByTag(tag, nth)
-   nNth = nNth or 1
+   nth = nth or 1
    
-   nwn.engine.StackPushInteger(nNth)
-   nwn.engine.StackPushString(sTag)
+   nwn.engine.StackPushInteger(nth)
+   nwn.engine.StackPushString(tag)
    nwn.engine.ExecuteCommand(200, 2)
    return nwn.engine.StackPopObject()
 end
@@ -333,3 +372,10 @@ function nwn.GetTimeMillisecond()
    return nwn.engine.StackPopInteger()
 end
 
+--- Force update time.
+function nwn.UpdateTime()
+   nwn.SetTime(nwn.GetTimeHour(),
+	       nwn.GetTimeMinute(),
+	       nwn.GetTimeSecond(),
+	       nwn.GetTimeMillisecond())
+end
