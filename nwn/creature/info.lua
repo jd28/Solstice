@@ -50,6 +50,13 @@ function Creature:GetDeityId()
    return 0
 end
 
+-- Determines if Creature is a DM
+function Creature:GetIsDM()
+   if not self:GetIsValid() then return false end
+   
+   return self.stats.cs_is_dm ~= 0
+end
+
 --- Gets if creature is possessed by DM.
 function Creature:GetIsDMPossessed()
    nwn.engine.StackPushObject(self)
