@@ -1,26 +1,10 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-require 'nwn.funcs'
-require 'nwn.effects'
+safe_require 'nwn.funcs'
+safe_require 'nwn.effects'
+safe_require 'nwn.logger'
 
 local ffi = require "ffi"
 local C = ffi.C
-
+local sm = string.strip_margin
 
 ffi.cdef[[
 void *malloc(size_t size);
@@ -35,7 +19,7 @@ function nwn.engine.GetCommandObject()
 end
 
 --- Sets NWN stack command object
-function nwn.engine.SetCommandObjectId(object)
+function nwn.engine.SetCommandObject(object)
    return C.nwn_SetCommandObjectId(object.id)
 end
 
@@ -58,8 +42,9 @@ end
 -- @param es_type The type of the Engine Structure being popped.
 function nwn.engine.StackPopEngineStructure(es_type)
    if not es_type then
-      print(debug.traceback())
-      error "Nil value passed to StackPopEngineStructure"
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Nil value passed to StackPopEngineStructure
+                        |%s]], debug.traceback()))
    end
 
    local es = C.nwn_StackPopEngineStructure(es_type)
@@ -123,21 +108,32 @@ end
 -- easier for Lua.
 -- @param value Boolean value
 function nwn.engine.StackPushBoolean(value)
+   if type(value) ~= "boolean" then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Non-boolean value passed to StackPushBoolean
+                        |%s]], debug.traceback()))
+   end
    C.nwn_StackPushInteger(value and 1 or 0)
 end
 
 --- Pushes float onto NWScript stack
 -- @param value Float value
 function nwn.engine.StackPushFloat(value)
+   if type(value) ~= "number" then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Non-number value passed to StackPushFloat
+                        |%s]], debug.traceback()))
+   end
    C.nwn_StackPushFloat(value)
 end
 
 --- Pushes integer onto NWScript stack
 -- @param value Integer value
 function nwn.engine.StackPushInteger(value)
-   if not value then
-      print(debug.traceback())
-      error "Nil value passed to StackPushInteger"
+   if type(value) ~= "number" then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Non-number value passed to StackPushInteger
+                        |%s]], debug.traceback()))
    end
    C.nwn_StackPushInteger(value)
 end
@@ -146,7 +142,15 @@ end
 -- @param es_type
 -- @param value Engine structure
 function nwn.engine.StackPushEngineStructure(es_type, value)
-   if es_type == nwn.ENGINE_STRUCTURE_EFFECT then
+   if not es_type or not value then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Nil value passed to StackPushEngineStructure
+                        |%s]], debug.traceback()))
+   end
+
+   if es_type == nwn.ENGINE_STRUCTURE_EFFECT 
+      or es_type == nwn.ENGINE_STRUCTURE_ITEMPROPERTY
+   then
       C.nwn_StackPushEngineStructure(es_type, value.eff)
    else
       C.nwn_StackPushEngineStructure(es_type, value)
@@ -156,18 +160,34 @@ end
 --- Pushes object onto NWscript stack
 -- @param object Object to push.
 function nwn.engine.StackPushObject(object)
+   if not object then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Nil value passed to StackPushObject
+                        |%s]], debug.traceback()))
+   end
+
    C.nwn_StackPushObject(object.id)
 end
 
 --- Pushes string onto NWScript stack
 -- @param value String value
 function nwn.engine.StackPushString(value)
+   if type(value) ~= "string" then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Non-string value passed to StackPushString
+                        |%s]], debug.traceback()))
+   end
    C.nwn_StackPushString(value)
 end
 
 --- Pushes vector onto NWScript stack
 -- @param value Vector value.
 function nwn.engine.StackPushVector(value)
+   if not value then
+      error(nwn.Log(nwn.LOGLEVEL_ERROR,
+		    sm[[Nil value passed to StackPushVector
+                        |%s]], debug.traceback()))
+   end
    C.nwn_StackPushVector(value)
 end
 

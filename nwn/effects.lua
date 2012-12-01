@@ -418,21 +418,29 @@ end
 --- Determine which of two damage resistance effects are better.
 -- @param eff1 An effect.
 -- @param eff2 An effect.
-function nwn.DetermineBestResistEffect(eff1, eff2)
+function nwn.DetermineResistEffect(eff1, eff2, min)
    local amount = eff1.eff.eff_integers[1]
    local limit = eff1.eff.eff_integers[2]
 
    local amount2 = eff2.eff.eff_integers[1]
    local limit2 = eff2.eff.eff_integers[2]
+
+   local min, max
    
    -- If the resist amount is higher, set the resist effect list to the effect index.
    -- If they are equal prefer the one with the highest damage limit.
-   if amount > amount2
-      or (amount == amount2 and limit > limit2)
-   then
-      return eff1
+   if (amount > amount2 or (amount == amount2 and limit > limit2)) then
+      max = eff1
+      min = eff2
    else
-      return eff2
+      max = eff2
+      min = eff1
+   end
+
+   if min then 
+      return min
+   else 
+      return max
    end
 end
 

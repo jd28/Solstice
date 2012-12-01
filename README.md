@@ -45,16 +45,17 @@
       type X - Y.  (i.e. 5 - 10 fire damage).
 	* EffectRecurring allows creating an effect that can apply another
       effect at arbitrary intervals.
+    * EffectHitPointIncrease/Decrease allows an objects maximum
+      hitpoints to be increased/decreased.
 	* EffectIcon (source nwnx_structs.nss)
 	* EffectBonusFeat (source nwnx_structs.nss)
 	* EffectWounding
-
-# Effect Stacking / Caps
-* Hardcoded effect caps have been mostly removed.  They can now be determined on
-  a creature-by-creature case-by-case basis.
-* The stacking policies of almost all effects are changeable.
-  See `examples/stacking_policies.lua`.
-
+	* EffectDisarm
+* Stacking / Caps
+    * Hardcoded effect caps have been mostly removed.  They can now be determined on
+      a creature-by-creature case-by-case basis.
+    * The stacking policies of almost all effects are changeable.
+      See `examples/stacking_policies.lua`.
 
 ## Combat Engine Differences
 * Concealment in the combat log is the modified amount, as in nwnx_defenses.
@@ -66,12 +67,6 @@
   modify combat by a number of situational factors.
   
 ## Combat Modifiers
-* 'Combat' is a slight misnomer as these adjustment are all in effect
-  outside of combat.  The only ones used only in combat are Favored
-  Enemy and situational attacks as they are dependent on attack target
-  and other factors.
-* Hitpoint adjustments are not possible versus Favored Enemy or in
-  situational attacks.
 * Modifications to AB, AC, Damage Bonus, Hitpoints can be determined
   by area, class, feat, combat mode, race, creature size, skill,
   versus favored enemies, and in situational attacks.

@@ -1,21 +1,3 @@
---------------------------------------------------------------------------------
---  Copyright (C) 2011-2012 jmd ( jmd2028 at gmail dot com )
--- 
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or
---  (at your option) any later version.
---
---  This program is distributed in the hope that it will be useful,
---  but WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---  GNU General Public License for more details.
---
---  You should have received a copy of the GNU General Public License
---  along with this program; if not, write to the Free Software
---  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
---------------------------------------------------------------------------------
-
 -- TODO: this all needs to be redone /if/ there is going to be a proxy faction
 -- object
 
@@ -138,23 +120,3 @@ function Faction:GetWorstAC(bVisible)
    return nwn.engine.StackPopObject()
 end
 
----
-function Faction:GetFirstFactionMember(bPCOnly)
-   if bPCOnly == nil then bPCOnly = true end
-   
-   nwn.engine.StackPushInteger(bPCOnly)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(380, 2)
-
-   return nwn.engine.StackPopObject()
-end
-
----
-function Faction:GetNextFactionMember(bPCOnly)
-   if bPCOnly == nil then bPCOnly = true end
-   
-   nwn.engine.StackPushInteger(bPCOnly)
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(381, 2)
-   return nwn.engine.StackPopObject()
-end

@@ -51,7 +51,7 @@ nwn.RegisterCustomEffectHandler(
 -- Since it's kind of annoying to have the effect applied but not to have those HP usable this
 -- will heal the target amount for the additional hitpoints that it receives.
 nwn.RegisterCustomEffectHandler(
-   nwn.EFFECT_CUSTOMTYPE_HITPOINTS,
+   nwn.EFFECT_CUSTOMTYPE_HP_INCREASE,
    function (effect, target, is_apply)
       local amount = effect:GetInt(1)
       if is_apply then
