@@ -14,6 +14,7 @@ require 'nwn.ctypes.encounter'
 require 'nwn.ctypes.feat'
 require 'nwn.ctypes.item'
 require 'nwn.ctypes.module'
+require 'nwn.ctypes.nwnx'
 require 'nwn.ctypes.placeable'
 require 'nwn.ctypes.trigger'
 require 'nwn.ctypes.waypoint'
@@ -51,6 +52,7 @@ void                  nwn_AddParryIndex(CNWSCombatRound *cr);
 void                  nwn_ApplyEffect(CNWSObject *, CGameEffect *, int a, int b);
 int                   nwn_CalculateOffHandAttacks(CNWSCombatRound *cr);
 uint32_t              nwn_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
+bool                  nwn_ClearLineOfSight(CNWSArea *area, Vector pointa, Vector pointb);
 CGameEffect          *nwn_CreateEffect(int32_t show_icon);
 void                  nwn_DelayCommand(uint32_t obj_id, double delay, void *vms);
 void                  nwn_DeleteLocalFloat(CNWSScriptVarTable *vt, const char *var_name);
@@ -100,6 +102,7 @@ uint32_t              nwn_GetLocalObject(CNWSScriptVarTable *vt, const char *var
 const char           *nwn_GetLocalString(CNWSScriptVarTable *vt, const char *var_name);
 CScriptVariable      *nwn_GetLocalVariableByPosition (CNWSScriptVarTable *vt, int idx);
 int                   nwn_GetLocalVariableCount (CNWSScriptVarTable *vt);
+bool                  nwn_GetLocalVariableSet(CNWSScriptVarTable *vt, const char *var_name, int8_t type);
 double                nwn_GetMaxAttackRange(CNWSCreature *cre, nwn_objid_t target);
 CNWSModule           *nwn_GetModule();
 CNWSPlayer           *nwn_GetPlayerByID (nwn_objid_t oid);
@@ -110,6 +113,7 @@ int                   nwn_GetTotalDamage(CNWSCombatAttackData *data, int a);
 int                   nwn_GetTotalEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
                                          const int eff_spellid, const int eff_type, const int eff_int0);
 int                   nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
+int                   nwn_GetTotalNegativeLevels(CNWSCreatureStats *stats);
 CNWSWaypoint         *nwn_GetWaypointById(uint32_t id);
 int8_t                nwn_GetWeaponAttackType(CNWSCombatRound *cr);
 void                  nwn_NotifyAssociateActionToggle(CNWSCreature *cre, int32_t mode);
@@ -168,15 +172,21 @@ void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
 void ns_AddAttackFeedback(CNWSCombatAttackData *attack, int32_t strref);
 void ns_AddOnHitEffect(CNWSCombatAttackData *attack, nwn_objid_t creator, CGameEffect *eff);
 void ns_AddOnHitVisual(CNWSCombatAttackData *attack, nwn_objid_t creator, uint32_t vfx);
+int  ns_BitScanFFS(uint32_t mask);
 void ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
 void ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
-
 void ns_SignalAOO(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 void ns_SignalAttack(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 void ns_SignalDamage(CNWSCreature *cre, CNWSObject *obj, double event_number, int32_t anim_len);
 void ns_SignalMiss(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 void ns_SignalOnHitEffects(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 
-CGameEffect *Local_GetLastDamageEffect();
-void Local_NWNXLog(int level, const char* log);
+ChatMessage   *Local_GetLastChatMessage();
+CombatMessage *Local_GetLastCombatMessage();
+EquipEvent    *Local_GetLastEquipEvent();
+EventEffect   *Local_GetLastEffectEvent();
+EventItemprop *Local_GetLastItemPropEvent();
+CGameEffect   *Local_GetLastDamageEffect();
+Event         *Local_GetLastNWNXEvent();
+void           Local_NWNXLog(int level, const char* log);
 ]]
