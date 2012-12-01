@@ -20,34 +20,37 @@ local mod
 -- Functions for initializing APS and working with result sets
 
 function NWNXDb.SQLInit()
-   mod = nwn.GetModule()
-   mod:SetLocalString("NWNX!ONWNXDBC!SPACER", string.rep('.', 8*128))
+   mod = mod or nwn.GetModule()
+   mod:SetLocalString("NWNX!ODBC!SPACER", string.rep('.', 8*128))
 end
 
 function NWNXDb.SQLExecDirect(sql)
-   mod:SetLocalString("NWNX!ONWNXDBC!EXEC", sql)
+   mod = mod or nwn.GetModule()
+   mod:SetLocalString("NWNX!ODBC!EXEC", sql)
 end
 
 local result_set
 
 function NWNXDb.SQLFetch()
+   mod = mod or nwn.GetModule()
    -- Reset the result set.
    result_set = nil
 
-   mod:SetLocalString("NWNX!ONWNXDBC!FETCH", mod:GetLocalString("NWNX!ONWNXDBC!SPACER"))
-   local row = mod:GetLocalString("NWNX!ONWNXDBC!FETCH");
+   mod:SetLocalString("NWNX!ODBC!FETCH", mod:GetLocalString("NWNX!ODBC!SPACER"))
+   local row = mod:GetLocalString("NWNX!ODBC!FETCH");
    if #row > 0 then
-      mod:SetLocalString("NWNX_ONWNXDBC_CurrentRow", row)
+      mod:SetLocalString("NWNX_ODBC_CurrentRow", row)
       return NWNXDb.SQL_SUCCESS
    else
-      mod:SetLocalString("NWNX_ONWNXDBC_CurrentRow", "");
+      mod:SetLocalString("NWNX_ODBC_CurrentRow", "");
       return NWNXDb.SQL_ERROR;
    end
 end
 
 function NWNXDb.SQLGetData(column)
+   mod = mod or nwn.GetModule()
    if not result_set then
-      result_set = string.split(mod:GetLocalString("NWNX_ONWNXDBC_CurrentRow"), "¬")
+      result_set = string.split(mod:GetLocalString("NWNX_ODBC_CurrentRow"), "¬")
    end
    if column > #result_set then
       return ""
@@ -110,16 +113,18 @@ void SQLExecStatement(string sql, string sStr0="",
         sRight = GetStringRight(sRight, GetStringLength(sRight) - (nPos + 1));
     }
 
-    SetLocalString(GetModule(), "NWNX!ONWNXDBC!EXEC", sLeft + sRight);
+    SetLocalString(GetModule(), "NWNX!ODBC!EXEC", sLeft + sRight);
 }
    --]]
 
 local function get_tag(object, is_global)
+   local tag
    if is_global and object:GetLocalInt ("pc_is_pc") then
       tag = object:GetLocalString("pc_player_name")
    else
       tag = object:GetTag()
    end
+   return tag
 end
 
 function NWNXDb.GetString(object, varname, is_global, table)
@@ -144,6 +149,8 @@ function NWNXDb.SetString(object, varname, value, expires, is_global, table)
    tag = NWNXDb.SQLEncodeSpecialChars(tag)
    varname = NWNXDb.SQLEncodeSpecialChars(varname)
    value = NWNXDb.SQLEncodeSpecialChars(value)
+   table = table or DEFAULT_TABLE
+   expires = expires or 0
 
    local sql = "SELECT tag FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
    NWNXDb.SQLExecDirect(sql)
@@ -174,8 +181,8 @@ function NWNXDb.GetInt(object, varname, is_global, table)
    local sql = "SELECT val FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'";
    NWNXDb.SQLExecDirect(sql)
 
-   mod:SetLocalString("NWNX!ONWNXDBC!FETCH", "-2147483647")
-   return tonumber(mod:GetLocalString("NWNX!ONWNXDBC!FETCH")) or 0
+   mod:SetLocalString("NWNX!ODBC!FETCH", "-2147483647")
+   return tonumber(mod:GetLocalString("NWNX!ODBC!FETCH")) or 0
 end
 
 function NWNXDb.SetFloat(object, varname, value, expires, is_global, table)
@@ -192,12 +199,12 @@ function NWNXDb.GetFloat(object, varname, is_global, table)
    local sql = "SELECT val FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
    NWNXDb.SQLExecDirect(sql)
 
-   mod:SetLocalString("NWNX!ONWNXDBC!FETCH", "-340282306073709650000000000000000000000.000000000");
-   return tonumber(mod:GetLocalString("NWNX!ONWNXDBC!FETCH")) or 0
+   mod:SetLocalString("NWNX!ODBC!FETCH", "-340282306073709650000000000000000000000.000000000");
+   return tonumber(mod:GetLocalString("NWNX!ODBC!FETCH")) or 0
 end
 
 function NWNXDb.SetLocation(object, varname, value, expires, is_global, table)
-   NWNXDb.SetString(object, varname, value:tostring(), expires, is_global, table)
+   NWNXDb.SetString(object, varname, value:ToString(), expires, is_global, table)
 end
 
 function NWNXDb.GetLocation(object, varname, is_global, table)
@@ -205,7 +212,7 @@ function NWNXDb.GetLocation(object, varname, is_global, table)
 end
 
 function NWNXDb.SetVector(object, varname, value, expires, is_global, table)
-   NWNXDb.SetString(object, varname, value:tostring(), expires, is_global, table)
+   NWNXDb.SetString(object, varname, value:ToString(), expires, is_global, table)
 end
 
 function NWNXDb.GetVector(object, varname, is_global, table)
@@ -231,7 +238,7 @@ function NWNXDb.SetObject(owner, varname, object, expires, is_global, table)
       sql = "INSERT INTO " .. table .. " (tag,name,val,expire) VALUES" ..
          "('" .. tag .. "','" .. varname .. "',%s," .. expires .. ")"
    end
-   mod:SetLocalString("NWNX!ONWNXDBC!SETSCORCOSQL", sql);
+   mod:SetLocalString("NWNX!ODBC!SETSCORCOSQL", sql);
    nwn.StoreCampaignObject ("NWNX", "-", object);
 end
 
@@ -245,7 +252,7 @@ function NWNXDb.GetObject(object, varname, owner, is_global, table)
    varname = SQLEncodeSpecialChars(varname)
 
     local sql = "SELECT val FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
-    mod:SetLocalString("NWNX!ONWNXDBC!SETSCORCOSQL", sql);
+    mod:SetLocalString("NWNX!ODBC!SETSCORCOSQL", sql);
 
     if not owner:GetIsValid() then
         owner = object

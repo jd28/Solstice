@@ -3,13 +3,7 @@ require 'nwn.ctypes.location'
 local ffi = require 'ffi'
 
 --- Engine Structures
-local location_mt = { __index = Location
-                      --__tostring = function ()
-                      --   if not self:GetArea() then return end
-                      --   if ((self:x() < 0) or (self:y() < 0)) then return end
-                      --   return string.format("%s %.4f %.4f %.4f %.4f", GetTag(self:area()), self:x(), self:y(), self:z(), self:facing())
-                      --end
-}
+local location_mt = { __index = Location }
 
 location_t = ffi.metatype("CScriptLocation", location_mt)
 
@@ -72,6 +66,24 @@ function Location:GetNearestCreature(type1, value1, nth, ...)
    nwn.engine.ExecuteCommand(226, 8)
    
    return nwn.engine.StackPopObject()
+end
+
+function Location.FromString(str)
+   local area, x, y, z, orient = string.match(str, "([%w_]+) %(([%d%.]+), ([%d%.]+), ([%d%.]+)%) ([%d%.]+)")
+   area = nwn.GetObjectByTag(area)
+   local pos = vector_t(x, y, z)
+
+   return nwn.Location(pos, orient, area)
+end
+
+function Location:ToString()
+   local area = self:GetArea()
+   if not area:GetIsValid() then return "" end
+
+   local pos = area:GetPosition()
+   if pos.x < 0 or pos.y < 0 then return "" end
+
+   return string.format("%s %s %.4f", area:GetTag(), pos:ToString(), self:GetFacing())
 end
 
 --- Create square trap at location.
