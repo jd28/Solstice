@@ -100,11 +100,11 @@ typedef struct CNWSItem {
     uint8_t                     field_1E7;
 
     uint32_t                    field_1E8;              /* 01E8 */
-    uint32_t                    field_1EC;              /* 01EC */
-    uint32_t                    field_1F0;              /* 01F0 */
+    CNWItemProperty            *it_active_ip;           /* 01EC */
+    uint32_t                    it_active_ip_len;       /* 01F0 */
     uint32_t                    field_1F4;              /* 01F4 */
-    uint32_t                    field_1F8;              /* 01F8 */
-    uint32_t                    field_1FC;              /* 01FC */
+    CNWItemProperty            *it_passive_ip;          /* 01F8 */
+    uint32_t                    it_passive_ip_len;      /* 01FC */
     uint32_t                    field_200;              /* 0200 */
 
     uint32_t                    it_charges;             /* 0204 */
@@ -129,14 +129,10 @@ typedef struct CNWSItem {
     uint32_t                    field_244;              /* 0244 */
     uint32_t                    field_248;              /* 0248 */
     uint32_t                    field_24C;              /* 024C */
-    uint32_t                    field_250;              /* 0250 */
-    uint32_t                    field_254;              /* 0254 */
-    uint32_t                    field_258;              /* 0258 */
-    uint32_t                    field_25C;              /* 025C */
-    uint32_t                    field_260;              /* 0260 */
-    uint32_t                    field_264;              /* 0264 */
-    uint32_t                    field_268;              /* 0268 */
-    uint32_t                    field_26C;              /* 026C */
+    CExoLocString               it_desc_id;             /* 0250 */
+    CExoLocString               it_desc_unid;           /* 0258 */
+    CExoString                  it_desc_id_over;        /* 0260 */
+    CExoString                  it_desc_unid_over;      /* 0268 */
     uint32_t                    field_270;              /* 0270 */
     uint32_t                    field_274;              /* 0274 */
     uint32_t                    field_278;              /* 0278 */
@@ -149,11 +145,11 @@ typedef struct CNWSItem {
     uint8_t                     field_28A;
     uint8_t                     field_28B;
 
-    uint32_t                    it_pickpocketable;              /* 028C */
+    uint32_t                    it_pickpocketable;      /* 028C */
 
-    uint32_t                    it_cursed;      /* 0290 */
+    uint32_t                    it_cursed;              /* 0290 */
 
-    uint32_t                    it_stacksize;              /* 0294 */
+    uint32_t                    it_stacksize;           /* 0294 */
 
     uint8_t                     it_stolen;              /* 0298 */
     uint8_t                     field_299;

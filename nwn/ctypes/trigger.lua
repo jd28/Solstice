@@ -32,7 +32,7 @@ typedef struct CNWSTrigger {
     uint32_t                    field_22C;           /* 022C 022C */
     uint32_t                    field_230;           /* 0230 0230 */
     uint32_t                    field_234;           /* 0234 0234 */
-    uint32_t                    field_238;           /* 0238 0238 */
+    uint32_t                    tr_last_clicker;     /* 0238 0238 */
     uint32_t                    field_23C;           /* 023C 023C */
     uint32_t                    field_240;           /* 0240 0240 */
     uint32_t                    field_244;           /* 0244 0244 */
