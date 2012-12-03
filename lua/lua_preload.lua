@@ -1,3 +1,5 @@
+-- Copyright (C) 2012 jmd ( jmd2028 at gmail dot com )
+
 -- String Function
 function string:split(sep)
   local sep, fields = sep or " ", {}
