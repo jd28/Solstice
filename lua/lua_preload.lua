@@ -15,7 +15,7 @@ function string:strip_margin (header)
    if header then
       pat = string.format("\n%%s+%s", header)
    end
-   return string.gsub(str, pat, "\n")
+   return string.gsub(self, pat, "\n")
 end
 
 function string:trim()

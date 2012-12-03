@@ -31,7 +31,7 @@ function NWNXChat_HandleChatMessage()
 end
 
 function NWNXChat_HandleCombatMessage()
-   if not CHAT_HANDLER then return false end
+   if not CC_HANDLER then return false end
 
    local msg = C.Local_GetLastCombatMessage()
    if msg == nil then 

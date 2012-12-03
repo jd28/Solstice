@@ -19,9 +19,9 @@ function safe_require(file)
 
    C.Local_NWNXLog(0, "Requiring: " .. file .. "\n")
 
-   local result, error = pcall(req)
+   local result, err = pcall(req)
    if not result then
-      C.Local_NWNXLog(0, fmt("ERROR Requiring: %s : %s \n", file, error))
+      C.Local_NWNXLog(0, fmt("ERROR Requiring: %s : %s \n", file, err))
       return ret
    end
 
@@ -54,9 +54,9 @@ for f in lfs.dir("./Solstice") do
 
       -- Wrap the dofile call in a pcall so that errors can be logged here
       -- and so that they will not cause the for loop to abort.
-      result, error = pcall(function() dofile(file) end)
+      local result, err = pcall(function() dofile(file) end)
       if not result then
-	 C.Local_NWNXLog(0, fmt("ERROR Loading: %s : %s \n", file, error))
+	 C.Local_NWNXLog(0, fmt("ERROR Loading: %s : %s \n", file, err))
       end
    end
 end

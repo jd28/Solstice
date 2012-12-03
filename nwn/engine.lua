@@ -108,10 +108,10 @@ end
 -- easier for Lua.
 -- @param value Boolean value
 function nwn.engine.StackPushBoolean(value)
-   if type(value) ~= "boolean" then
+   if value and type(value) ~= "boolean" then
       error(nwn.Log(nwn.LOGLEVEL_ERROR,
-		    sm[[Non-boolean value passed to StackPushBoolean
-                        |%s]], debug.traceback()))
+		    sm([[Non-boolean value passed to StackPushBoolean
+                        |%s]]), debug.traceback()))
    end
    C.nwn_StackPushInteger(value and 1 or 0)
 end
