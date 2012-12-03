@@ -1,212 +1,249 @@
 local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
+local fmt = string.format
+local sm = string.strip_margin
+local socket = require 'socket'
 
-ffi.cdef[[
-typedef struct AttackInfo {
-   CNWSCombatRound  *attacker_cr;
-   CNWSCombatRound  *target_cr;
-   CNWSCombatAttackData *attack;
-   uint32_t current_attack;
-   uint32_t attack_id;
-   uint32_t target_state;
-   uint32_t situational_flags;
-   int32_t  weapon;
-   bool is_offhand;
-   nwn_objid_t attacker;
-   nwn_objid_t target;
-} AttackInfo;
-]]
+safe_require 'nwn.ctypes.solstice'
+safe_require 'nwn.attack'
 
-attack_info_t = ffi.typeof("AttackInfo")
+--- Bridge functions.
 
-require 'nwn.combat.bridge'
-require 'nwn.combat.damage_format'
-require 'nwn.combat.damage'
-require 'nwn.combat.defensive_abilities'
-require 'nwn.combat.defensive_effects'
-require 'nwn.combat.post_damage'
-require 'nwn.combat.situation'
-require 'nwn.combat.state'
+-- this function is called by a few others, EquipMostDamaging...
+function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
+   return 0
 
-local dc = require 'nwn.combat.default_combat'
-
-
-function NSAddCombatMessageData(attack_info, type, objs, ints)
-   C.nwn_AddCombatMessageData(attack_info.attack, type or 0, #objs, objs[1] or 0, objs[2] or 0, 
-			      #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0)
+--   attacker = _NL_GET_CACHED_OBJECT(attacker)
+--   target = _NL_GET_CACHED_OBJECT(target)
+--   if not attacker:GetIsValid() then return 0 end
+--   return attacker:GetDamageRollVersus(target, is_offhand, mult, is_sneak, is_death, is_kistrike, attack)
 end
 
---- Add feedback to attack
-function NSAddAttackFeedback(attack_info, feedback)
-   C.ns_AddAttackFeedback(attack_info.attack, feedback)
+function NSGetCriticalHitMultiplier(attacker, is_offhand)
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   if not attacker:GetIsValid() then return 0 end
+   return attacker:GetCriticalHitMultiplier(is_offhand == 1)
 end
 
-local ATTACK_ID = 1
+function NSGetCriticalHitRange(attacker, is_offhand)
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   if not attacker:GetIsValid() then return 0 end
+   return attacker:GetCriticalHitRange(is_offhand == 1)
+end
 
-function NSGetAttackInfo(attacker, target)
-   local attack_info = attack_info_t()
-   attack_info.attacker_cr = attacker.obj.cre_combat_round
-   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
-   attack_info.attacker = attacker.id
-   attack_info.target = target.id
-   attack_info.attack_id = ATTACK_ID
-   ATTACK_ID = ATTACK_ID + 1
-   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
-   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
-   attack_info.attack.cad_target = target.id
-   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
-   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+function NSGetCriticalHitRoll(attacker, is_offhand)
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   if not attacker:GetIsValid() then return 0 end
+   return 21 - attacker:GetCriticalHitRange(is_offhand == 1)
+end
 
-   -- Get equip number
-   local weapon = C.nwn_GetCurrentAttackWeapon(attack_info.attacker_cr, attack_info.attack.cad_attack_type)
-   attack_info.weapon = 3
-   if weapon ~= nil then
-      for i = 0, 5 do
-	 if attacker.ci.equips[i].id == weapon.obj.obj_id then
-	    attack_info.weapon = i
-	    break
-	 end
-      end
-   end
+function NSInitializeNumberOfAttacks(cre)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   if not cre:GetIsValid() then return end
+   cre:InitializeNumberOfAttacks()
+end
 
+function NSResolveMeleeAttack(attacker, target, attack_count, anim)
+   local start = socket.gettime() * 1000
+
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   target = _NL_GET_CACHED_OBJECT(target)
+
+   if not target:GetIsValid() then return end 
+
+   local attack = Attack.new(attacker, target)
+   local use_cached = false
+   local damage_result
+
+   -- If the target is a creature detirmine it's state and any situational modifiers that
+   -- might come into play.  This only needs to be done once per attack group because
+   -- the values can't change.
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
-      attack_info.target_cr = target.obj.cre_combat_round
+      attack.info.target_state = attacker:ResolveTargetState(target)
+      attack.info.situational_flags = attacker:ResolveSituationalModifiers(target, attack)
    end
 
-   return attack_info
-end
+   for i = 0, attack_count - 1 do
+      if not attack:GetIsCoupDeGrace() then
+         attack:ResolveCachedSpecialAttacks()
+      end
 
-function NSUpdateAttackInfo(attack_info, attacker, target)
-   attack_info.attacker_cr.cr_current_attack = attack_info.attacker_cr.cr_current_attack + 1
-   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
-   attack_info.attack_id = ATTACK_ID
-   ATTACK_ID = ATTACK_ID + 1
-   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
-   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
-   attack_info.attack.cad_target = target.id
-   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
-   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+      -- Determine if able to use special attack (if one has been used).
+      if attack:GetIsSpecialAttack() then
+	 local sa = attack:GetSpecialAttack()
+         if sa < 1115 and attacker:GetRemainingFeatUses(sa) == 0 then
+            attack:ClearSpecialAttack()
+         end
+      end
 
-   -- Get equip number
-   local weapon = C.nwn_GetCurrentAttackWeapon(attack_info.attacker_cr, attack_info.attack.cad_attack_type)
-   attack_info.weapon = 3
-   if weapon ~= nil then
-      for i = 0, 5 do
-	 if attacker.ci.equips[i].id == weapon.obj.obj_id then
-	    attack_info.weapon = i
-	    break
+      attack:ResolveAttackRoll(use_cached)
+
+      if attack:GetIsHit() then
+	 damage_result = attack:ResolveDamage(use_cached)
+	 attack:ResolvePostDamage(false)
+      end
+      attack:ResolveMeleeAnimations(i, attack_count, anim)
+
+      -- Attempt to resolve a special attack one was
+      -- a) Used
+      -- b) The attack is a hit.
+      if attack:GetIsSpecialAttack() and attack:GetIsHit() then
+	 -- Special attacks only apply when the target is a creature
+	 -- and damage is greater than zero.
+	 if target.type == nwn.GAME_OBJECT_TYPE_CREATURE and damage_result:GetTotal() > 0 then
+	    attacker:DecrementRemainingFeatUses(attack:GetSpecialAttack())
+	    
+	    -- The resolution of Special Attacks will return an effect to be applied
+	    -- or nil.
+	    local success, eff = NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack)
+	    if success then
+	       -- Check to makes sure an effect was returned.
+	       if eff then
+		  -- Set effect to direct so that Lua will not delete the
+		  -- effect.  It will be deleted by the combat engine.
+		  eff.direct = true
+		  -- Add the effect to the onhit effect list so that it can
+		  -- be applied when damage is signaled.
+		  attack:AddEffect(eff)
+	       end
+	    else
+	       -- If the special attack failed because it wasn't
+	       -- applicable or the targets skill check (for example)
+	       -- was success full set the attack result to 5.
+	       attack:SetResult(5)
+	    end
+	 else
+	    -- If the target is not a creature or no damage was dealt set attack result to 6.
+	    attack:SetResult(6)
 	 end
       end
+
+      attack:UpdateInfo()
    end
+
+   attack:SignalDamage(attack_count, false)
+
+   local stop = socket.gettime() * 1000
+   print(string.format("Resolve Melee Attack Timer: Attacks %d, Time: %.4f", attack_count, stop-start))
 end
---- Gets the current attack weapon
--- @param attack_info AttackInfo ctype
-function NSGetCurrentAttackWeapon(attacker, attack_info)
-   if not attack_info then
-      error(debug.traceback())
+
+-- called by nwnx
+function NSResolveRangedAttack(attacker, target, attack_count, anim)
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   target = _NL_GET_CACHED_OBJECT(target)
+
+   local start = socket.gettime() * 1000
+
+   -- Attack count can be modified if, say, a creature only has less arrows left than attacks
+   -- or none at all.
+   attack_count = attacker:GetAmmunitionAvailable(attack_count)
+
+   -- TODO
+   if not target:GetIsValid() or attack_count == 0 then
+      NSResolveOutOfAmmo(attacker)
+      return
    end
-   local n = attack_info.weapon
-   if n >= 0 and n <= 5 then
-      local id = attacker.ci.equips[n].id
-      if id == 0 then
-	 return nwn.OBJECT_INVALID
-      else
-	 return _NL_GET_CACHED_OBJECT(id)
+
+   local attack = Attack.new(attacker, target)
+   local use_cached = false
+   local dmg_result
+
+   -- If the target is a creature detirmine it's state and any situational modifiers that
+   -- might come into play.  This only needs to be done once per attack group because
+   -- the values can't change.
+   if target.type == nwn.GAME_OBJECT_TYPE_CREATURE then
+      attack.info.target_state = attacker:ResolveTargetState(target)
+      attack.info.situational_flags = attacker:ResolveSituationalModifiers(target, attack)
+   end
+
+   for i = 0, attack_count - 1 do
+      if not attack:GetIsCoupDeGrace() then
+         attack:ResolveCachedSpecialAttacks()
       end
+
+      -- Special Attack
+      -- Determine if able to use special attack (if one has been used).
+      if attack:GetIsSpecialAttack() then
+	 local sa = attack:GetSpecialAttack()
+         if sa < 1115 and attacker:GetRemainingFeatUses(sa) == 0 then
+            attack:ClearSpecialAttack()
+         end
+      end
+
+      attack:ResolveAttackRoll(use_cached)
+
+      if attack:GetIsHit() then
+	 damage_result = attack:ResolveDamage(use_cached)
+	 attack:ResolvePostDamage(true)
+      else
+         attack:ResolveRangedMiss()
+      end
+      attack:ResolveRangedAnimations(anim)
+
+      -- Attempt to resolve a special attack one was
+      -- a) Used
+      -- b) The attack is a hit.
+      if attack:GetIsSpecialAttack() and attack:GetIsHit() then
+	 -- Special attacks only apply when the target is a creature
+	 -- and damage is greater than zero.
+	 if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
+	    and damage_result:GetTotal() > 0
+	 then
+	    attacker:DecrementRemainingFeatUses(attack:GetSpecialAttack())
+	    
+	    -- The resolution of Special Attacks will return an effect to be applied
+	    -- or nil.
+	    local success, eff = NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, attack_info)
+	    if success then
+	       -- Check to makes sure an effect was returned.
+	       if eff then
+		  -- Set effect to direct so that Lua will not delete the
+		  -- effect.  It will be deleted by the combat engine.
+		  eff.direct = true
+		  -- Add the effect to the onhit effect list so that it can
+		  -- be applied when damage is signaled.
+		  attack:AddEffect(eff)
+	       end
+	    else
+	       -- If the special attack failed because it wasn't
+	       -- applicable or the targets skill check (for example)
+	       -- was success full set the attack result to 5.
+	       attack:SetAttackResult(5)
+	    end
+	 else
+	    -- If the target is not a creature or no damage was dealt set attack result to 6.
+	    attack:SetAttackResult(6)
+	 end
+      end
+
+      attack:UpdateAttackInfo()
    end
-   return nwn.OBJECT_INVALID
+   attack:SignalDamage(attack_count, true)
+
+   local stop = socket.gettime() * 1000
+   print(string.format("Resolve Ranged Attack Timer: Attacks %d, Time: %.4f", attack_count, stop-start))
+
 end
 
---- Get if attack is an offhand attack
--- @param cr CNWSCombatRound ctype
-function NSGetOffhandAttack(cr)
-   return cr.cr_current_attack + 1 > 
-      cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
+-- This function is called by others get worst faction AC...
+function NSGetArmorClassVersus(target, attacker, touch)
+   attacker = _NL_GET_CACHED_OBJECT(attacker)
+   target = _NL_GET_CACHED_OBJECT(target)
+   return target:GetACVersus(attacker, touch == 1)
 end
 
-function NSAddOnHitVisualEffect(attack, attacker, vfx)
-   C.ns_AddOnHitVisual(attack, attacker.id, vfx)
+-- this function is called by a few others, EquipMostDamaging...
+function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type)
+   return 0
+--   attacker = _NL_GET_CACHED_OBJECT(attacker)
+--   target = _NL_GET_CACHED_OBJECT(target)
+--   return attacker:GetABVersus(target)
 end
 
-function NSAddOnHitEffect(attack_info, attacker, eff)
-   C.ns_AddOnHitEffect(attack_info.attack, attacker.id, eff.eff)
-end
+function NSSavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat)
+   cre = _NL_GET_CACHED_OBJECT(cre)
+   vs = _NL_GET_CACHED_OBJECT(vs)
 
-function NSGetAttackResult(attack_info)
-   local t = attack_info.attack.cad_attack_result
-
-   return t == 1 or t == 3 or t == 5 or t == 6 or t == 7 or t == 10
-end
-
-function NSGetAttackRoll(attack_info)
-   return attack_info.attack.cad_attack_roll + attack_info.attack.cad_attack_mod
-end
-
-function NSGetIsRangedAttack(attack_info)
-   return attack_info.attack.cad_ranged_attack == 1
-end
-
-function NSSignalMeleeDamage(attacker, target, attack_count)
-   C.nwn_SignalMeleeDamage(attacker.obj, target.obj.obj, attack_count)
-end
-
-function NSSignalRangedDamage(attacker, target, attack_count)
-   C.nwn_SignalRangedDamage(attacker.obj, target.obj.obj, attack_count)
-end
-
-function NSSetAttackResult(attack_info, result)
-   attack_info.attack.cad_attack_result = result
-end
-
-function NSResolveCachedSpecialAttacks(attacker)
-   C.nwn_ResolveCachedSpecialAttacks(attacker.obj)
-end
-
-function NSResolveItemCastSpell(attacker, target)
-   C.nwn_ResolveItemCastSpell(attacker.obj, target.obj.obj)
-end
-
-function NSResolveOnHitEffects(attacker, target, attack_info, crit)
-   C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, attack_info.is_offhand, crit)
-end
-
-function NSResolveMeleeAnimations(attacker, i, attack_count, target, anim)
-   C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, anim)
-end
-
-function NSResolveOutOfAmmo(attacker)
-   C.nwn_SetRoundPaused(attacker.cre_combat_round, 0, 0x7F000000)
-   C.nwn_SetPauseTimer(attacker.cre_combat_round, 0, 0)
-   C.nwn_SetAnimation(attacker.obj, 1)
-end
-
-function NSResolveRangedAnimations(attacker, target, anim)
-   C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, anim)
-end
-
-function NSResolveRangedMiss(attacker, target)
-   C.nwn_ResolveRangedMiss(attacker.obj, target.obj.obj)
-end
-
-function NSGetIsCoupDeGrace(attack_info)
-   return attack_info.attack.cad_coupdegrace ~= 0
-end
-
-function NSGetIsCriticalHit(attack_info)
-   return attack_info.attack.cad_attack_result == 3
-end
-
-function NSGetIsSpecialAttack(attack_info)
-   return attack_info.attack.cad_special_attack ~= 0
-end
-
-function NSGetSpecialAttack(attack_info)
-   return attack_info.attack.cad_special_attack
-end
-
-function NSClearSpecialAttack(attack_info)
-   attack_info.attack.cad_special_attack = 0
+   return cre:SavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat)
 end

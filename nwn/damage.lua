@@ -39,8 +39,6 @@ function nwn.RegisterDamageRoll(id, dice, side, bonus)
       return
    end
 
---   print(id)
-
    DAMAGES.roll[id] = dice_roll_t(dice, side, bonus)
 end
 
@@ -66,17 +64,28 @@ function nwn.GetDamageIndexFromFlag(flag)
    return idx
 end
 
+--- Get damage flag from damage index.
+-- @param idx Damage idx
 function nwn.GetDamageFlagFromIndex(idx)
    return bit.lshift(1, idx)
 end
 
-function nwn.GetDamageName(type)
-   local dmg = DAMAGES[type].name
+--- Get damage name by flag.
+-- @param flag Damage flag
+function nwn.GetDamageName(flag)
+   local dmg = DAMAGES[flag].name
    if not dmg then
       return "Invalid Damage"
    else
       return dmg
    end
+end
+
+--- Get damage name by index.
+-- @param idx Damage idx
+function nwn.GetDamageNameByIndex(idx)
+   local flag = nwn.GetDamageFlagFromIndex(idx)
+   return nwn.GetDamageName(flag)
 end
 
 --- Get damage roll from constant
@@ -95,8 +104,10 @@ function nwn.GetDamageRollFromRange(start, stop)
    return dice_roll_t(1, stop - start, start)
 end
 
-function nwn.GetDamageSaveType(dmg_type)
-   local st = DAMAGES[type].save_type
+--- Get damage save type
+-- @param flag Damage flag
+function nwn.GetDamageSaveType(flag)
+   local st = DAMAGES[flag].save_type
    if not st then
       return nwn.SAVING_THROW_TYPE_NONE
    else

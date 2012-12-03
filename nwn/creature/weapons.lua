@@ -196,7 +196,7 @@ function Creature:GetWeaponCritMultiplier(weap)
    local basecm = bi.bi_crit_mult
    local feat
 
-   -- WM Ki Critical add +2.  Might be more efficient to calculate via level.
+   -- WM Ki Critical add +1.  Might be more efficient to calculate via level.
    if self:GetHasFeat(nwn.FEAT_INCREASE_MULTIPLIER) then
       feat = nwn.GetWeaponFeat(nwn.WEAPON_MASTERFEAT_WEAPON_OF_CHOICE,
                                basetype)

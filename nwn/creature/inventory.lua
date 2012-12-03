@@ -2,11 +2,12 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
+local sm = string.strip_margin
 
 ---
 -- TODO fill in.
 function Creature:GetAmmunitionAvailable(attack_count)
-   return true
+   return attack_count
 end
 
 --- Iterator of a creature's equipped items.
@@ -42,6 +43,32 @@ function Creature:ForceUnequip(item)
    self:ActionUnequipItem(item)
    self:ActionDoCommand(function (self) self:SetCommandable(true) end)
    self:SetCommandable(false)
+end
+
+function Creature:GetEquipNumFromEquips(is_offhand)
+   local weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   if not is_offhand and weap:GetIsValid() then
+      return 0
+   end
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+   if weap:GetIsValid() then return 1 end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_ARMS)
+   if weap:GetIsValid() and weap:GetBaseType() == nwn.BASE_ITEM_GLOVES then 
+      return 2
+   end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_L)
+   if weap:GetIsValid() then return 3 end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_R)
+   if weap:GetIsValid() then return 4 end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_B)
+   if weap:GetIsValid() then return 5 end
+
+   -- Default to unarmed.
+   return 3
 end
 
 --- Determines if weapon is effect versus a target.
@@ -113,6 +140,39 @@ function Creature:GetRelativeWeaponSize(weap)
       return 0
    end
    return C.nwn_GetRelativeWeaponSize(self.obj, weap.obj)
+end
+
+function Creature:GetWeaponFromEquips(is_offhand)
+   -- If the attack is offhand, then there is either a weapon there
+   -- or not so just return it.
+   local weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND)
+   if is_offhand then return weap end
+
+   -- If it's not an offhand attack check the right hand.
+   -- if it's there we can return if not fall back to gloves,
+   -- then to creature attacks.  If nothing is equipped return
+   -- nwn.OBJECT_INVALID
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   if weap:GetIsValid() then return weap end
+
+   -- We want to ignore bracers here...
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_ARMS)
+   if weap:GetIsValid() and weap:GetBaseType() == nwn.BASE_ITEM_GLOVES then 
+      return weap
+   end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_L)
+   if weap:GetIsValid() then return weap end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_R)
+   if weap:GetIsValid() then return weap end
+
+   weap = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_B)
+   if weap:GetIsValid() then return weap end
+
+   -- Default to unarmed.
+   return nwn.OBJECT_INVALID
 end
 
 --- Gives gold to creature

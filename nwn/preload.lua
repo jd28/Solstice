@@ -40,8 +40,10 @@ require "nwn.location"
 require "nwn.object"
 require "nwn.aoe"
 require "nwn.area"
+safe_require 'nwn.attack'
 require "nwn.combat"
 require "nwn.damage"
+safe_require 'nwn.damage_roll'
 require "nwn.weapons"
 require "nwn.creature"
 require "nwn.effects"

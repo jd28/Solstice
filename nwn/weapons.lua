@@ -35,14 +35,9 @@ function nwn.GetWeaponBaseDamageType(baseitem)
       mask = nwn.DAMAGE_TYPE_PHYSICAL
    end
 
-   if not WEAPONS.base_dmg_type or not WEAPONS.base_dmg_type[baseitem] then
-      type = nwn.DAMAGE_TYPE_BASE_WEAPON
-   end
-
    type = type or WEAPONS.base_dmg_type[baseitem]
-   mask = mask or WEAPONS.base_dmg_mask[baseitem]
 
-   return type, mask
+   return type
 end
 
 --- Determines which ability modifer to use for damage bonus

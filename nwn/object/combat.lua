@@ -7,11 +7,43 @@ function Object:DoDamage(amount)
    return C.nwn_DoDamage(self.obj.obj, self.type, amount)
 end
 
+--- Get an objects AC
+-- This is just a placeholder function, if anyone wants to hook in and give, say, a 
+-- placeable AC.
+-- @param attack Attack instance, just in case.
+function Object:GetAC(attack)
+   return 0
+end
+
+--- Get an objects AC versus
+-- This is just a placeholder function, if anyone wants to hook in and give, say, a 
+-- placeable AC.
+-- @param attacker Whoever is attacking the object
+-- @param attack Attack instance, just in case.
+function Object:GetACVersus(attacker, attack)
+   local ac = self:GetAC(attack)
+   return ac
+end
+
+--- Get an objects concealment
+-- This is just a placeholder function, if anyone wants to hook in and give, say, a 
+-- placeable concealment.
+function Object:GetConcealment()
+   return 0
+end
+
 ---
 function Object:GetHardness()
    nwn.engine.StackPushObject(self)
    nwn.engine.ExecuteCommand(796, 1)
    return nwn.engine.StackPopInteger()
+end
+
+--- Get if an object is immune to critical hits.
+-- This is just a placeholder function, if anyone wants to hook in and give, say, a 
+-- placeable immune to criticals.
+function Object:GetIsImmuneToCriticalHits(attacker)
+   return false
 end
 
 --- Determine who last attacked a creature, door or placeable object.

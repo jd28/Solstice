@@ -28,25 +28,25 @@ end
 ------------------------------------------------------------------------
 -- Global Functions
 
-function NSSpecialAttack(event_type, attacker, target, attack_info)
-   if NSGetIsRangedAttack(attack_info) then
-      return NSMeleeRangedAttack(NSGetSpecialAttack(attack_info), event_type, attacker, target, attack_info)
+function NSSpecialAttack(event_type, attacker, target, attack)
+   if attack:GetIsRangedAttack() then
+      return NSMeleeRangedAttack(attack:GetSpecialAttack(), event_type, attacker, target, attack)
    else
-      return NSMeleeSpecialAttack(NSGetSpecialAttack(attack_info), event_type, attacker, target, attack_info)
+      return NSMeleeSpecialAttack(attack:GetSpecialAttack(), event_type, attacker, target, attack)
    end
 end
 
-function NSMeleeSpecialAttack(attack_type, event_type, attacker, defender, attack_info)
+function NSMeleeSpecialAttack(attack_type, event_type, attacker, defender, attack)
    if spec_attacks[attack_type] and spec_attacks[attack_type][event_type] then
-      return spec_attacks[attack_type][event_type](attacker, defender, attack_info)
+      return spec_attacks[attack_type][event_type](attacker, defender, attack)
    elseif event_type == nwn.SPECIAL_ATTACK_EVENT_AB then
       return 0
    end
 end
 
-function NSMeleeRangedAttack(attack_type, event_type, attacker, defender, attack_info)
+function NSMeleeRangedAttack(attack_type, event_type, attacker, defender, attack)
    if spec_attacks_ranged[attack_type] and spec_attacks[attack_type][event_type] then
-      return spec_attacks_ranged[attack_type][event_type](attacker, defender, attack_info)
+      return spec_attacks_ranged[attack_type][event_type](attacker, defender, attack)
    elseif event_type == nwn.SPECIAL_ATTACK_EVENT_AB then
       return 0
    end
