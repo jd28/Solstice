@@ -154,16 +154,7 @@ nwn.GENDER_BOTH    = 2
 nwn.GENDER_OTHER   = 3
 nwn.GENDER_NONE    = 4
 
--- Deprecated: nwn.ATTACK_BONUS_* use nwn.ATTACK_TYPE_* instead.
-nwn.ATTACK_BONUS_MISC                = 0
-nwn.ATTACK_BONUS_ONHAND              = 1
-nwn.ATTACK_BONUS_OFFHAND             = 2
-nwn.ATTACK_BONUS_CWEAPON1            = 3
-nwn.ATTACK_BONUS_CWEAPON2            = 4
-nwn.ATTACK_BONUS_CWEAPON3            = 5
--- ????
-nwn.ATTACK_BONUS_UNARMED             = 7
-
+-- Removed nwn.ATTACK_BONUS_* use nwn.ATTACK_TYPE_* instead.
 nwn.ATTACK_TYPE_MISC                = 0
 nwn.ATTACK_TYPE_ONHAND              = 1
 nwn.ATTACK_TYPE_OFFHAND             = 2
@@ -174,12 +165,7 @@ nwn.ATTACK_TYPE_CWEAPON3            = 5
 nwn.ATTACK_TYPE_UNARMED             = 7
 -- ????
 
-nwn.AC_DODGE_BONUS                   = 0
-nwn.AC_NATURAL_BONUS                 = 1
-nwn.AC_ARMOUR_ENCHANTMENT_BONUS      = 2
-nwn.AC_SHIELD_ENCHANTMENT_BONUS      = 3
-nwn.AC_DEFLECTION_BONUS              = 4
-
+-- Removed old nwn.AC_* use these instead.
 nwn.AC_DODGE      = 0
 nwn.AC_NATURAL    = 1
 nwn.AC_ARMOUR     = 2

@@ -171,6 +171,9 @@ function DamageRoll:ResolveDamageAdjustments(is_offhand, attack)
    local weap = attack and attack:GetCurrentWeapon() or att:GetWeaponFromEquips(is_offhand)
    local base_dmg_type = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
 
+   -- Damage power.  TODO: The monk unarmed Ki thing.
+   local damage_power = nwn.GetWeaponPower(weap, tar)
+
    for i = 0, NS_OPT_NUM_DAMAGES - 1 do
       local amt = self.result.damages[i]
       local imm_adj, resist_adj, soak_adj, mod_adj = 0, 0, 0, 0
@@ -187,7 +190,7 @@ function DamageRoll:ResolveDamageAdjustments(is_offhand, attack)
       -- Damage Reduction.  Damage reduction only applies to base weapon damage at index 12.
       if i == 12 then
 	 amt, soak_adj = tar:GetDamageReductionAdj(self.result.damages[12],
-						damage_power or 1, true)
+						   damage_power, true)
 	 self.result.soak_adjust = soak_adj
       end
 
@@ -310,6 +313,41 @@ function DamageRoll:ResolveEffectModifiers()
 
       self.bonus.idxs[i] = bon_idx
       self.penalty.idxs[i] = pen_idx
+   end
+end
+
+--- Resolves damage from weapons item properties.
+-- NOTE: This is only for ranged ammunition.  ALL other weapon damage is 
+-- already calculated when resolving effects.
+function DamageRoll:ResolveWeaponDamage(weap)
+   local ip
+
+   -- Active, might not have to bother with the active ones.
+   for i = 0, weap.obj.it_active_ip_len - 1 do
+      ip = weap.obj.it_active_ip[i]
+      if ip.ip_type == nwn.ITEM_PROPERTY_DAMAGE_BONUS then
+	 local bonus = nwn.GetDamageRollFromConstant(ip.ip_param_value)
+	 self:AddBonus(ip.ip_cost_value, bonus)
+      end
+
+      if ip.ip_type == nwn.ITEM_PROPERTY_DECREASED_DAMAGE then
+	 local pen = dice_roll_t(0, 0, ip.ip_cost_value)
+	 self:AddPenalty(nwn.DAMAGE_TYPE_BASE_WEAPON, pen)
+      end
+   end
+
+   -- Passive
+   for i = 0, weap.obj.it_passive_ip_len - 1 do
+      ip = weap.obj.it_passive_ip[i]
+      if ip.ip_type == nwn.ITEM_PROPERTY_DAMAGE_BONUS then
+	 local bonus = nwn.GetDamageRollFromConstant(ip.ip_param_value)
+	 self:AddBonus(ip.ip_cost_value, bonus)
+      end
+
+      if ip.ip_type == nwn.ITEM_PROPERTY_DECREASED_DAMAGE then
+	 local pen = dice_roll_t(0, 0, ip.ip_cost_value)
+	 self:AddPenalty(nwn.DAMAGE_TYPE_BASE_WEAPON, pen)
+      end
    end
 end
 

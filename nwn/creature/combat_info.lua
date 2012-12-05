@@ -122,7 +122,7 @@ function Creature:UpdateCombatModifierFeat()
    local ab, ac = 0, 0
 
    if self:GetHasFeat(nwn.FEAT_EPIC_PROWESS) then
-      ab = ab + 2
+      ab = ab + 1
    end
 
    if self:GetHasFeat(nwn.FEAT_EPIC_ARMOR_SKIN) then

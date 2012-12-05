@@ -11,18 +11,19 @@ safe_require 'nwn.attack'
 ---
 function nwn.GetAttackTypeFromEquipNum(num)
    if num == 0 then
-      return nwn.ATTACK_BONUS_ONHAND
+      return nwn.ATTACK_TYPE_ONHAND
    elseif num == 1 then
-      return nwn.ATTACK_BONUS_OFFHAND
+      return nwn.ATTACK_TYPE_OFFHAND
    elseif num == 2 then
-      return nwn.ATTACK_BONUS_UNARMED
+      return nwn.ATTACK_TYPE_UNARMED
    elseif num == 3 then
-      return nwn.ATTACK_BONUS_CWEAPON1
+      return nwn.ATTACK_TYPE_CWEAPON1
    elseif num == 4 then
-      return nwn.ATTACK_BONUS_CWEAPON2
+      return nwn.ATTACK_TYPE_CWEAPON2
    elseif num == 5 then
-      return nwn.ATTACK_BONUS_CWEAPON3
+      return nwn.ATTACK_TYPE_CWEAPON3
    else
+      print(debug.traceback())
       error "Invalid Equip Number"
    end
 end
@@ -37,16 +38,6 @@ function nwn.ZeroCombatMod(mod)
 end
 
 --- Bridge functions.
-
--- this function is called by a few others, EquipMostDamaging...
-function NSGetDamageRoll(attacker, target, offhand, crit, sneak, death, ki_damage, attack_info)
-   return 0
-
---   attacker = _NL_GET_CACHED_OBJECT(attacker)
---   target = _NL_GET_CACHED_OBJECT(target)
---   if not attacker:GetIsValid() then return 0 end
---   return attacker:GetDamageRollVersus(target, is_offhand, mult, is_sneak, is_death, is_kistrike, attack)
-end
 
 function NSGetCriticalHitMultiplier(attacker, is_offhand)
    attacker = _NL_GET_CACHED_OBJECT(attacker)
@@ -258,7 +249,7 @@ end
 function NSGetArmorClassVersus(target, attacker, touch)
    attacker = _NL_GET_CACHED_OBJECT(attacker)
    target = _NL_GET_CACHED_OBJECT(target)
-   return target:GetACVersus(attacker, touch == 1)
+   return target:GetACVersus(attacker, touch)
 end
 
 -- this function is called by a few others, EquipMostDamaging...

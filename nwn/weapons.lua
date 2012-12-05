@@ -68,6 +68,35 @@ function nwn.GetWeaponFeat(masterfeat, basetype)
    return feat
 end
 
+--- Determines weapon damage power.
+-- @param weapon Weapon in question.
+-- @param target Verus target. (Default: nwn.OBJECT_INVALID)
+function nwn.GetWeaponPower(weapon, target)
+   if not weapon:GetIsValid() then return 0 end
+   target = target or nwn.OBJECT_INVALID
+
+   local ip
+   local power = 0
+
+   -- Active, might not have to bother with the active ones.
+   for i = 0, weapon.obj.it_active_ip_len - 1 do
+      ip = weapon.obj.it_active_ip[i]
+
+      if ip.ip_type == nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS then
+	 power = math.max(power, ip.ip_cost_value)
+      end
+   end
+
+   -- Passive
+   for i = 0, weapon.obj.it_passive_ip_len - 1 do
+      ip = weapon.obj.it_passive_ip[i]
+      if ip.ip_type == nwn.ITEM_PROPERTY_ENHANCEMENT_BONUS then
+	 power = math.max(power, ip.ip_cost_value)
+      end
+   end
+   return power
+end
+
 --- Determines if a weapon type is usable with a feat.
 -- This is for Zen Archery, Weapon Finesse, etc.
 -- @param feat nwn.FEAT_*
