@@ -81,6 +81,10 @@ function DamageRoll:CompactPhysicalDamage()
    self.result.damages[2] = 0
 end
 
+function DamageRoll:GetWeightedDamageAmount(amt)
+   return amt
+end
+
 --- Returns total of damage roll
 function DamageRoll:GetTotal()
    local total = 0
@@ -113,7 +117,10 @@ function DamageRoll:GetTotalResistAdjustment()
 end
 
 function DamageRoll:MapResult(f)
-
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      local amt = self.result.damages[i]
+      self.result.damages[i] = f(amt, i)
+   end
 end
 
 --- Resolves all damage bonus.
@@ -160,18 +167,49 @@ end
 --- Resolves all immunities, resitances, and soaks
 -- @param attack Attack instance
 function DamageRoll:ResolveDamageAdjustments(is_offhand, attack)
-   local weap = attack and attack:GetCurrentWeapon() or self.attacker:GetWeaponFromEquips(is_offhand)
-   local target = self.target
-   local base_dmg_type = nwn.GetWeaponBaseDamageType(weap)
+   local tar, att = self.target, self.attacker
+   local weap = attack and attack:GetCurrentWeapon() or att:GetWeaponFromEquips(is_offhand)
+   local base_dmg_type = nwn.GetWeaponBaseDamageType(weap:GetBaseType())
 
-    -- Immunity
-   target:DoDamageImmunity(self.attacker, self, base_dmg_type, attack)
+   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
+      local amt = self.result.damages[i]
+      local imm_adj, resist_adj, soak_adj, mod_adj = 0, 0, 0, 0
 
-   -- Resist
-   target:DoDamageResistance(self.attacker, self, base_dmg_type, attack)
-   
-   -- Damage Reduction
-   target:DoDamageReduction(self.attacker, self, damage_power or 1, attack)
+      -- Damage Modification
+      amt, mod_adj = att:GetDamageAdjustment(tar, amt, i)
+      
+      -- Immunity
+      amt, imm_adj = tar:GetDamageImmunityAdj(amt, i, base_dmg_type)
+
+      -- Resist
+      amt, resist_adj = tar:GetDamageResistAdj(amt, i, base_dmg_type, true)
+      
+      -- Damage Reduction.  Damage reduction only applies to base weapon damage at index 12.
+      if i == 12 then
+	 amt, soak_adj = tar:GetDamageReductionAdj(self.result.damages[12],
+						damage_power or 1, true)
+	 self.result.soak_adjust = soak_adj
+      end
+
+      amt = self:GetWeightedDamageAmount(amt)
+      
+      self.result.damages[i] = amt
+      self.result.immunity_adjust[i] = imm_adj
+      self.result.resist_adjust[i] = resist_adj
+      self.result.mod_adjust[i] = mod_adj
+
+      if attack and not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK then
+	 if soak_adj > 0 then
+	    attack:AddCCMessage(nil, { tar.id }, { 64, soak_adj })
+	 end
+	 if imm_adj > 0 then
+	    attack:AddCCMessage(nil, { tar.id }, { 62, imm_adj, bit.lshift(1, i) })
+	 end
+	 if resist_adj > 0 then
+	    attack:AddCCMessage(nil, { tar.id }, { 63, resist_adj })
+	 end
+      end
+   end
 end
 
 --- Rolls all damages bonuses and penalities.

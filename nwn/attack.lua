@@ -6,10 +6,10 @@ local socket = require 'socket'
 Attack = {}
 local Attack_mt = { __index = Attack }
 
-function Attack.new(attacker, target)
+function Attack.new(attacker, target, attack_info)
    local t = {}
    setmetatable(t, Attack_mt)
-   t.info = t:GetAttackInfo(attacker, target)
+   t.info = attack_info or t:CreateAttackInfo(attacker, target)
    t.attacker = attacker
    t.target = target
    
@@ -19,6 +19,10 @@ function Attack.new(attacker, target)
 	 ac = {},
 	 dmg_mod = {},
 	 gen = {},
+	 --cc_message = {},
+	 --feedback = {},
+	 --effects = {},
+	 --vfx = {},
 
 	 start = 0,
 	 stop = 0
@@ -30,22 +34,27 @@ end
 
 --- Adds combat message to an attack.
 function Attack:AddCCMessage(type, objs, ints)
+   --self.cc_message[#self.cc_message + 1] = {type, objs, ints}
+
    C.nwn_AddCombatMessageData(self.info.attack, type or 0, #objs, objs[1] or 0, objs[2] or 0, 
 			      #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0)
 end
 
 --- Add feedback to attack
 function Attack:AddFeedback(feedback)
+   --self.feedback[#self.feedback + 1] = feedback
    C.ns_AddAttackFeedback(self.info.attack, feedback)
 end
 
 --- Adds an onhit effect to an attack.
 function Attack:AddEffect(eff)
+   --self.effects[#self.effects + 1] = eff
    C.ns_AddOnHitEffect(self.info.attack, self.attacker.id, eff.eff)
 end
 
 --- Adds an onhit visual effect to an attack.
 function Attack:AddVFX(vfx)
+   --self.vfx[#self.vfx + 1] = eff
    C.ns_AddOnHitVisual(self.info.attack, self.attacker.id, vfx)
 end
 
@@ -78,16 +87,15 @@ end
 
 function Attack:CreateAttackInfo(attacker, target)
    local attack_info = attack_info_t()
-   attack_info.attacker_cr = attacker.obj.cre_combat_round
-   attack_info.current_attack = attack_info.attacker_cr.cr_current_attack
-   attack_info.attacker = attacker.id
-   attack_info.target = target.id
-   attack_info.attack = C.nwn_GetAttack(attack_info.attacker_cr, attack_info.current_attack)
+   local cr = attacker.obj.cre_combat_round
+   attack_info.attacker_cr = cr
+   attack_info.current_attack = cr.cr_current_attack
+   attack_info.attack = C.nwn_GetAttack(cr, attack_info.current_attack)
    attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
    attack_info.attack.cad_target = target.id
    attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attack_info.attacker_cr)
-   attack_info.is_offhand = NSGetOffhandAttack(attack_info.attacker_cr)
+   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(cr)
+   attack_info.is_offhand = cr.cr_current_attack + 1 > cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
 
    -- Get equip number
    local weapon = C.nwn_GetCurrentAttackWeapon(attack_info.attacker_cr, attack_info.attack.cad_attack_type)
@@ -106,53 +114,6 @@ function Attack:CreateAttackInfo(attacker, target)
    end
 
    return attack_info
-end
-
---- Adds attack bonus debugging info to an attack.
--- @param str Is a format string to be passed to string.format
--- @param ... Values to be passed to string.format
-function Attack:DebugAB(str, ...)
-   if not self.dbg then return end
-   self.dbg.ab[#self.dbg.ab + 1] = fmt(str, ...)
-end
-
---- Adds armor class debugging info to an attack.
--- @param str Is a format string to be passed to string.format
--- @param ... Values to be passed to string.format
-function Attack:DebugAC(str, ...)
-   if not self.dbg then return end
-   self.dbg.ac[#self.dbg.ac + 1] = fmt(str, ...)
-end
-
---- Adds damage debugging info to an attack
--- @param str Is a format string to be passed to string.format
--- @param ... Values to be passed to string.format
-function Attack:DebugDamage(dmgtype, str, roll)
-   if not self.dbg then return end
-   self.dbg.dmg_mod[dmgtype] = self.dbg.dmg_mod[dmgtype] or {}
-   t = self.dbg.dmg_mod[dmgtype]
-   t[t+1] = fmt(str, roll.sides, roll.dice, roll.bonus)
-end
-
---- Adds general debugging info to an attack.
--- @param str Is a format string to be passed to string.format
--- @param ... Values to be passed to string.format
-function Attack:DebugGeneral(str, ...)
-   if not self.dbg then return end
-   self.dbg.gen[#self.dbg.gen + 1] = fmt(str, ...)
-end
-
---- Starts a debug timer
-function Attack:DebugStartTimer(fmt)
-   if not self.dbg then return end
-   self.dbg.start = socket.gettime() * 1000
-   self.dbg.timer_fmt = fmt
-end
-
---- Stops debug timer.
-function Attack:DebugStopTimer()
-   if not self.dbg then return end
-   self.dbg.stop = socket.gettime() * 1000
 end
 
 --- Gets the total attack roll.
@@ -224,7 +185,7 @@ function Attack:GetIsSpecialAttack()
 end
 
 --- Determines the attack penalty based on attack count.
-function Attack:GetIterationPenalty()
+function Attack:GetIterationPenalty(log)
    local iter_pen = 0
    local spec_att = self:GetSpecialAttack()
    local att = self.attacker
@@ -243,7 +204,7 @@ function Attack:GetIterationPenalty()
       iter_pen = self.info.current_attack * att.ci.equips[self.info.weapon].iter
    end
 
-   self:DebugAB("Iteration Penalty: -%d", iter_pen)
+   nwn.LogTableAdd(log, "Iteration Penalty: -%d", iter_pen)
    return iter_pen
 end
 
@@ -284,7 +245,7 @@ function Attack:ResolveAttackModifier(use_cached)
    return self.ab_cache
 end
 
-function Attack:ResolveAttackRoll(use_cached)
+function Attack:ResolveAttackRoll(use_cached, log)
    local attacker = self.attacker
    local target = self.target
    local attack_type = self.info.attack.cad_attack_type
@@ -306,7 +267,7 @@ function Attack:ResolveAttackRoll(use_cached)
    end
 
    local roll = random(20)
-   self:DebugAB("Attack Roll: %d", roll)
+   nwn.LogTableAdd(log, "Attack Roll: %d", roll)
    self:SetAttackRoll(roll)
 
    local hit = (roll + ab >= ac or roll == 20) and roll ~= 1
@@ -373,7 +334,7 @@ function Attack:ResolveDamage(use_cached)
 						 self)
    local total = dmg_roll:GetTotal()
 
-   --Defensive Roll
+   -- Defensive Roll
    if target.type == nwn.GAME_OBJECT_TYPE_CREATURE
       and target:GetCurrentHitPoints() - total <= 0
       and not attacker:CheckTargetState(nwn.COMBAT_TARGET_STATE_FLATFOOTED)
@@ -382,10 +343,11 @@ function Attack:ResolveDamage(use_cached)
       target:DecrementRemainingFeatUses(nwn.FEAT_DEFENSIVE_ROLL)
       
       if target:ReflexSave(total, nwn.SAVING_THROW_TYPE_DEATH, attacker) then
-         -- TODO: Adjust individual damages.
-         total = math.floor(total / 2)
+	 dmg_roll:MapResult(function (amt) return math.floor(amt / 2) end)
       end
    end
+
+   local total = dmg_roll:GetTotal()
 
    -- Add the damage result info to the CNWSCombatAttackData
    self:CopyDamageToNWNAttackData(dmg_roll)
@@ -697,15 +659,17 @@ end
 function Attack:UpdateInfo()
    local attacker = self.attacker
    local target = self.target
-   
-   self.info.attacker_cr.cr_current_attack = self.info.attacker_cr.cr_current_attack + 1
-   self.info.current_attack = self.info.attacker_cr.cr_current_attack
-   self.info.attack = C.nwn_GetAttack(self.info.attacker_cr, self.info.current_attack)
+
+   local cr = self.info.attacker_cr
+
+   cr.cr_current_attack = cr.cr_current_attack + 1
+   self.info.current_attack = cr.cr_current_attack
+   self.info.attack = C.nwn_GetAttack(cr, self.info.current_attack)
    self.info.attack.cad_attack_group = self.info.attack.cad_attack_group
    self.info.attack.cad_target = target.id
    self.info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   self.info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(self.info.attacker_cr)
-   self.info.is_offhand = NSGetOffhandAttack(self.info.attacker_cr)
+   self.info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(cr)
+   self.info.is_offhand = cr.cr_current_attack + 1 > cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
 
    -- Get equip number
    local weapon = C.nwn_GetCurrentAttackWeapon(self.info.attacker_cr, self.info.attack.cad_attack_type)

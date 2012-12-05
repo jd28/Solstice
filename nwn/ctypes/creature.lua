@@ -164,11 +164,13 @@ typedef struct CNWSCreatureStats {
     uint32_t                    field_41C;
 
     CCombatInformation         *cs_combat_info;         /* 0428 */
-
-    uint32_t                    field_424;
-    uint32_t                    field_428;
-    uint32_t                    field_42C;
+    int8_t                      cs_arcane_sp_fail_1;    /* 042C */
+    int8_t                      cs_arcane_sp_fail_2;    /* 042D */
+    int8_t                      cs_arcane_sp_fail_3;    /* 042E */
+    int8_t                      cs_spell_failure;       /* 042F */
     uint32_t                    field_430;
+    uint32_t                    field_434;
+    uint32_t                    field_438;
 
     void                       *cs_specabil;            /* 043C */
 

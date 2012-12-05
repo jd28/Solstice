@@ -3,17 +3,19 @@ local C = ffi.C
 
 ffi.cdef[[
 typedef struct AttackInfo {
-   CNWSCombatRound  *attacker_cr;
-   CNWSCombatRound  *target_cr;
-   CNWSCombatAttackData *attack;
    uint32_t current_attack;
    uint32_t attack_id;
    uint32_t target_state;
    uint32_t situational_flags;
    int32_t  weapon;
-   bool is_offhand;
-   nwn_objid_t attacker;
-   nwn_objid_t target;
+   bool     is_offhand;
+   bool     is_sneak;
+   bool     is_death;
+   uint32_t special_attack;
+
+   CNWSCombatRound  *attacker_cr;
+   CNWSCombatRound  *target_cr;
+   CNWSCombatAttackData *attack;
 } AttackInfo;
 ]]
 
@@ -24,6 +26,7 @@ typedef struct DamageResult {
    int32_t    damages[$NS_OPT_NUM_DAMAGES];
    int32_t    immunity_adjust[$NS_OPT_NUM_DAMAGES];
    int32_t    resist_adjust[$NS_OPT_NUM_DAMAGES];
+   int32_t    mod_adjust[$NS_OPT_NUM_DAMAGES];
    int32_t    soak_adjust;
 } CDamageResult;
 

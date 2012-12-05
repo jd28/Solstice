@@ -8,6 +8,34 @@ local socket = require 'socket'
 safe_require 'nwn.ctypes.solstice'
 safe_require 'nwn.attack'
 
+---
+function nwn.GetAttackTypeFromEquipNum(num)
+   if num == 0 then
+      return nwn.ATTACK_BONUS_ONHAND
+   elseif num == 1 then
+      return nwn.ATTACK_BONUS_OFFHAND
+   elseif num == 2 then
+      return nwn.ATTACK_BONUS_UNARMED
+   elseif num == 3 then
+      return nwn.ATTACK_BONUS_CWEAPON1
+   elseif num == 4 then
+      return nwn.ATTACK_BONUS_CWEAPON2
+   elseif num == 5 then
+      return nwn.ATTACK_BONUS_CWEAPON3
+   else
+      error "Invalid Equip Number"
+   end
+end
+
+function nwn.ZeroCombatMod(mod)
+   mod.ab = 0
+   mod.ac = 0
+   mod.dmg.dice = 0
+   mod.dmg.dice = 0
+   mod.dmg.bonus = 0
+   mod.dmg_type = nwn.DAMAGE_TYPE_BASE_WEAPON
+end
+
 --- Bridge functions.
 
 -- this function is called by a few others, EquipMostDamaging...

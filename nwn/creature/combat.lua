@@ -3,227 +3,28 @@ local ffi = require 'ffi'
 local C = ffi.C
 local bit = require 'bit'
 
-function nwn.ZeroCombatMod(mod)
-   mod.ab = 0
-   mod.ac = 0
-   mod.dmg.dice = 0
-   mod.dmg.dice = 0
-   mod.dmg.bonus = 0
-   mod.dmg_type = nwn.DAMAGE_TYPE_BASE_WEAPON
-end
-
 --- Adds parry attack.
 -- @param attacker Attacker to do parry attack against.
 function Creature:AddParryAttack(attacker)
    C.nwn_AddParryAttack(self.obj.cre_combat_round, attacker.id)
 end
 
+--- Checks if target state flag is set
+-- @param state nwn.COMBAT_TARGET_STATE_*
 function Creature:CheckTargetState(state)
    return bit.band(self.ci.target_state_mask, state) ~= 0
 end
 
+--- Clears target state
 function Creature:ClearTargetState()
    self.ci.target_state_mask = 0
 end
 
---- Place holder for creature specific damage adjustments.
--- NOTE: these are applied BEFORE Immunity, Resistance, and Reduction.
-function Creature:DoDamageAdjustments(attacker, dmg_roll, damage_power, attack)
-   return
-end
-
----
-function Creature:DoDamageImmunity(attacker, dmg_roll, base_damage, attack)
-   local imm, dmg, imm_adj
-
-   -- We can safely loop over all damages because
-   -- a) Base damage at index 12 is handled specially.
-   -- b) doesn't apply to non-combat situations, and
-   -- c) Any base damage types in the damage result will be zero.
-   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
-      dmg = dmg_roll.result.damages[i]
-      -- No need to apply immunity to a damage that is zero.
-      if dmg > 0 then
-	 -- If attack info ctype is passed in then we're in a combat situation.
-	 if i == 12 and attack_info then
-	    -- Immunity favors the attacker, so find the target's minimum immunity versus
-	    -- the base damage flags.
-	    imm = self:GetDamageImmunityVsFlags(base_damage, true)
-	 elseif i ~= 12 then
-	    imm = self:GetDamageImmunity(i)
-	 end
-
-	 imm_adj = math.floor((imm * dmg) / 100)
-	 -- Immunity
-	 dmg_roll.result.immunity_adjust[i] = imm_adj
-	 dmg_roll.result.damages[i] = dmg - imm_adj
-
-	 if not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and imm_adj > 0 and attack then
-	    attack:AddCCMessage(nil, { self.id }, { 62, imm_adj, bit.lshift(1, i) })
-	 end
-      end
-   end
-end
-
----
-function Creature:DoDamageResistance(attacker, dmg_roll, base_damage, attack)
-   local eff_type, amount, dmg_flg, idx, dmg
-   local limit, use_eff, resist, eff
-
-   for i = 0, NS_OPT_NUM_DAMAGES - 1 do
-      -- Base damage is at index 12
-      dmg = dmg_roll.result.damages[i]
-      -- If damage is not greater than zero there is nothing to resist.
-      if dmg > 0 then
-	 -- If the damage index is 12 and attack info was passed to the function
-	 -- then this is a combat situation.
-	 if i == 12 and attack_info then
-	    -- Damage resistance favors the defender.  It will return the maximum innate resistance
-	    -- and the highest applicable resistance effect.  It doesn't return a resist effect index
-	    -- but the actual effect that applies as an effect_t ctype.
-	    resist, eff = self:GetDamageResistVsFlags(base_damage, false)
-	    
-	    -- Innate / Feat resistance.  In the case of damage reduction these stack
-	    -- with damage resistance effects.
-	    -- If the resistance is greater than zero, use it.
-	    if resist > 0 then
-	       -- Take the minimum of damage and resistance, since you can't resist
-	       -- more damage than you take.
-	       resist = math.min(dmg_roll.result.damages[i], resist)
-	       dmg_roll.result.resist_adjust[i] = resist
-	       dmg_roll.result.damages[i] = dmg_roll.result.damages[i] - resist
-	    end
-
-	    -- If there is any damage left to be resisted by effects and
-	    -- if there is an applicable resist effect, use it.
-	    if dmg_roll.result.damages[12] > 0 and eff then
-	       use_eff = eff
-	    end
-	  
-	 -- Ignore index 12 since it's either handled above or not applicable.
-	 elseif i ~= 12 then
-	    -- Innate / Feat resistance.  In the case of damage reduction these stack
-	    -- with damage resistance effects.
-	    if self.ci.resist[i] > 0 then
-	       -- Take the minimum of damage and resistance, since you can't resist
-	       -- more damage than you take.
-	       resist = math.min(dmg_roll.result.damages[i], self.ci.resist[i])
-	       dmg_roll.result.resist_adjust[i] = resist
-	       dmg_roll.result.damages[i] = dmg_roll.result.damages[i] - resist
-	    end
-	    
-	    -- If there is any damage left to be resisted by effects.
-	    if dmg_roll.result.damages[i] > 0 then
-	       local eff = self.ci.eff_resist[i]
-	       
-	       -- If there is a resist effect for this damage, use it.
-	       if eff >= 0 then
-		  use_eff = self:GetEffectAtIndex(eff)
-	       end
-	    end
-	 end
-      end
-
-      -- If using a resist effect determine if the effect has a limit and adjust it if so.
-      if use_eff then
-	 -- Take the minimum of damage and resistance, since you can't resist
-	 -- more damage than you take.
-         resist = math.min(use_eff.eff.eff_integers[1], dmg_roll.result.damages[i])
-
-	 --- Don't destroy the effect unless this is a REAL attack.
-	 if attack then
-	    local eff_limit = use_eff.eff.eff_integers[2]
-	    if eff_limit > 0 then
-	       -- If the remain damage limit is less than the amount to resist.
-	       -- then resist only what is left and remove the effect.
-	       -- Else modifiy the effects damage limit by the resist amount.
-	       if eff_limit <= resist then
-		  resist = eff_limit
-		  self:RemoveEffectByID(use_eff.eff.eff_id)
-	       else
-		  use_eff.eff.eff_integers[2] = eff_limit - resist
-	       end
-	    end
-	 end
-
-         -- Resist adjustment must be incremented by effect resistance in case any
-         -- innate resistance has already been applied.
-         dmg_roll.result.resist_adjust[i] = dmg_roll.result.resist_adjust[i] + resist
-         dmg_roll.result.damages[i] = dmg_roll.result.damages[i] - resist
-      end
-
-      if attack and not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and dmg_roll.result.resist_adjust[i] > 0 then
-	 attack:AddCCMessage(nil, { self.id }, { 63, dmg_roll.result.resist_adjust[i] })
-      end
-   end
-end
-
---- Modifies damage roll by highest applicable soak, if any.
-function Creature:DoDamageReduction(attacker, dmg_roll, damage_power, attack)
-   -- Set highest soak amount to the players innate soak.  E,g their EDR
-   -- Dwarven Defender, and/or Barbarian Soak.
-   local highest_soak = self.ci.soak
-
-   -- In the NWN Engine base damage is stored in damage index 12.
-   local base_damage = dmg_roll.result.damages[12]
-   local use_eff
-
-   -- If damage power is greater then 20 or less than zero something is most
-   -- likely wrong so don't bother with effects
-   if damage_power < 20 and damage_power >= 0 then
-      -- Loop through the soak effects and find a soak that is a) higher than innate soak
-      -- and b) is greater than the damage power.
-      for i = damage_power + 1, 20 do
-         local eff = self.ci.eff_soak[i]
-         if eff >= 0 then
-            local eff_amount = self.obj.obj.obj_effects[eff].eff_integers[0]
-            -- If the soak amount is greater than the higest soak, save the effect for later use.
-            -- If it has a limit it will need to be adjusted or removed.  Update the new highest
-            -- soak amount.  The limit here is itself not relevent.
-            if eff_amount >= highest_soak then
-               highest_soak = eff_amount
-               use_eff = self.obj.obj.obj_effects[eff]
-            end
-         end
-      end
-   end
-
-   -- Now that the highest soak amount has been found, determine the minimum of it and
-   -- the base damage.  I.e. you can't soak more than your damamge.
-   highest_soak = math.min(base_damage, highest_soak)
-
-   -- If using a soak effect determine if the effect has a limit and adjust it if so.
-   if use_eff then
-      --- Don't destroy the effect unless this is a REAL attack.
-      if attack then
-	 local eff_limit = use_eff.eff_integers[2]
-	 if eff_limit > 0 then
-	    -- If the effect damage limit is less than the highest soak amount then
-	    -- the effect needs to be remove and the highest soak amount adjusted. I.e.
-	    -- You can't soak more than the remaing limit on soak damage.  Effect removal
-	    -- will trigger Creature:UpdateDamageReduction to determine the new best soak
-	    -- effects.
-	    -- Else the current limit must be adjusted by the highest soak amount.
-	    if eff_limit <= highest_soak then
-	       highest_soak = eff_limit
-	       self:RemoveEffectByID(use_eff.eff_id)
-	    else
-	       use_eff.eff_integers[2] = eff_limit - highest_soak
-	    end
-	 end
-      end
-   end
-
-   -- Set the soak amount and adjust the base damage result
-   dmg_roll.result.soak_adjust = highest_soak
-   dmg_roll.result.damages[12] = base_damage - highest_soak
-   
-   if attack and not NS_OPT_NO_DAMAGE_REDUCTION_FEEDBACK and highest_soak > 0 then
-      attack:AddCCMessage(nil, { self.id }, { 64, highest_soak })
-   end
-end
-
-function Creature:GetAB(is_offhand, attack)
+--- Determines creature's attack bonus
+-- @param is_offhand If true attack is using offhand weapon.
+-- @param attack Optional: Attack class instance.  This should only ever be passed from
+--    Solstice combat engine.
+function Creature:GetAB(is_offhand, attack, log)
    local ab = self.ci.bab
    local wp_num = attack and attack.info.weapon or self:GetEquipNumFromEquips(is_offhand)
 
@@ -253,16 +54,16 @@ function Creature:GetAB(is_offhand, attack)
 
    -- Only debug if this is an attack
    if attack then
-      attack:DebugAB("Ability Modifier: %d", ab_abil)
-      attack:DebugAB("Area: %d", self.ci.area.ab)
-      attack:DebugAB("Base Attack Bonus: %d", self.ci.bab)
-      attack:DebugAB("Dual Wield Off Penalty: %d", self.ci.offhand_penalty_off)
-      attack:DebugAB("Dual Wield On Penalty: %d", self.ci.offhand_penalty_on)
-      attack:DebugAB("Feat: %d", self.ci.feat.ab)
-      attack:DebugAB("Mode: %d", self.ci.mode.ab)
-      attack:DebugAB("Race: %d", self.ci.race.ab)
-      attack:DebugAB("Size: %d", self.ci.size.ab)
-      attack:DebugAB("Weapon Feat: %d", self.ci.equips[attack.info.weapon].ab_mod)
+      nwn.LogTableAdd(log, "Ability Modifier: %d", ab_abil)
+      nwn.LogTableAdd(log, "Area: %d", self.ci.area.ab)
+      nwn.LogTableAdd(log, "Base Attack Bonus: %d", self.ci.bab)
+      nwn.LogTableAdd(log, "Dual Wield Off Penalty: %d", self.ci.offhand_penalty_off)
+      nwn.LogTableAdd(log, "Dual Wield On Penalty: %d", self.ci.offhand_penalty_on)
+      nwn.LogTableAdd(log, "Feat: %d", self.ci.feat.ab)
+      nwn.LogTableAdd(log, "Mode: %d", self.ci.mode.ab)
+      nwn.LogTableAdd(log, "Race: %d", self.ci.race.ab)
+      nwn.LogTableAdd(log, "Size: %d", self.ci.size.ab)
+      nwn.LogTableAdd(log, "Weapon Feat: %d", self.ci.equips[attack.info.weapon].ab_mod)
    else
       -- Cannot be included if there is an attack do to their possibly being
       -- Versus effects
@@ -272,7 +73,12 @@ function Creature:GetAB(is_offhand, attack)
    return ab
 end
 
-function Creature:GetABVersus(tar, is_offhand, attack)
+--- Determines creature's attack bonus vs object.
+-- @param tar Attack target
+-- @param is_offhand If true attack is using offhand weapon.
+-- @param attack Optional: Attack class instance.  This should only ever be passed from
+--    Solstice combat engine.
+function Creature:GetABVersus(tar, is_offhand, attack, log)
    local att = self
    local att_type = attack:GetType()
    local ab = att:GetAB(is_offhand, attack)
@@ -292,16 +98,15 @@ function Creature:GetABVersus(tar, is_offhand, attack)
    -- This is as far as we can go if this is not called from the combat engine.
    if not attack then return ab + eff_ab end
 
-   -- Debugging info for the results calculated above.  NOTE: Offensive traing
-   -- is currently hardcoded
-   attack:DebugAB("Favored Enemy: %d", att.ci.fe.ab)
-   attack:DebugAB("Offensive Training Vs: %d", 1)
-   attack:DebugAB("Effect Bonus: %d", eff_ab)
+   -- Debugging info for the results calculated above.  NOTE: Offensive traing is currently hardcoded
+   nwn.LogTableAdd(log, "Favored Enemy: %d", att.ci.fe.ab)
+   nwn.LogTableAdd(log, "Offensive Training Vs: %d", 1)
+   nwn.LogTableAdd(log, "Effect Bonus: %d", eff_ab)
 
    -- Special Attack Modifier
    if attack:GetIsSpecialAttack() then
       local val = NSSpecialAttack(nwn.SPECIAL_ATTACK_EVENT_AB, att, tar, attack)
-      attack:DebugAB("Special Attack (%d), %d", attack:GetIsSpecialAttack(), val)
+      nwn.LogTableAdd(log, "Special Attack (%d), %d", attack:GetIsSpecialAttack(), val)
       ab = ab + val
    end
 
@@ -309,7 +114,7 @@ function Creature:GetABVersus(tar, is_offhand, attack)
    
    -- Target State
    local state = att:GetEnemyStateAttackBonus(is_ranged)
-   attack:DebugAB("Enemy State: %d", state)
+   nwn.LogTableAdd(log, "Enemy State: %d", state)
    ab = ab + state
 
    -- Ranged Attacker Modifications
@@ -319,13 +124,16 @@ function Creature:GetABVersus(tar, is_offhand, attack)
    end
 
    local sit_ab = att:GetSituationalAttackBonus()
-   attack:DebugAB("Situation Bonus: %d", sit_ab)
+   nwn.LogTableAdd(log, "Situation Bonus: %d", sit_ab)
 
    return ab + eff_ab + sit_ab
 end
 
 --- Get creature's AC
-function Creature:GetAC(touch, attack)
+-- @param touch If true it's a touch attack.
+-- @param attack Optional: Attack class instance.  This should only ever be passed from
+--    Solstice combat engine.
+function Creature:GetAC(touch, attack, log)
    -- 10 base AC
    local ac = 10
 
@@ -344,44 +152,63 @@ function Creature:GetAC(touch, attack)
    -- Feat: Armor Skin, etc
    ac = ac + self.ci.feat.ac
 
-   -- Only debug if it's an attack
-   if attack then
-      attack:DebugAC("Base: %d", 10)
-      attack:DebugAC("Base Armor: %d", self.stats.cs_ac_armour_base)
-      attack:DebugAC("Base Natural: %d", self.stats.cs_ac_natural_base)
-      attack:DebugAC("Base Shield: %d", self.stats.cs_ac_shield_base)
-      attack:DebugAC("Class: %d", self.ci.class.ac)
-      attack:DebugAC("Feat: %d", self.ci.feat.ac)
-      attack:DebugAC("Mode: %d", self.ci.mode.ac)
-      attack:DebugAC("Size: %d", self.ci.size.ac)
-   else
-      -- If this is an attack then some AC, will be left out of this because
-      -- it is attacker / attack type specific and is therefore dealt with in
-      -- Attack:ResolveArmorClass()
+   nwn.LogTableAdd(log, "Base: %d", 10)
+   nwn.LogTableAdd(log, "Base Armor: %d", self.stats.cs_ac_armour_base)
+   nwn.LogTableAdd(log, "Base Natural: %d", self.stats.cs_ac_natural_base)
+   nwn.LogTableAdd(log, "Base Shield: %d", self.stats.cs_ac_shield_base)
+   nwn.LogTableAdd(log, "Class: %d", self.ci.class.ac)
+   nwn.LogTableAdd(log, "Feat: %d", self.ci.feat.ac)
+   nwn.LogTableAdd(log, "Mode: %d", self.ci.mode.ac)
+   nwn.LogTableAdd(log, "Size: %d", self.ci.size.ac)
 
+   if not attack then
+      local val = self.stats.cs_ac_armour_bonus - self.stats.cs_ac_armour_penalty
       -- Armor AC
-      ac = ac + self.stats.cs_ac_armour_bonus - self.stats.cs_ac_armour_penalty
+      ac = ac + val
+      nwn.LogTableAdd(log, "Armor Bonus: %d", val)
+
       -- Deflect AC
-      ac = ac + self.stats.cs_ac_deflection_bonus - self.stats.cs_ac_deflection_penalty
+      val = self.stats.cs_ac_deflection_bonus - self.stats.cs_ac_deflection_penalty
+      ac = ac + val
+      nwn.LogTableAdd(log, "Deflection Bonus: %d", val)
+
       -- Natural AC
-      ac = ac + self.stats.cs_ac_natural_bonus - self.stats.cs_ac_natural_penalty
+      val = self.stats.cs_ac_natural_bonus - self.stats.cs_ac_natural_penalty
+      ac = ac + val
+      nwn.LogTableAdd(log, "Natural Bonus: %d", val)
+
       -- Skill: Tumble...
       ac = ac + self.ci.skill.ac   
+      nwn.LogTableAdd(log, "Skills: %d", self.ci.skill.ac)
+
       -- Shield AC
-      ac = ac + self.stats.cs_ac_shield_bonus - self.stats.cs_ac_shield_penalty
+      val = self.stats.cs_ac_shield_bonus - self.stats.cs_ac_shield_penalty
+      ac = ac + val
+      nwn.LogTableAdd(log, "Shield Bonus: %d", val)
+
       -- Dodge AC
-      ac = ac + self.stats.cs_ac_dodge_bonus - self.stats.cs_ac_dodge_penalty
+      val = self.stats.cs_ac_dodge_bonus - self.stats.cs_ac_dodge_penalty
+      ac = ac + val
+      nwn.LogTableAdd(log, "Dodge Bonus: %d", val)
+
       -- Dex Mod.
-      ac = ac + self:GetDexMod(true)
+      val = self:GetDexMod(true)
+      ac = ac + val
+      nwn.LogTableAdd(log, "Dexterity Modifier: %d", val)
    end
 
    return ac
 end
 
-function Creature:GetACVersus(att, touch, attack)
+--- Determines AC vs creature
+-- @param att Attacking creature
+-- @param touch If true it's a touch attack.
+-- @param attack Optional: Attack class instance.  This should only ever be passed from
+--    Solstice combat engine.
+function Creature:GetACVersus(att, touch, attack, log)
    local nat, armor, shield, deflect, dodge = 0, 0, 0, 0, 0
    local eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge
-   local ac = self:GetAC(touch, attack)
+   local ac = self:GetAC(touch, attack, log)
 
    -- A huge chunk of this function only really makes sense when it's called from
    -- the solstice combat engine.  The few other locations that it would be called from
@@ -417,7 +244,7 @@ function Creature:GetACVersus(att, touch, attack)
 	    dodge = self.stats.cs_ac_dodge_bonus - self.stats.cs_ac_dodge_penalty
 
 	    -- Skill: Tumble...
-	    attack:DebugAC("Skills: %d", self.ci.skill.ac)
+	    nwn.LogTableAdd(log, "Skills: %d", self.ci.skill.ac)
 	    ac = ac + self.ci.skill.ac
 	    
 	    -- If this is an attack of opportunity and target has mobility
@@ -425,7 +252,7 @@ function Creature:GetACVersus(att, touch, attack)
 	    if attack:GetSpecialAttack() == -534 
 	       and self:GetHasFeat(nwn.FEAT_MOBILITY)
 	    then
-	       attack:DebugAC("AoO Mobility Bonus: %d", 4)
+	       nwn.LogTableAdd(log, "AoO Mobility Bonus: %d", 4)
 	       ac = ac + 4
 	    end
 	    
@@ -437,7 +264,7 @@ function Creature:GetACVersus(att, touch, attack)
 		  and not self:CanUseClassAbilities(nwn.CLASS_TYPE_MONK)
 	       then
 		  ac = ac + 1
-		  attack:DebugAC("Dodge Feat: %d", 1)
+		  nwn.LogTableAdd(log, "Dodge Feat: %d", 1)
 	       end
 	    end
 	 end
@@ -457,18 +284,18 @@ function Creature:GetACVersus(att, touch, attack)
       end
 
       if dexed then
-	 attack:DebugAC("Dexterity Modifier: %d", dex_mod)
+	 nwn.LogTableAdd(log, "Dexterity Modifier: %d", dex_mod)
 	 ac = ac + dex_mod
       end
    end
    -- +4 Defensive Training Vs.
    if self:GetHasDefensiveTrainingVs(att) then
-      attack:DebugAC("Defensive Training Vs: %d", 4)
+      nwn.LogTableAdd(log, "Defensive Training Vs: %d", 4)
       ac = ac + 4
    end
 
    if touch then
-      attack:DebugGeneral("Touch Attack: true")
+      nwn.LogTableAdd(log, "Touch Attack: true")
       return ac + dodge
    end
 
@@ -480,52 +307,34 @@ function Creature:GetACVersus(att, touch, attack)
    if eff_shield > shield then shield = eff_shield end
    if eff_deflect > deflect then deflect = eff_deflect end
 
-   attack:DebugAC("Deflection: %d", deflect)
-   attack:DebugAC("Natural: %d", nat)
-   attack:DebugAC("Shield: %d", shield)
+   nwn.LogTableAdd(log, "Deflection: %d", deflect)
+   nwn.LogTableAdd(log, "Natural: %d", nat)
+   nwn.LogTableAdd(log, "Shield: %d", shield)
 
    dodge = dodge + eff_dodge
    local max_dodge_ac = self:GetMaxDodgeAC()
    if dodge > max_dodge_ac then
       dodge = max_dodge_ac
    end
-   attack:DebugAC("Dodge: %d", dodge)
+   nwn.LogTableAdd(log, "Dodge: %d", dodge)
 
-   attack:DebugGeneral("Touch Attack: false")
+   nwn.LogTableAdd(log, "Touch Attack: false")
 
    return ac + nat + armor + shield + deflect + dodge
 end
 
 --- Get creature's arcane spell failure.
 function Creature:GetArcaneSpellFailure()
-   nwn.engine.StackPushObject(self)
-   nwn.engine.ExecuteCommand(737, 1)
-   return nwn.engine.StackPopInteger()
+   if not self:GetIsValid() then return 0 end
+   local amt = self.stats.cs_arcane_sp_fail_2 + self.stats.cs_arcane_sp_fail_1 + self.stats.cs_arcane_sp_fail_3
+   return math.clamp(amt, 0, 100)
 end
 
 --- Get creature's attack target
 function Creature:GetAttackTarget()
-   
+   if not self:GetIsValid() then return nwn.OBJECT_INVALID end
    local obj = cre.obj.cre_attack_target
    return _NL_GET_CACHED_OBJECT(obj)
-end
-
-function nwn.GetAttackTypeFromEquipNum(num)
-   if num == 0 then
-      return nwn.ATTACK_BONUS_ONHAND
-   elseif num == 1 then
-      return nwn.ATTACK_BONUS_OFFHAND
-   elseif num == 2 then
-      return nwn.ATTACK_BONUS_UNARMED
-   elseif num == 3 then
-      return nwn.ATTACK_BONUS_CWEAPON1
-   elseif num == 4 then
-      return nwn.ATTACK_BONUS_CWEAPON2
-   elseif num == 5 then
-      return nwn.ATTACK_BONUS_CWEAPON3
-   else
-      error "Invalid Equip Number"
-   end
 end
 
 --- Get creature's attempted attack target
@@ -598,6 +407,8 @@ function Creature:GetCriticalHitMultiplier(offhand, weap_num)
 end
 
 --- Gets creatures critical threat range
+-- @param is_offhand If true calculate for offhand weapon.
+-- @param weap_num
 function Creature:GetCriticalHitRange(is_offhand, weap_num)
    local result
    if weap_num then
