@@ -1364,3 +1364,11 @@ nwn.ITEM_APPR_ARMOR_MODEL_LSHOULDER                 =  15
 nwn.ITEM_APPR_ARMOR_MODEL_RHAND                     =  16
 nwn.ITEM_APPR_ARMOR_MODEL_LHAND                     =  17
 nwn.ITEM_APPR_ARMOR_MODEL_ROBE                      =  18
+
+nwn.RANGED_TYPE_NONE      = 0
+nwn.RANGED_TYPE_BOW       = 1
+nwn.RANGED_TYPE_SLING     = 2
+nwn.RANGED_TYPE_CROSSBOW  = 3
+nwn.RANGED_TYPE_SHURIKEN  = 4
+nwn.RANGED_TYPE_DART      = 5
+nwn.RANGED_TYPE_THROWAXE  = 6

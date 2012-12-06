@@ -4,12 +4,6 @@ local ffi = require 'ffi'
 local C = ffi.C
 local sm = string.strip_margin
 
----
--- TODO fill in.
-function Creature:GetAmmunitionAvailable(attack_count)
-   return attack_count
-end
-
 --- Iterator of a creature's equipped items.
 -- @param creature If true include creature items.
 function Creature:Equips(creature)

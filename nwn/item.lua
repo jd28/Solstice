@@ -160,6 +160,9 @@ function Item:GetIsRangedWeapon()
       or base == nwn.BASE_ITEM_THROWINGAXE
       or base == nwn.BASE_ITEM_SLING
       or base == nwn.BASE_ITEM_DART
+      or base == nwn.BASE_ITEM_SHURIKEN
+      or base == nwn.BASE_ITEM_HEAVYCROSSBOW
+      or base == nwn.BASE_ITEM_LIGHTCROSSBOW
    then
       return true
    end
@@ -168,22 +171,29 @@ function Item:GetIsRangedWeapon()
 end
 
 --- Determine if item is unarmed weapon.
--- TODO: Remove/Fix CEP stuff
 function Item:GetIsUnarmedWeapon()
-   if not self:GetIsValid() then
-      return true
-   end
+   if not self:GetIsValid() then return true end
    
    local baseitem = self:GetBaseType()
+   if baseitem == nwn.BASE_ITEM_GLOVES
+      or baseitem == nwn.BASE_ITEM_BRACER
+      or baseitem == nwn.BASE_ITEM_CSLASHWEAPON
+      or baseitem == nwn.BASE_ITEM_CPIERCWEAPON
+      or baseitem == nwn.BASE_ITEM_CBLUDGWEAPON
+      or baseitem == nwn.BASE_ITEM_CSLSHPRCWEAP
+   then 
+      return true
+   end
 
-   return (baseitem == nwn.BASE_ITEM_GLOVES       or
-           baseitem == nwn.BASE_ITEM_BRACER       or
-           baseitem == nwn.BASE_ITEM_CSLASHWEAPON or
-           baseitem == nwn.BASE_ITEM_CPIERCWEAPON or
-           baseitem == nwn.BASE_ITEM_CBLUDGWEAPON or
-           baseitem == nwn.BASE_ITEM_CSLSHPRCWEAP or
-           baseitem == 376                        or -- BASE_ITEM_CEP_GLOVES_SPIKED
-           baseitem == 377)                          -- BASE_ITEM_CEP_GLOVES_BLADED
+   if NS_OPT_USING_CEP >= 23 then
+      if baseitem == cep.BASE_ITEM_GLOVES_SPIKED
+	 or baseitem == cep.BASE_ITEM_GLOVES_BLADED
+      then
+	 return true
+      end
+   end
+
+   return false
 end
 
 --- Determines the first itemproperty on an item

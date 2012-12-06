@@ -11,7 +11,7 @@ typedef struct AttackInfo {
    bool     is_offhand;
    bool     is_sneak;
    bool     is_death;
-   uint32_t special_attack;
+   uint32_t ranged_type;
 
    CNWSCombatRound  *attacker_cr;
    CNWSCombatRound  *target_cr;

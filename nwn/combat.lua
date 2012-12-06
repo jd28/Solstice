@@ -153,20 +153,18 @@ function NSResolveRangedAttack(attacker, target, attack_count, anim)
    target = _NL_GET_CACHED_OBJECT(target)
 
    local start = socket.gettime() * 1000
-
-   -- Attack count can be modified if, say, a creature only has less arrows left than attacks
-   -- or none at all.
-   attack_count = attacker:GetAmmunitionAvailable(attack_count)
-
-   -- TODO
-   if not target:GetIsValid() or attack_count == 0 then
-      NSResolveOutOfAmmo(attacker)
-      return
-   end
-
    local attack = Attack.new(attacker, target)
    local use_cached = false
    local dmg_result
+
+   -- Attack count can be modified if, say, a creature only has less arrows left than attacks
+   -- or none at all.
+   attack_count = attack:GetAmmunitionAvailable(attack_count)
+   if not target:GetIsValid() or attack_count == 0 then
+      attack:ResolveOutOfAmmo)
+      return
+   end
+
 
    -- If the target is a creature detirmine it's state and any situational modifiers that
    -- might come into play.  This only needs to be done once per attack group because

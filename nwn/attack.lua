@@ -116,6 +116,14 @@ function Attack:CreateAttackInfo(attacker, target)
    return attack_info
 end
 
+--- Determines if creature has ammunition available.
+-- @param attack_count Number of attacks in attack group.
+function Attack:GetAmmunitionAvailable(attack_count)
+   local rng_type = attacker.ci.ranged_type
+   return C.ns_GetAmmunitionAvailable(self.obj, attack_count, rng_type)
+end
+
+
 --- Gets the total attack roll.
 function Attack:GetAttackRoll()
    return self.info.attack.cad_attack_roll + self.info.attack.cad_attack_mod

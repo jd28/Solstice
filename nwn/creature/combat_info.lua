@@ -28,12 +28,31 @@ function Creature:DebugCombatEquips()
    return table.concat(t)
 end
 
-
-
-
 --- Updates equipped weapon object IDs.
 function Creature:UpdateCombatEquips()
-   self.ci.equips[0].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND).id
+   -- Determine the ranged weapon type, this is used in the combat engine
+   -- to check if we can load more ammunition
+   local rng_type = 0
+   local rh = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
+   if rh:GetIsValid() and rh:GetIsRangedWeapon() then
+      local base = self:GetBaseType()
+      if base == nwn.BASE_ITEM_LONGBOW or base == nwn.BASE_ITEM_SHORTBOW then
+	 rng_type = nwn.RANGED_TYPE_BOW
+      elseif base == nwn.BASE_ITEM_HEAVYCROSSBOW or base == nwn.BASE_ITEM_LIGHTCROSSBOW then
+	 rng_type = nwn.RANGED_TYPE_CROSSBOW
+      elseif base == nwn.BASE_ITEM_THROWINGAXE then
+	 rng_type = nwn.RANGED_TYPE_THROWAXE
+      elseif base == nwn.BASE_ITEM_SLING then
+	 rng_type = nwn.RANGED_TYPE_SLING
+      elseif base == nwn.BASE_ITEM_DART then
+	 rng_type = nwn.RANGED_TYPE_DART
+      elseif base == nwn.BASE_ITEM_SHURIKEN then
+	 rng_type = nwn.RANGED_TYPE_SHURIKEN
+      end
+   end
+   self.ci.ranged_type = rng_type
+
+   self.ci.equips[0].id = rh.id
    self.ci.equips[1].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_LEFTHAND).id
    self.ci.equips[2].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_ARMS).id
    self.ci.equips[3].id = self:GetItemInSlot(nwn.INVENTORY_SLOT_CWEAPON_L).id

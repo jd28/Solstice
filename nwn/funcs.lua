@@ -64,6 +64,7 @@ void                  nwn_DoCommand(CNWSObject *obj, void *vms);
 int32_t               nwn_DoDamage(void *obj, uint32_t obj_type, int32_t amount);
 void                  nwn_EffectSetNumIntegers(CGameEffect *eff, uint32_t num);
 void                  nwn_ExecuteCommand(int command, int num_args);
+uint32_t              ns_GetAmmunitionAvailable(CNWSCreature *cre, int num_attacks, int32_t ranged_type);
 CNWSArea             *nwn_GetAreaById(uint32_t id);
 CNWSCombatAttackData *nwn_GetAttack(CNWSCombatRound *cr, int attack);
 int                   nwn_GetAttackResultHit(CNWSCreature *cre, CNWSCombatAttackData *data);
