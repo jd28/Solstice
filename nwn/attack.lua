@@ -116,11 +116,19 @@ function Attack:CreateAttackInfo(attacker, target)
    return attack_info
 end
 
+--- Forces people to equip ammunition.
+-- NWN just doesn't seem to like letting Throwaxes, shurikens, darts... so we're forcing them
+-- to auto-equip them (if they have none they will default to normal behavior, unarmed attacks)
+-- @param attack_count Number of attacks in attack group.
+function Attack:ForceEquipAmmunition(attack_count)
+   C.ns_ForceEquipAmmunition(self.attacker.obj, attack_count, self.attacker.ci.ranged_type)
+end
+
 --- Determines if creature has ammunition available.
 -- @param attack_count Number of attacks in attack group.
 function Attack:GetAmmunitionAvailable(attack_count)
-   local rng_type = attacker.ci.ranged_type
-   return C.ns_GetAmmunitionAvailable(self.obj, attack_count, rng_type)
+   local rng_type = self.attacker.ci.ranged_type
+   return C.ns_GetAmmunitionAvailable(self.attacker.obj, attack_count, rng_type)
 end
 
 
@@ -560,8 +568,8 @@ function Attack:ResolveOnHitVFX(dmg)
 end
 
 function Attack:ResolveOutOfAmmo()
-   C.nwn_SetRoundPaused(self.attacker.cre_combat_round, 0, 0x7F000000)
-   C.nwn_SetPauseTimer(self.attacker.cre_combat_round, 0, 0)
+   C.nwn_SetRoundPaused(self.attacker.obj.cre_combat_round, 0, 0x7F000000)
+   C.nwn_SetPauseTimer(self.attacker.obj.cre_combat_round, 0, 0)
    C.nwn_SetAnimation(self.attacker.obj, 1)
 end
 

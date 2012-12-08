@@ -66,6 +66,8 @@ typedef struct CombatInformation {
    uint32_t target_state_mask;
    uint32_t situational_flags;
 
+   uint32_t ranged_type;
+
    int32_t immunity[$NS_OPT_NUM_DAMAGES];
 
    int32_t eff_resist[$NS_OPT_NUM_DAMAGES];

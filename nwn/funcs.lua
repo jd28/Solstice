@@ -64,7 +64,6 @@ void                  nwn_DoCommand(CNWSObject *obj, void *vms);
 int32_t               nwn_DoDamage(void *obj, uint32_t obj_type, int32_t amount);
 void                  nwn_EffectSetNumIntegers(CGameEffect *eff, uint32_t num);
 void                  nwn_ExecuteCommand(int command, int num_args);
-uint32_t              ns_GetAmmunitionAvailable(CNWSCreature *cre, int num_attacks, int32_t ranged_type);
 CNWSArea             *nwn_GetAreaById(uint32_t id);
 CNWSCombatAttackData *nwn_GetAttack(CNWSCombatRound *cr, int attack);
 int                   nwn_GetAttackResultHit(CNWSCreature *cre, CNWSCombatAttackData *data);
@@ -175,6 +174,8 @@ void ns_AddOnHitEffect(CNWSCombatAttackData *attack, nwn_objid_t creator, CGameE
 void ns_AddOnHitVisual(CNWSCombatAttackData *attack, nwn_objid_t creator, uint32_t vfx);
 int  ns_BitScanFFS(uint32_t mask);
 void ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
+void ns_ForceEquipAmmunition(CNWSCreature *cre, int num_attacks, int32_t ranged_type);
+uint32_t ns_GetAmmunitionAvailable(CNWSCreature *cre, int num_attacks, int32_t ranged_type);
 void ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
 void ns_SignalAOO(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);
 void ns_SignalAttack(CNWSCreature *cre, CNWSObject *obj, CNWSCombatAttackData* attack, int32_t anim_len);

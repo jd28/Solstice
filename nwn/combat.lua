@@ -161,7 +161,7 @@ function NSResolveRangedAttack(attacker, target, attack_count, anim)
    -- or none at all.
    attack_count = attack:GetAmmunitionAvailable(attack_count)
    if not target:GetIsValid() or attack_count == 0 then
-      attack:ResolveOutOfAmmo)
+      attack:ResolveOutOfAmmo()
       return
    end
 
@@ -233,10 +233,10 @@ function NSResolveRangedAttack(attacker, target, attack_count, anim)
 	    attack:SetAttackResult(6)
 	 end
       end
-
-      attack:UpdateAttackInfo()
+      attack:UpdateInfo()
    end
    attack:SignalDamage(attack_count, true)
+   attack:ForceEquipAmmunition(attack_count)
 
    local stop = socket.gettime() * 1000
    print(string.format("Resolve Ranged Attack Timer: Attacks %d, Time: %.4f", attack_count, stop-start))

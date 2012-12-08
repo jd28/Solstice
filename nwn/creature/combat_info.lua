@@ -35,7 +35,7 @@ function Creature:UpdateCombatEquips()
    local rng_type = 0
    local rh = self:GetItemInSlot(nwn.INVENTORY_SLOT_RIGHTHAND)
    if rh:GetIsValid() and rh:GetIsRangedWeapon() then
-      local base = self:GetBaseType()
+      local base = rh:GetBaseType()
       if base == nwn.BASE_ITEM_LONGBOW or base == nwn.BASE_ITEM_SHORTBOW then
 	 rng_type = nwn.RANGED_TYPE_BOW
       elseif base == nwn.BASE_ITEM_HEAVYCROSSBOW or base == nwn.BASE_ITEM_LIGHTCROSSBOW then

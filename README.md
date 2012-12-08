@@ -65,6 +65,8 @@
 * Added the concept of "Situational Attacks" these abstract situations
   like Sneak/Death attacks and Coup de Grace.  They can be extend to
   modify combat by a number of situational factors.
+* All ammo including shurikens, throwing axes, and darts are
+  auto-equipped when the stack is depleted.
   
 ## Combat Modifiers
 * Modifications to AB, AC, Damage Bonus, Hitpoints can be determined
