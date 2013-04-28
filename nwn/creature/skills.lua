@@ -3,32 +3,6 @@ require 'nwn.effects'
 local ffi = require 'ffi'
 local color = require 'nwn.color'
 
--- Accumulator locals
-local bonus = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
-local penalty = ffi.new("uint32_t[?]", NS_OPT_MAX_EFFECT_MODS)
-local skill_amount = nwn.CreateEffectAmountFunc(1)
-local skill_range = nwn.CreateEffectRangeFunc(nwn.EFFECT_TRUETYPE_SKILL_DECREASE,
-					      nwn.EFFECT_TRUETYPE_SKILL_INCREASE)
-
-
---- Creatues a skill debug string
-function Creature:CreateSkillDebugString()
-   local base = {}
-   local eff  = {}
-   local fmt  = "%s: Base %d, Effect: %d\n"
-
-   table.insert(base, "Base:\n")
-
-   for i = 0, nwn.SKILL_LAST do
-      table.insert(base, string.format(fmt, 
-				       nwn.GetSkillName(i), 
-				       self:GetSkillRank(i, true),
-				       self:GetTotalEffectSkillBonus(nwn.OBJECT_INVALID, i)))
-   end
-
-   return table.concat(base)
-end
-
 --- Determines if a creature has a skill
 -- @param skill nwn.SKILL_*
 function Creature:GetHasSkill(skill)
@@ -113,18 +87,6 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    return ret
 end
 
---- Determines maximum skill bonus from effects/gear.
--- @param skill nwn.SKILL_*
-function Creature:GetMaxSkillMod(skill)
-   return 20
-end
-
---- Determines minimum skill bonus from effects/gear.
--- @param skill nwn.SKILL_*
-function Creature:GetMinSkillMod(skill)
-   return -20
-end
-
 --- Gets the amount a skill was increased at a level.
 -- @param level Level to check
 -- @param skill nwn.SKILL_*
@@ -151,6 +113,8 @@ end
 
 --- Gets creature's skill rank.
 -- @param skill nwn.SKILL_*
+-- TODO replace with call to NWNXCombat
+-- [[
 function Creature:GetSkillRank(skill, vs, base, no_scale)
    if skill < 0 or skill > nwn.SKILL_LAST then
       error(string.format("ERROR: Creature:GetSkillRank invalid skill: %d", skill))
@@ -183,73 +147,7 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
 
    return math.clamp(total, -127, 127)
 end
-
---- Determines total skill bonus from effects/gear.
--- @param vs Versus a target
--- @param skill nwn.SKILL_*
-function Creature:GetTotalEffectSkillBonus(vs, skill)
-   local function valid(eff, vs_info)
-      if skill ~= eff:GetInt(0) then
-	 return false
-      end
-
-      -- If using versus info is globally disabled return true.
-      if not NS_OPT_USE_VERSUS_INFO then return true end
-
-      local race      = eff:GetInt(2)
-      local lawchaos  = eff:GetInt(3)
-      local goodevil  = eff:GetInt(4)
-      local subrace   = eff:GetInt(5)
-      local deity     = eff:GetInt(6)
-      local target    = eff:GetInt(7)
-
-      if (race == nwn.RACIAL_TYPE_INVALID or race == vs_info.race)
-         and (lawchaos == 0 or lawchaos == vs_info.lawchaos)
-         and (goodevil == 0 or goodevil == vs_info.goodevil)
-         and (subrace == 0 or subrace == vs_info.subrace_id)
-         and (deity == 0 or deity == vs_info.deity_id)
-         and (target == 0 or target == vs_info.target)
-      then
-         return true
-      end
-      return false
-   end
-
-   local vs_info
-   if NS_OPT_USE_VERSUS_INFO then
-      vs_info = nwn.GetVersusInfo(vs)
-   end
-
-   local bon_idx, pen_idx = self:GetEffectArrays(bonus,
-						 penalty,
-						 vs_info,
-						 SKILL_EFF_INFO,
-						 skill_range,
-						 valid,
-						 skill_amount,
-						 math.max,
-						 self.stats.cs_first_skill_eff)
-
-   local bon_total, pen_total = 0, 0
-   
-   for i = 0, bon_idx - 1 do
-      if SKILL_EFF_INFO.stack then
-	 bon_total = bon_total + bonus[i]
-      else
-	 bon_total = math.max(bon_total, bonus[i])
-      end
-   end
-
-   for i = 0, pen_idx - 1 do
-      if SKILL_EFF_INFO.stack then
-	 pen_total = pen_total + penalty[i]
-      else
-	 pen_total = math.max(pen_total, penalty[i])
-      end
-   end
-
-   return math.clamp(bon_total - pen_total, self:GetMinSkillMod(skill), self:GetMaxSkillMod(skill))
-end
+--]]
 
 --- Modifies skill rank.
 -- @param skill nwn.SKILL_*
@@ -305,20 +203,4 @@ function Creature:SetSkillRank(skill, amount)
 
    self.stats.cs_skills[skill] = amount
    return self.stats.cs_skills[skill]
-end
-
----------------------------------------------------------------------------------------------------
-
-function NSGetSkillRank(cre, skill, vs, base, no_scale)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
-
-   return cre:GetSkillRank(skill, vs, base, no_scale)
-end
-
-function NSGetTotalSkillBonus(cre, vs, skill)
-   cre = _NL_GET_CACHED_OBJECT(cre)
-   vs = _NL_GET_CACHED_OBJECT(vs)
-
-   return cre:GetTotalEffectSkillBonus(vs, skill)
 end

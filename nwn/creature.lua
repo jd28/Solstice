@@ -20,7 +20,6 @@ typedef struct Creature {
     uint32_t           id;
     CNWSCreature      *obj;
     CNWSCreatureStats *stats;
-    CombatInformation  ci;
     uint32_t           effective_level;
     uint32_t           first_custom_eff;
 } Creature;
@@ -29,36 +28,34 @@ typedef struct Creature {
 local creature_mt = { __index = Creature }
 creature_t = ffi.metatype("Creature", creature_mt)
 
-require 'nwn.creature.ability'
-require 'nwn.creature.action'
-require 'nwn.creature.ai'
-require 'nwn.creature.alignment'
-require 'nwn.creature.armor_class'
-require 'nwn.creature.associate'
-require 'nwn.creature.attack_bonus'
-require 'nwn.creature.class'
-require 'nwn.creature.combat'
-require 'nwn.creature.combat_info'
-require 'nwn.creature.conceal'
-require 'nwn.creature.cutscene'
-safe_require 'nwn.creature.damage'
-require 'nwn.creature.effects'
-require 'nwn.creature.faction'
-require 'nwn.creature.feats'
-require 'nwn.creature.hp'
-require 'nwn.creature.info'
-require 'nwn.creature.internal'
-require 'nwn.creature.inventory'
-require 'nwn.creature.level'
-require 'nwn.creature.logger'
-require 'nwn.creature.modes'
-require 'nwn.creature.pc'
-require 'nwn.creature.saves'
-require 'nwn.creature.skills'
-require 'nwn.creature.spells'
-require 'nwn.creature.state'
-require 'nwn.creature.talent'
-require 'nwn.creature.xp'
+safe_require 'nwn.creature.ability'
+safe_require 'nwn.creature.action'
+safe_require 'nwn.creature.ai'
+safe_require 'nwn.creature.alignment'
+safe_require 'nwn.creature.armor_class'
+safe_require 'nwn.creature.associate'
+safe_require 'nwn.creature.attack_bonus'
+safe_require 'nwn.creature.class'
+safe_require 'nwn.creature.combat'
+safe_require 'nwn.creature.conceal'
+safe_require 'nwn.creature.cutscene'
+safe_require 'nwn.creature.effects'
+safe_require 'nwn.creature.faction'
+safe_require 'nwn.creature.feats'
+safe_require 'nwn.creature.hp'
+safe_require 'nwn.creature.info'
+safe_require 'nwn.creature.internal'
+safe_require 'nwn.creature.inventory'
+safe_require 'nwn.creature.level'
+safe_require 'nwn.creature.logger'
+safe_require 'nwn.creature.modes'
+safe_require 'nwn.creature.pc'
+safe_require 'nwn.creature.saves'
+safe_require 'nwn.creature.skills'
+safe_require 'nwn.creature.spells'
+safe_require 'nwn.creature.state'
+safe_require 'nwn.creature.talent'
+safe_require 'nwn.creature.xp'
 
 
 --- Briefly displays a string ref as ambient text above targets head.
