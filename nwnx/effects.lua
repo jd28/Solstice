@@ -7,6 +7,10 @@ NWNXEffects = {}
 local IP_HANDLERS = {}
 local EFF_HANDLERS = {}
 
+function NWNXEffects.SendEffects(obj)
+   obj:SetLocalString("NWNX!EFFECTS!SENDEFFECTS", " ")
+end
+
 function NWNXEffects.GetItempropInfo()
    local e = C.Local_GetLastNWNXEventItemprop()
    if e == nil then return end

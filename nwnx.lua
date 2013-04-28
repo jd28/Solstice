@@ -1,15 +1,16 @@
 nwnx = nwnx or {}
 
-require "nwnx.areas"
-require 'nwnx.chat'
-require "nwnx.database"
-require "nwnx.dmactions"
-require "nwnx.effects"
-require 'nwnx.equips'
-require "nwnx.events"
-require "nwnx.haks"
-require "nwnx.levels"
-require "nwnx.system"
+safe_require "nwnx.areas"
+safe_require 'nwnx.chat'
+safe_require 'nwnx.combat'
+safe_require "nwnx.database"
+safe_require "nwnx.dmactions"
+safe_require "nwnx.effects"
+safe_require 'nwnx.equips'
+safe_require "nwnx.events"
+safe_require "nwnx.haks"
+safe_require "nwnx.levels"
+safe_require "nwnx.system"
 
 --- Gets a result from NWNX
 -- @param object Object to set the variable on
