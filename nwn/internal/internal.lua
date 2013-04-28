@@ -45,9 +45,9 @@ function _NL_GET_CACHED_OBJECT(id)
    elseif type == nwn.GAME_OBJECT_TYPE_MODULE then
       object = module_t(type, id, C.nwn_GetModule())
    elseif type == nwn.GAME_OBJECT_TYPE_AREA then 
-      object = area_t(type, id, C.nwn_GetAreaById(id))
+      object = area_t(type, id, C.nwn_GetAreaByID(id))
    elseif type == nwn.GAME_OBJECT_TYPE_ITEM then 
-      object = item_t(type, id, C.nwn_GetItemById(id))
+      object = item_t(type, id, C.nwn_GetItemByID(id))
    elseif type == nwn.GAME_OBJECT_TYPE_TRIGGER then 
       obj = ffi.cast("CNWSTrigger*", obj)
       object = trigger_t(type, id, obj)

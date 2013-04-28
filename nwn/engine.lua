@@ -91,7 +91,7 @@ function nwn.engine.StackPopString()
    if tx then return "" end
 
    local t = ffi.string(s)
-   ffi.C.free(s)
+   C.free(s)
    return t
 end
 

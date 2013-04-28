@@ -62,9 +62,9 @@ end
 function Creature:ExploreArea(area, explored)
    if explored == nil then explored = true end 
    
-   StackPushBoolean(explored)
-   StackPushObject(self)
-   StackPushObject(area)
+   ne.StackPushBoolean(explored)
+   ne.StackPushObject(self)
+   ne.StackPushObject(area)
    ne.ExecuteCommand(403, 3)
 end
 
