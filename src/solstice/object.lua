@@ -114,6 +114,14 @@ function M.Object:Destroy(delay)
    NWE.ExecuteCommand(241, 2)
 end
 
+--- Determine if dead
+function M.Object:GetIsDead()
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(140, 1);
+   return NWE.StackPopBoolean();
+end
+
+
 --- Determine if named timer is still active.
 -- @param name Timer name.
 -- @return true if the timer is active

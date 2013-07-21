@@ -58,6 +58,14 @@ function M.Creature:GetIsInConversation()
    return NWE.StackPopBoolean()
 end
 
+--- Determine if PC is dying
+-- HACK: This returns that they're dead...
+function M.Creature:GetIsPCDying()
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(140, 1);
+   return NWE.StackPopBoolean();
+end
+
 --- Check whether a creature is resting.
 function M.Creature:GetIsResting()
    NWE.StackPushObject(self)
