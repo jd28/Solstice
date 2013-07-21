@@ -1,1 +1,4 @@
 test.lua
+doc/output
+ta_*
+ta/

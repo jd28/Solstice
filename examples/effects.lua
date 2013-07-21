@@ -1,26 +1,26 @@
-require 'nwn.object'
-require 'nwn.effects'
-require 'nwnx'
+-- NEEDS TO BE UPDATED
 
--- See nwn/constants/effects.lua and nwn.EFFECT_CUSTOMTYPE_* for values already
--- in use.
-nwn.EFFECT_CUSTOMTYPE_DECREASE_DC = 1000
+require 'solstice.nwn.object'
+require 'solstice.nwn.effects'
+NWNXEffects = require 'solstice.nwnx.effects'
+
+local EFFECT_CUSTOMTYPE_DECREASE_DC = 1000
 
 -- Custom effect creation function.
-function nwn.EffectDecreaseDC(amount)
-   -- Simply call nwn.EffectCustom with the effect type and a list of 
+function solstice.nwn.EffectDecreaseDC(amount)
+   -- Simply call solstice.nwn.EffectCustom with the effect type and a list of 
    -- integer values that you want to store on the effect.  In this case
    -- there is only one value the amount to decrease the casters DC by.
-   return nwn.EffectCustom(ta.EFFECT_CUSTOMTYPE_DECREASE_DC, {amount})
+   return solstice.nwn.EffectCustom(ta.EFFECT_CUSTOMTYPE_DECREASE_DC, {amount})
 end
 
 -- Register the effect and a function to call when the effect is applied/removed.
 -- This particular effect assumes you have a spell system that can adjust spell DCs
 -- by local variables set on the caster.  I believe the one in the Community Patch 
 -- can do this, tho it uses different variable names.
-nwn.RegisterCustomEffectHandler(
+solstice.nwn.RegisterCustomEffectHandler(
    -- The custom effect type.
-   nwn.EFFECT_CUSTOMTYPE_DECREASE_DC,
+   solstice.nwn.EFFECT_CUSTOMTYPE_DECREASE_DC,
    -- When the function is called it is passed three arguments,
    -- the effect itself, the target that it is being applied to
    -- and a boolean value which is true when the effect is applied
@@ -50,12 +50,12 @@ nwn.RegisterCustomEffectHandler(
 -- permenant hitpoints as an effect.  I.e. unlike temporary hitpoints they are fully healable.
 -- Since it's kind of annoying to have the effect applied but not to have those HP usable this
 -- will heal the target amount for the additional hitpoints that it receives.
-nwn.RegisterCustomEffectHandler(
-   nwn.EFFECT_CUSTOMTYPE_HP_INCREASE,
+solstice.nwn.RegisterCustomEffectHandler(
+   solstice.nwn.EFFECT_CUSTOMTYPE_HP_INCREASE,
    function (effect, target, is_apply)
       local amount = effect:GetInt(1)
       if is_apply then
-	 target:ApplyEffect(nwn.EffectHeal(amount))
+	 target:ApplyEffect(solstice.nwn.EffectHeal(amount))
       end
 
       return 0

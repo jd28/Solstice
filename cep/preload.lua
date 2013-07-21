@@ -1,3 +1,0 @@
-cep = {}
-
-require 'cep.constants'

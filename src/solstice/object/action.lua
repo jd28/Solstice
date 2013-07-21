@@ -1,0 +1,238 @@
+--- Object
+-- @license GPL v2
+-- @copyright 2011-2013
+-- @author jmd ( jmd2028 at gmail dot com )
+-- @module object
+
+local NWE = require 'solstice.nwn.engine'
+local Chat = require 'solstice.chat'
+local M = require 'solstice.object.init'
+
+--- Class Object: Actions
+-- @section action
+
+--- An action that causes an object to close a door.
+-- @param door Door to close
+function M.Object:ActionCloseDoor(door)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(door)
+   NWE.ExecuteCommand(44, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+
+--- Gives a specified item to a target creature.
+-- @param item Item to give.
+-- @param target Receiver
+function M.Object:ActionGiveItem(item, target)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(target)
+   NWE.StackPushObject(item)
+   NWE.ExecuteCommand(135, 2)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- An action that will cause a creature to lock a door or 
+-- other unlocked object.
+-- @param target Door or placeable object that will be the
+--     target of the lock attempt.
+function M.Object:ActionLockObject(target)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(target)
+   NWE.ExecuteCommand(484, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- An action that will cause a creature to open a door.
+-- @param door Door to open
+function M.Object:ActionOpenDoor(door)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(door)
+   NWE.ExecuteCommand(43, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Pause the current conversation.
+function M.Object:ActionPauseConversation()
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.ExecuteCommand(205, 0)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Resume a conversation after it has been paused.
+function M.Object:ActionResumeConversation()
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.ExecuteCommand(206, 0)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Causes an object to speak.
+-- @param message String to be spoken.
+-- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+function M.Object:ActionSpeakString(message, volume)
+   volume = volume or Chat.VOLUME_TALK
+
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushInteger(volume)
+   NWE.StackPushString(message)
+   NWE.ExecuteCommand(39, 2)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Causes the creature to speak a translated string.
+-- @param strref Reference of the string in the talk table
+-- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+function M.Object:ActionSpeakStringByStrRef(strref, volume)
+   volume = volume or Chat.VOLUME_TALK
+
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushInteger(volume)
+   NWE.StackPushInteger(strref)
+   NWE.ExecuteCommand(240, 2)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Action to start a conversation with a PC
+-- @param target An object to converse with.
+-- @param dialog The resource reference (filename) of a conversation.
+--     (Default: "") 
+-- @param private Specify whether the conversation is audible to everyone
+--     or only to the PC. (Default: false) 
+-- @param hello Determines if initial greeting is played. (Default: true) 
+function M.Object:ActionStartConversation(target, dialog, private, hello)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   dialog = dialog or ""
+   if hello == nil then hello = true end
+   
+   NWE.StackPushBoolean(hello)
+   NWE.StackPushBoolean(private)
+   NWE.StackPushString(dialog)
+   NWE.StackPushObject(target)
+   NWE.ExecuteCommand(204, 4)
+
+   print(self, temp)
+   NWE.SetCommandObject(temp)
+end
+
+--- Takes an item from an object
+-- @param item The item to take.
+-- @param target The object from which to take the item.
+function M.Object:ActionTakeItem(item, target)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(oTakeFrom)
+   NWE.StackPushObject(oItem)
+   NWE.ExecuteCommand(136, 2)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Causes a creature to unlock a door or other locked object.
+-- @param target Door or placeable object that will be the
+--     target of the unlock attempt.
+function M.Object:ActionUnlockObject(target)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(target)
+   NWE.ExecuteCommand(483, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Adds a wait action to an objects queue.
+-- @param time Time in seconds to wait.
+function M.Object:ActionWait(time)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushFloat(time)
+   NWE.ExecuteCommand(202, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Removes all actions from an action queue.
+-- @param clear_combat combat along with all other actions. (Default: false) 
+function M.Object:ClearAllActions(clear_combat)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushBoolean(clear_combat)
+   NWE.ExecuteCommand(9, 1)
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Returns the currently executing Action.
+function M.Object:GetCurrentAction()
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(522, 1)
+
+   NWE.SetCommandObject(temp)
+   return NWE.StackPopInteger()
+end
+
+--- Forces an object to immediately speak.
+-- @param text Text to be spoken.
+-- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+function M.Object:SpeakString(text, volume)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+   volume = volume or Chat.VOLUME_TALK
+
+   NWE.StackPushInteger(volume);
+   NWE.StackPushString(text);
+   NWE.ExecuteCommand(221, 2);
+
+   NWE.SetCommandObject(temp)
+end
+
+--- Causes an object to instantly speak a translated string.
+-- @param strref TLK string reference to speak.
+-- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+function M.Object:SpeakStringByStrRef(strref, volume)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
+
+   volume = volume or Chat.VOLUME_TALK
+
+   NWE.StackPushInteger(volume)
+   NWE.StackPushInteger(strref)
+   NWE.ExecuteCommand(691, 2)
+
+   NWE.SetCommandObject(temp)
+end
+
+
+
