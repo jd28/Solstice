@@ -33,7 +33,7 @@ function M.Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
    local off = mode == Mode.INVALID
    if change and self.obj.cre_mode_combat > 11 then
-      local f = Mode.GetCombatMode(self.obj.cre_mode_combat)
+      local f = Mode.Get(self.obj.cre_mode_combat)
       f(self, mode, true)
       self.obj.cre_mode_combat = 0
       -- TODO: Remove all mode effects.
@@ -85,7 +85,7 @@ function M.Creature:SetCombatMode(mode, change)
    if not change and mode == current_mode then
       set_activity()
    elseif change or self.obj.cre_combat_round.cr_round_started ~= 1 then
-      local f = Mode.GetCombatMode(mode)
+      local f = Mode.Get(mode)
       if f and not f(self, mode, off) then
          return
       end
