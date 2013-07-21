@@ -216,3 +216,5 @@ function M.ToAction(mode)
 
    return -1
 end
+
+return M
