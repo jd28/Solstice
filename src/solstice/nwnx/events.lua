@@ -2,6 +2,7 @@
 -- @module nwnx.events
 
 local Mod = require 'solstice.module'
+local Vec = require 'solstice.vector'
 
 local M = {}
 
@@ -24,6 +25,8 @@ M.EVENT_TYPE_TOGGLE_MODE       = 9
 M.EVENT_TYPE_CAST_SPELL        = 10
 M.EVENT_TYPE_TOGGLE_PAUSE      = 11
 M.EVENT_TYPE_POSSESS_FAMILIAR  = 12
+M.EVENT_TYPE_DESTROY_OBJECT    = 14
+M.EVENT_TYPE_PVP_STATE         = 15
 
 M.NODE_TYPE_STARTING_NODE      = 0
 M.NODE_TYPE_ENTRY_NODE         = 1
@@ -59,7 +62,7 @@ function M.GetEventInfo()
             object = _SOL_GET_CACHED_OBJECT(e.object),
             target = _SOL_GET_CACHED_OBJECT(e.target),
             item = _SOL_GET_CACHED_OBJECT(e.item),
-            pos = vector_t(e.loc.x, e.loc.y, e.loc.z)
+            pos = Vec.vector_t(e.loc.x, e.loc.y, e.loc.z)
           }
 end
 
