@@ -164,6 +164,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.INVALID, true)
       else
          cre:SetCombatMode(M.DEFENSIVE_STANCE, false)
+         cre:DecrementRemainingFeatUses(Ft.DWARVEN_DEFENDER_DEFENSIVE_STANCE)
       end
    end
 
