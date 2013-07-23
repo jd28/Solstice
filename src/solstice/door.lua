@@ -8,7 +8,9 @@ local ffi = require 'ffi'
 local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 
-local M = {
+local M = {}
+
+M.const = {
    ACTION_OPEN            = 0,
    ACTION_UNLOCK          = 1,
    ACTION_BASH            = 2,
@@ -21,6 +23,7 @@ local M = {
    ANIMATION_OPEN2        = 206,
    ANIMATION_DESTROY      = 207,
 }
+setmetatable(M, { __index = M.const })
 
 M.Door = inheritsFrom(Obj.Object, "solstice.door.Door")
 

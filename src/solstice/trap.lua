@@ -9,7 +9,8 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = require 'solstice.trap.init'
-require 'solstice.trap.constant'
+M.const = require 'solstice.trap.constant'
+setmetatable(M, { __index = M.const })
 
 M.Trap = inheritsFrom( nil, "solstice.trap.Trap" )
 

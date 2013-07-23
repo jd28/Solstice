@@ -9,7 +9,9 @@ local C   = ffi.C
 local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.effect.init'
-require 'solstice.effect.constant'
+M.const = require 'solstice.effect.constant'
+setmetatable(M, { __index = M.const })
+
 require 'solstice.effect.creation'
 
 M.Effect = inheritsFrom(nil, 'solstice.effect.Effect')

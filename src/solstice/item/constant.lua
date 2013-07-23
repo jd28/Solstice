@@ -1,4 +1,4 @@
-local M = require 'solstice.item.init'
+local M = {}
 
 M.APPR_TYPE_SIMPLE_MODEL         = 0
 M.APPR_TYPE_WEAPON_COLOR         = 1
@@ -167,3 +167,5 @@ M.APPR_ARMOR_MODEL_LSHOULDER                 =  15
 M.APPR_ARMOR_MODEL_RHAND                     =  16
 M.APPR_ARMOR_MODEL_LHAND                     =  17
 M.APPR_ARMOR_MODEL_ROBE                      =  18
+
+return M

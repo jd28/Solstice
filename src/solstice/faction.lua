@@ -9,12 +9,15 @@
 
 local NWE = require 'solstice.nwn.engine'
 
-local M = {
+local M = {}
+M.const = {
    STANDARD_HOSTILE  = 0,
    STANDARD_COMMONER = 1,
    STANDARD_MERCHANT = 2,
    STANDARD_DEFENDER = 3,
 }
+
+setmetatable(M, { __index = M.const })
 
 ---
 function M.Faction:GetAverageGoodEvilAlignment()

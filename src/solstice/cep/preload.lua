@@ -1,7 +1,10 @@
 --- CEP
 -- @module cep
 
---- Constant holder.
-cep = {}
+--[[
+local cep = {}
 
-require 'solstice.cep.constants'
+cep.const = require 'solstice.cep.constants'
+
+return cep
+   --]]

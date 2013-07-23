@@ -11,7 +11,8 @@ local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
 
-require 'solstice.itemprop.constant'
+M.const = require 'solstice.itemprop.constant'
+setmetatable(M, { __index = M.const })
 
 M.Itemprop = inheritsFrom(Eff.Effect, "solstice.itemprop.Itemprop")
 

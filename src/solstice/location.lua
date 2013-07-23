@@ -8,6 +8,8 @@ local Obj = require 'solstice.object'
 local Eff = require 'solstice.effect'
 
 local M = require 'solstice.location.init'
+M.const = require 'solstice.location.constant'
+setmetatable(M, { __index = M.const })
 
 M.Location = inheritsFrom(nil, "solstice.location.Location")
 
@@ -19,8 +21,6 @@ M.location_t = ffi.metatype("CScriptLocation",
 M.INVALID = M.location_t(Vec.vector_t(0,0,0),
 			 Vec.vector_t(0,0,0),
 			 Obj.INVALID.id)
-
-require 'solstice.location.constant'
 
 --- Create a new location
 -- @param position Location's position

@@ -1,4 +1,4 @@
-local M = require 'solstice.effect.init'
+local M = {}
 
 --Effect type constants
 M.DURATION_INSTANT    = 0
@@ -148,3 +148,5 @@ M.IMMUNITY_TYPE_NEGATIVE_LEVEL    = 29
 M.IMMUNITY_TYPE_SNEAK_ATTACK      = 30
 M.IMMUNITY_TYPE_CRITICAL_HIT      = 31
 M.IMMUNITY_TYPE_DEATH             = 32
+
+return M

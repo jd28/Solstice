@@ -1,4 +1,5 @@
-local M = {
+local M = {}
+M.const = {
    NONE                        = -1,
    DUR_BLUR                    = 0,
    DUR_DARKNESS                = 1,
@@ -540,5 +541,6 @@ local M = {
    IMP_STARBURST_RED              = 645,
    IMP_NIGHTMARE_HEAD_HIT         = 670,
 }
+setmetatable(M, { __index = M.const })
 
 return M

@@ -1,4 +1,4 @@
-local M = require 'solstice.area.init'
+local M = {}
 
 M.INVALID = -1
 M.NATURAL = 1

@@ -10,7 +10,8 @@ local _COMMANDS = {}
 local _SYMBOLS = {}
 
 local M = require 'solstice.chat.init'
-require 'solstice.chat.constant'
+M.const = require 'solstice.chat.constant'
+setmetatable(M, { __index = M.const })
 
 --- ChatInfo table.
 --     A table containing the following fields will be passed to the

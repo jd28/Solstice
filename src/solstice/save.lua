@@ -2,5 +2,6 @@
 -- @module save
 
 local M = require 'solstice.save.init'
-require 'solstice.save.constant'
+M.const = require 'solstice.save.constant'
+setmetatable(M, { __index = M.const })
 

@@ -1,4 +1,4 @@
-local M = require 'solstice.feat.init'
+local M = {}
 
 M.ALERTNESS                      = 0
 M.AMBIDEXTERITY                  = 1
@@ -1044,3 +1044,5 @@ M.PLAYER_TOOL_07                     = 1112
 M.PLAYER_TOOL_08                     = 1113
 M.PLAYER_TOOL_09                     = 1114
 M.PLAYER_TOOL_10                     = 1115
+
+return M

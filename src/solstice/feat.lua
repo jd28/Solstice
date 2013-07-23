@@ -1,5 +1,7 @@
 local M = require 'solstice.feat.init'
-require 'solstice.feat.constant'
+M.const = require 'solstice.feat.constant'
+setmetatable(M, { __index = M.const })
+
 local TDA = require 'solstice.2da'
 
 local FEAT_USES = {}

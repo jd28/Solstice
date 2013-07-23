@@ -1,7 +1,7 @@
 --- AoE constants.
 -- @module aoe
 
-local M = require 'solstice.aoe.init'
+local M = {}
 
 --VFX_Persistent.2da
 M.PER_FOGACID                = 0

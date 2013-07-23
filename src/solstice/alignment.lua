@@ -3,11 +3,15 @@
 
 local M = {}
 
-M.ALL                    = 0
-M.NEUTRAL                = 1
-M.LAWFUL                 = 2
-M.CHAOTIC                = 3
-M.GOOD                   = 4
-M.EVIL                   = 5
+M.const = {
+   ALL                    = 0,
+   NEUTRAL                = 1,
+   LAWFUL                 = 2,
+   CHAOTIC                = 3,
+   GOOD                   = 4,
+   EVIL                   = 5,
+}
+
+setmetatable(M, { __index = M.CONST })
 
 return M

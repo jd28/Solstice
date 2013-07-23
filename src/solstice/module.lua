@@ -9,12 +9,14 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = {}
-
-M.GAME_DIFFICULTY_VERY_EASY   = 0
-M.GAME_DIFFICULTY_EASY        = 1
-M.GAME_DIFFICULTY_NORMAL      = 2
-M.GAME_DIFFICULTY_CORE_RULES  = 3
-M.GAME_DIFFICULTY_DIFFICULT   = 4
+M.const = {
+   GAME_DIFFICULTY_VERY_EASY   = 0,
+   GAME_DIFFICULTY_EASY        = 1,
+   GAME_DIFFICULTY_NORMAL      = 2,
+   GAME_DIFFICULTY_CORE_RULES  = 3,
+   GAME_DIFFICULTY_DIFFICULT   = 4,
+}
+setmetatable(M, { __index = M.const })
 
 --- Functions
 -- @section

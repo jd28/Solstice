@@ -1,7 +1,7 @@
 ---
 -- @module object
 
-local M = require 'solstice.object.init'
+local M = {}
 
 M.NONE              = 0
 M.CREATURE          = 1
@@ -64,3 +64,5 @@ M.internal.ENCOUNTER        = 13
 M.internal.STORE            = 14
 M.internal.PORTAL           = 15
 M.internal.SOUND            = 16
+
+return M

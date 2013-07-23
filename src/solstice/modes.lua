@@ -7,33 +7,37 @@ local Ft = require 'solstice.feat'
 local MODES = {}
 local M = {}
 
--- Combat Mode Defines
-M.INVALID                 = 0
-M.PARRY                   = 1
-M.POWER_ATTACK            = 2
-M.IMPROVED_POWER_ATTACK   = 3
-M.COUNTER_SPELL           = 4
-M.FLURRY_OF_BLOWS         = 5
-M.RAPID_SHOT              = 6
-M.EXPERTISE               = 7
-M.IMPROVED_EXPERTISE      = 8
-M.DEFENSIVE_CASTING       = 9
-M.DIRTY_FIGHTING          = 10
-M.DEFENSIVE_STANCE        = 11
+M.const = {
+   -- Combat Mode Defines
+   INVALID                 = 0,
+   PARRY                   = 1,
+   POWER_ATTACK            = 2,
+   IMPROVED_POWER_ATTACK   = 3,
+   COUNTER_SPELL           = 4,
+   FLURRY_OF_BLOWS         = 5,
+   RAPID_SHOT              = 6,
+   EXPERTISE               = 7,
+   IMPROVED_EXPERTISE      = 8,
+   DEFENSIVE_CASTING       = 9,
+   DIRTY_FIGHTING          = 10,
+   DEFENSIVE_STANCE        = 11,
 
-M.ACTION_DETECT                  = 0
-M.ACTION_STEALTH                 = 1
-M.ACTION_PARRY                   = 2
-M.ACTION_POWER_ATTACK            = 3
-M.ACTION_IMPROVED_POWER_ATTACK   = 4
-M.ACTION_COUNTERSPELL            = 5
-M.ACTION_FLURRY_OF_BLOWS         = 6
-M.ACTION_RAPID_SHOT              = 7
-M.ACTION_EXPERTISE               = 8
-M.ACTION_IMPROVED_EXPERTISE      = 9
-M.ACTION_DEFENSIVE_CAST          = 10
-M.ACTION_DIRTY_FIGHTING          = 11
-M.ACTION_DEFENSIVE_STANCE        = 12
+   ACTION_DETECT                  = 0,
+   ACTION_STEALTH                 = 1,
+   ACTION_PARRY                   = 2,
+   ACTION_POWER_ATTACK            = 3,
+   ACTION_IMPROVED_POWER_ATTACK   = 4,
+   ACTION_COUNTERSPELL            = 5,
+   ACTION_FLURRY_OF_BLOWS         = 6,
+   ACTION_RAPID_SHOT              = 7,
+   ACTION_EXPERTISE               = 8,
+   ACTION_IMPROVED_EXPERTISE      = 9,
+   ACTION_DEFENSIVE_CAST          = 10,
+   ACTION_DIRTY_FIGHTING          = 11,
+   ACTION_DEFENSIVE_STANCE        = 12,
+}
+
+setmetatable(M, { __index = M.const })
 
 --- Internal toggle mode function
 -- @param cre Creature to toggle mode on

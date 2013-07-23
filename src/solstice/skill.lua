@@ -10,7 +10,8 @@ local bit = require 'bit'
 local C = ffi.C
 local TLK = require 'solstice.tlk'
 
-local M = {
+local M = {}
+M.const = {
    ANIMAL_EMPATHY   = 0,
    CONCENTRATION    = 1,
    DISABLE_TRAP     = 2,
@@ -46,7 +47,7 @@ local M = {
    SUB_RECOVERTRAP   = 101,
    SUB_EXAMINETRAP   = 102,
 }
-
+setmetatable(M, { __index = M.const })
 --- Get skill's associated ability.
 -- @return solstice.ability type constant
 function M.GetAbility(skill)

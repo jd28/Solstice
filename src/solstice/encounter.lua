@@ -7,7 +7,8 @@
 local ffi = require 'ffi'
 local Obj = require 'solstice.object'
 
-local M = {
+local M = {}
+M.const = {
    -- These represent the row in the difficulty 2da, rather than
    -- a difficulty value.
    DIFFICULTY_VERY_EASY  = 0,
@@ -17,7 +18,7 @@ local M = {
    DIFFICULTY_IMPOSSIBLE = 4,
 
 }
-
+setmetatable(M, { __index = M.const })
 M.Encounter = inheritsFrom(Obj.Object, 'solstice.encounter.Encounter')
 
 --- Internal ctype.

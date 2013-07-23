@@ -1,4 +1,4 @@
-local M = require 'solstice.trap.init'
+local M = {}
 
 M.MINOR_SPIKE          = 0
 M.AVERAGE_SPIKE        = 1
@@ -48,3 +48,5 @@ M.EPIC_ELECTRICAL      = 44
 M.EPIC_FIRE            = 45
 M.EPIC_FROST           = 46
 M.EPIC_SONIC           = 47
+
+return M

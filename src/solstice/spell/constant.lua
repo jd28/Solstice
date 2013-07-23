@@ -1,4 +1,4 @@
-local M = require 'solstice.spell.init'
+local M = {}
 
 M.METAMAGIC_NONE           = 0
 M.METAMAGIC_EMPOWER        = 1
@@ -632,3 +632,5 @@ M.PROJECTILE_PATH_TYPE_HOMING         = 1
 M.PROJECTILE_PATH_TYPE_BALLISTIC      = 2
 M.PROJECTILE_PATH_TYPE_HIGH_BALLISTIC = 3
 M.PROJECTILE_PATH_TYPE_ACCELERATING   = 4
+
+return M

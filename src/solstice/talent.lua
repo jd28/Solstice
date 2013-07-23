@@ -9,7 +9,9 @@
 
 local NWE = require 'solstice.nwn.engine'
 
-local M = {
+local M = {}
+
+M.const = {
    SPELL = 0,
    FEAT  = 1,
    SKILL = 2,
@@ -37,6 +39,7 @@ local M = {
    CATEGORY_BENEFICIAL_ENHANCEMENT_POTION     = 21,
    CATEGORY_HARMFUL_MELEE                     = 22,
 }
+setmetatable(M, { __index = M.const })
 
 M.Talent = inheritsfrom(nil, "solstice.talent.Talent")
 

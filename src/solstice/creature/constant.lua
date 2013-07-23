@@ -1,4 +1,4 @@
-local M = require 'solstice.creature.init'
+local M = {}
 
 M.ABILITY_STRENGTH         = 0
 M.ABILITY_DEXTERITY        = 1
@@ -667,3 +667,5 @@ M.WINGS_BAT                      = 3
 M.WINGS_DRAGON                   = 4
 M.WINGS_BUTTERFLY                = 5
 M.WINGS_BIRD                     = 6
+
+return M

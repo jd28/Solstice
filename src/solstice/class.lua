@@ -1,7 +1,9 @@
 --- Class
 -- @module class
 
-local M = {
+local M = {}
+
+M.const = {
    BARBARIAN                    = 0,
    BARD                         = 1,
    CLERIC                       = 2,
@@ -179,5 +181,7 @@ local M = {
    PACKAGE_NPC_ARIBETH_BLACKGUARD       = 130,
    PACKAGE_INVALID                      = 255,
 }
+
+setmetatable(M, { __index = M.const })
 
 return M

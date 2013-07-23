@@ -5,6 +5,9 @@
 -- @module object
 
 local M = safe_require 'solstice.object.init'
+M.const = safe_require 'solstice.object.constant'
+setmetatable(M, { __index = M.const })
+
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 
@@ -18,7 +21,7 @@ M.object_t = ffi.metatype("Object", { __index = M.Object })
 -- Create invalid object so don't have to test nullity and validity.
 M.INVALID = M.object_t(-1, 0x7F000000, nil)
 
-safe_require 'solstice.object.constant'
+
 safe_require "solstice.object.action"
 safe_require "solstice.object.combat"
 safe_require "solstice.object.commands"

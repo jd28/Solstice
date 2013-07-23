@@ -1,4 +1,4 @@
-local M = require 'solstice.save.init'
+local M = {}
 
 M.ALL                  = 0
 M.FORT                 = 1
@@ -26,3 +26,5 @@ M.VS_GOOD              = 16
 M.VS_EVIL              = 17
 M.VS_LAW               = 18
 M.VS_CHAOS             = 19
+
+return M

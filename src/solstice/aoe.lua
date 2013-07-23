@@ -5,7 +5,8 @@
 -- @module aoe
 
 local M = require 'solstice.aoe.init'
-require 'solstice.aoe.constant'
+M.const = require 'solstice.aoe.constant'
+setmetatable(M, { __index = M.const })
 
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'

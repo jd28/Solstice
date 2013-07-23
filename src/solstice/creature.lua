@@ -6,6 +6,8 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = require 'solstice.creature.init'
+M.const = require 'solstice.creature.constant'
+setmetatable(M, { __index = M.const })
 
 M.Creature  = inheritsFrom(Obj.Object, "solstice.creature.Creature" )
 

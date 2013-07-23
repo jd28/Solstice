@@ -11,12 +11,14 @@ local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
 
 local M = require 'solstice.item.init'
+M.const = require 'solstice.item.constant'
+setmetatable(M, { __index = M.const })
+
 M.Item = inheritsFrom(Obj.Object, "solstice.item.Item")
 
 --- Internal ctype.
 M.item_t = ffi.metatype("Item", { __index = M.Item })
 
-require 'solstice.item.constant'
 require 'solstice.item.env'
 
 --- Class Item: Armor Class

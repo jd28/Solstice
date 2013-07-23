@@ -1,4 +1,4 @@
-local M = require 'solstice.chat.init'
+local M = {}
 
 M.VOICE_ATTACK           =   0
 M.VOICE_BATTLECRY1       =   1

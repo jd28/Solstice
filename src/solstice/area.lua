@@ -11,7 +11,8 @@ local C = ffi.C
 local Obj = require 'solstice.object'
 
 local M = require 'solstice.area.init'
-require 'solstice.area.constant'
+M.cont = require 'solstice.area.constant'
+setmetatable(M, { __index = M.const })
 
 M.Area = inheritsFrom(Obj.Object, 'solstice.area.Area')
 
