@@ -11,15 +11,17 @@
 -- REQUIRED: Log directory.
 LOG_DIR = "../logs.0"
 
+AUTOLOAD_CONSTANTS = true
+
 -- OPTIONAL: Preload file for server specific lua files.
-PRELOAD = "ta.preload"
+--PRELOAD = "ta.preload"
 
 -- OPTIONAL: 
 -- If set to false all CEP specific variables, baseitems, etc
 -- will be ignored.  If set to a CEP version number without dots
 -- (e,g 2.3c -> 23) CEP resources will be available.
-USING_CEP = 23
+--USING_CEP = 23
 
 ----------------------------------------------------------------------
 -- Fake server specific setting.
-WHATEVER = "whatever"
+--WHATEVER = "whatever"
