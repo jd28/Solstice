@@ -28,6 +28,19 @@ function string:trim()
   return self:match "^%s*(.-)%s*$"
 end
 
+--- Chain table lookups
+function table.chain(...)
+   local chain = {...}
+   local function lookup(tbl, key)
+      for _, v in ipairs(chain) do
+         if v[key] then
+            return v[key]
+         end
+      end
+   end
+   return setmetatable({}, { __index = lookup })
+end
+
 --- Clamp function
 function math.clamp(number, low, high)
    if number < low then
