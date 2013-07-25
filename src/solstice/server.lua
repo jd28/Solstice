@@ -22,14 +22,23 @@ function M.RegisterDM(cdkey, name)
 end
 
 --- Verify Admin
--- @param cdkey Public CDKEY.
-function M.VerifyAdmin(cdkey)
-   return ADMIN[cdkey] and true or false
+-- @param obj Object to test for admin privileges.
+function M.VerifyAdmin(obj)
+   if not isinstance(obj, Creature) then
+      return false
+   end
+   local cdkey = obj:GetPCPublicCDKey()
+   return ADMIN[obj:GetPCPublicCDKey()] and true or false
 end
 
 --- Verify DM
--- @param cdkey Public CDKEY.
-function M.VerifyDM(cdkey)
+-- @param obj Object to test for DM privileges.
+function M.VerifyDM(obj)
+   if not isinstance(obj, Creature) then
+      return false
+   end
+
+   local cdkey = obj:GetPCPublicCDKey()
    local res = ADMIN[cdkey] or DM[cdkey]
    return res and true or false
 end
