@@ -39,7 +39,7 @@ function E.Ability(ability, mod)
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { ability, mod, f = "Ability" })
+      { ability, mod, f = "AbilityScore" })
    return true
 end
 
@@ -105,6 +105,16 @@ end
 
 ---
 function E.DamageBonus(damage_type, va1, val2, is_range, is_penalty)
+   return true
+end
+
+---
+function E.DamageImmunity(damage_type, amount)
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { damage_type, amount, f = "DamageImmunity" })
    return true
 end
 
