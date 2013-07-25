@@ -107,14 +107,14 @@ end
 
 function M.CreateItempropEffect(show_icon)
    show_icon = show_icon or 0
-   local eff = itemprop_t(C.nwn_CreateEffect(show_icon), false)
+   local eff = M.itemprop_t(C.nwn_CreateEffect(show_icon), false)
 
    eff:SetCreator(NWE.GetCommandObject())
    eff:SetNumIntegers(9)
    eff:SetAllInts(-1)
    eff:SetSubType(0)
-   eff:SetDurationType(Eff.DURATION_TYPE_PERMANENT)
-   eff:SetTrueType(Eff.ITEMPROPERTY)
+   eff:SetDurationType(Eff.DURATION_PERMANENT)
+   eff:SetType(Eff.ITEMPROPERTY)
 
    return eff
 end
