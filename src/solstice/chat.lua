@@ -55,12 +55,14 @@ function M.ChatHandler(channel, speaker, msg, to)
       local symbol
 
       for sym, ver in pairs(_SYMBOLS) do
-	 if cmd:starts(sym) and 
-	    (ver == true or ver(speaker))
-	 then
-	    symbol   = sym
-	    dispatch = _COMMANDS[sym]
-	 end
+         if cmd:starts(sym) then         
+            if ver == true or ver(speaker) then
+               symbol   = sym
+               dispatch = _COMMANDS[sym]
+            else
+               speaker:SendMessage("You are not authorized to use this command!")
+            end
+         end
       end
 
       -- If not a command or emote return false and don't suppress
@@ -68,7 +70,7 @@ function M.ChatHandler(channel, speaker, msg, to)
       if not dispatch then return false end
 
       info.cmd, info.param = get_command(symbol, cmd)
-      print (info.cmd, info.param)
+      --print (info.cmd, info.param)
 
       if dispatch[info.cmd] then
          if info.param:match("--help") then
@@ -79,7 +81,7 @@ function M.ChatHandler(channel, speaker, msg, to)
 
          return true
       else
-         speaker:ErrorMsg("Invalid Command!")
+         speaker:SendMessage("Invalid Command!")
       end
    end 
 
