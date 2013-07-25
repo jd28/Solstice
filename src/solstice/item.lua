@@ -332,7 +332,8 @@ local _ITEMS = {}
 local E = M.env
 local ip = require 'solstice.itemprop'
 local ipc = ip.const
-local env_mt = { __index = function(t, k) return M.env[k] or ipc[k] end }
+local Cre = require 'solstice.creature'
+local env_mt = { __index = table.chain(M.env, ipc, Cre.const) }
 
 local function get_value(value, use_max)
    if type(value) == 'number' then
@@ -370,6 +371,9 @@ function M.Generate(object, resref, max)
    end
 
    local it  = object:GiveItem(resref)
+   if not it:GetIsValid() then
+      error("Invalid item: Resref: " .. resref)
+   end
 
    -- This probably could be done in a better fashion...
    
@@ -377,24 +381,25 @@ function M.Generate(object, resref, max)
       it:SetGoldValue(item.value)
    end
 
-   for _, p in item.props do 
+   for _, p in ipairs(item.props) do 
       local f = p.f
       if not f then
-	 error "No item property function!"
+         error "No item property function!"
       end
 
---      local prop = p
---      if p.or then
---	 prop = p.or[math.random(1, #p.or)]
---      end
+      --      local prop = p
+      --      if p.or then
+      --	 prop = p.or[math.random(1, #p.or)]
+      --      end
 
       local t = {}
-      for _, v in ipairs(prop) do
-	 table.insert(get_value(v, max))
+      for _, v in ipairs(p) do
+         local val = get_value(v, max)
+         table.insert(t, val)
       end
 
       if not p.chance or math.random(1, 100) <= p.chance then
-	 it:AddItemProperty(Eff.DURATION_TYPE_PERMENANT, ip[f](unpack(t)))
+         it:AddItemProperty(Eff.DURATION_PERMANENT, ip[f](unpack(t)))
       end
    end
 end
