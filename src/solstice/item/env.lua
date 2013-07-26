@@ -24,7 +24,8 @@ E.CRE = require('solstice.creature').const
 E.DAMAGE = require('solstice.damage').const
 E.CLASS = require('solstice.class').const
 E.SKILL = require('solstice.skill').const
-E.EFF = require('solstice.effect').const
+E.DAMAGE = require('solstice.damage').const
+
 ---
 function E.Random(start, stop)
    return range_t(start, stop)
@@ -121,6 +122,16 @@ function E.DamageImmunity(damage_type, amount)
    table.insert(
       E.item.props,
       { damage_type, amount, f = "DamageImmunity" })
+   return true
+end
+
+---
+function E.DamageResistance(damage_type, amount)
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { damage_type, amount, f = "DamageResistance" })
    return true
 end
 
