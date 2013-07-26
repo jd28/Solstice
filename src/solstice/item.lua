@@ -333,7 +333,7 @@ local E = M.env
 local ip = require 'solstice.itemprop'
 local ipc = ip.const
 local Cre = require 'solstice.creature'
-local env_mt = { __index = table.chain(M.env, ipc, Cre.const) }
+local env_mt = { __index = table.chain(M.env, ipc) }
 
 local function get_value(value, use_max)
    if type(value) == 'number' then
