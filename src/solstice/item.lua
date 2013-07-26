@@ -398,8 +398,11 @@ function M.Generate(object, resref, max)
          table.insert(t, val)
       end
 
-      if not p.chance or math.random(1, 100) <= p.chance then
-         it:AddItemProperty(Eff.DURATION_PERMANENT, ip[f](unpack(t)))
+      local count = p.n or 1
+      for i = 1,count do
+         if not p.chance or math.random(1, 100) <= p.chance then
+            it:AddItemProperty(Eff.DURATION_PERMANENT, ip[f](unpack(t)))
+         end
       end
    end
 end
