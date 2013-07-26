@@ -137,14 +137,13 @@ end
 ---
 -- @param bonus
 -- @param ac_type
-function M.AC(bonus, ac_type)
-   ac_type = ac_type or solstice.nwn.AC_DODGE_BONUS
+function M.AC(bonus)
    local eff = M.CreateItempropEffect()
    
    if bonus < 0 then
-      eff:SetValues(M.DECREASED_AC, ac_type, 20, math.clamp(-bonus, 1, 20))
+      eff:SetValues(M.DECREASED_AC, -1, 20, math.clamp(-bonus, 1, 20))
    else
-      eff:SetValues(M.AC_BONUS, ac_type, 2, math.clamp(bonus, 1, 20))
+      eff:SetValues(M.AC_BONUS, -1, 2, math.clamp(bonus, 1, 20))
    end
    
    return eff
