@@ -20,6 +20,11 @@ local M = require 'solstice.item.init'
 M.env = {}
 local E = M.env
 
+E.CRE = require('solstice.creature').const
+E.DAMAGE = require('solstice.damage').const
+E.CLASS = require('solstice.class').const
+E.SKILL = require('solstice.skill').const
+E.EFF = require('solstice.effect').const
 ---
 function E.Random(start, stop)
    return range_t(start, stop)
@@ -85,11 +90,12 @@ end
 
 ---
 function E.BonusLevelSpell(class, level, n)
+   n = n or 1
    E.item = E.item or {}
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { class, level, f = "CastSpell", n = n })
+      { class, level, f = "BonusLevelSpell", n = n })
    return true
 end
 
@@ -140,6 +146,18 @@ function E.Haste()
 end
 
 ---
+function E.Immunity(type, amount)
+   amount = amount or 100
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { type, amount, f = "ImmunityMisc" })
+   return true
+end
+
+
+---
 function E.HolyAvenger()
    E.item = E.item or {}
    E.item.props = E.item.props or {}
@@ -175,7 +193,7 @@ function E.Mighty(value)
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { value, "Mighty" })
+      { value, f = "Mighty" })
    return true
 end
 
@@ -210,12 +228,32 @@ function E.Regeneration(value)
 end
 
 ---
+function E.SavingThrow(save, amount)
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { save, amount, f = "BonusSavingThrow" })
+   return true
+end
+
+---
+function E.SavingThrowVs(save, amount)
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { save, amount, f = "SavingThrowVsX" })
+   return true
+end
+
+---
 function E.Skill(skill, mod)
    E.item = E.item or {}
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { skill, mod, f = "Skill" })
+      { skill, mod, f = "SkillModifier" })
    return true
 end
 
@@ -225,7 +263,16 @@ function E.SpellResistance(value)
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { value, "SpellResistance" })
+      { value, f = "SpellResistance" })
+   return true
+end
+
+function E.TrueSeeing()
+   E.item = E.item or {}
+   E.item.props = E.item.props or {}
+   table.insert(
+      E.item.props,
+      { f = "TrueSeeing" })
    return true
 end
 
@@ -236,7 +283,7 @@ function E.TurnResistance(value)
    E.item.props = E.item.props or {}
    table.insert(
       E.item.props,
-      { value, "TurnResistance" })
+      { value, f = "TurnResistance" })
    return true
 end
 
