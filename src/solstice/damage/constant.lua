@@ -2,31 +2,31 @@ local M = {}
 
 -- NWN Damage related constants
 
-M.TYPE_BLUDGEONING  = 0x1
-M.TYPE_BLUDG_PIERCE = 0x3
-M.TYPE_PIERCING     = 0x2
-M.TYPE_SLASHING     = 0x4
-M.TYPE_PIERCE_SLASH = 0x6
-M.TYPE_MAGICAL      = 0x8
-M.TYPE_ACID         = 0x10
-M.TYPE_COLD         = 0x20
-M.TYPE_DIVINE       = 0x40
-M.TYPE_ELECTRICAL   = 0x80
-M.TYPE_FIRE         = 0x100
-M.TYPE_NEGATIVE     = 0x200
-M.TYPE_POSITIVE     = 0x400
-M.TYPE_SONIC        = 0x800
+M.BLUDGEONING  = 0x1
+M.BLUDG_PIERCE = 0x3
+M.PIERCING     = 0x2
+M.SLASHING     = 0x4
+M.PIERCE_SLASH = 0x6
+M.MAGICAL      = 0x8
+M.ACID         = 0x10
+M.COLD         = 0x20
+M.DIVINE       = 0x40
+M.ELECTRICAL   = 0x80
+M.FIRE         = 0x100
+M.NEGATIVE     = 0x200
+M.POSITIVE     = 0x400
+M.SONIC        = 0x800
 -- The base weapon damage is the base damage delivered by the weapon before
 -- any additional types of damage (e.g. fire) have been added.
-M.TYPE_BASE_WEAPON  = 0x1000
+M.BASE_WEAPON  = 0x1000
 
 -- The following are for testing damage flags, not doing damage.
-M.TYPE_PHYSICAL     = 0x1007
-M.TYPE_ELEMENT      = 0x9B0
-M.TYPE_ENERGY       = 0x648
+M.PHYSICAL     = 0x1007
+M.ELEMENT      = 0x9B0
+M.ENERGY       = 0x648
 
 -- Special versus flag just for AC effects
-M.TYPE_ALL    = 4103
+M.ALL    = 4103
 
 M.BONUS_1           = 1
 M.BONUS_2           = 2
