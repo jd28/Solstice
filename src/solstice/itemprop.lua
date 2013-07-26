@@ -10,6 +10,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
+local Dmg = require 'solstice.damage'
 
 M.const = require 'solstice.itemprop.constant'
 setmetatable(M, { __index = M.const })
@@ -90,12 +91,6 @@ function M.Itemprop:SetValues(type, subtype, cost, cost_val, param1, param1_val,
 end
 
 -------------------------------------------------------------------------------
-
-EFFECT_VS_INVALID   = 0
-EFFECT_VS_ALIGN     = 1
-EFFECT_VS_ALIGN_GRP = 2
-EFFECT_VS_RACE      = 3
-EFFECT_VS_DMG_TYPE  = 4
 
 --- Item Property creation functions.
 -- @section ip_create
@@ -222,9 +217,10 @@ function M.CastSpell(spell, uses)
 end
 
 --- Creates a damage bonus itemproperty.
--- @param damage_type solstice.itemprop.const.DAMAGETYPE_*
--- @param damage solstice.itemprop.const.DAMAGEBONUS_*
+-- @param damage_type solstice.damage constant.
+-- @param damage solstice.damage.BONUS_*
 function M.DamageBonus(damage_type, damage)
+   damage_type = Dmg.ConvertToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(M.DAMAGE_BONUS, damage_type, 4, damage)
    return eff
@@ -235,9 +231,10 @@ function M.DamageBonusVsRace(damage_type, damage) end
 function M.DamageBonusVsAlignment(damage_type, damage) end
 
 --- Creates a damage immunity itemproperty.
--- @param damage_type solstice.itemprop.const.DAMAGETYPE_*
+-- @param damage_type solstice.damage type constant.
 -- @param amount 
 function M.DamageImmunity(damage_type, amount)
+   damage_type = Dmg.ConvertToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(M.IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
    return eff
@@ -261,18 +258,20 @@ function M.DamageReduction(enhancement, soak)
 end
 
 --- Creates damage resistance item property.
--- @param damage_type solstice.itemprop.const.DAMAGETYPE_*
+-- @param damage_type solstice.damage type constant.
 -- @param amount solstice.itemprop.const.DAMAGERESIST_*
 function M.DamageResistance(damage_type, amount)
+   damage_type = Dmg.ConvertToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(M.DAMAGE_RESISTANCE, damage_type, 7, amount)
    return eff
 end
 
 --- Creates damage vulnerability item property.
--- @param damage_type solstice.itemprop.const.DAMAGETYPE_*
+-- @param damage_type solstice.damage type constant.
 -- @param amount solstice.itemprop.const.DAMAGEVULNERABILITY_*
 function M.DamageVulnerability(damage_type, amount)
+   damage_type = Dmg.ConvertToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(M.DAMAGE_VULNERABILITY, damage_type, 22, amount)
    return eff
