@@ -4,6 +4,8 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module aoe
 
+local ffi = require 'ffi'
+
 local M = require 'solstice.aoe.init'
 M.const = require 'solstice.aoe.constant'
 setmetatable(M, { __index = M.const })
@@ -12,6 +14,7 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 M.AoE = inheritsFrom(Obj.Object, 'solstice.aoe.AoE')
+M.aoe_t = ffi.metatype("AoE", { __index = M.AoE })
 
 --- Class AoE
 -- @section

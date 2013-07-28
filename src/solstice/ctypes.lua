@@ -50,6 +50,12 @@ damage_roll_t = ffi.typeof('DamageRoll')
 spell_duration_impact_t = ffi.typeof('SpellDurationImpact')
 
 ffi.cdef[[
+typedef struct {
+    uint32_t          type;
+    uint32_t          id;
+    CNWSAreaOfEffectObject *obj;
+} AoE;
+
 typedef struct Area {
     uint32_t        type;
     uint32_t        id;
