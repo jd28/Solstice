@@ -9,9 +9,16 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 local M = require 'solstice.creature.init'
+local NWE = require 'solstice.nwn.engine'
 
 --- Modes
 -- @section level
+
+function M.Creature:GetDetectMode()
+   NWE.StackPushObject(self);
+   NWE.ExecuteCommand(575, 1);
+   return NWE.StackPopInteger();
+end
 
 --- Notifies creature's associats of combat mode change
 -- @param mode solstice.modes type constant.
@@ -21,7 +28,7 @@ end
 
 --- Sets a creature's activity
 -- @param act
--- @param on 
+-- @param on
 function M.Creature:SetActivity(act, on)
    C.nwn_SetActivity(self.obj, act, on)
 end
@@ -39,7 +46,7 @@ function M.Creature:SetCombatMode(mode, change)
       -- TODO: Remove all mode effects.
       return
    end
-   
+
    local function set_activity()
       self.obj.cre_mode_combat = mode
       local act, on
