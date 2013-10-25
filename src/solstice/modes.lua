@@ -145,10 +145,10 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.IMPROVED_EXPERTISE, true)
       end
    elseif mode == M.ACTION_DEFENSIVE_CAST then
-      if cre.obj.cre_mode_combat == M.DEFENSIVE_CAST then
+      if cre.obj.cre_mode_combat == M.DEFENSIVE_CASTING then
          cre:SetCombatMode(M.INVALID, true)
       else
-         cre:SetCombatMode(M.DEFENSIVE_CAST, false)
+         cre:SetCombatMode(M.DEFENSIVE_CASTING, false)
       end
    elseif mode == M.ACTION_DIRTY_FIGHTING then
       if not cre:GetHasFeat(Ft.DIRTY_FIGHTING) then
