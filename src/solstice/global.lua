@@ -207,7 +207,7 @@ end
 
 -- Command related functions
 -- Table holding stored commands.  See DoCommand, DelayCommand, etc.
-local _COMMANDS = { }
+_COMMANDS = { }
 
 _COMMANDS.COMMAND_TYPE_DELAY      = 0
 _COMMANDS.COMMAND_TYPE_DO         = 1
