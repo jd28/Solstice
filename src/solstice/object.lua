@@ -54,7 +54,7 @@ function M.Create(object_type, template, loc, appear, newtag)
    newtag = newtag or ""
    print (object_type, template, loc, appear, newtag)
    NWE.StackPushString(newtag)
-   NWE.StackPushInteger(appear)
+   NWE.StackPushBoolean(appear)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, loc)
    NWE.StackPushString(template)
    NWE.StackPushInteger(object_type)
