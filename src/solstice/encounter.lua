@@ -6,6 +6,7 @@
 
 local ffi = require 'ffi'
 local Obj = require 'solstice.object'
+local Loc = require 'solstice.location'
 
 local M = {}
 M.const = {
@@ -74,7 +75,7 @@ function M.Encounter:GetSpawnPointByIndex(idx)
    
    if sp.position.z < 0 then sp.position.z = 0 end
 
-   return solstice.nwn.Location(sp.position, sp.orientation, self:GetArea())
+   return Loc.Create(sp.position, sp.orientation, self:GetArea())
 end
 
 --- Sets an encounter to active or inactive.
