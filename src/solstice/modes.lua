@@ -3,6 +3,7 @@
 
 local Sk = require 'solstice.skill'
 local Ft = require 'solstice.feat'
+local Obj = require 'solstice.object'
 
 local MODES = {}
 local M = {}
@@ -59,8 +60,8 @@ function NSToggleMode(cre, mode)
       end
       cre:SetActivity(act, on)
    elseif mode == M.ACTION_STEALTH then
-      if self.obj.cre_attack_target ~= solstice.nwn.OBJECT_INVALID.id
-         or self.obj.cre_attempted_target ~= solstice.nwn.OBJECT_INVALID.id
+      if cre.obj.cre_attack_target ~= Obj.INVALID.id
+         or cre.obj.cre_attempted_target ~= Obj.INVALID.id
       then
          cre:SendMessageByStrRef(60)
       elseif cre:CanUseSkill(Sk.HIDE) or cre:CanUseSkill(Sk.SILENTLY) then
@@ -144,10 +145,10 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.IMPROVED_EXPERTISE, true)
       end
    elseif mode == M.ACTION_DEFENSIVE_CAST then
-      if cre.obj.cre_mode_combat == M.DEFENSIVE_CAST then
+      if cre.obj.cre_mode_combat == M.DEFENSIVE_CASTING then
          cre:SetCombatMode(M.INVALID, true)
       else
-         cre:SetCombatMode(M.DEFENSIVE_CAST, false)
+         cre:SetCombatMode(M.DEFENSIVE_CASTING, false)
       end
    elseif mode == M.ACTION_DIRTY_FIGHTING then
       if not cre:GetHasFeat(Ft.DIRTY_FIGHTING) then
@@ -185,7 +186,7 @@ end
 --- Register a combat mode.
 -- See examples/modes.lua
 -- @param mode
--- @param f A function taking object, mode, and a boolean indicating whether the mode is being 
+-- @param f A function taking object, mode, and a boolean indicating whether the mode is being
 -- turned on or off.
 function M.Register(mode, f)
    MODES[mode] = f
@@ -194,7 +195,7 @@ end
 --- Convert solstice.modes constants to solstice.modes.ACTION_*
 -- @param mode solstice.modes constant.
 -- @return -1 on error.
-function M.ToAction(mode) 
+function M.ToAction(mode)
    if mode == M.PARRY then
       return M.ACTION_PARRY
    elseif mode == M.POWER_ATTACK then
