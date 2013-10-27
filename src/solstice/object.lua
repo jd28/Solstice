@@ -52,7 +52,6 @@ safe_require "solstice.object.vars"
 function M.Create(object_type, template, loc, appear, newtag)
    if appear == nil then appear = false end
    newtag = newtag or ""
-   print (object_type, template, loc, appear, newtag)
    NWE.StackPushString(newtag)
    NWE.StackPushBoolean(appear)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, loc)
