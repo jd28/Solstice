@@ -2,6 +2,7 @@
 -- @module creature
 
 local ffi = require 'ffi'
+local C   = ffi.C
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
@@ -59,6 +60,11 @@ end
 
 --- Misc
 -- @section misc
+
+function M.Creature:JumpToLimbo()
+   if not self:GetIsValid() then return end
+   C.nwn_JumpToLimbo(self.obj)
+end
 
 --- Briefly displays a string ref as ambient text above targets head.
 -- @param strref String ref (therefore text is translated)

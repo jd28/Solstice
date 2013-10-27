@@ -116,6 +116,7 @@ int8_t    nwn_GetSkillRank(CNWSCreature *cre, uint8_t skill, CNWSObject *vs, boo
 int       nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
 int       nwn_GetTotalKnownSpells (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
 int       nwn_GetTotalNegativeLevels(CNWSCreatureStats *stats);
+void      nwn_JumpToLimbo(CNWSCreature *cre);
 void      nwn_NotifyAssociateActionToggle(CNWSCreature *cre, int32_t mode);
 int       nwn_RecalculateDexModifier(CNWSCreatureStats *stats);
 int       nwn_RemoveKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_id);
