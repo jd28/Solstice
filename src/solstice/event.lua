@@ -186,6 +186,7 @@ end
 function M.GetPCChatSpeaker()
    NWE.ExecuteCommand(838, 0);
    return NWE.StackPopObject();
+end
 
 ---
 function M.GetPCLevellingUp()
