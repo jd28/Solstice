@@ -19,8 +19,6 @@ M.Item = inheritsFrom(Obj.Object, "solstice.item.Item")
 --- Internal ctype.
 M.item_t = ffi.metatype("Item", { __index = M.Item })
 
-require 'solstice.item.env'
-
 --- Class Item: Armor Class
 -- @section
 
@@ -36,7 +34,7 @@ end
 -- @return -1 if item is not armor.
 function M.Item:GetBaseArmorACBonus()
    if not self:GetIsValid()
-      or self:GetBaseType() ~= M.BASE_ARMOR 
+      or self:GetBaseType() ~= M.BASE_ARMOR
    then
       return -1
    end
@@ -72,7 +70,7 @@ function M.Item:Copy(target, copy_vars)
    NWE.StackPushObject(target or Obj.INVALID)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(584, 3)
-   
+
    return NWE.StackPopObject()
 end
 
@@ -125,7 +123,7 @@ function M.Item:GetEntireAppearance()
    for i = 0, 21 do
       table.insert(app, string.format("%02X", self.obj.it_model[i]))
    end
-   
+
    return table.concat(app)
 end
 
@@ -146,7 +144,7 @@ end
 function M.Item:RestoreAppearance(appearance)
    local app = {}
    string.gsub(appearance, "(%w%w)",
-               function (x) 
+               function (x)
                   table.insert(app, tonumber(x, 16))
                end)
 
@@ -162,7 +160,7 @@ function M.Item:RestoreAppearance(appearance)
    end
 end
 
---- Set item 
+--- Set item
 function M.Item:SetAppearance(index, value)
    if not self:GetIsValid()
       or index < M.APPR_COLOR_LEATHER_1
@@ -171,7 +169,7 @@ function M.Item:SetAppearance(index, value)
    then
       return -1
    end
-   
+
    if index < M.APPR_MODEL_PART_1 then
       self.obj.it_color[index + 9] = value
    else
@@ -188,7 +186,7 @@ function M.Item:SetColor(index, value)
    if not self:GetIsValid() or index < 0 or index > 5
       or value < 0 or value > 255
    then
-      return -1 
+      return -1
    end
 
    self.obj.it_color[index] = value
@@ -203,7 +201,7 @@ function M.Item:GetGoldValue()
    if not self:GetIsValid() then return -1 end
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(311, 1)
-   
+
    return NWE.StackPopInteger()
 end
 
@@ -212,7 +210,7 @@ end
 -- @param value New gold value.
 function M.Item:SetGoldValue(value)
    if not self:GetIsValid() then return -1 end
-   
+
    self.obj.it_cost_ided = value
    return self.obj.it_cost_ided
 end
@@ -324,88 +322,5 @@ function M.Item:SetWeight(weight)
    if not self:GetIsValid() then return end
    self.obj.it_weight = weight
 end
-
---- Functions
--- @section
-
-local _ITEMS = {}
-local E = M.env
-local ip = require 'solstice.itemprop'
-local ipc = ip.const
-local Cre = require 'solstice.creature'
-local env_mt = { __index = table.chain(M.env, ipc) }
-
-local function get_value(value, use_max)
-   if type(value) == 'number' then
-      return value
-   end
-   
-   if use_max then
-      return value.stop
-   else
-      return math.random(value.start, value.stop)
-   end
-end
-
---- Load item file.
--- @param file Item file to load.
-function M.Load(file)
-   E.item = setmetatable({}, env_mt)
-
-   local res = runfile(file, E.item)
-   _ITEMS[assert(res.resref)] = res
-
-   E.item = nil
-end
-
---- Generate item
--- @param object Object to create item on.
--- @param resref Resref of item to create.
--- @param[opt=false] max If true, the maximum value of an
--- item property parameter.
--- @see solstice.item.Load
-function M.Generate(object, resref, max)
-   local item = _ITEMS[resref]
-   if not item then
-      error("No such resref: " .. resref)
-   end
-
-   local it  = object:GiveItem(resref)
-   if not it:GetIsValid() then
-      error("Invalid item: Resref: " .. resref)
-   end
-
-   -- This probably could be done in a better fashion...
-   
-   if item.value then
-      it:SetGoldValue(item.value)
-   end
-
-   for _, p in ipairs(item.props) do 
-      local f = p.f
-      if not f then
-         error "No item property function!"
-      end
-
-      --      local prop = p
-      --      if p.or then
-      --	 prop = p.or[math.random(1, #p.or)]
-      --      end
-
-      local t = {}
-      for _, v in ipairs(p) do
-         local val = get_value(v, max)
-         table.insert(t, val)
-      end
-
-      local count = p.n or 1
-      for i = 1,count do
-         if not p.chance or math.random(1, 100) <= p.chance then
-            it:AddItemProperty(Eff.DURATION_PERMANENT, ip[f](unpack(t)))
-         end
-      end
-   end
-end
-
 
 return M
