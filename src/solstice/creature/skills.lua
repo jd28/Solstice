@@ -17,6 +17,12 @@ local Obj   = require 'solstice.object'
 local D     = require 'solstice.dice'
 local LOG   = require 'solstice.log'
 
+--- Determines if a creature can use a skill
+-- @param skill solstice.skill constant.
+function M.Creature:CanUseSkill(skill)
+   return ffi.C.nwn_CanUseSkill(self.obj, skill)
+end
+
 --- Determines if a creature has a skill
 -- @param skill solstice.skill constant.
 function M.Creature:GetHasSkill(skill)
