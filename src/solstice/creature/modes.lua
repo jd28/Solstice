@@ -7,6 +7,7 @@
 local Mode = require 'solstice.modes'
 local ffi = require 'ffi'
 local C = ffi.C
+local jit = require 'jit'
 
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
@@ -32,6 +33,8 @@ end
 function M.Creature:SetActivity(act, on)
    C.nwn_SetActivity(self.obj, act, on)
 end
+
+jit.off(M.Creature.SetActivity)
 
 --- Sets creature's combat mode
 -- @param mode solstice.modes type constant.
