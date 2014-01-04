@@ -64,7 +64,7 @@ function NSToggleMode(cre, mode)
          or cre.obj.cre_attempted_target ~= Obj.INVALID.id
       then
          cre:SendMessageByStrRef(60)
-      elseif cre:CanUseSkill(Sk.HIDE) or cre:CanUseSkill(Sk.SILENTLY) then
+      elseif cre:CanUseSkill(Sk.HIDE) or cre:CanUseSkill(Sk.MOVE_SILENTLY) then
          if cre.obj.cre_mode_stealth == 1 then
             act, on = 1, 0
          else
