@@ -3,6 +3,7 @@
 
 local Mod = require 'solstice.module'
 local Vec = require 'solstice.vector'
+local Log = require 'solstice.log'
 
 local M = {}
 
@@ -55,7 +56,10 @@ M.LANGUAGE_JAPANESE            = 131
 -- @return see table type NWNXEventInfo
 function M.GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
-   if e == nil then return end
+   if e == nil then 
+      Log.WriteTimestampedLogEntry("GetEventInfo GetLastNWNXEvent is null")
+      return 
+   end
 
    return { type = e.type,
             subtype = e.subtype,
