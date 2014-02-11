@@ -1,4 +1,4 @@
---- 
+---
 -- The solstice.global module injects some common functions and types
 -- into the global namespace. It is automatically loaded so there
 -- is no need to require in user scripts.
@@ -39,7 +39,7 @@ end
 function anyinstance(inst, ...)
    for _, C in ipairs(...) do
       if isinstance(inst, C) then
-	 return true
+         return true
       end
    end
    return false
@@ -145,25 +145,26 @@ function _SOL_GET_CACHED_OBJECT(id)
    if type == Obj.internal.CREATURE then
       obj = ffi.cast("CNWSCreature*", obj)
       object = sol_cre.creature_t(type, id, obj, obj.cre_stats)
+      _OBJECTS[id] = object
    elseif type == Obj.internal.MODULE then
       object = sol_mod.module_t(type, id, C.nwn_GetModule())
-   elseif type == Obj.internal.AREA then 
+   elseif type == Obj.internal.AREA then
       object = sol_area.area_t(type, id, C.nwn_GetAreaByID(id))
-   elseif type == Obj.internal.ITEM then 
+   elseif type == Obj.internal.ITEM then
       object = sol_item.item_t(type, id, C.nwn_GetItemByID(id))
-   elseif type == Obj.internal.TRIGGER then 
+   elseif type == Obj.internal.TRIGGER then
       obj = ffi.cast("CNWSTrigger*", obj)
       object = sol_trig.trigger_t(type, id, obj)
-   elseif type == Obj.internal.PLACEABLE then 
+   elseif type == Obj.internal.PLACEABLE then
       obj = ffi.cast("CNWSPlaceable*", obj)
       object = sol_plc.placeable_t(type, id, obj)
    elseif type == Obj.internal.DOOR then
       obj = ffi.cast("CNWSDoor*", obj)
       object = sol_door.door_t(type, id, obj)
-   elseif type == Obj.internal.AREA_OF_EFFECT then 
+   elseif type == Obj.internal.AREA_OF_EFFECT then
       obj = ffi.cast("CNWSAreaOfEffectObject*", obj)
       object = sol_aoe.aoe_t(type, id, obj)
-   elseif type == Obj.internal.WAYPOINT then 
+   elseif type == Obj.internal.WAYPOINT then
       object = sol_way.waypoint_t(type, id, C.nwn_GetWaypointByID(id))
    elseif type == Obj.internal.ENCOUNTER then
       obj = ffi.cast("CNWSEncounter*", obj)
@@ -173,9 +174,19 @@ function _SOL_GET_CACHED_OBJECT(id)
       object = sol_store.store_t(type, id, obj)
    end
 
-   _OBJECTS[id] = object
+   return object
+end
 
-   return _OBJECTS[id]
+local mod
+function _SOL_DESTROY_OBJECT(id, delay)
+   local obj = _OBJECTS[id]
+   if not obj then return end
+
+   -- Remove it immediately, but add delay command to ensure its
+   -- removal.
+   _SOL_REMOVE_CACHED_OBJECT(id)
+   if not mod then mod = sol_mod.Get() end
+   mod:DelayCommand(delay+0.1, function () _SOL_REMOVE_CACHED_OBJECT(id) end)
 end
 
 function _SOL_REMOVE_CACHED_OBJECT(id)
@@ -213,7 +224,7 @@ _COMMANDS.COMMAND_TYPE_DELAY      = 0
 _COMMANDS.COMMAND_TYPE_DO         = 1
 _COMMANDS.COMMAND_TYPE_REPEAT     = 2
 
--- Internal Function handling DoCommand 
+-- Internal Function handling DoCommand
 local function _RUN_DO_COMMAND (token)
    if not token then return end
    if _COMMANDS[token] ~= nil then
@@ -240,12 +251,12 @@ local function _RUN_REPEAT_COMMAND(token)
    if token and _COMMANDS[token] ~= nil then
       local f = _COMMANDS[token]["f"]
       if f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id)) then
-         local newdelay = _COMMANDS[token]["d"] + _COMMANDS[token]["s"]; 
+         local newdelay = _COMMANDS[token]["d"] + _COMMANDS[token]["s"];
          -- Delay can never be a negative or equal to zero.
          if newdelay <= 0 then
             _COMMANDS[token] = nil
-         else    
-            _COMMANDS[token]["d"] = newdelay 
+         else
+            _COMMANDS[token]["d"] = newdelay
             print("Repeat Delay:", newdelay)
             return newdelay
          end
@@ -268,6 +279,6 @@ function _RUN_COMMAND(ctype, token, objid)
    elseif ctype == _COMMANDS.COMMAND_TYPE_REPEAT then
       res = _RUN_REPEAT_COMMAND(token)
    end
-   
+
    return res
 end
