@@ -45,14 +45,13 @@ end
 -- NOTE: This function should be called only from the module
 -- load event.
 function M.Load()
-   for name, t in pairs(LOOKUP) do
-      local temp = require(name)
-      load(temp.const, t)
+   for _, t in ipairs(LOOKUP) do
+      load(t.into or _G, t)
    end
 end
 
 --- Register constant loader.
--- @param module_name Name of the module to load constants into.
+-- Loads constants from 2das in the global table `sol`
 -- @param tda 2da name (without .2da)
 -- @param column_label Label of the 2da column that contains constant
 -- names.
@@ -63,13 +62,15 @@ end
 -- 2da row number.
 -- @param[opt="int"] const_type Constant type.  Only used when
 -- value_label is passed. Legal values: "int", "string", "float"
-function M.Register(module_name, tda, column_label, extract,
-                    value_label, value_type)
-   LOOKUP[module_name] = { tda = tda, 
-                           column_label = column_label,
-                           extract = extract,
-                           value_type = value_type,
-                           value_label = value_label }
+-- @param[opt=sol] into Load the constants into a particular table.
+function M.Register(tda, column_label, extract,
+                    value_label, value_type, into)
+   table.insert(LOOKUP, { tda = tda, 
+			  column_label = column_label,
+			  extract = extract,
+			  value_type = value_type,
+			  value_label = value_label,
+			  into = into }
 end
 
 -- Global function to simplify loading constants from a NWNX
