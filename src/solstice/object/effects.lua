@@ -16,7 +16,7 @@ local NWE = require 'solstice.nwn.engine'
 -- @section effects
 
 --- Applies an effect to an object.
--- @param dur_type solstice.effect.DURATION_TYPE_*
+-- @param dur_type DURATION_TYPE_*
 -- @param effect Effect to apply.
 -- @param[opt=0.0] duration Time in seconds for effect to last.
 function M.Object:ApplyEffect(dur_type, effect, duration)
@@ -28,30 +28,13 @@ function M.Object:ApplyEffect(dur_type, effect, duration)
    NWE.StackPushInteger(dur_type)
    NWE.ExecuteCommand(220, 4)
 end
---[[
---- Applies an effect to an object.
--- @param dur_type solstice.effect.DURATION_TYPE_*
--- @param effect Effect to apply.
--- @param duration Time in seconds for effect to last. (Default: 0.0)
-function M.Object:ApplyEffect(dur_type, effect, duration)
-   if not self:GetIsValid() then return end
-
-   duration = duration or 0.0
-
-   effect:SetDurationType(dur_type)
-   effect:SetDuration(duration)
-   
-   -- TODO: check object type
-   C.nwn_ApplyEffect(self.obj.obj, effect.eff, 0, 1)
-end
-   --]]
 
 --- Applies visual effect to object.
 -- @param vfx solstice.vfx constant
--- @param duration Duration in seconds.  If not passed effect will be of 
--- duration type solstice.effect.DURATION_TYPE_INSTANT
+-- @param duration Duration in seconds.  If not passed effect will be of
+-- duration type DURATION_TYPE_INSTANT
 function M.Object:ApplyVisual(vfx, duration)
-   local dur_type = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_INSTANT
+   local dur_type = duration and DURATION_TYPE_TEMPORARY or DURATION_TYPE_INSTANT
    duration = duration or 0.0
 
    self:ApplyEffect(dur_type, Eff.VisualEffect(vfx), duration)
@@ -60,18 +43,18 @@ end
 --- Recurringly applies a custom effect
 -- @param effect An effect.
 -- @param duration Time in seconds that the effect will continue recurring.
--- @param dur_type solstice.effect.DURATION_TYPE_TEMPORARY or solstice.effect..DURATION_TYPE_PERMANENT
+-- @param dur_type DURATION_TYPE_TEMPORARY or DURATION_TYPE_PERMANENT
 -- @param interval Time in seconds between effect application. Default 6s
 -- @param[opt=solstice.effect.Recurring()] eff_recur The only reason to pass a
 -- different recurring effect here is if you need one that is Supernatural or
 -- Magical.
 function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_recur)
    error "TODO"
-   dur_type = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_PERMANENT
+   dur_type = duration and DURATION_TYPE_TEMPORARY or DURATION_TYPE_PERMANENT
    duration = duration or 0
    interval = interval or 6
    eff_recur = eff_recur or solstice.nwn.EffectRecurring()
-   
+
    if eff_recur:GetCustomType() ~= solstice.nwn.EFFECT_CUSTOM_RECURRING_EFFECT then
       error "eff_recur MUST be of custom effect type solstice.nwn.EFFECT_CUSTOM_RECURRING_EFFECT"
       return
@@ -96,7 +79,7 @@ function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff
                          self:ApplyEffect(Eff.DURATION_TYPE_INSTANT, effect)
                          return true
                       end)
-                         
+
 end
 
 --- An iterator that iterates directly over applied effects
@@ -157,7 +140,7 @@ function M.Object:GetHasSpellEffect(spell)
          return true
       end
    end
-   
+
    return false
 end
 
@@ -183,7 +166,7 @@ function M.Object:LogEffects()
    if not self:GetIsValid() then return end
 
    local t = {}
-   
+
    table.insert(t, string.format("Effects - %s", self:GetName()))
 
    for eff in self:EffectsDirect() do

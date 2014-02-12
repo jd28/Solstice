@@ -12,7 +12,7 @@ local M = require 'solstice.effect.init'
 -- @section
 
 --- Create raw effect.
--- It's initial type will be solstice.effect.INVALID
+-- It's initial type will be EFFECT_TYPE_INVALID
 -- @param ints Number of effect integers.
 -- @bool show_icon Sets whether an icon is shown... maybe?
 function M.Create(ints, show_icon)
@@ -20,12 +20,12 @@ function M.Create(ints, show_icon)
    show_icon = show_icon or 0
    local eff = effect_t(C.nwn_CreateEffect(show_icon), false)
 
-   eff:SetType(solstice.effect.INVALID)
+   eff:SetType(EFFECT_TYPE_INVALID)
    eff:SetCreator(NWE.GetCommandObject())
    eff:SetNumIntegers(ints)
    eff:SetAllInts(0)
-   eff:SetSubType(M.SUBTYPE_MAGICAL)
-   eff:SetDurationType(M.DURATION_TYPE_PERMANENT)
+   eff:SetSubType(SUBTYPE_MAGICAL)
+   eff:SetDurationType(DURATION_TYPE_PERMANENT)
 
    return eff
 end
@@ -37,7 +37,7 @@ function M.Recurring()
 end
 
 --- Creates an ability increase/decrease effect on specified ability score.
--- @param ability solstice.ABILITY_*
+-- @param ability ABILITY_*
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
 function M.Ability(ability, amount)
@@ -47,11 +47,11 @@ end
 --- Creates an AC increase/decrease effect.
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
--- @param[opt=solstice.AC_DODGE_BONUS] modifier_type AC_*
--- @param[opt=solstice.AC_VS_DAMAGE_TYPE_ALL] damage_type solstice.DAMAGE\_TYPE\_*
+-- @param[opt=AC_DODGE_BONUS] modifier_type AC_*
+-- @param[opt=AC_VS_DAMAGE_TYPE_ALL] damage_type DAMAGE\_TYPE\_*
 function M.AC(amount, modifier_type, damage_type)
-   modifier_type = solstice.AC_DODGE_BONUS
-   damage_type = solstice.AC_VS_DAMAGE_TYPE_ALL
+   modifier_type = AC_DODGE_BONUS
+   damage_type = AC_VS_DAMAGE_TYPE_ALL
 
    return M.effect_t(C.effect_ac(amount, modifier_type, damage_type), false)
 end
@@ -71,28 +71,28 @@ function M.AreaOfEffect(aoe, enter, heartbeat, exit)
    enter = enter or ""
    heartbeat = heartbeat or ""
    exit = heartbeat or ""
-   
+
    return M.effect_t(C.effect_aoe(aoe, enter, heartbeat, exit), false)
-end   
+end
 
 --- Create an Attack increase/decrease effect.
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
--- @param[opt=solstice.ATTACK_BONUS_MISC] modifier_type solstice.ATTACK\_BONUS\_*
+-- @param[opt=ATTACK_BONUS_MISC] modifier_type ATTACK\_BONUS\_*
 function M.AttackBonus(amount, modifier_type)
-   modifier_type = modifier_type or solstice.ATTACK_BONUS_MISC
+   modifier_type = modifier_type or ATTACK_BONUS_MISC
    return M.effect_t(C.effect_attack(amount, modifier_type), false)
 end
 
 --- Create a Beam effect.
--- @param beam solstice.vfx.BEAM_* Constant defining the visual type of beam to use.
+-- @param beam VFX\_BEAM\_* Constant defining the visual type of beam to use.
 -- @param creator The beam is emitted from this creature
--- @param bodypart solstice.creature.BODY_NODE_* Constant defining where on the creature the beam originates from.
+-- @param bodypart BODY_NODE_* Constant defining where on the creature the beam originates from.
 -- @param[opt=false] miss_effect If true, the beam will fire to a random vector near or past the target.
 function M.Beam(beam, creator, bodypart, miss_effect)
    miss_effect = miss_effect and 1 or 0
    return M.effect_t(C.effect_beam(beam, creator, bodypart,
-				     miss_effect), 
+				     miss_effect),
 		       false)
 end
 
@@ -113,9 +113,9 @@ end
 
 --- Creates a concealment effect.
 -- @param percent [1,100]
--- @param[opt=solstice.effect.MISS_CHANCE_TYPE_NORMAL] miss_type Miss chance type: solstice.MISS\_CHANCE\_TYPE\_*
+-- @param[opt=MISS_CHANCE_TYPE_NORMAL] miss_type MISS\_CHANCE\_TYPE\_*
 function M.Concealment(percent, miss_type)
-   miss_type = miss_type or M.MISS_CHANCE_TYPE_NORMAL
+   miss_type = miss_type or MISS_CHANCE_TYPE_NORMAL
    return M.effect_t(C.effect_conealment(percent, miss_type), false)
 end
 
@@ -138,7 +138,7 @@ function M.Curse(str, dex, con, int, wis, cha)
    int = int or 1
    wis = wis or 1
    cha = cha or 1
-   
+
    return M.effect_t(C.effect_curse(str, dex, con, int, wis, cha), false)
 end
 
@@ -164,26 +164,26 @@ end
 
 --- Creates Damage effect.
 -- @param amount amount of damage to be dealt.
--- @param damage_type solstice.DAMAGE\_TYPE\_* 
--- @param[opt=solstice.DAMAGE_POWER_NORMAL] power solstice.DAMAGE\_POWER\_*
+-- @param damage_type solstice.DAMAGE\_TYPE\_*
+-- @param[opt=DAMAGE_POWER_NORMAL] power DAMAGE\_POWER\_*
 function M.Damage(amount, damage_type, power)
-   damage_type = damage_type or solstice.DAMAGE_TYPE_MAGICAL
-   power = power or solstice.DAMAGE_POWER_NORMAL
+   damage_type = damage_type or DAMAGE_TYPE_MAGICAL
+   power = power or DAMAGE_POWER_NORMAL
 
    return M.effect_t(C.effect_damage(amount, damage_type, power), false)
 end
 
 --- Effect Damage Decrease
 -- @param amount Amount
--- @param damage_type solstice.DAMAGE\_TYPE\_* 
+-- @param damage_type DAMAGE\_TYPE\_*
 -- @param attack_type
 function M.DamageDecrease(amount, damage_type, attack_type)
    error "???"
 end
 
 --- Effect Damage Increase
--- @param amount 
--- @param damage_type DAMAGE_TYPE_* (Default: solstice.nwn.DAMAGE_TYPE_MAGICAL) 
+-- @param amount
+-- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
 -- @param attack_type
 function M.DamageIncrease(amount, damage_type, attack_type)
    error "???"
@@ -192,8 +192,8 @@ end
 --- Effect Damage Range Decrease
 -- @param start Start of damage range.
 -- @param stop Start of damage range.
--- @param damage_type solstice.nwn.DAMAGE_TYPE_* (Default: solstice.nwn.DAMAGE_TYPE_MAGICAL) 
--- @param attack_type solstice.nwn.ATTACK_TYPE_*
+-- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
+-- @param attack_type ATTACK_TYPE_*
 function M.DamageRangeDecrease(start, stop, damage_type, attack_type)
    error "???"
 end
@@ -201,14 +201,14 @@ end
 --- Effect Damage Range Increase
 -- @param start Start of damage range.
 -- @param stop Start of damage range.
--- @param damage_type solstice.nwn.DAMAGE_TYPE_* (Default: solstice.nwn.DAMAGE_TYPE_MAGICAL) 
--- @param attack_type solstice.nwn.ATTACK_TYPE_*
+-- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
+-- @param attack_type ATTACK_TYPE_*
 function M.DamageRangeIncrease(start, stop, damage_type, attack_type)
    error "???"
 end
 
 ---
--- @param damage_type solstice.nwn.DAMAGE_TYPE_*
+-- @param damage_type DAMAGE_TYPE_*
 -- @param percent [1,100]
 function M.DamageImmunity(damage_type, percent)
    return M.effect_t(C.effect_damage_immunity(damage_type, percent),
@@ -246,17 +246,17 @@ function M.DamageShield(amount, random, damage_type)
 
 end
 
---- Create a Darkness effect. 
+--- Create a Darkness effect.
 function M.Darkness()
    return M.effect_t(C.effect_darkness(), false)
 end
 
---- Create a Daze effect. 
+--- Create a Daze effect.
 function M.Dazed()
    return M.effect_t(C.effect_dazed(), false)
 end
 
---- Create a Deaf effect. 
+--- Create a Deaf effect.
 function M.Deaf()
    return M.effect_t(C.effect_deaf(), false)
 end
@@ -311,7 +311,7 @@ function M.DispelMagicBest(caster_level)
    return M.effect_t(C.effect_dispel_best(caster_level), false)
 end
 
---- Create a Dominate effect. 
+--- Create a Dominate effect.
 function M.Dominated()
    return M.effect_t(C.effect_dominated(), false)
 end
@@ -331,7 +331,7 @@ function M.Frightened()
    return M.effect_t(C.effect_frightened(), false)
 end
 
---- Create a Haste effect. 
+--- Create a Haste effect.
 function M.Haste()
    return M.effect_t(C.effect_haste(), false)
 end
@@ -342,10 +342,10 @@ function M.Heal(amount)
    return M.effect_t(C.effect_heal(amount), false)
 end
 
---- Create a Hit Point Change When Dying effect. 
+--- Create a Hit Point Change When Dying effect.
 -- @param hitpoint_change Positive or negative, but not zero.
 function M.HitPointChangeWhenDying(hitpoint_change)
-   return M.effect_t(C.effect_hp_change_when_dying(hitpoint_change), 
+   return M.effect_t(C.effect_hp_change_when_dying(hitpoint_change),
 		       false)
 end
 
@@ -395,9 +395,9 @@ end
 
 --- Creates a miss chance effect.
 -- @param percent [1,100].
--- @param[opt=solstice.MISS_CHANCE_TYPE_NORMAL] misstype solstice.nwn.MISS\_CHANCE\_TYPE\_*
+-- @param[opt=solstice.MISS_CHANCE_TYPE_NORMAL] misstype MISS\_CHANCE\_TYPE\_*
 function M.MissChance(percent, misstype)
-   misstype = misstype or solstice.nwn.MISS_CHANCE_TYPE_NORMAL
+   misstype = misstype or MISS_CHANCE_TYPE_NORMAL
    return M.effect_t(C.effect_miss_chance(percent, misstype), false)
 end
 
@@ -405,7 +405,7 @@ end
 -- @param attacks Maximum is 5, even with the effect stacked
 function M.ModifyAttacks(attacks)
    if attacks < 0 or attacks > 5 then
-      error "solstice.nwn.EffectModifyAttacks: Invalid argument must be [1,5]"
+      error "EffectModifyAttacks: Invalid argument must be [1,5]"
    end
    return M.effect_t(C.effect_additional_attacks(attacks), false)
 end
@@ -423,8 +423,8 @@ end
 function M.NegativeLevel(amount, hp_bonus)
    return M.effect_t(C.effect_negative_level(amount, hp_bonus), false)
 end
- 
---- Create a Paralyze effect. 
+
+--- Create a Paralyze effect.
 function M.Paralyze()
    return M.effect_t(C.effect_paralyze(), false)
 end
@@ -435,13 +435,13 @@ function M.Petrify()
 end
 
 --- Create a Poison effect.
--- @param poison The type of poison to use, as defined in the solstice.nwn.POISON_* constant group.
+-- @param poison The type of poison to use, as defined in the POISON_* constant group.
 function M.Poison(poison)
    return M.effect_t(C.effect_poison(poison), false)
 end
 
 --- Create a Polymorph effect that changes the target into a different type of creature.
--- @param polymorph solstice.nwn.POLYMORPH_TYPE_*
+-- @param polymorph POLYMORPH_TYPE_*
 -- @param[opt=false] locked If true, player can't cancel polymorph.
 function M.Polymorph(polymorph, locked)
    return M.effect_t(C.effect_polymorph(polymorph, locked), false)
@@ -454,7 +454,7 @@ function M.Regenerate(amount, interval)
    return M.effect_t(C.effect_regenerate(amount, interval), false)
 end
 
---- Create a Resurrection effect. 
+--- Create a Resurrection effect.
 function M.Resurrection()
    return M.effect_t(C.effect_resurrection(), false)
 end
@@ -466,16 +466,16 @@ function M.Sanctuary(dc)
 end
 
 --- Create a Saving Throw Increase/Decrease effect to modify one Saving Throw type.
--- @param save The Saving Throw to affect, as defined by the solstice.nwn.SAVING_THROW_* constants group.
+-- @param save The Saving Throw to affect, as defined by the SAVING_THROW_* constants group.
 -- @param amount The amount to modify the saving throws by.  If > 0 an increase, if < 0 a decrease.
--- @param[opt=solstice.nwn.SAVING_THROW_TYPE_ALL] save_type The type of resistance this effect applies to as
--- defined by the solstice.nwn.SAVING\_THROW\_TYPE\_* constants group.
+-- @param[opt=SAVING_THROW_TYPE_ALL] save_type The type of resistance this effect applies to as
+-- defined by the SAVING\_THROW\_TYPE\_* constants group.
 function M.SavingThrow(save, amount, save_type)
-   save_type = save_type or solstice.nwn.SAVING_TYROW_TYPE_ALL
+   save_type = save_type or SAVING_TYROW_TYPE_ALL
    return M.effect_t(C.effect_save(save, amount, save_type), false)
 end
 
---- Create a See Invisible effect. 
+--- Create a See Invisible effect.
 function M.SeeInvisible()
    return M.effect_t(C.effect_see_invisible(), false)
 end
@@ -504,28 +504,27 @@ end
 
 --- Creates an effect that inhibits spells.
 -- @param[opt=100] percent Percent chance of spell failing (1 to 100).
--- @param[opt=solstice.SPELL_SCHOOL_GENERAL] spell_school Spell school that
--- is affected.
+-- @param[opt=SPELL_SCHOOL_GENERAL] spell_school SPELL\_SCHOOL\_*
 function M.SpellFailure(percent, spell_school)
    percent = percent or 100
-   spell_school = spell_school or solstice.SPELL_SCHOOL_GENERAL
+   spell_school = spell_school or SPELL_SCHOOL_GENERAL
    return M.effect_t(C.effect_spell_failure(percent, spell_school), false)
 end
 
 --- Returns an effect of spell immunity.
--- @param[opt=solstice.SPELL_ALL_SPELLS] spell solstice.SPELL_*
+-- @param[opt=SPELL_ALL_SPELLS] spell SPELL_*
 function M.SpellImmunity(spell)
-   spell = spell or solstice.SPELL_ALL_SPELLS
+   spell = spell or SPELL_ALL_SPELLS
    return M.effect_t(C.effect_spell_immunity(spell), false)
 end
 
 --- Creates a Spell Level Absorption effect
 -- @param max_level Highest spell level that can be absorbed.
 -- @param max_spells Maximum number of spells to absorb
--- @param[opt=solstice.SPELL_SCHOOL_GENERAL] school solstice.SPELL_SCHOOL_*.
+-- @param[opt=SPELL_SCHOOL_GENERAL] school SPELL_SCHOOL_*.
 function M.SpellLevelAbsorption(max_level, max_spells, school)
    max_spells = max_spells or 0
-   school = school or solstice.nwn.SPELL_SCHOOL_GENERAL
+   school = school or SPELL_SCHOOL_GENERAL
    return M.effect_t(C.effect_spell_absorbtion(max_level,
 						 max_spells, school),
 		       false)
@@ -570,7 +569,7 @@ function M.Swarm(looping, resref1, resref2, resref3, resref4)
    resref3 = resref3 or ""
    resref4 = resref4 or ""
    return M.effect_t(C.effect_swarm(looping, resref1,
-				      resref2, resref3, resref4), 
+				      resref2, resref3, resref4),
 		       false)
 end
 
@@ -580,7 +579,7 @@ function M.TemporaryHitpoints(hitpoints)
    return M.effect_t(C.effect_hp_temporary(hitpoints), false)
 end
 
---- Create a Time Stop effect. 
+--- Create a Time Stop effect.
 function M.TimeStop()
    return M.effect_t(C.effect_time_stop(), false)
 end
@@ -590,7 +589,7 @@ function M.TrueSeeing()
    return M.effect_t(C.effect_true_seeing(), false)
 end
 
---- Create a Turned effect. 
+--- Create a Turned effect.
 function M.Turned()
    return M.effect_t(C.effect_turned(), false)
 end

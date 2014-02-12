@@ -14,7 +14,7 @@ local M = require 'solstice.creature.init'
 -- @section
 
 --- Add known feat to creature
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 -- @param level If level is specified feat will be add at that level. (Default: 0)
 function M.Creature:AddKnownFeat(feat, level)
    if not self:GetIsValid() then return -1 end
@@ -24,7 +24,7 @@ function M.Creature:AddKnownFeat(feat, level)
 end
 
 --- Decrement remaining feat uses.
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:DecrementRemainingFeatUses(feat)
    NWE.StackPushInteger(feat)
    NWE.StackPushObject(self)
@@ -32,7 +32,7 @@ function M.Creature:DecrementRemainingFeatUses(feat)
 end
 
 --- Determine if creature has a feat
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:GetHasFeat(feat)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(feat)
@@ -41,9 +41,9 @@ function M.Creature:GetHasFeat(feat)
 end
 
 --- Returns the highest feat in a range of feats.
--- @param low_feat solstice.feat constant
--- @param high_feat solstice.feat constant
--- @return solstice.feat constant or -1 on error.
+-- @param low_feat FEAT\_*
+-- @param high_feat FEAT\_*
+-- @return FEAT\_* or -1 on error.
 function M.Creature:GetHighestFeatInRange(low_feat, high_feat)
    while high_feat >= low_feat do
       if self:GetHasFeat(high_feat) then
@@ -81,15 +81,15 @@ end
 
 --- Determines if a creature knows a feat.
 -- Feats acquired from gear do not count.
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:GetKnowsFeat(feat)
    if not self:GetIsValid() then return false end
-   
+
    return C.nwn_GetKnowsFeat(self.stats, feat)
 end
 
 --- Get remaining feat uses
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:GetRemainingFeatUses(feat)
    if not self:GetIsValid() then return -1 end
 
@@ -97,7 +97,7 @@ function M.Creature:GetRemainingFeatUses(feat)
 end
 
 --- Get total feat uses.
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:GetTotalFeatUses(feat)
    if not self:GetIsValid() then return -1 end
    return C.nwn_GetTotalFeatUses(self.stats, feat)
@@ -123,7 +123,7 @@ function M.Creature:GetTotalKnownFeatsByLevel(level)
 end
 
 --- Increment remaining feat uses.
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:IncrementRemainingFeatUses(feat)
    NWE.StackPushInteger(feat)
    NWE.StackPushObject(self)
@@ -131,7 +131,7 @@ function M.Creature:IncrementRemainingFeatUses(feat)
 end
 
 --- Remove feat from creature.
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:RemoveKnownFeat(feat)
    if not self:GetIsValid() then return end
    C.nwn_RemoveKnownFeat(self.stats, feat)
@@ -139,7 +139,7 @@ end
 
 --- Set known feat on creature
 -- @param index Feat index to set
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:SetKnownFeat(index, feat)
    if not self:GetIsValid() or index < 0 or idx > self.stats.cs_feats.len then
       return -1
@@ -152,7 +152,7 @@ end
 --- Set known feat by level
 -- @param level Level to set the feat on.
 -- @param index Feat index
--- @param feat solstice.feat constant
+-- @param feat FEAT\_*
 function M.Creature:SetKnownFeatByLevel(level, index, feat)
    if not self:GetIsValid() then return -1 end
 

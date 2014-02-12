@@ -9,23 +9,6 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = {}
-M.const = {
-   GAME_DIFFICULTY_VERY_EASY   = 0,
-   GAME_DIFFICULTY_EASY        = 1,
-   GAME_DIFFICULTY_NORMAL      = 2,
-   GAME_DIFFICULTY_CORE_RULES  = 3,
-   GAME_DIFFICULTY_DIFFICULT   = 4,
-}
-setmetatable(M, { __index = M.const })
-
---- Functions
--- @section
-
---- Get Module.
-function M.Get()
-   NWE.ExecuteCommand(242, 0)
-   return NWE.StackPopObject()
-end
 
 M.Module = inheritsFrom(Obj.Object, "solstice.module.Module" )
 
@@ -38,7 +21,7 @@ M.module_t = ffi.metatype("Module", { __index = Module })
 --- Area iterator
 function M.Module:Areas()
    local i, _i = 0
-   return function () 
+   return function ()
       while i < self.obj.mod_areas_len do
          _i, i = i, i + 1
          return _SOL_GET_CACHED_OBJECT(self.obj.mod_areas[_i])
@@ -85,4 +68,3 @@ function M.Module:SetModuleXPScale(scale)
 end
 
 return M
-

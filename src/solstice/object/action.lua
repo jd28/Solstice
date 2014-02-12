@@ -5,7 +5,6 @@
 -- @module object
 
 local NWE = require 'solstice.nwn.engine'
-local Chat = require 'solstice.chat'
 local M = require 'solstice.object.init'
 
 --- Class Object: Actions
@@ -38,7 +37,7 @@ function M.Object:ActionGiveItem(item, target)
    NWE.SetCommandObject(temp)
 end
 
---- An action that will cause a creature to lock a door or 
+--- An action that will cause a creature to lock a door or
 -- other unlocked object.
 -- @param target Door or placeable object that will be the
 --     target of the lock attempt.
@@ -88,7 +87,7 @@ end
 -- @param message String to be spoken.
 -- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
 function M.Object:ActionSpeakString(message, volume)
-   volume = volume or Chat.VOLUME_TALK
+   volume = volume or error("Chat.VOLUME_TALK")
 
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -104,7 +103,7 @@ end
 -- @param strref Reference of the string in the talk table
 -- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
 function M.Object:ActionSpeakStringByStrRef(strref, volume)
-   volume = volume or Chat.VOLUME_TALK
+   volume = volume or error("Chat.VOLUME_TALK")
 
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -119,17 +118,17 @@ end
 --- Action to start a conversation with a PC
 -- @param target An object to converse with.
 -- @param dialog The resource reference (filename) of a conversation.
---     (Default: "") 
+--     (Default: "")
 -- @param private Specify whether the conversation is audible to everyone
---     or only to the PC. (Default: false) 
--- @param hello Determines if initial greeting is played. (Default: true) 
+--     or only to the PC. (Default: false)
+-- @param hello Determines if initial greeting is played. (Default: true)
 function M.Object:ActionStartConversation(target, dialog, private, hello)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
    dialog = dialog or ""
    if hello == nil then hello = true end
-   
+
    NWE.StackPushBoolean(hello)
    NWE.StackPushBoolean(private)
    NWE.StackPushString(dialog)
@@ -180,7 +179,7 @@ function M.Object:ActionWait(time)
 end
 
 --- Removes all actions from an action queue.
--- @param clear_combat combat along with all other actions. (Default: false) 
+-- @param clear_combat combat along with all other actions. (Default: false)
 function M.Object:ClearAllActions(clear_combat)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -209,7 +208,7 @@ end
 function M.Object:SpeakString(text, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
-   volume = volume or Chat.VOLUME_TALK
+   volume = volume or error("Chat.VOLUME_TALK")
 
    NWE.StackPushInteger(volume);
    NWE.StackPushString(text);
@@ -225,7 +224,7 @@ function M.Object:SpeakStringByStrRef(strref, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   volume = volume or Chat.VOLUME_TALK
+   volume = volume or error("Chat.VOLUME_TALK")
 
    NWE.StackPushInteger(volume)
    NWE.StackPushInteger(strref)
@@ -233,6 +232,3 @@ function M.Object:SpeakStringByStrRef(strref, volume)
 
    NWE.SetCommandObject(temp)
 end
-
-
-

@@ -6,6 +6,7 @@
 
 local M = require 'solstice.creature.init'
 local ffi = require 'ffi'
+local C = ffi.C
 local ne = require 'solstice.nwn.engine'
 
 --- PC
@@ -34,13 +35,13 @@ end
 --- Add an entry to a player's Journal. (Create the entry in the Journal Editor first).
 -- @param plot The tag of the Journal category (case sensitive).
 -- @param state The ID of the Journal entry.
--- @param[opt=true] entire_party If true, the entry is added to the journal of the entire party. (Default: true) 
+-- @param[opt=true] entire_party If true, the entry is added to the journal of the entire party. (Default: true)
 -- @param[opt=false] all_pc If true, the entry will show up in the journal of all PCs in the
 -- module.
 -- @param[opt=false] allow_override If true, override restriction that nState must be > current
 -- Journal Entry.
 function M.Creature:AddJournalQuestEntry(plot, state, entire_party, all_pc, allow_override)
-   if entire_party == nil then entire_party = true end 
+   if entire_party == nil then entire_party = true end
 
    ne.StackPushBoolean(allow_override)
    ne.StackPushBoolean(all_pc)
@@ -70,8 +71,8 @@ end
 -- @param[opt=true] explored true (explored) or false (hidden). Whether the map should
 -- be completely explored or hidden.
 function M.Creature:ExploreArea(area, explored)
-   if explored == nil then explored = true end 
-   
+   if explored == nil then explored = true end
+
    ne.StackPushBoolean(explored)
    ne.StackPushObject(self)
    ne.StackPushObject(area)
@@ -91,8 +92,8 @@ end
 -- @param[opt=false] all_pc If this is true, the entry will be removed from the journal of
 -- everyone in the world.
 function M.Creature:RemoveJournalQuestEntry(plot, entire_party, all_pc)
-   if entire_party == nil then entire_party = true end 
-   
+   if entire_party == nil then entire_party = true end
+
    ne.StackPushBoolean(all_pc)
    ne.StackPushBoolean(entire_party)
    ne.StackPushObject(self)
@@ -130,7 +131,7 @@ function M.Creature:GetPCPlayerName()
 end
 
 --- Changes the current Day/Night cycle for this player to daylight
--- @param transition_time Time it takes for the daylight to fade in (Default: 0) 
+-- @param transition_time Time it takes for the daylight to fade in (Default: 0)
 function M.Creature:NightToDay(transition_time)
    transition_time = transition_time or 0
    ne.StackPushFloat(transition_time)
@@ -144,8 +145,8 @@ end
 -- @param[opt=0] help_strref String reference to display for help.
 -- @param[opt=""] help_str String to display for help which appears in the top of the panel.
 function M.Creature:PopUpDeathGUIPanel(respawn_enabled, wait_enabled, help_strref, help_str)
-   if respawn_enabled == nil then respawn_enabled = true end 
-   if wait_enabled == nil then wait_enabled = true end 
+   if respawn_enabled == nil then respawn_enabled = true end
+   if wait_enabled == nil then wait_enabled = true end
    help_strref = help_strref or 0
    help_str = help_str or ""
 
@@ -205,4 +206,21 @@ function M.Creature:SetPanelButtonFlash(button, enable_flash)
    ne.StackPushInteger(button);
    ne.StackPushObject(self);
    ne.ExecuteCommand(521, 3);
+end
+
+--- Sends a chat message
+-- @param channel Channel the message to send message on.
+-- @param from Sender.
+-- @param message Text to send.
+function M.Creature:SendChatMessage(channel, from, message)
+   C.nwn_SendMessage(channel, from.id, message, self.id)
+end
+
+--- Simple wrapper around solstice.chat.SendChatMessage
+-- that sends a server message to a player.
+-- @param message Text to send.
+-- @param recipient Receiver.
+function M.Creature:SendServerMessage(message)
+   if not recipient:GetIsValid() then return end
+   self:SendChatMessage(5, self, message)
 end

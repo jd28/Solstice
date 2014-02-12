@@ -37,44 +37,6 @@ safe_require "solstice.object.saves"
 safe_require "solstice.object.spells"
 safe_require "solstice.object.vars"
 
---- Functions
--- @section
-
---- Create an object of a specified type at a given location 
--- NWScript: CreateObject
--- @param object_type solstice.object.ITEM, solstice.object.CREATURE,
--- solstice.object.PLACEABLE, solstice.object.STORE, solstice.object.WAYPOINT.
--- @param template The resref of the object to create from the pallet.
--- @param loc The location to create the object at.
--- @param[opt=false] appear If `true`, the object will play its spawn in animation.
--- @param[opt=""] newtag If this string is not empty, it will replace the default tag from the template.
--- @return New object or solstice.object.INVALID
-function M.Create(object_type, template, loc, appear, newtag)
-   if appear == nil then appear = false end
-   newtag = newtag or ""
-   NWE.StackPushString(newtag)
-   NWE.StackPushBoolean(appear)
-   NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, loc)
-   NWE.StackPushString(template)
-   NWE.StackPushInteger(object_type)
-   NWE.ExecuteCommand(243, 5)
-
-   return NWE.StackPopObject()
-end
-
---- Gets an object by tag
--- @param tag Tag of object
--- @param[opt=1] nth Nth object.
-function M.GetByTag(tag, nth)
-   nth = nth or 1
-   
-   NWE.StackPushInteger(nth)
-   NWE.StackPushString(tag)
-   NWE.ExecuteCommand(200, 2)
-   return NWE.StackPopObject()
-end
-
-
 --- Class Object
 -- @section class_object
 
@@ -99,7 +61,7 @@ end
 -- @param[opt=""] conversation Dialog resref
 function M.Object:BeginConversation(target, conversation)
    conversation = conversation or ""
-   
+
    NWE.StackPushObject(target)
    NWE.StackPushString(conversation)
    NWE.ExecuteCommand(255, 2)

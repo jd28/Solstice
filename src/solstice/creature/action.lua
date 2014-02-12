@@ -12,7 +12,6 @@ local M = require 'solstice.creature.init'
 local ffi = require 'ffi'
 local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
-local SP = require 'solstice.spell'
 
 ---
 -- @param target Target to attack.
@@ -31,15 +30,15 @@ function M.Creature:ActionAttack(target, passive)
 end
 
 ---
--- @param spell solstice.spell constant.
+-- @param spell SPELL\_* constant.
 -- @param target Object to cast fake spell at.
--- @param[opt=solstice.spell.PROJECTILE_PATH_TYPE_DEFAULT] path_type solstice.spell.PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 function M.Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   path_type = path_type or SP.PROJECTILE_PATH_TYPE_DEFAULT
-   
+   path_type = path_type or PROJECTILE_PATH_TYPE_DEFAULT
+
    NWE.StackPushInteger(path_type)
    NWE.StackPushObject(target)
    NWE.StackPushInteger(spell)
@@ -49,14 +48,14 @@ function M.Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
 end
 
 ---
--- @param spell solstice.spell constant.
+-- @param spell SPELL\_* constant.
 -- @param target Location to cast spell at.
--- @param[opt=solstice.spell.PROJECTILE_PATH_TYPE_DEFAULT] path_type solstice.spell.PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 function M.Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   path_type = path_type or SP.PROJECTILE_PATH_TYPE_DEFAULT
+   path_type = path_type or PROJECTILE_PATH_TYPE_DEFAULT
 
    NWE.StackPushInteger(path_type)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, target)
@@ -69,16 +68,16 @@ end
 ---
 -- @param spell solstice.spell constant.
 -- @param target Location to cast spell at.
--- @param[opt=solstice.spell.METAMAGIC_ANY] metamagic solstice.spell.METAMAGIC_*.
+-- @param[opt=METAMAGIC_ANY] metamagic METAMAGIC_*.
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
--- @param[opt=solstice.spell.PROJECTILE_PATH_TYPE_DEFAULT] path_type solstice.spell.PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant If true spell can instantaneously.
 function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, projectile_path, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   metamagic = metamagic or SP.METAMAGIC_ANY
-   projectile_path = projectile_path or SP.PROJECTILE_PATH_TYPE_DEFAULT
+   metamagic = metamagic or METAMAGIC_ANY
+   projectile_path = projectile_path or PROJECTILE_PATH_TYPE_DEFAULT
 
    NWE.StackPushBoolean(instant)
    NWE.StackPushInteger(projectile_path)
@@ -92,18 +91,18 @@ function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, p
 end
 
 ---
--- @param spell 
+-- @param spell
 -- @param target
--- @param[opt=solstice.spell.METAMAGIC_ANY] metamagic solstice.spell.METAMAGIC_*
+-- @param[opt=METAMAGIC_ANY] metamagic METAMAGIC_*
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
--- @param[opt=solstice.spell.PROJECTILE_PATH_TYPE_DEFAULT] path_type solstice.spell.PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant
 function M.Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, projectile_path, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   metamagic = metamagic or SP.METAMAGIC_ANY
-   projectile_path = projectile_path or SP.PROJECTILE_PATH_TYPE_DEFAULT
+   metamagic = metamagic or METAMAGIC_ANY
+   projectile_path = projectile_path or PROJECTILE_PATH_TYPE_DEFAULT
 
    NWE.StackPushBoolean(instant)
    NWE.StackPushBoolean(projectile_path)
@@ -136,7 +135,7 @@ function M.Creature:ActionDoWhirlwindAttack(feedback, improved)
    NWE.SetCommandObject(self)
 
    if feedback == nil then feedback = true end
-   
+
    NWE.StackPushInteger(improved)
    NWE.StackPushInteger(feedback)
    NWE.ExecuteCommand(709, 2)
@@ -232,7 +231,7 @@ function M.Creature:ActionForceMoveToLocation(target, run, timeout)
    NWE.StackPushInteger(run)
    NWE.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, target)
    NWE.ExecuteCommand(382, 3)
-   
+
 
    NWE.SetCommandObject(temp)
 end
@@ -245,7 +244,7 @@ end
 function M.Creature:ActionForceMoveToObject(target, run, range, timeout)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
-   
+
    NWE.StackPushFloat(timeout or 30)
    NWE.StackPushFloat(range or 1)
    NWE.StackPushBoolean(run)
@@ -303,7 +302,7 @@ function M.Creature:ActionMoveAwayFromLocation(loc, run, range)
    NWE.SetCommandObject(self)
 
    range = range or 40.0
-   
+
    NWE.StackPushFloat(range)
    NWE.StackPushBoolean(run)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, loc)
@@ -334,7 +333,7 @@ end
 function M.Creature:ActionMoveToLocation(target, run)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
-   
+
    NWE.StackPushBoolean(run)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, target)
    NWE.ExecuteCommand(21, 2)
@@ -381,7 +380,7 @@ function M.Creature:ActionPlayAnimation(animation, speed, dur)
    print(NWE.GetCommandObject())
    speed = speed or 1.0
    dur = dur or 0.0
-   
+
    NWE.StackPushFloat(dur or 0)
    NWE.StackPushFloat(speed or 1)
    NWE.StackPushInteger(animation)
@@ -503,7 +502,7 @@ end
 function M.Creature:ActionUseSkill(skill, target, subskill, item)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
-   
+
    NWE.StackPushObject(item)
    NWE.StackPushInteger(subskill or 0)
    NWE.StackPushObject(target)
@@ -567,7 +566,7 @@ function M.Creature:PlayVoiceChat(id)
 end
 
 ---
--- @param resref 
+-- @param resref
 -- @param target
 function M.Creature:SpeakOneLinerConversation(resref, target)
    local temp = NWE.GetCommandObject()

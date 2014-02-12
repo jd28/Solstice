@@ -25,10 +25,10 @@ end
 
 --- Finds a waypiont by tag
 -- @param tag Tag of waypoint.
--- @return solstice.waypoint.Waypoint instance or solstice.object.INVALID
+-- @return solstice.waypoint.Waypoint instance or OBJECT_INVALID
 function M.GetByTag(tag)
    NWE.StackPushString(tag)
    return NWE.StackPopObject()
-end 
+end
 
 return M

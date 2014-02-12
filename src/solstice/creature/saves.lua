@@ -5,14 +5,13 @@
 -- @module creature
 
 local M = require 'solstice.creature.init'
-   
+
 --- Saves
 -- @section
 
 require 'solstice.effect'
 
 local ffi = require 'ffi'
-local Save = require 'solstice.save'
 
 function M.Creature:DebugSaves()
    return ""
@@ -25,11 +24,11 @@ function M.Creature:GetSavingThrowBonus(save)
 
    local bonus = 0
 
-   if save == Save.FORT then
+   if save == SAVING_THROW_FORT then
       bonus = self.stats.cs_save_fort
-   elseif save == Save.REFLEX then
+   elseif save == SAVING_THROW_REFLEX then
       bonus = stats.cs_save_reflex
-   elseif save == Save.WILL then
+   elseif save == SAVING_THROW_WILL then
       bonus = stats.cs_save_will
    end
 
@@ -37,16 +36,16 @@ function M.Creature:GetSavingThrowBonus(save)
 end
 
 --- Sets creatures saving throw bonus
--- @param save solstice.save type 
+-- @param save solstice.save type
 -- @param bonus New saving throw bonus
 function M.Creature:SetSavingThrowBonus(save, bonus)
    if not self:GetIsValid() then return 0 end
 
-   if save == Save.FORT then
+   if save == SAVING_THROW_FORT then
       self.stats.cs_save_fort = bonus
-   elseif save == Save.REFLEX then
+   elseif save == SAVING_THROW_REFLEX then
       stats.cs_save_reflex = bonus
-   elseif save == Save.WILL then
+   elseif save == SAVING_THROW_WILL then
       stats.cs_save_will = bonus
    end
 

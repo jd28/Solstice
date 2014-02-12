@@ -9,19 +9,6 @@ local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
-M.const = {
-   ACTION_USE               = 0,
-   ACTION_UNLOCK            = 1,
-   ACTION_BASH              = 2,
-   ACTION_KNOCK             = 4,
-
-   -- Placeable animation constants
-   ANIMATION_ACTIVATE       = 200,
-   ANIMATION_DEACTIVATE     = 201,
-   ANIMATION_OPEN           = 202,
-   ANIMATION_CLOSE          = 203,
-}
-setmetatable(M, { __index = M.const })
 
 M.Placeable = inheritsFrom( Obj.Object, "solstice.placeable.Placeable" )
 

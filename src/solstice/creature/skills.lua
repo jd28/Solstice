@@ -12,19 +12,17 @@ local M = require 'solstice.creature.init'
 local ffi   = require 'ffi'
 local NWE   = require 'solstice.nwn.engine'
 local color = require 'solstice.color'
-local Sk    = require 'solstice.skill'
-local Obj   = require 'solstice.object'
 local D     = require 'solstice.dice'
 local LOG   = require 'solstice.log'
 
 --- Determines if a creature can use a skill
--- @param skill solstice.skill constant.
+-- @param skill SKILL\_*.
 function M.Creature:CanUseSkill(skill)
    return ffi.C.nwn_CanUseSkill(self.obj, skill)
 end
 
 --- Determines if a creature has a skill
--- @param skill solstice.skill constant.
+-- @param skill SKILL\_*.
 function M.Creature:GetHasSkill(skill)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(skill)
@@ -33,7 +31,7 @@ function M.Creature:GetHasSkill(skill)
 end
 
 --- Determines if skill check is successful
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 -- @param dc Difficulty Class
 -- @param vs Versus a target
 -- @param feedback If true sends feedback to participants.
@@ -47,7 +45,7 @@ end
 
 --- Determine's a skill check.
 -- Source: FunkySwerve on NWN bioboards
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 -- @param dc Difficulty Class
 -- @param vs Versus a target
 -- @param feedback If true sends feedback to participants.
@@ -56,7 +54,7 @@ end
 -- @param take Replaces dice roll.
 -- @param bonus And bonus.
 function M.Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus)
-   vs = vs or Obj.INVALID
+   vs = vs or OBJECT_INVALID
    if feedback == nil then feedback = true end
    auto = auto or 0
    delay = delay or 0
@@ -95,9 +93,9 @@ function M.Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, ta
 
    if feedback and (self:GetIsPC() or vs:GetIsPC()) then
       local msg = string.format("%s%s%s : %s : %s : (%d %s %d = %d vs. DC: %d)</c>", color.LIGHT_BLUE,
-				self:GetName(), color.BLUE, Sk.GetName(skill), success, roll, 
+				self:GetName(), color.BLUE, Rules.GetSkillName(skill), success, roll,
 				sign, math.abs(rank), roll + rank, dc)
-      
+
       if vs:GetIsValid() and self.id ~= vs.id then
          vs:DelayCommand(delay, function () vs:SendMessage(msg) end)
       end
@@ -105,25 +103,25 @@ function M.Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, ta
    end
 
    local dbg = "Skill Check: User: %s, Versus: %s, Skill: %s, Rank: %d, Roll: %d, DC: %d, Auto: %d"
-   self:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Sk.GetName(skill),
+   self:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Rules.GetSkillName(skill),
             rank, roll, dc, auto)
-   vs:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Sk.GetName(skill),
+   vs:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Rules.GetSkillName(skill),
           rank, roll, dc, auto)
-   
+
    return ret
 end
 
 --- Gets the amount a skill was increased at a level.
 -- @param level Level to check
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 -- @return -1 on error.
 function M.Creature:GetSkillIncreaseByLevel(level, skill)
    if not self:GetIsValid()
-      or skill < 0 or skill > Sk.LAST
+      or skill < 0 or skill > SKILL_LAST
    then
       return -1
    end
-   
+
    local ls = self:GetLevelStats(level)
    if ls == nil then return -1 end
 
@@ -138,19 +136,19 @@ function M.Creature:GetSkillPoints()
 end
 
 -- Gets creature's skill rank.
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 function M.Creature:GetSkillRank(skill, vs, base, no_scale)
    error "nwnxcombat"
 end
 --]]
 
 --- Modifies skill rank.
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 -- @param amount Amount to modify skill rank.
 -- @param level If a level is specified the modification will occur at that level.
 function M.Creature:ModifySkillRank(skill, amount, level)
    if not self:GetIsValid() or
-      skill < 0 or skill > Sk.LAST
+      skill < 0 or skill > SKILL_LAST
    then
       return -1
    end
@@ -183,11 +181,11 @@ function M.Creature:SetSkillPoints(amount)
 end
 
 --- Sets a creatures skill rank
--- @param skill solstice.skill constant
+-- @param skill SKILL\_*
 -- @param amount New skill rank
 function M.Creature:SetSkillRank(skill, amount)
    if not self:GetIsValid() or
-      skill < 0 or skill > Sk.LAST
+      skill < 0 or skill > SKILL_LAST
    then
       return -1
    end

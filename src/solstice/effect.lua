@@ -9,15 +9,12 @@ local C   = ffi.C
 local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.effect.init'
-M.const = require 'solstice.effect.constant'
-setmetatable(M, { __index = M.const })
-
 require 'solstice.effect.creation'
 
 M.Effect = inheritsFrom(nil, 'solstice.effect.Effect')
 
 local effect_mt = { __index = M.Effect,
-                    __gc = function(eff) 
+                    __gc = function(eff)
                        if not eff.direct and eff.eff ~= nil then
                           C.free(eff.eff)
                        end
@@ -65,7 +62,7 @@ end
 --- Gets the duration of an effect.
 -- Returns the duration specified when applied for
 -- the effect. The value of this is undefined for effects which are
--- not of solstice.effect.DURATION_TYPE_TEMPORARY. 
+-- not of DURATION_TYPE_TEMPORARY.
 -- Source: nwnx_structs by Acaos
 function M.Effect:GetDuration ()
    return self.eff.eff_duration
@@ -74,16 +71,16 @@ end
 --- Gets the remaing duration of an effect
 -- Returns the remaining duration of the specified effect. The value
 -- of this is undefined for effects which are not of
--- solstice.effect.DURATION_TYPE_TEMPORARY. Source: nwnx_structs by Acaos
+-- DURATION_TYPE_TEMPORARY. Source: nwnx_structs by Acaos
 function M.Effect:GetDurationRemaining ()
    local current = C.nwn_GetWorldTime(nil, nil)
    local expire = self.eff.eff_expire_time
    expire = (expire * 2880000LL) + self.eff.eff_expire_time
    return expire - current / 1000.0
-end 
+end
 
 --- Get duration type
--- @return solstice.effect.DURATION_TYPE_*
+-- @return DURATION_TYPE_*
 function M.Effect:GetDurationType()
    return bit.band(self.eff.eff_dursubtype, 0x7)
 end
@@ -117,7 +114,7 @@ function M.Effect:GetSpellId()
 end
 
 --- Get the subtype of the effect.
--- @return solstice.effect.SUBTYPE_*
+-- @return SUBTYPE_*
 function M.Effect:GetSubType()
    return bit.band(self.eff.eff_dursubtype, 0x18)
 end
@@ -136,7 +133,7 @@ function M.Effect:SetAllInts(val)
 end
 
 --- Sets the effects creator
--- @param object 
+-- @param object
 function M.Effect:SetCreator(object)
    if type(object) == "number" then
       self.eff.eff_creator = object
@@ -205,29 +202,29 @@ function M.Effect:SetType(value)
 end
 
 --- Sets an effect versus a specified alignment
--- @param[opt=solstice.ALIGNMENT_ALL] lawchaos Law / Chaos
--- @param[opt=solstice.ALIGNMENT_ALL] goodevil Good / Evil
+-- @param[opt=ALIGNMENT_ALL] lawchaos Law / Chaos
+-- @param[opt=ALIGNMENT_ALL] goodevil Good / Evil
 function M.Effect:SetVersusAlignment(lawchaos, goodevil)
    local lcidx
    local geidx
    local type = self.eff.eff_type
-   lawchaos = lawchaos or solstice.ALIGNMENT_ALL
-   goodevil = goodevil or solstice.ALIGNMENT_ALL
+   lawchaos = lawchaos or ALIGNMENT_ALL
+   goodevil = goodevil or ALIGNMENT_ALL
 
-   if type == Eff.ATTACK_INCREASE
-      or type == Eff.ATTACK_DECREASE
-      or type == Eff.DAMAGE_INCREASE 
-      or type == Eff.DAMAGE_DECREASE
-      or type == Eff.AC_INCREASE
-      or type == Eff.AC_DECREASE
-      or type == Eff.SKILL_INCREASE
-      or type == Eff.SKILL_DECREASE 
+   if type == EFFECT_TYPE_ATTACK_INCREASE
+      or type == EFFECT_TYPE_ATTACK_DECREASE
+      or type == EFFECT_TYPE_DAMAGE_INCREASE
+      or type == EFFECT_TYPE_DAMAGE_DECREASE
+      or type == EFFECT_TYPE_AC_INCREASE
+      or type == EFFECT_TYPE_AC_DECREASE
+      or type == EFFECT_TYPE_SKILL_INCREASE
+      or type == EFFECT_TYPE_SKILL_DECREASE
    then
       lcidx, geidx = 3, 4
-   elseif type == Eff.CONCEALMENT 
-      or type == Eff.IMMUNITY 
-      or type == Eff.INVISIBILITY
-      or type == Eff.SANCTUARY
+   elseif type == EFFECT_TYPE_CONCEALMENT
+      or type == EFFECT_TYPE_IMMUNITY
+      or type == EFFECT_TYPE_INVISIBILITY
+      or type == EFFECT_TYPE_SANCTUARY
    then
       lcidx, geidx = 2, 3
    else
@@ -247,20 +244,20 @@ function M.Effect:SetVersusDeity(deity)
    local idx
    local type = self.eff.eff_type
 
-   if type == Eff.ATTACK_INCREASE 
-      or type == Eff.ATTACK_DECREASE 
-      or type == Eff.SKILL_INCREASE 
-      or type == Eff.SKILL_DECREASE 
+   if type == EFFECT_TYPE_ATTACK_INCREASE
+      or type == EFFECT_TYPE_ATTACK_DECREASE
+      or type == EFFECT_TYPE_SKILL_INCREASE
+      or type == EFFECT_TYPE_SKILL_DECREASE
    then
       idx = 6
-   elseif type == Eff.DAMAGE_INCREASE
-      or type == Eff.DAMAGE_DECREASE 
-      or type == Eff.AC_INCREASE
-      or type == Eff.AC_DECREASE
+   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
+      or type == EFFECT_TYPE_DAMAGE_DECREASE
+      or type == EFFECT_TYPE_AC_INCREASE
+      or type == EFFECT_TYPE_AC_DECREASE
    then
       idx = 7
-   elseif type == Eff.IMMUNITY then
-      
+   elseif type == EFFECT_TYPE_IMMUNITY then
+
    else
       error(string.format("Effect Type (%d) does not support versus deity", type))
       return
@@ -281,7 +278,7 @@ function M.Effect:SetVersusPercentage(perc)
    local idx
    local type = self:GetType()
 
-   if type == Eff.IMMUNITY then
+   if type == EFFECT_TYPE_IMMUNITY then
       idx = 1
    else
       error(string.format("Effect Type (%d) does not support versus subrace", type))
@@ -297,20 +294,20 @@ function M.Effect:SetVersusRace(race)
    local idx
    local type = self:GetType()
 
-  if type == Eff.ATTACK_INCREASE
-      or type == Eff.ATTACK_DECREASE
-      or type == Eff.DAMAGE_INCREASE 
-      or type == Eff.DAMAGE_DECREASE
-      or type == Eff.AC_INCREASE
-      or type == Eff.AC_DECREASE
-      or type == Eff.SKILL_INCREASE
-      or type == Eff.SKILL_DECREASE 
+  if type == EFFECT_TYPE_ATTACK_INCREASE
+      or type == EFFECT_TYPE_ATTACK_DECREASE
+      or type == EFFECT_TYPE_DAMAGE_INCREASE
+      or type == EFFECT_TYPE_DAMAGE_DECREASE
+      or type == EFFECT_TYPE_AC_INCREASE
+      or type == EFFECT_TYPE_AC_DECREASE
+      or type == EFFECT_TYPE_SKILL_INCREASE
+      or type == EFFECT_TYPE_SKILL_DECREASE
    then
       idx = 2
-   elseif type == Eff.CONCEALMENT 
-      or type == Eff.IMMUNITY 
-      or type == Eff.INVISIBILITY
-      or type == Eff.SANCTUARY
+   elseif type == EFFECT_TYPE_CONCEALMENT
+      or type == EFFECT_TYPE_IMMUNITY
+      or type == EFFECT_TYPE_INVISIBILITY
+      or type == EFFECT_TYPE_SANCTUARY
    then
       idx = 1
       error(string.format("Effect Type (%d) does not support versus race", type))
@@ -328,20 +325,20 @@ function M.Effect:SetVersusSubrace(subrace)
    local idx
    local type = self:GetType()
 
-   if type == Eff.ATTACK_INCREASE 
-      or type == Eff.ATTACK_DECREASE 
-      or type == Eff.SKILL_INCREASE 
-      or type == Eff.SKILL_DECREASE 
+   if type == EFFECT_TYPE_ATTACK_INCREASE
+      or type == EFFECT_TYPE_ATTACK_DECREASE
+      or type == EFFECT_TYPE_SKILL_INCREASE
+      or type == EFFECT_TYPE_SKILL_DECREASE
    then
       idx = 5
-   elseif type == Eff.DAMAGE_INCREASE
-      or type == Eff.DAMAGE_DECREASE 
-      or type == Eff.AC_INCREASE
-      or type == Eff.AC_DECREASE
+   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
+      or type == EFFECT_TYPE_DAMAGE_DECREASE
+      or type == EFFECT_TYPE_AC_INCREASE
+      or type == EFFECT_TYPE_AC_DECREASE
    then
       idx = 6
-   elseif type == Eff.CONCEALMENT then
-   elseif type == Eff.IMMUNITY then
+   elseif type == EFFECT_TYPE_CONCEALMENT then
+   elseif type == EFFECT_TYPE_IMMUNITY then
    else
       error(string.format("Effect Type (%d) does not support versus subrace", type))
       return
@@ -358,19 +355,19 @@ function M.Effect:SetVersusTarget(target)
    local idx
    local type = self.eff.eff_type
 
-   if type == Eff.ATTACK_INCREASE 
-      or type == Eff.ATTACK_DECREASE 
-      or type == Eff.SKILL_INCREASE 
-      or type == Eff.SKILL_DECREASE 
+   if type == EFFECT_TYPE_ATTACK_INCREASE
+      or type == EFFECT_TYPE_ATTACK_DECREASE
+      or type == EFFECT_TYPE_SKILL_INCREASE
+      or type == EFFECT_TYPE_SKILL_DECREASE
    then
       idx = 7
-   elseif type == Eff.DAMAGE_INCREASE
-      or type == Eff.DAMAGE_DECREASE 
-      or type == Eff.AC_INCREASE
-      or type == Eff.AC_DECREASE
+   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
+      or type == EFFECT_TYPE_DAMAGE_DECREASE
+      or type == EFFECT_TYPE_AC_INCREASE
+      or type == EFFECT_TYPE_AC_DECREASE
    then
       idx = 8
-   elseif type == Eff.IMMUNITY then
+   elseif type == EFFECT_TYPE_IMMUNITY then
    else
       error(string.format("Effect Type (%d) does not support versus target", type))
       return

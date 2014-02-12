@@ -10,21 +10,6 @@ local NWE = require 'solstice.nwn.engine'
 
 local M = {}
 
-M.const = {
-   ACTION_OPEN            = 0,
-   ACTION_UNLOCK          = 1,
-   ACTION_BASH            = 2,
-   ACTION_IGNORE          = 3,
-   ACTION_KNOCK           = 4,
-
-   -- Door animation constants
-   ANIMATION_CLOSE        = 204,
-   ANIMATION_OPEN1        = 205,
-   ANIMATION_OPEN2        = 206,
-   ANIMATION_DESTROY      = 207,
-}
-setmetatable(M, { __index = M.const })
-
 M.Door = inheritsFrom(Obj.Object, "solstice.door.Door")
 
 --- Internal ctype
@@ -34,7 +19,7 @@ M.door_t = ffi.metatype("Door", { __index = M.Door })
 -- @section
 
 --- Determines whether an action can be used on a door.
--- @param action solstice.door.ACTION_*
+-- @param action DOOR_ACTION_*
 function M.Door:GetIsActionPossible(action)
    NWE.StackPushInteger(action)
    NWE.StackPushObject(self)
@@ -43,7 +28,7 @@ function M.Door:GetIsActionPossible(action)
 end
 
 --- Does specific action to target door.
--- @param action solstice.door.ACTION_*
+-- @param action DOOR_ACTION_*
 function M.Door:DoAction(action)
    NWE.StackPushInteger(action);
    NWE.StackPushObject(self);

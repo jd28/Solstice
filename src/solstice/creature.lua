@@ -7,8 +7,6 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = require 'solstice.creature.init'
-M.const = require 'solstice.creature.constant'
-setmetatable(M, { __index = M.const })
 
 M.Creature  = inheritsFrom(Obj.Object, "solstice.creature.Creature" )
 
@@ -34,7 +32,6 @@ safe_require 'solstice.creature.info'
 safe_require 'solstice.creature.internal'
 safe_require 'solstice.creature.inventory'
 safe_require 'solstice.creature.level'
-safe_require 'solstice.creature.logger'
 safe_require 'solstice.creature.modes'
 safe_require 'solstice.creature.pc'
 safe_require 'solstice.creature.saves'
@@ -48,10 +45,10 @@ safe_require 'solstice.creature.xp'
 -- @section
 
 --- Generates a random name
--- @param[opt=solstice.creature.NAME_FIRST_GENERIC_MALE] name_type solstice.creature.NAME_*
+-- @param[opt=NAME_FIRST_GENERIC_MALE] name_type NAME_*
 -- @return Random name.
 function M.RandomName(name_type)
-   name_type = name_type or M.NAME_FIRST_GENERIC_MALE
+   name_type = name_type or NAME_FIRST_GENERIC_MALE
 
    NWE.StackPushInteger(name_type);
    NWE.ExecuteCommand(249, 1);
@@ -68,8 +65,8 @@ end
 
 --- Briefly displays a string ref as ambient text above targets head.
 -- @param strref String ref (therefore text is translated)
--- @param broadcast If this is true then only creatures in the same faction
---  will see the floaty text, and only if they are within range (30 meters). Default: false
+-- @param[opt=false] broadcast If this is true then only creatures in the same faction
+--  will see the floaty text, and only if they are within range (30 meters).
 function M.Creature:FloatingStrRef(strref, broadcast)
    NWE.StackPushInteger(broadcast)
    NWE.StackPushObject(self)
@@ -79,8 +76,8 @@ end
 
 --- Briefly displays ambient text above targets head.
 -- @param msg Text to display
--- @param broadcast If this is true then only creatures in the same faction
---  will see the floaty text, and only if they are within range (30 meters). Default: false
+-- @param[opt=false] broadcast If this is true then only creatures in the same faction
+--  will see the floaty text, and only if they are within range (30 meters).
 function M.Creature:FloatingText(msg, broadcast)
    NWE.StackPushBoolean(broadcast)
    NWE.StackPushObject(self)
@@ -89,7 +86,7 @@ function M.Creature:FloatingText(msg, broadcast)
 end
 
 --- Fully restores a creature
--- Gives this creature the benefits of a rest (restored hitpoints, spells, feats, etc..) 
+-- Gives this creature the benefits of a rest (restored hitpoints, spells, feats, etc..)
 function M.Creature:ForceRest()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(775, 1)
@@ -103,7 +100,7 @@ function M.Creature:GetBlockingDoor()
 end
 
 --- Checks if a creature has triggered an OnEnter event
--- @param subarea Subarea to check 
+-- @param subarea Subarea to check
 function M.Creature:GetIsInSubArea(subarea)
    NWE.StackPushObject(subarea)
    NWE.StackPushObject(self)

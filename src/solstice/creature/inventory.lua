@@ -55,7 +55,7 @@ function M.Creature:GetIsWeaponEffective(vs, is_offhand)
    NWE.StackPushBoolean(is_offhand)
    NWE.StackPushObject(vs)
    NWE.ExecuteCommand(422, 2)
-   
+
    return NWE.StackPopBoolean()
 end
 
@@ -68,24 +68,24 @@ end
 --- Determines if a weapon is light for a creature.
 -- @param weap The weapon in question.
 function M.Creature:GetIsWeaponLight(weap)
-   if not weap:GetIsValid() or 
+   if not weap:GetIsValid() or
       weap:GetIsUnarmedWeapon()
    then
       return true
    end
    local size = self:GetSize()
 
-   if size < M.SIZE_TINY or size > M.SIZE_HUGE then 
+   if size < CREATURE_SIZE_TINY or size > CREATURE_SIZE_HUGE then
       return false
    end
 
    local rel = self:GetRelativeWeaponSize(weap)
-   
+
    return rel < 0
 end
 
 --- Gets an equipped item in creature's inventory.
--- @param slot solstice.creature.INVENTORY_SLOT_*
+-- @param slot INVENTORY_SLOT_*
 function M.Creature:GetItemInSlot(slot)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(slot)
@@ -105,15 +105,15 @@ end
 --- Gives gold to creature
 -- @param amount Amount of gold to give.
 -- @param[opt=true] feedback Sends feedback to creature.
--- @param[opt=solstice.object.INVALID] source Source object
+-- @param[opt=OBJECT_INVALID] source Source object
 function M.Creature:GiveGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
-   if not self:GetIsValid() 
+   if not self:GetIsValid()
       or self.obj.cre_gold >= 999999999
       or amount <= 0
-   then 
-      return 
+   then
+      return
    end
    self.obj.cre_gold = math.min(999999999, self.obj.cre_gold + amount)
 
@@ -129,7 +129,7 @@ function M.Creature:GiveGold(amount, feedback, source)
 end
 
 --- Forces the item in an inventory slot to be reequiped.
--- @param slot solstice.creature.INVENTORY_SLOT_*
+-- @param slot INVENTORY_SLOT_*
 function M.Creature:ReequipItemInSlot(slot)
    local item = self:GetItemInSlot(slot)
    if not item then return end
@@ -144,15 +144,15 @@ end
 --- Gives gold to creature
 -- @param amount Amount of gold to give.
 -- @param[opt=true] feedback Sends feedback to creature.
--- @param[opt=solstice.object.INVALID] source Source object
+-- @param[opt=OBJECT_INVALID] source Source object
 function M.Creature:TakeGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
-   if not self:GetIsValid() 
-      or self.obj.cre_gold == 0 
+   if not self:GetIsValid()
+      or self.obj.cre_gold == 0
       or amount <= 0
-   then 
-      return 
+   then
+      return
    end
    self.obj.cre_gold = math.max(0, self.obj.cre_gold - amount)
 

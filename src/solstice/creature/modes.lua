@@ -4,7 +4,6 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
-local Mode = require 'solstice.modes'
 local ffi = require 'ffi'
 local C = ffi.C
 local jit = require 'jit'

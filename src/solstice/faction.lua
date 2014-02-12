@@ -10,14 +10,6 @@
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
-M.const = {
-   STANDARD_HOSTILE  = 0,
-   STANDARD_COMMONER = 1,
-   STANDARD_MERCHANT = 2,
-   STANDARD_DEFENDER = 3,
-}
-
-setmetatable(M, { __index = M.const })
 
 ---
 function M.Faction:GetAverageGoodEvilAlignment()
@@ -59,7 +51,7 @@ end
 -- @param visible If true member must be visible
 function M.Faction:GetBestAC(visible)
    if visible == nil then visible = true end
-   
+
    NWE.StackPushInteger(visible)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(193, 2)
@@ -86,7 +78,7 @@ end
 ---
 function M.Faction:GetMostDamagedMember(visible)
    if visible == nil then visible = true end
-   
+
    NWE.StackPushInteger(visible)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(183, 2)
@@ -110,7 +102,7 @@ end
 ---
 function M.Faction:GetStrongestMember(visible)
    if visible == nil then visible = true end
-   
+
    NWE.StackPushInteger(visible)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(182, 2)
@@ -137,4 +129,3 @@ function M.Faction:GetWorstAC(visible)
    NWE.ExecuteCommand(192, 2)
    return NWE.StackPopObject()
 end
-

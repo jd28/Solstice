@@ -9,17 +9,7 @@ local Obj = require 'solstice.object'
 local Loc = require 'solstice.location'
 
 local M = {}
-M.const = {
-   -- These represent the row in the difficulty 2da, rather than
-   -- a difficulty value.
-   DIFFICULTY_VERY_EASY  = 0,
-   DIFFICULTY_EASY       = 1,
-   DIFFICULTY_NORMAL     = 2,
-   DIFFICULTY_HARD       = 3,
-   DIFFICULTY_IMPOSSIBLE = 4,
 
-}
-setmetatable(M, { __index = M.const })
 M.Encounter = inheritsFrom(Obj.Object, 'solstice.encounter.Encounter')
 
 --- Internal ctype.
@@ -53,7 +43,7 @@ function M.Encounter:GetSpawnsCurrent()
    return self.obj.enc_spawns_current
 end
 
---- Get the maximum number of times that oEncounter will spawn.
+--- Get the maximum number of times that an encounter will spawn.
 function M.Encounter:GetSpawnsMax()
    if not self:GetIsValid() then return -1 end
    return self.obj.enc_spawns_max
@@ -72,7 +62,7 @@ function M.Encounter:GetSpawnPointByIndex(idx)
    if not self:GetIsValid() then return end
    if idx < 0 or idx >= self.obj.enc_spawn_points_len then return end
    local sp = self.obj.enc_spawn_points[idx]
-   
+
    if sp.position.z < 0 then sp.position.z = 0 end
 
    return Loc.Create(sp.position, sp.orientation, self:GetArea())
@@ -86,7 +76,7 @@ function M.Encounter:SetActive(value)
 end
 
 --- Sets the difficulty level of an encounter.
--- @param value solstice.encounter.DIFFICULTY_*
+-- @param value ENCOUNTER\_DIFFICULTY\_*
 function M.Encounter:SetDifficulty(value)
    if not self:GetIsValid() then return end
    self.obj.enc_difficulty = value

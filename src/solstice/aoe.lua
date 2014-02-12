@@ -5,13 +5,10 @@
 -- @module aoe
 
 local ffi = require 'ffi'
-
-local M = require 'solstice.aoe.init'
-M.const = require 'solstice.aoe.constant'
-setmetatable(M, { __index = M.const })
-
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
+
+local M = {}
 
 M.AoE = inheritsFrom(Obj.Object, 'solstice.aoe.AoE')
 M.aoe_t = ffi.metatype("AoE", { __index = M.AoE })
@@ -40,7 +37,7 @@ end
 -- @return First object in AoE or solstice.object.INVALID if none.
 function M.AoE:GetFirstInPersistentObject(object_mask)
    object_mask = object_mask or solstice.object.CREATURE
-   
+
    NWE.StackPushInteger(0)
    NWE.StackPushInteger(object_mask)
    NWE.StackPushObject(self)
@@ -54,7 +51,7 @@ end
 -- @return Next object in AoE and finally solstice.object.INVALID
 function M.AoE:GetNextInPersistentObject(object_mask)
    object_mask = object_mask or solstice.object.CREATURE
-   
+
    NWE.StackPushInteger(0)
    NWE.StackPushInteger(object_mask)
    NWE.StackPushObject(self)
@@ -74,7 +71,7 @@ end
 ---
 function M.AoE:SetSpellDC(dc)
    if not self:GetIsValid() then return -1 end
-   
+
    self.obj.aoe_spell_dc = dc
    return self.obj.aoe_spell_dc
 end
@@ -82,7 +79,7 @@ end
 ---
 function M.AoE:SetSpellLevel(level)
    if not self:GetIsValid() then return -1 end
-   
+
    self.obj.aoe_spell_level = level
    return self.obj.aoe_spell_level
 end

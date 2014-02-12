@@ -6,8 +6,6 @@
 
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
-local Cut = require 'solstice.cutscene'
-
 
 --- Faction
 -- @section
@@ -19,22 +17,22 @@ function M.Creature:BlackScreen()
 end
 
 --- Fades screen from black
--- @param[opt=solstice.cutscene.FADE_SPEED_MEDIUM] speed 
--- solstice.cutscene.FADE_SPEED_*
+-- @param[opt=FADE_SPEED_MEDIUM] speed
+-- FADE_SPEED_*
 function M.Creature:FadeFromBlack(speed)
-   speed = speed or Cut.FADE_SPEED_MEDIUM
-   
+   speed = speed or FADE_SPEED_MEDIUM
+
    NWE.StackPushFloat(speed)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(695, 2)
 end
 
 --- Fades screen to black
--- @param[opt=solstice.cutscene.FADE_SPEED_MEDIUM] speed 
--- solstice.cutscene.FADE_SPEED_*
+-- @param[opt=FADE_SPEED_MEDIUM] speed
+-- FADE_SPEED_*
 function M.Creature:FadeToBlack(speed)
-   speed = speed or Cut.FADE_SPEED_MEDIUM
-   
+   speed = speed or FADE_SPEED_MEDIUM
+
    NWE.StackPushFloat(speed)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(696, 2)
@@ -89,13 +87,13 @@ end
 -- @param direction direction to face.
 -- @param[opt=-1.0] distance Camera distance.
 -- @param[opt=-1.0] pitch Camera pitch.
--- @param[opt=solstice.cutscene.CAMERA_TRANSITION_TYPE_SNAP] transition_type 
--- solstice.cutscene.CAMERA_TRANSITION_TYPE_*
+-- @param[opt=CAMERA_TRANSITION_TYPE_SNAP] transition_type
+-- CAMERA_TRANSITION_TYPE_*
 function M.Creature:SetCameraFacing(direction, distance, pitch, transition_type)
    distance = distance or -1.0
    pitch = pitch or -1.0
-   transition_type = transition_type or Cut.CAMERA_TRANSITION_TYPE_SNAP
-   
+   transition_type = transition_type or CAMERA_TRANSITION_TYPE_SNAP
+
    NWE.StackPushInteger(transition_type)
    NWE.StackPushFloat(pitch)
    NWE.StackPushFloat(distance)

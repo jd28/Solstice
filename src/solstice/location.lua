@@ -7,20 +7,18 @@ local Vec = require 'solstice.vector'
 local Obj = require 'solstice.object'
 local Eff = require 'solstice.effect'
 
-local M = require 'solstice.location.init'
-M.const = require 'solstice.location.constant'
-setmetatable(M, { __index = M.const })
+local M = {}
 
 M.Location = inheritsFrom(nil, "solstice.location.Location")
 
 --- Internal ctype
 M.location_t = ffi.metatype("CScriptLocation",
-			    { __index = M.Location })
+                            { __index = M.Location })
 
 --- Invalid location.
 M.INVALID = M.location_t(Vec.vector_t(0,0,0),
-			 Vec.vector_t(0,0,0),
-			 Obj.INVALID.id)
+                         Vec.vector_t(0,0,0),
+                         Obj.INVALID.id)
 
 --- Create a new location
 -- @param position Location's position
@@ -41,7 +39,7 @@ end
 -- @param[opt=0.0] duration Duration of an effect.
 function M.Location:ApplyEffect(durtype, eff, duration)
    duration = duration or 0.0
-      
+
    NWE.StackPushFloat(duration)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_EFFECT, eff.eff)
@@ -65,8 +63,8 @@ end
 -- @param mask solstice.object type mask.
 -- @param[opt=1] nth Which object to find.
 function M.Location:GetNearestObject(mask, nth)
-   nth = nth or 1 
-   
+   nth = nth or 1
+
    NWE.StackPushInteger(nth)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.StackPushInteger(mask)
@@ -95,7 +93,7 @@ function M.Location:GetNearestCreature(type1, value1, nth, ...)
    NWE.StackPushInteger(value1)
    NWE.StackPushInteger(type1)
    NWE.ExecuteCommand(226, 8)
-   
+
    return NWE.StackPopObject()
 end
 
@@ -152,7 +150,7 @@ function M.Location:SetTileSourceLightColor(color1, color2)
 end
 
 --- Determines the color of the first main light of a tile.
--- @return solstice.TILE_SOURCE_MAIN_COLOR_*
+-- @return AREA_TILE_SOURCE_MAIN_COLOR_*
 function M.Location:GetTileMainLight1Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(517, 1)
@@ -161,7 +159,7 @@ function M.Location:GetTileMainLight1Color()
 end
 
 --- Determines the color of the second main light of a tile.
--- @return solstice.TILE_SOURCE_MAIN_COLOR_*
+-- @return AREA_TILE_SOURCE_MAIN_COLOR_*
 function M.Location:GetTileMainLight2Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(518, 1)
@@ -170,7 +168,7 @@ function M.Location:GetTileMainLight2Color()
 end
 
 --- Determines the color of the first source light of a tile.
--- @return solstice.TILE_SOURCE_LIGHT_COLOR_*
+-- @return AREA_TILE_SOURCE_LIGHT_COLOR_*
 function M.Location:GetTileSourceLight1Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(519, 1)
@@ -178,7 +176,7 @@ function M.Location:GetTileSourceLight1Color()
 end
 
 --- Determines the color of the second source light of a tile.
--- @return solstice.area.TILE_SOURCE_LIGHT_COLOR_*
+-- @return AREA_TILE_SOURCE_LIGHT_COLOR_*
 function M.Location:GetTileSourceLight2Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(520, 1)

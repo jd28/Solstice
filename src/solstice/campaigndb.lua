@@ -12,9 +12,9 @@ local Obj = require 'solstice.object'
 --- Deletes a campaign variable from the database.
 -- @param name Campaign to delete the variable from (case-sensitive).
 -- @param var Variable name to delete.
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.DeleteVariable(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
    NWE.StackPushString(name)
@@ -30,10 +30,10 @@ end
 
 --- Retrieves a float from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
--- @param player Player associated with a variable. (Default: Obj.INVALID)
+-- @param var Variable name
+-- @param player Player associated with a variable. (Default: OBJECT_INVALID)
 function M.GetFloat(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
    NWE.StackPushString(name)
@@ -43,10 +43,10 @@ end
 
 --- Retrieves a integer from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param var Variable name
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.GetInt(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -57,10 +57,10 @@ end
 
 --- Retrieves a location from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param var Variable name
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.GetLocation(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -71,10 +71,10 @@ end
 
 --- Retrieves a string from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param var Variable name
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.GetString(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -85,10 +85,10 @@ end
 
 --- Retrieves a vector from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param var Variable name
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.GetVector(name, var, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -100,13 +100,13 @@ end
 
 --- Retrieves an object from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param loc Location to create the object at.
--- @param[opt=solstice.object.INVALID] owner Owner to attempt to create the object within. (Default: Obj.INVALID)
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] owner Owner to attempt to create the object within. (Default: OBJECT_INVALID)
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.RetrieveCampaignObject(name, var, loc, owner, player)
-   owner = owner or Obj.INVALID
-   player = player or Obj.INVALID
+   owner = owner or OBJECT_INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushObject(owner)
@@ -119,11 +119,11 @@ end
 
 --- Stores float in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.SetCampaignFloat(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushFloat(value)
@@ -134,11 +134,11 @@ end
 
 --- Stores integer in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.SetCampaignInt(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushInteger(value)
@@ -149,11 +149,11 @@ end
 
 --- Stores Location in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.SetCampaignLocation(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushEngineStructure(ENGINE_STRUCTURE_LOCATION, value)
@@ -164,11 +164,11 @@ end
 
 --- Stores string in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.SetCampaignString(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushString(value)
@@ -179,11 +179,11 @@ end
 
 --- Stores vector in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.SetCampaignVector(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushVector(value)
@@ -194,11 +194,11 @@ end
 
 --- Stores object in the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
--- @param var Variable name 
+-- @param var Variable name
 -- @param value Value to store
--- @param[opt=solstice.object.INVALID] player Player associated with a variable.
+-- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.StoreCampaignObject(name, var, value, player)
-   player = player or Obj.INVALID
+   player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
    NWE.StackPushObject(value)

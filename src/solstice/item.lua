@@ -10,10 +10,7 @@ local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
 
-local M = require 'solstice.item.init'
-M.const = require 'solstice.item.constant'
-setmetatable(M, { __index = M.const })
-
+local M = {}
 M.Item = inheritsFrom(Obj.Object, "solstice.item.Item")
 
 --- Internal ctype.
@@ -34,7 +31,7 @@ end
 -- @return -1 if item is not armor.
 function M.Item:GetBaseArmorACBonus()
    if not self:GetIsValid()
-      or self:GetBaseType() ~= M.BASE_ARMOR
+      or self:GetBaseType() ~= BASE_ITEM_ARMOR
    then
       return -1
    end
@@ -94,9 +91,9 @@ end
 -- @section
 
 --- Get the base item type.
--- @return solstice.item.BASE_INVALID if invalid item.
+-- @return BASE_ITEM_INVALID if invalid item.
 function M.Item:GetBaseType()
-   if not self:GetIsValid() then return M.BASE_INVALID end
+   if not self:GetIsValid() then return BASE_ITEM_INVALID end
    return self.obj.it_baseitem
 end
 
@@ -219,7 +216,7 @@ end
 -- @section
 
 --- Add an itemproperty to an item
--- @param dur_type solstice.DURATION_TYPE_*
+-- @param dur_type DURATION_TYPE_*
 -- @param ip Itemproperty to add.
 -- @param[opt=0.0] duration Duration Duration in seconds in added temporarily.
 function M.Item:AddItemProperty(dur_type, ip, duration)
@@ -231,7 +228,7 @@ function M.Item:AddItemProperty(dur_type, ip, duration)
 end
 
 --- Check whether an item has a given property.
--- @param ip_type solstice.itemprop property constant
+-- @param ip_type ITEM\_PROPERTY\_*
 function M.Item:GetHasItemProperty(ip_type)
    return C.nwn_HasPropertyType(self.obj, ip_type) ~= 0
 end

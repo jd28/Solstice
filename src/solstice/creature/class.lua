@@ -2,13 +2,12 @@
 -- @module creature
 
 local M = require 'solstice.creature.init'
-local CL = require 'solstice.class'
 
 --- Class
 -- @section class
 
 --- Determine's if a creature can use a classes abilities.
--- @param class solstice.class constant
+-- @param class CLASS\_TYPE\_* constant
 function M.Creature:CanUseClassAbilities(class)
    return true
 --   local f = solstice.nwn.GetClassAbilityRequirements()
@@ -31,7 +30,7 @@ end
 
 --- Determines class that was chosen at a particular level.
 -- @param level Level to get class at.
--- @return solstice.class constant or -1 on error.
+-- @return CLASS\_TYPE\_* constant or -1 on error.
 function M.Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
@@ -56,7 +55,7 @@ function M.Creature:GetClericDomain(domain)
    end
 
    for class in self:Classes() do
-      if class.cl_class == CL.CLERIC then
+      if class.cl_class == CLASS_TYPE_CLERIC then
          if domain == 1 then
             return class.cl_domain_1
          else
@@ -68,7 +67,7 @@ function M.Creature:GetClericDomain(domain)
 end
 
 --- Get number of levels a creature by class
--- @param class solstice.class type constant.
+-- @param class CLASS\_TYPE\_* type constant.
 function M.Creature:GetLevelByClass(class)
    for cl in self:Classes() do
       if cl.cl_class == class then
@@ -82,7 +81,7 @@ end
 --- Get number of levels a creature by position
 -- @param position Valid values: 0, 1, or 2
 function M.Creature:GetLevelByPosition(position)
-   if position < 0 or position > 2 then 
+   if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
    end
 
@@ -98,14 +97,14 @@ function M.Creature:GetLevelStats(level)
    if level < 1 or level > self.stats.cs_levelstat_len then
       return
    end
-   
+
    return self.stats.cs_levelstat[level - 1];
 end
 
 --- Get class type by position
 -- @param position Valid values: 0, 1, or 2
 function M.Creature:GetClassByPosition(position)
-   if position < 0 or position > 2 then 
+   if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
    end
 
@@ -122,7 +121,7 @@ function M.Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
 
    for class in self:Classes() do
-      if class.cl_class == CL.WIZARD then
+      if class.cl_class == CLASS_TYPE_WIZARD then
          return class.cl_specialist
       end
    end
@@ -137,7 +136,7 @@ function M.Creature:SetClericDomain(domain, newdomain)
    if not self:GetIsValid() then return -1 end
 
    domain = domain or 1
-   if not newdomain then 
+   if not newdomain then
       error "A new domain must be specified"
    end
 
@@ -146,7 +145,7 @@ function M.Creature:SetClericDomain(domain, newdomain)
    end
 
    for class in self:Classes() do
-      if class.cl_class == CL.CLERIC then
+      if class.cl_class == CLASS_TYPE_CLERIC then
          if domain == 1 then
             class.cl_domain_1 = newdomain
          else
@@ -164,7 +163,7 @@ function M.Creature:SetWizardSpecialization(specialization)
    if not self:GetIsValid() then return -1 end
 
    for class in self:Classes() do
-      if class.cl_class == CL.WIZARD then
+      if class.cl_class == CLASS_TYPE_WIZARD then
          class.cl_specialist = specilization
          return specilization
       end
@@ -172,4 +171,3 @@ function M.Creature:SetWizardSpecialization(specialization)
 
    return -1
 end
-

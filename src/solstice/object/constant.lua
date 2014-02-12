@@ -15,37 +15,6 @@ M.STORE             = 128
 M.ENCOUNTER         = 256
 M.ALL               = 32767
 
-M.ACTION_MOVETOPOINT        = 0
-M.ACTION_PICKUPITEM         = 1
-M.ACTION_DROPITEM           = 2
-M.ACTION_ATTACKOBJECT       = 3
-M.ACTION_CASTSPELL          = 4
-M.ACTION_OPENDOOR           = 5
-M.ACTION_CLOSEDOOR          = 6
-M.ACTION_DIALOGOBJECT       = 7
-M.ACTION_DISABLETRAP        = 8
-M.ACTION_RECOVERTRAP        = 9
-M.ACTION_FLAGTRAP           = 10
-M.ACTION_EXAMINETRAP        = 11
-M.ACTION_SETTRAP            = 12
-M.ACTION_OPENLOCK           = 13
-M.ACTION_LOCK               = 14
-M.ACTION_USEOBJECT          = 15
-M.ACTION_ANIMALEMPATHY      = 16
-M.ACTION_REST               = 17
-M.ACTION_TAUNT              = 18
-M.ACTION_ITEMCASTSPELL      = 19
-M.ACTION_COUNTERSPELL       = 31
-M.ACTION_HEAL               = 33
-M.ACTION_PICKPOCKET         = 34
-M.ACTION_FOLLOW             = 35
-M.ACTION_WAIT               = 36
-M.ACTION_SIT                = 37
-M.ACTION_SMITEGOOD          = 40
-M.ACTION_KIDAMAGE           = 41
-M.ACTION_RANDOMWALK         = 43
-M.ACTION_INVALID            = 65535
-
 -- The following are internal object types.
 M.internal = {}
 M.internal.GUI              = 1

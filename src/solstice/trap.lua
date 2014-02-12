@@ -8,9 +8,7 @@ local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
-local M = require 'solstice.trap.init'
-M.const = require 'solstice.trap.constant'
-setmetatable(M, { __index = M.const })
+local M = {}
 
 M.Trap = inheritsFrom( nil, "solstice.trap.Trap" )
 

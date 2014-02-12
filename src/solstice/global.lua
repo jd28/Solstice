@@ -26,40 +26,31 @@ function inheritsFrom( baseClass, typename )
    return new_class
 end
 
---- Checks if object is class instance.
--- @param inst Instance.
--- @param class Class type
-function isinstance(inst, class)
-   return inst._type and inst._type == class._type
-end
-
---- Checks if object is an instance of a list of Classes.
--- @param inst Instance
--- @param ... List of class types.
-function anyinstance(inst, ...)
-   for _, C in ipairs(...) do
-      if isinstance(inst, C) then
-         return true
-      end
-   end
-   return false
-end
-
 --- Types
 -- @section types
 
 require 'solstice.ctypes'
 
+-- Global modules
+
+Effect   = require 'solstice.effect'
+ItemProp = require 'solstice.itemprop'
+Game     = require 'solstice.game'
+Rules    = require 'solstice.rules'
+
 local Obj       = require 'solstice.object'
+Rules.RegisterConstant("OBJECT_INVALID", Obj.INVALID)
+
 local sol_aoe   = require 'solstice.aoe'
 local sol_area  = require 'solstice.area'
 local sol_cre   = require 'solstice.creature'
 local sol_door  = require 'solstice.door'
-local sol_eff   = require 'solstice.effect'
 local sol_enc   = require 'solstice.encounter'
 local sol_item  = require 'solstice.item'
-local sol_ip    = require 'solstice.itemprop'
+
 local sol_loc   = require 'solstice.location'
+Rules.RegisterConstant("LOCATION_INVALID", sol_loc.INVALID)
+
 local sol_lock  = require 'solstice.lock'
 local sol_mod   = require 'solstice.module'
 local sol_plc   = require 'solstice.placeable'
@@ -69,44 +60,8 @@ local sol_trap  = require 'solstice.trap'
 local sol_trig  = require 'solstice.trigger'
 local sol_way   = require 'solstice.waypoint'
 
---- Alias of solstice.aoe.AoE
-AoE = assert(sol_aoe.AoE)
---- Alias of solstice.area.Area
-Area = assert(sol_area.Area)
---- Alias of solstice.creature.Creature
-Creature = assert(sol_cre.Creature)
---- Alias of solstice.door.Door
-Door = assert(sol_door.Door)
---- Alias of solstice.effect.Effect
-Effect = assert(sol_eff.Effect)
---- Alias of solstice.encounter.Encounter
-Encounter = assert(sol_enc.Encounter)
---- Alias of solstice.item.Item
-Item = assert(sol_item.Item)
---- Alias of solstice.itemprop.Itemprop
-Itemprop = assert(sol_ip.Itemprop)
---- Alias of solstice.location.Location
-Location = assert(sol_loc.Location)
---- Alias of solstice.lock.Lock
-Lock = assert(sol_lock.Lock)
---- Alias of solstice.module.Module
-Module = assert(sol_mod.Module)
---- Alias of solstice.object.Object
-Object = assert(Obj.Object)
---- Alias of solstice.placeable.Placeable
-Placeable = assert(sol_plc.Placeable)
---- Alias of solstice.sound.Sound
-Sound = assert(sol_snd.Sound)
---- Alias of solstice.store.Store
-Store = assert(sol_store.Store)
---- Alias of solstice.trap.Trap
-Trap = assert(sol_trap.Trap)
---- Alias of solstice.trigger.Trigger
-Trigger = assert(sol_trig.Trigger)
---- Alias of solstice.waypoint.Waypoint
-Waypoint = assert(sol_way.Waypoint)
 
--- Private globals.
+-- 'Private' globals.
 local ffi = require 'ffi'
 local C = ffi.C
 
@@ -142,34 +97,34 @@ function _SOL_GET_CACHED_OBJECT(id)
    local type = ffi.cast("CGameObject*", obj).type
 
    local object
-   if type == Obj.internal.CREATURE then
+   if type == OBJECT_TRUETYPE_CREATURE then
       obj = ffi.cast("CNWSCreature*", obj)
       object = sol_cre.creature_t(type, id, obj, obj.cre_stats)
       _OBJECTS[id] = object
-   elseif type == Obj.internal.MODULE then
+   elseif type == OBJECT_TRUETYPE_MODULE then
       object = sol_mod.module_t(type, id, C.nwn_GetModule())
-   elseif type == Obj.internal.AREA then
+   elseif type == OBJECT_TRUETYPE_AREA then
       object = sol_area.area_t(type, id, C.nwn_GetAreaByID(id))
-   elseif type == Obj.internal.ITEM then
+   elseif type == OBJECT_TRUETYPE_ITEM then
       object = sol_item.item_t(type, id, C.nwn_GetItemByID(id))
-   elseif type == Obj.internal.TRIGGER then
+   elseif type == OBJECT_TRUETYPE_TRIGGER then
       obj = ffi.cast("CNWSTrigger*", obj)
       object = sol_trig.trigger_t(type, id, obj)
-   elseif type == Obj.internal.PLACEABLE then
+   elseif type == OBJECT_TRUETYPE_PLACEABLE then
       obj = ffi.cast("CNWSPlaceable*", obj)
       object = sol_plc.placeable_t(type, id, obj)
-   elseif type == Obj.internal.DOOR then
+   elseif type == OBJECT_TRUETYPE_DOOR then
       obj = ffi.cast("CNWSDoor*", obj)
       object = sol_door.door_t(type, id, obj)
-   elseif type == Obj.internal.AREA_OF_EFFECT then
+   elseif type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
       obj = ffi.cast("CNWSAreaOfEffectObject*", obj)
       object = sol_aoe.aoe_t(type, id, obj)
-   elseif type == Obj.internal.WAYPOINT then
+   elseif type == OBJECT_TRUETYPE_WAYPOINT then
       object = sol_way.waypoint_t(type, id, C.nwn_GetWaypointByID(id))
-   elseif type == Obj.internal.ENCOUNTER then
+   elseif type == OBJECT_TRUETYPE_ENCOUNTER then
       obj = ffi.cast("CNWSEncounter*", obj)
       object = sol_enc.encounter_t(type, id, obj)
-   elseif type == Obj.internal.STORE then
+   elseif type == OBJECT_TRUETYPE_STORE then
       obj = ffi.cast("CNWSStore*", obj)
       object = sol_store.store_t(type, id, obj)
    end

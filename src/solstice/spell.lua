@@ -4,9 +4,7 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module spells
 
-local M = require 'solstice.spell.init'
-M.const = require 'solstice.spell.constant'
-setmetatable(M, { __index = M.const })
+local M = {}
 
 --- Gets a random delay
 -- @param min Minimum delay

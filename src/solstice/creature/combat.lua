@@ -11,7 +11,6 @@ local C = ffi.C
 local bit = require 'bit'
 
 local NWE = require 'solstice.nwn.engine'
-local OBJ = require 'solstice.object'
 
 --- Combat
 -- @section
@@ -26,7 +25,7 @@ end
 
 --- Get creature's attack target
 function M.Creature:GetAttackTarget()
-   if not self:GetIsValid() then return OBJ.INVALID end
+   if not self:GetIsValid() then return OBJECT_INVALID end
    local obj = cre.obj.cre_attack_target
    return _SOL_GET_CACHED_OBJECT(obj)
 end
