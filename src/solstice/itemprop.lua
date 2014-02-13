@@ -413,7 +413,7 @@ function M.Material(material)
 end
 
 --- Creates a mighty item property.
--- @param modifier [1,20]
+-- @param value [1,20]
 function M.Mighty(value)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MIGHTY, nil, 2, math.clamp(value, 1, 20))

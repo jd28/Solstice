@@ -30,11 +30,11 @@ M.SPHERE             = 4
 -- @param size The size of the shape. Dependent on shape or solstice.shape.RADIUS\_SIZE\_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
--- @func[opt] predicate A function predicate 
+-- @func[opt] predicate A function predicate
 -- @param[opt=vector(0)] origin Normally the spell-caster's position.
 function M.GetFirstObject(shape, size, location, line_of_sight, predicate, origin)
-   local function pred(obj) 
-      return isinstance(obj, Creature) 
+   local function pred(obj)
+      return isinstance(obj, Creature)
    end
 
    origin = origin or vector_t(0, 0, 0)
@@ -60,7 +60,7 @@ end
 -- @func[opt] predicate A function predicate. Default predicate tests
 -- for the object being an instance of type Creature.
 -- @param[opt=vector(0)] origin Normally the spell-caster's position.
-function M.GetNextObject(shape, size, location, line_of_sight, mask, origin)
+function M.GetNextObject(shape, size, location, line_of_sight, predicate, origin)
    local function test(obj) return isinstance(Creature) end
    predicate = predicate or test
 
@@ -83,7 +83,7 @@ end
 -- @param size The size of the shape. Dependent on shape or solstice.shape.RADIUS\_SIZE\_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
--- @func[opt] predicate A function predicate 
+-- @func[opt] predicate A function predicate
 -- @param[opt=vector(0)] origin Normally the spell-caster's position.
 function M.Objects(shape, size, location, line_of_sight, predicate, origin)
    local function test(obj) return isinstance(Creature) end

@@ -31,7 +31,7 @@ function M.AoE:ObjectsInEffect(object_mask)
    end
 end
 
---- Gets the first object in an AoE
+--- Gets the first object in an AoE.
 --    Perfer the solstice.aoe.AoE:ObjectsInEffect iterator.
 -- @param[opt=solstice.object.CREATURE] object_mask solstice.object type constant
 -- @return First object in AoE or solstice.object.INVALID if none.
@@ -45,7 +45,7 @@ function M.AoE:GetFirstInPersistentObject(object_mask)
    return NWE.StackPopObject()
 end
 
---- Gets the next object in an AoE
+--- Gets the next object in an AoE.
 --    Perfer the solstice.aoe.AoE:ObjectsInEffect iterator.
 -- @param[opt=solstice.object.CREATURE] object_mask solstice.object. type constant.
 -- @return Next object in AoE and finally solstice.object.INVALID

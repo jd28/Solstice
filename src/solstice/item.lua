@@ -270,6 +270,7 @@ end
 
 --- Class Item: Flags
 -- @section
+
 --- Determines if an item can be dropped.
 function M.Item:GetDroppable()
    if not self:GetIsValid() then return -1 end

@@ -219,8 +219,7 @@ end
 --- Simple wrapper around solstice.chat.SendChatMessage
 -- that sends a server message to a player.
 -- @param message Text to send.
--- @param recipient Receiver.
 function M.Creature:SendServerMessage(message)
-   if not recipient:GetIsValid() then return end
+   if not self:GetIsValid() then return end
    self:SendChatMessage(5, self, message)
 end

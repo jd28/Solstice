@@ -23,7 +23,7 @@ end
 
 --- Get string by TLK table reference.
 -- @param strref TLK table reference.
--- @bool[opt=false] gender If true gets string from 'female'
+-- @bool[opt=false] female If true gets string from 'female'
 -- TLK table, else 'male'.
 function M.GetString(strref, female)
    NWE.StackPushBoolean(gender)

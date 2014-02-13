@@ -72,7 +72,7 @@ end
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
 -- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant If true spell can instantaneously.
-function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, projectile_path, instant)
+function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -97,7 +97,7 @@ end
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
 -- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant
-function M.Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, projectile_path, instant)
+function M.Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
