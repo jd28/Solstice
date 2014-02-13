@@ -175,6 +175,31 @@ function M.Object:GetTransitionTarget()
    return NWE.StackPopObject()
 end
 
+function M.Object:GetType()
+   if not self:GetIsValid() then return OBJECT_TYPE_NONE end
+   if self.type == OBJECT_TRUETYPE_CREATURE then
+      return OBJECT_TYPE_CREATURE
+   elseif self.type == OBJECT_TRUETYPE_ITEM then
+      return OBJECT_TYPE_ITEM
+   elseif self.type == OBJECT_TRUETYPE_TRIGGER then
+      return OBJECT_TYPE_TRIGGER
+   elseif self.type == OBJECT_TRUETYPE_DOOR then
+      return OBJECT_TYPE_DOOR
+   elseif self.type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
+      return OBJECT_TYPE_AREA_OF_EFFECT
+   elseif self.type == OBJECT_TRUETYPE_WAYPOINT then
+      return OBJECT_TYPE_WAYPOINT
+   elseif self.type == OBJECT_TRUETYPE_ENCOUNTER then
+      return OBJECT_TYPE_ENCOUNTER
+   elseif self.type == OBJECT_TRUETYPE_STORE then
+      return OBJECT_TYPE_STORE
+   elseif self.type == OBJECT_TRUETYPE_PLACEABLE then
+      return OBJECT_TYPE_PLACEABLE
+   end
+
+   return OBJECT_TYPE_NONE
+end
+
 --- Gets the last object to open an object
 function M.Object:GetLastOpenedBy()
    NWE.ExecuteCommand(376, 0)
