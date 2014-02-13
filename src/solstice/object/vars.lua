@@ -13,9 +13,9 @@ local NWE = require 'solstice.nwn.engine'
 -- @section vars
 
 local function get_var_table(obj)
-   if isinstance(obj, Module) then
+   if obj.type == OBJECT_TRUETYPE_MODULE then
       return obj.obj.mod_vartable
-   elseif isinstance(obj, Area) then
+   elseif obj.type == OBJECT_TRUETYPE_AREA then
       return obj.obj.area_vartable
    else
       return obj.obj.obj.obj_vartable
@@ -27,11 +27,12 @@ end
 -- @param[opt=1] val Amount to decrement.
 -- @return New local variable value.
 function M.Object:DecrementLocalInt(name, val)
-    val = val or 1
+   if not self:GetIsValid() then return end
+   val = val or 1
 
-    local newval = self:GetLocalInt(name) - val
-    self:SetLocalInt(name, newval)
-    return newval
+   local newval = self:GetLocalInt(name) - val
+   self:SetLocalInt(name, newval)
+   return newval
 end
 
 --- Boolean wrapper around DeleteLocalInt
@@ -44,31 +45,36 @@ end
 --- Delete a local int variable
 -- @param name Variable name.
 function M.Object:DeleteLocalInt(name)
-    return C.nwn_DeleteLocalInt(get_var_table(self), name) 
+   if not self:GetIsValid() then return end
+   return C.nwn_DeleteLocalInt(get_var_table(self), name)
 end
 
 --- Delete a local float variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalFloat(name)
-    return C.nwn_DeleteLocalFloat(get_var_table(self), name) 
+   if not self:GetIsValid() then return end
+   return C.nwn_DeleteLocalFloat(get_var_table(self), name)
 end
 
 --- Delete a local string variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalString(name)
-   return C.nwn_DeleteLocalString(get_var_table(self), name) 
+   if not self:GetIsValid() then return end
+   return C.nwn_DeleteLocalString(get_var_table(self), name)
 end
 
 --- Delete a local object variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalObject(name)
-    return C.nwn_DeleteLocalObject(get_var_table(self), name) 
+   if not self:GetIsValid() then return end
+   return C.nwn_DeleteLocalObject(get_var_table(self), name)
 end
 
 --- Delete a local location variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalLocation(name)
-    return C.nwn_DeleteLocalLocation(get_var_table(self), name) 
+   if not self:GetIsValid() then return end
+   return C.nwn_DeleteLocalLocation(get_var_table(self), name)
 end
 
 --- Boolean wrapper around GetLocalInt
@@ -82,18 +88,21 @@ end
 --- Get a local int variable
 -- @param name Variable name
 function M.Object:GetLocalInt(name)
-    return C.nwn_GetLocalInt(get_var_table(self), name) 
+   if not self:GetIsValid() then return 0 end
+   return C.nwn_GetLocalInt(get_var_table(self), name)
 end
 
 --- Get local float variable
 -- @param name Variable name
 function M.Object:GetLocalFloat(name)
+   if not self:GetIsValid() then return 0.0 end
    return C.nwn_GetLocalFloat(get_var_table(self), name)
 end
 
 --- Get local location variable
 -- @param name Variable name
 function M.Object:GetLocalLocation(name)
+   if not self:GetIsValid() then return LOCATION_INVALID end
    return C.nwn_GetLocalLocation(get_var_table(self), name)
 end
 
@@ -121,11 +130,11 @@ end
 -- @param[opt=1] val Amount to increment.
 -- @return New local variable value.
 function M.Object:IncrementLocalInt(name, val)
-    val = val or 1
+   val = val or 1
 
-    local newval = self:GetLocalInt(name) + val
-    self:SetLocalInt(name, newval)
-    return newval
+   local newval = self:GetLocalInt(name) + val
+   self:SetLocalInt(name, newval)
+   return newval
 end
 
 --- Boolean wrapper around SetLocalInt
@@ -141,21 +150,24 @@ end
 -- @param name Variable name
 -- @param val Value
 function M.Object:SetLocalFloat(name, val)
+   if not self:GetIsValid() then return end
    C.nwn_SetLocalFloat(get_var_table(self), name, val)
 end
 
 --- Set local int variable
 -- @param name Variable name
 -- @param val Value
-function M.Object:SetLocalInt(name, val) 
-    C.nwn_SetLocalInt(get_var_table(self), name, val) 
+function M.Object:SetLocalInt(name, val)
+   if not self:GetIsValid() then return end
+   C.nwn_SetLocalInt(get_var_table(self), name, val)
 end
 
 --- Set local location variable
 -- @param name Variable name
 -- @param val Value
 function M.Object:SetLocalLocation(name, val)
-    C.nwn_SetLocalLocation(get_var_table(self), name, val) 
+   if not self:GetIsValid() then return end
+   C.nwn_SetLocalLocation(get_var_table(self), name, val)
 end
 
 --- Set local string variable
@@ -181,4 +193,3 @@ function M.Object:SetLocalObject(name, val)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(58, 3)
 end
-
