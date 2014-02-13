@@ -96,7 +96,6 @@ local function load(into, lookup)
             else
                into[const] = i
             end
-            print(const, into[const])
          end
       end
    end
@@ -108,7 +107,7 @@ end
 -- load event.
 function M.LoadConstants()
    for _, t in ipairs(LOOKUP) do
-      load(_CONSTS, t)
+      load(_G, t)
    end
 end
 
@@ -136,7 +135,7 @@ end
 --- Register constant.
 function M.RegisterConstant(name, value)
    assert(type(name) == "string")
-   _CONSTS[name] = value
+   _G[name] = value
 end
 
 -- Global function to simplify loading constants from a NWNX
