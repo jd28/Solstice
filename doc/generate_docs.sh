@@ -1,3 +1,3 @@
 #! /bin/bash
 
-ldoc -d output -l . --style . -c config.ld .
+ldoc -d output --style . -c config.ld .
