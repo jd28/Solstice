@@ -128,7 +128,7 @@ function _SOL_GET_CACHED_OBJECT(id)
       obj = ffi.cast("CNWSStore*", obj)
       object = sol_store.store_t(type, id, obj)
    else
-      error "Unknown Object Type!"
+      error(string.format("Unknown Object Type: %d!", type))
    end
 
    return object
