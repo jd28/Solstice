@@ -232,7 +232,7 @@ CNWSWaypoint *nwn_GetWaypointByID(uint32_t id);
 -- effects/creation.h
 ffi.cdef [[
 CGameEffect * nwn_CreateEffect(int show_icon);
-    
+
 CGameEffect * effect_ability(int32_t ability, int32_t amount);
 CGameEffect * effect_ac(int32_t amount, int32_t modifier_type, int32_t damage_type);
 
@@ -464,8 +464,8 @@ CGameEffect * ip_visual_effect(int32_t effect);
 ffi.cdef [[
 void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
 int  ns_BitScanFFS(uint32_t mask);
-void ns_DelayCommand(CNWSObject *obj, float delay, uint32_t token);
-void ns_RepeatCommand(CNWSObject *obj, float delay, uint32_t token);
+void ns_DelayCommand(uint32_t objid, float delay, uint32_t token);
+void ns_RepeatCommand(uint32_t objid, float delay, uint32_t token);
 
 
 ChatMessage   *Local_GetLastChatMessage();

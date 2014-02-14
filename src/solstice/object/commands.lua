@@ -28,8 +28,8 @@ function M.Object:DelayCommand(delay, action)
    local delay = delay or 0
    local count = table.maxn(_COMMANDS) + 1
    _COMMANDS[count] = { f = action, id = self.id }
-   
-   C.ns_DelayCommand(self.obj.obj, delay, count)
+
+   C.ns_DelayCommand(self.id, delay, count)
 end
 
 --- Repeats a command.
@@ -38,14 +38,14 @@ end
 -- @param step Change in seconds from one application to the next.
 function M.Object:RepeatCommand(delay, action, step)
    local count = table.maxn(_COMMANDS) + 1
-   
+
    -- No zero or negative .
    if delay <= 0 then return end
-   
+
    step = step or 0
    _COMMANDS[count] = { f = action, d = delay, s = step, self = self }
-   
-   C.ns_RepeatCommand(self.obj.obj, delay, count)
+
+   C.ns_RepeatCommand(self.id, delay, count)
 end
 
 --- Inserts action into acction queue
