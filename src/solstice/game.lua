@@ -1,4 +1,5 @@
 local M = {}
+local NWE = require 'solstice.nwn.engine'
 
 --- Get Module.
 function M.GetModule()
