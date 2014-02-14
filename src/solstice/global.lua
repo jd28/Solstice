@@ -183,7 +183,6 @@ _COMMANDS.COMMAND_TYPE_REPEAT     = 2
 
 -- Internal Function handling DoCommand
 local function _RUN_DO_COMMAND (token)
-   if not token then return end
    if _COMMANDS[token] ~= nil then
       local f = _COMMANDS[token]["f"]
       f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
@@ -193,7 +192,6 @@ end
 
 -- Internal Function handling DelayCommand
 local function _RUN_DELAY_COMMAND (token)
-   if not token then return end
    if _COMMANDS[token] ~= nil then
       print("Delay Token: " .. token)
       local f = _COMMANDS[token]["f"]
@@ -228,6 +226,10 @@ end
 -- command functions.  Entry point for nwnx_solstice
 -- RunScriptSituation hook.
 function _RUN_COMMAND(ctype, token, objid)
+   assert(ctype)
+   assert(token)
+   assert(objid)
+
    local res = 0
    if ctype == _COMMANDS.COMMAND_TYPE_DELAY then
       _RUN_DELAY_COMMAND(token)
@@ -235,6 +237,8 @@ function _RUN_COMMAND(ctype, token, objid)
       _RUN_DO_COMMAND(token)
    elseif ctype == _COMMANDS.COMMAND_TYPE_REPEAT then
       res = _RUN_REPEAT_COMMAND(token)
+   else
+      error(string.format("ERROR: Invalid Command Type %d", ctype))
    end
 
    return res
