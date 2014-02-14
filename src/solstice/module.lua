@@ -13,7 +13,7 @@ local M = {}
 M.Module = inheritsFrom(Obj.Object, "solstice.module.Module" )
 
 --- Internal ctype.
-M.module_t = ffi.metatype("Module", { __index = Module })
+M.module_t = ffi.metatype("Module", { __index = M.Module })
 
 --- Class Module
 -- @section
