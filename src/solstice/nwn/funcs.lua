@@ -34,10 +34,10 @@ CGameObject *nwn_GetObjectByID (nwn_objid_t oid);
 CGameObject *nwn_GetObjectByStringID (const char *oid);
 CNWSPlayer *nwn_GetPlayerByID (nwn_objid_t oid);
 
-bool nwn_GetKnowsFeat (const CNWSCreatureStats *stats, int feat);
-int nwn_GetKnowsSkill (const CNWSCreatureStats *stats, int skill);
-int nwn_GetLevelByClass (const CNWSCreatureStats *stats, int cl);
-CNWSStats_Level *nwn_GetLevelStats (const CNWSCreatureStats *stats, int level);
+bool nwn_GetKnowsFeat (const CNWSCreatureStats *stats, int32_t feat);
+int32_t nwn_GetKnowsSkill (const CNWSCreatureStats *stats, int32_t skill);
+int32_t nwn_GetLevelByClass (const CNWSCreatureStats *stats, int32_t cl);
+CNWSStats_Level *nwn_GetLevelStats (const CNWSCreatureStats *stats, int32_t level);
 int64_t nwn_GetWorldTime (uint32_t *time_2880s, uint32_t *time_msec);
 void nwn_UpdateQuickBar (CNWSCreature *cre);
 void nwn_ExecuteScript (const char *scr, nwn_objid_t oid);
@@ -46,14 +46,14 @@ void nwn_ExecuteScript (const char *scr, nwn_objid_t oid);
 -- 2da.h
 ffi.cdef [[
 C2DA *nwn_GetCached2da(const char *file);
-int nwn_Get2daColumnCount(C2DA *tda);
-int nwn_Get2daRowCount(C2DA *tda);
+int32_t nwn_Get2daColumnCount(C2DA *tda);
+int32_t nwn_Get2daRowCount(C2DA *tda);
 char * nwn_Get2daString(C2DA *tda, const char* col, uint32_t row);
-char * nwn_Get2daStringIdx(C2DA *tda, int col, uint32_t row);
+char * nwn_Get2daStringIdx(C2DA *tda, int32_t col, uint32_t row);
 int32_t nwn_Get2daInt(C2DA *tda, const char* col, uint32_t row);
-int32_t nwn_Get2daIntIdx(C2DA *tda, int col, uint32_t row);
+int32_t nwn_Get2daIntIdx(C2DA *tda, int32_t col, uint32_t row);
 float nwn_Get2daFloat(C2DA *tda, const char* col, uint32_t row);
-float nwn_Get2daFloatIdx(C2DA *tda, int col, uint32_t row);
+float nwn_Get2daFloatIdx(C2DA *tda, int32_t col, uint32_t row);
 ]]
 
 -- area.h
@@ -83,25 +83,25 @@ CNWSkill *nwn_GetSkill(uint32_t skill);
 ffi.cdef [[
 CNWSCreature *nwn_GetCreatureByID(uint32_t oid);
 
-void      nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObject *target, CNWSArea* area, CScriptLocation *loc, int prop);
+void      nwn_ActionUseItem(CNWSCreature *cre, CNWSItem* it, CNWSObject *target, CNWSArea* area, CScriptLocation *loc, int32_t prop);
 void      nwn_AddKnownFeat(CNWSCreature *cre, uint16_t feat, uint32_t level);
-int       nwn_AddKnownSpell(CNWSCreature *cre, uint32_t sp_class, uint32_t sp_id, uint32_t sp_level);
+int32_t       nwn_AddKnownSpell(CNWSCreature *cre, uint32_t sp_class, uint32_t sp_id, uint32_t sp_level);
 uint32_t  nwn_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
 bool      nwn_CanUseSkill(CNWSCreature* cre, uint8_t skill);
 void      nwn_DecrementFeatRemainingUses(CNWSCreatureStats *stats, uint16_t feat);
 int8_t    nwn_GetAbilityModifier(CNWSCreatureStats *stats, int8_t abil, bool armorcheck);
-int       nwn_GetAttacksPerRound(CNWSCreatureStats *stats);
+int32_t       nwn_GetAttacksPerRound(CNWSCreatureStats *stats);
 int8_t    nwn_GetBaseSavingThrow(CNWSCreature *cre, uint32_t type);
-int       nwn_GetBonusSpellSlots(CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
-int       nwn_GetCriticalHitMultiplier(CNWSCreatureStats *stats, bool offhand);
-int       nwn_GetCriticalHitRange(CNWSCreatureStats *stats, bool offhand);
+int32_t       nwn_GetBonusSpellSlots(CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
+int32_t       nwn_GetCriticalHitMultiplier(CNWSCreatureStats *stats, bool offhand);
+int32_t       nwn_GetCriticalHitRange(CNWSCreatureStats *stats, bool offhand);
 uint16_t  nwn_GetDamageFlags(CNWSCreature *cre);
 int32_t   nwn_GetDexMod(CNWSCreatureStats *stats, bool armor_check);
-bool      nwn_GetEffectImmunity(CNWSCreature *cre, int type, CNWSCreature *vs);
-int       nwn_GetFeatRemainingUses(CNWSCreatureStats *stats, uint16_t feat);
+bool      nwn_GetEffectImmunity(CNWSCreature *cre, int32_t type, CNWSCreature *vs);
+int32_t       nwn_GetFeatRemainingUses(CNWSCreatureStats *stats, uint16_t feat);
 bool      nwn_GetFlanked(CNWSCreature *cre, CNWSCreature *target);
 bool      nwn_GetFlatFooted(CNWSCreature *cre);
-int       nwn_GetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx);
+int32_t       nwn_GetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx);
 bool      nwn_GetKnowsSpell(CNWSCreature *cre, uint32_t sp_class, uint32_t sp_id);
 bool      nwn_GetHasFeat(CNWSCreatureStats *stats, uint16_t feat);
 int32_t   nwn_GetHasNthFeat(CNWSCreature *cre, uint16_t start, uint16_t stop);
@@ -109,28 +109,28 @@ bool      nwn_GetIsInvisible(CNWSCreature *cre, CNWSObject *obj);
 bool      nwn_GetIsVisible(CNWSCreature *cre, nwn_objid_t target);
 CNWSItem *nwn_GetItemInSlot(CNWSCreature *cre, uint32_t slot);
 double    nwn_GetMaxAttackRange(CNWSCreature *cre, nwn_objid_t target);
-int       nwn_GetMaxSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
-int       nwn_GetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx);
-int       nwn_GetRelativeWeaponSize(CNWSCreature *cre, CNWSItem *weapon);
-int       nwn_GetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
+int32_t       nwn_GetMaxSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
+int32_t       nwn_GetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx);
+int32_t       nwn_GetRelativeWeaponSize(CNWSCreature *cre, CNWSItem *weapon);
+int32_t       nwn_GetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
 int8_t    nwn_GetSkillRank(CNWSCreature *cre, uint8_t skill, CNWSObject *vs, bool base);
-int       nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
-int       nwn_GetTotalKnownSpells (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
-int       nwn_GetTotalNegativeLevels(CNWSCreatureStats *stats);
+int32_t       nwn_GetTotalFeatUses(CNWSCreatureStats *stats, uint16_t feat);
+int32_t       nwn_GetTotalKnownSpells (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
+int32_t       nwn_GetTotalNegativeLevels(CNWSCreatureStats *stats);
 void      nwn_JumpToLimbo(CNWSCreature *cre);
 void      nwn_NotifyAssociateActionToggle(CNWSCreature *cre, int32_t mode);
-int       nwn_RecalculateDexModifier(CNWSCreatureStats *stats);
-int       nwn_RemoveKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_id);
-int       nwn_ReplaceKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_id, uint32_t sp_new);
+int32_t       nwn_RecalculateDexModifier(CNWSCreatureStats *stats);
+int32_t       nwn_RemoveKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_id);
+int32_t       nwn_ReplaceKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_id, uint32_t sp_new);
 void      nwn_ResolveItemCastSpell(CNWSCreature *cre, CNWSObject *target);
-void      nwn_ResolveSafeProjectile(CNWSCreature *cre, uint32_t delay, int attack_num);
-uint8_t   nwn_SetAbilityScore(CNWSCreatureStats *stats, int abil, int val);
+void      nwn_ResolveSafeProjectile(CNWSCreature *cre, uint32_t delay, int32_t attack_num);
+uint8_t   nwn_SetAbilityScore(CNWSCreatureStats *stats, int32_t abil, int32_t val);
 void      nwn_SetActivity(CNWSCreature *cre, int32_t a, int32_t b);
 void      nwn_SetAnimation(CNWSCreature *cre, uint32_t anim);
 void      nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
-int       nwn_SetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_id);
-int       nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_spell, uint32_t sp_meta, uint32_t sp_flags);
-int       nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
+int32_t       nwn_SetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_id);
+int32_t       nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_spell, uint32_t sp_meta, uint32_t sp_flags);
+int32_t       nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
 void      nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
 ]]
 
@@ -176,10 +176,10 @@ void             nwn_DeleteLocalString(CNWSScriptVarTable *vt, const char *var_n
 void             nwn_DoCommand(CNWSObject *obj, void *vms);
 
 CGameEffect*     nwn_GetEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
-                                    const int eff_spellid, const int eff_type, const int eff_int0, const int eff_int1);
+                                    const int32_t eff_spellid, const int32_t eff_type, const int32_t eff_int0, const int32_t eff_int1);
 
-int              nwn_GetHasEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
-                                       const int eff_spellid, const int eff_type, const int eff_int0);
+int32_t          nwn_GetHasEffect(const CNWSObject *obj, const nwn_objid_t eff_creator,
+                                  const int32_t eff_spellid, const int32_t eff_type, const int32_t eff_int0);
 
 int32_t          nwn_GetLocalInt(CNWSScriptVarTable *vt, const char *var_name);
 float            nwn_GetLocalFloat(CNWSScriptVarTable *vt, const char *var_name);
@@ -187,8 +187,8 @@ CScriptLocation  nwn_GetLocalLocation(CNWSScriptVarTable *vt, const char *var_na
 uint32_t         nwn_GetLocalObject(CNWSScriptVarTable *vt, const char *var_name);
 const char      *nwn_GetLocalString(CNWSScriptVarTable *vt, const char *var_name);
 
-CScriptVariable *nwn_GetLocalVariableByPosition (CNWSScriptVarTable *vt, int idx);
-int              nwn_GetLocalVariableCount (CNWSScriptVarTable *vt);
+CScriptVariable *nwn_GetLocalVariableByPosition (CNWSScriptVarTable *vt, int32_t idx);
+int32_t          nwn_GetLocalVariableCount (CNWSScriptVarTable *vt);
 bool             nwn_GetLocalVariableSet(CNWSScriptVarTable *vt, const char *var_name, int8_t type);
 
 void             nwn_SetLocalFloat(CNWSScriptVarTable *vt, const char *var_name, float value);
@@ -203,13 +203,13 @@ void             nwn_SetTag(CNWSObject *obj, const char *value);
 
 -- stack.h
 ffi.cdef [[
-void      nwn_ExecuteCommand(int command, int num_args);
+void      nwn_ExecuteCommand(int32_t command, int32_t num_args);
 
 uint32_t  nwn_GetCommandObjectId();
 uint32_t  nwn_SetCommandObjectId(uint32_t obj);
 
 bool      nwn_StackPopBoolean();
-int       nwn_StackPopInteger();
+int32_t   nwn_StackPopInteger();
 float     nwn_StackPopFloat();
 char     *nwn_StackPopString();
 Vector   *nwn_StackPopVector();
@@ -217,7 +217,7 @@ uint32_t  nwn_StackPopObject();
 void      nwn_StackPushBoolean(bool value);
 void     *nwn_StackPopEngineStructure(uint32_t type);
 void      nwn_StackPushFloat(float value);
-void      nwn_StackPushInteger(int value);
+void      nwn_StackPushInteger(int32_t value);
 void      nwn_StackPushString(const char *value);
 void      nwn_StackPushVector(Vector *value);
 void      nwn_StackPushObject(uint32_t value);
@@ -231,7 +231,7 @@ CNWSWaypoint *nwn_GetWaypointByID(uint32_t id);
 
 -- effects/creation.h
 ffi.cdef [[
-CGameEffect * nwn_CreateEffect(int show_icon);
+CGameEffect * nwn_CreateEffect(int32_t show_icon);
 
 CGameEffect * effect_ability(int32_t ability, int32_t amount);
 CGameEffect * effect_ac(int32_t amount, int32_t modifier_type, int32_t damage_type);
@@ -356,9 +356,9 @@ CGameEffect * effect_wounding (int32_t amount);
 -- effects/itemprop.h
 ffi.cdef [[
 CGameEffect * ip_create(bool show_icon);
-CGameEffect * ip_set_values(CGameEffect *eff, int type, int subtype, int cost,
-			     int cost_val, int param1, int param1_val,
-			     int uses_per_day, int chance);
+CGameEffect * ip_set_values(CGameEffect *eff, int32_t type, int32_t subtype, int32_t cost,
+			     int32_t cost_val, int32_t param1, int32_t param1_val,
+			     int32_t uses_per_day, int32_t chance);
 
 CGameEffect * ip_ability(int32_t ability, int32_t bonus);
 
@@ -463,7 +463,7 @@ CGameEffect * ip_visual_effect(int32_t effect);
 -- Solstice Functions
 ffi.cdef [[
 void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
-int  ns_BitScanFFS(uint32_t mask);
+int32_t ns_BitScanFFS(uint32_t mask);
 void ns_DelayCommand(uint32_t objid, float delay, uint32_t token);
 void ns_RepeatCommand(uint32_t objid, float delay, uint32_t token);
 
@@ -475,5 +475,5 @@ EventEffect   *Local_GetLastEffectEvent();
 EventItemprop *Local_GetLastItemPropEvent();
 CGameEffect   *Local_GetLastDamageEffect();
 Event         *Local_GetLastNWNXEvent();
-void           Local_NWNXLog(int level, const char* log);
+void           Local_NWNXLog(int32_t level, const char* log);
 ]]
