@@ -45,36 +45,41 @@ end
 --- Delete a local int variable
 -- @param name Variable name.
 function M.Object:DeleteLocalInt(name)
-   if not self:GetIsValid() then return end
-   return C.nwn_DeleteLocalInt(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(265, 2)
 end
 
 --- Delete a local float variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalFloat(name)
-   if not self:GetIsValid() then return end
-   return C.nwn_DeleteLocalFloat(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(266, 2)
 end
 
 --- Delete a local string variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalString(name)
-   if not self:GetIsValid() then return end
-   return C.nwn_DeleteLocalString(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(267, 2)
 end
 
 --- Delete a local object variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalObject(name)
-   if not self:GetIsValid() then return end
-   return C.nwn_DeleteLocalObject(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(268, 2)
 end
 
 --- Delete a local location variable
 -- @param name Variable to delete
 function M.Object:DeleteLocalLocation(name)
-   if not self:GetIsValid() then return end
-   return C.nwn_DeleteLocalLocation(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(269, 2)
 end
 
 --- Boolean wrapper around GetLocalInt
@@ -88,22 +93,28 @@ end
 --- Get a local int variable
 -- @param name Variable name
 function M.Object:GetLocalInt(name)
-   if not self:GetIsValid() then return 0 end
-   return C.nwn_GetLocalInt(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(51, 2)
+   return NWE.StackPopInteger()
 end
 
 --- Get local float variable
 -- @param name Variable name
 function M.Object:GetLocalFloat(name)
-   if not self:GetIsValid() then return 0.0 end
-   return C.nwn_GetLocalFloat(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(52, 2)
+   return NWE.StackPopFloat()
 end
 
 --- Get local location variable
 -- @param name Variable name
 function M.Object:GetLocalLocation(name)
-   if not self:GetIsValid() then return LOCATION_INVALID end
-   return C.nwn_GetLocalLocation(get_var_table(self), name)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(153, 2)
+   return NWE.StackPopLocation()
 end
 
 --- Get local object variable
@@ -150,24 +161,30 @@ end
 -- @param name Variable name
 -- @param val Value
 function M.Object:SetLocalFloat(name, val)
-   if not self:GetIsValid() then return end
-   C.nwn_SetLocalFloat(get_var_table(self), name, val)
+   NWE.StackPushFloat(val)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(55, 3)
 end
 
 --- Set local int variable
 -- @param name Variable name
 -- @param val Value
 function M.Object:SetLocalInt(name, val)
-   if not self:GetIsValid() then return end
-   C.nwn_SetLocalInt(get_var_table(self), name, val)
+   NWE.StackPushInteger(val)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(56, 3)
 end
 
 --- Set local location variable
 -- @param name Variable name
 -- @param val Value
 function M.Object:SetLocalLocation(name, val)
-   if not self:GetIsValid() then return end
-   C.nwn_SetLocalLocation(get_var_table(self), name, val)
+   NWE.StackPushLocation(val)
+   NWE.StackPushString(name)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(152, 3)
 end
 
 --- Set local string variable
