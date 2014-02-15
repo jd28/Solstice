@@ -61,9 +61,8 @@ function NWNXSolstice_GetMaximumFeatUses(feat, cre)
    return M.GetMaximumFeatUses(feat, cre)
 end
 
-local LOOKUP = {}
-
 _CONSTS = {}
+setmetatable(_G, { __index = _CONSTS })
 
 -- Helper function for loading the 2da values.
 local function load(into, lookup)
@@ -101,16 +100,6 @@ local function load(into, lookup)
    end
 end
 
---- Loads all registered consant loaders.
---
--- NOTE: This function should be called only from the module
--- load event.
-function M.LoadConstants()
-   for _, t in ipairs(LOOKUP) do
-      load(_G, t)
-   end
-end
-
 --- Register constant loader.
 -- @param module_name Name of the module to load constants into.
 -- @param tda 2da name (without .2da)
@@ -125,26 +114,17 @@ end
 -- value_label is passed. Legal values: "int", "string", "float"
 function M.RegisterConstants(tda, column_label, extract,
                              value_label, value_type)
-   table.insert(LOOKUP, { tda = tda,
-                          column_label = column_label,
-                          extract = extract,
-                          value_type = value_type,
-                          value_label = value_label })
+   load(_CONSTS, { tda = tda,
+                   column_label = column_label,
+                   extract = extract,
+                   value_type = value_type,
+                   value_label = value_label })
 end
 
 --- Register constant.
 function M.RegisterConstant(name, value)
    assert(type(name) == "string")
-   _G[name] = value
-end
-
--- Global function to simplify loading constants from a NWNX
--- request.
--- NOTE: This function should be called only from the module
--- load event.
-function NWNXSolstice_LoadConstants()
-   M.LoadConstants()
-   setmetatable(_G, { __index = _CONSTS })
+   _CONSTS[name] = value
 end
 
 return M
