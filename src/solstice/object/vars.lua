@@ -164,7 +164,7 @@ function M.Object:SetLocalFloat(name, val)
    NWE.StackPushFloat(val)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(55, 3)
+   NWE.ExecuteCommand(56, 3)
 end
 
 --- Set local int variable
@@ -174,7 +174,7 @@ function M.Object:SetLocalInt(name, val)
    NWE.StackPushInteger(val)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(56, 3)
+   NWE.ExecuteCommand(55, 3)
 end
 
 --- Set local location variable
