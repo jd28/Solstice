@@ -26,8 +26,8 @@ M.SPHERE             = 4
 -- @section
 
 --- Gets first object in a shape
--- @param shape solstice.shape.* constant
--- @param size The size of the shape. Dependent on shape or solstice.shape.RADIUS\_SIZE\_*.
+-- @param shape SHAPE\_*
+-- @param size The size of the shape. Dependent on shape or RADIUS\_SIZE\_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
 -- @func[opt] predicate A function predicate
@@ -53,8 +53,8 @@ function M.GetFirstObject(shape, size, location, line_of_sight, predicate, origi
 end
 
 --- Gets next object in a shape
--- @param shape solstice.shape constant.
--- @param size The size of the shape. Dependent on shape or solstice.shape.RADIUS\_SIZE\_*.
+-- @param shape SHAPE\_*
+-- @param size The size of the shape. Dependent on shape or RADIUS\_SIZE\_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
 -- @func[opt] predicate A function predicate. Default predicate tests
@@ -79,8 +79,8 @@ function M.GetNextObject(shape, size, location, line_of_sight, predicate, origin
 end
 
 --- Iterator over objects in a shape.
--- @param shape solstice.shape constant
--- @param size The size of the shape. Dependent on shape or solstice.shape.RADIUS\_SIZE\_*.
+-- @param shape SHAPE\_*
+-- @param size The size of the shape. Dependent on shape or RADIUS\_SIZE\_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
 -- @func[opt] predicate A function predicate

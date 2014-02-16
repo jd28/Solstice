@@ -102,13 +102,13 @@ function M.Creature:GetLastAssociateCommand()
 end
 
 --- Levels up a creature using the default settings.
--- @param[opt=solstice.class.INVALID] class solstice.class type constant.
+-- @param[opt=CLASS_TYPE_INVALID] class CLASS\_TYPE\_*
 -- @param[opt=false] ready_spells Determines if all memorizable spell slots will be
 -- filled without requiring rest.
--- @param[opt=solstice.class.PACKAGE_INVALID] package solstice.class.PACKAGE_*
+-- @param[opt=PACKAGE_INVALID] package PACKAGE\_*
 function M.Creature:LevelUpHenchman(class, ready_spells, package)
-   class = class or CL.INVALID
-   package = package or CL.PACKAGE_INVALID
+   class = class or CLASS_TYPE_INVALID
+   package = package or PACKAGE_INVALID
 
    NWE.StackPushInteger(package)
    NWE.StackPushBoolean(ready_spells)

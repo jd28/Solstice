@@ -85,7 +85,7 @@ end
 
 --- Causes an object to speak.
 -- @param message String to be spoken.
--- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+-- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:ActionSpeakString(message, volume)
    volume = volume or error("Chat.VOLUME_TALK")
 
@@ -101,7 +101,7 @@ end
 
 --- Causes the creature to speak a translated string.
 -- @param strref Reference of the string in the talk table
--- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+-- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:ActionSpeakStringByStrRef(strref, volume)
    volume = volume or error("Chat.VOLUME_TALK")
 
@@ -117,11 +117,10 @@ end
 
 --- Action to start a conversation with a PC
 -- @param target An object to converse with.
--- @param dialog The resource reference (filename) of a conversation.
---     (Default: "")
--- @param private Specify whether the conversation is audible to everyone
---     or only to the PC. (Default: false)
--- @param hello Determines if initial greeting is played. (Default: true)
+-- @param[opt=""] dialog The resource reference (filename) of a conversation.
+-- @param[opt=false] private Specify whether the conversation is audible to everyone
+--     or only to the PC.
+-- @param[opt=true] hello Determines if initial greeting is played.
 function M.Object:ActionStartConversation(target, dialog, private, hello)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -179,7 +178,7 @@ function M.Object:ActionWait(time)
 end
 
 --- Removes all actions from an action queue.
--- @param clear_combat combat along with all other actions. (Default: false)
+-- @param[opt=false] clear_combat combat along with all other actions.
 function M.Object:ClearAllActions(clear_combat)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -204,7 +203,7 @@ end
 
 --- Forces an object to immediately speak.
 -- @param text Text to be spoken.
--- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+-- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:SpeakString(text, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -219,7 +218,7 @@ end
 
 --- Causes an object to instantly speak a translated string.
 -- @param strref TLK string reference to speak.
--- @param[opt=solstice.chat.VOLUME_TALK] volume solstice.chat.VOLUME_*
+-- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:SpeakStringByStrRef(strref, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)

@@ -29,7 +29,7 @@ end
 --- Get the ability score of a specific type for a creature.
 -- NWScript: GetAbilityModifier
 -- @param ability ABILITY\_*.
--- @param base If set to true will return the base ability score
+-- @param[opt=false] base If true will return the base ability score
 -- without bonuses (e.g. ability bonuses granted from equipped
 -- items). If nothing entered, defaults to false.
 -- @return Returns the ability score of type `ability`
@@ -62,7 +62,7 @@ end
 --- Get the ability score of a specific type for a creature.
 -- NWScript: GetAbilityScore
 -- @param ability ABILITY\_*.
--- @param base If set to TRUE will return the base ability score
+-- @param[opt=false] base If `true` will return the base ability score
 -- without bonuses (e.g. ability bonuses granted from equipped
 -- items). If nothing entered, defaults to false.
 -- @return Returns the ability score of type ability for self

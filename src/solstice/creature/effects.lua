@@ -24,13 +24,13 @@ end
 
 --- Determine if creature has an immunity.
 -- @param vs Creature's attacker.
--- @param imm_type solstice.effect.IMMUNITY_TYPE_*
+-- @param imm_type IMMUNITY_TYPE_*
 function M.Creature:GetEffectImmunity(vs, imm_type)
    error "nwnxcombat"
 end
 
 --- Determins if creature has a feat effect.
--- @param feat solstice.feat type constant
+-- @param feat FEAT\_*
 function M.Creature:GetHasFeatEffect(feat)
    local f = C.nwn_GetFeat(feat)
    if f == nil then return false end
@@ -65,8 +65,8 @@ function M.Creature:GetInnateDamageResistance(dmg_idx)
 end
 
 --- Get if creature has immunity.
--- @param immunity solstice.effect.IMMUNITY_TYPE_*
--- @param[opt=solstice.object.INVALID] versus Versus object.
+-- @param immunity IMMUNITY_TYPE_*
+-- @param[opt=OBJECT_INVALID] versus Versus object.
 function M.Creature:GetIsImmune(immunity, versus)
    error "nwnxcombat"
 end

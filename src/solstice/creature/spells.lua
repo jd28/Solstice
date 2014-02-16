@@ -14,8 +14,8 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 --- Add known spell to creature
--- @param sp_class SPELL\_*
--- @param sp_id solstice.spell id constant
+-- @param sp_class CLASS\_TYPE\_*.
+-- @param sp_id SPELL\_*
 -- @param sp_level Spell level.
 function M.Creature:AddKnownSpell(sp_class, sp_id, sp_level)
    return C.nwn_AddKnownSpell(self.obj, sp_class, sp_id, sp_level)
@@ -31,7 +31,7 @@ end
 
 --- Get bonus spell slots
 -- @param sp_class CLASS\_TYPE\_*.
--- @param sp_id Spell ID
+-- @param sp_id SPELL\_*
 -- @param sp_level Spell level.
 function M.Creature:GetBonusSpellSlots(sp_class, sp_id, sp_level)
    return C.nwn_GetBonusSpellSlots(self.obj, sp_class, sp_level)

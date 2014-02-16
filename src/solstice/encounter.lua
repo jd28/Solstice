@@ -25,7 +25,7 @@ function M.Encounter:GetActive()
 end
 
 --- Get the difficulty level of the encounter.
--- @return solstice.encounter.DIFFICULTY_*
+-- @return ENCOUNTER\_DIFFICULTY\_*
 function M.Encounter:GetDifficulty()
    if self:GetIsValid() then return -1 end
    return self.obj.enc_difficulty

@@ -31,7 +31,7 @@ end
 --- Retrieves a float from the campaign database.
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
--- @param player Player associated with a variable. (Default: OBJECT_INVALID)
+-- @param player Player associated with a variable.
 function M.GetFloat(name, var, player)
    player = player or OBJECT_INVALID
    NWE.StackPushObject(player)
@@ -102,7 +102,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param loc Location to create the object at.
--- @param[opt=OBJECT_INVALID] owner Owner to attempt to create the object within. (Default: OBJECT_INVALID)
+-- @param[opt=OBJECT_INVALID] owner Owner to attempt to create the object within.
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
 function M.RetrieveCampaignObject(name, var, loc, owner, player)
    owner = owner or OBJECT_INVALID

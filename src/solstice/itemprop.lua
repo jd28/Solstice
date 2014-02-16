@@ -137,7 +137,7 @@ function M.CreateItempropEffect(show_icon)
 end
 
 --- Create Ability bonus/penalty item property.
--- @param ability solstice.creature.ABILITY_*
+-- @param ability ABILITY_*
 -- @param mod Bonus: [1, 12], Penalty [-12, -1]
 function M.AbilityScore(ability, mod)
    local eff = M.CreateItempropEffect()
@@ -381,7 +381,7 @@ function M.Light(brightness, color)
 end
 
 --- Creates a class use limitation item property
--- @param class solstice.class constant
+-- @param class CLASS\_TYPE\_*
 function M.LimitUseByClass(class)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_USE_LIMITATION_CLASS, class, 0)
@@ -397,7 +397,7 @@ function M.LimitUseByRace(race)
 end
 
 --- Creates a massive criticals item property.
--- @param damage solstice.damage.BONUS_*
+-- @param damage DAMAGE\_BONUS\_*
 function M.MassiveCritical(damage)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MASSIVE_CRITICALS, nil, 4, damage)

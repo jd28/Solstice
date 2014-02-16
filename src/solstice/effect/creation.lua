@@ -4,7 +4,6 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module effect
 
-local Sp  = require 'solstice.spell'
 local NWE = require 'solstice.nwn.engine'
 local M = require 'solstice.effect.init'
 
@@ -164,7 +163,7 @@ end
 
 --- Creates Damage effect.
 -- @param amount amount of damage to be dealt.
--- @param damage_type solstice.DAMAGE\_TYPE\_*
+-- @param damage_type DAMAGE\_TYPE\_*
 -- @param[opt=DAMAGE_POWER_NORMAL] power DAMAGE\_POWER\_*
 function M.Damage(amount, damage_type, power)
    damage_type = damage_type or DAMAGE_TYPE_MAGICAL
@@ -183,8 +182,8 @@ end
 
 --- Effect Damage Increase
 -- @param amount
--- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
--- @param attack_type
+-- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
+-- @param[opt=ATTACK_TYPE_MISC] attack_type
 function M.DamageIncrease(amount, damage_type, attack_type)
    error "???"
 end
@@ -192,8 +191,8 @@ end
 --- Effect Damage Range Decrease
 -- @param start Start of damage range.
 -- @param stop Start of damage range.
--- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
--- @param attack_type ATTACK_TYPE_*
+-- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
+-- @param[opt=ATTACK_TYPE_MISC] attack_type
 function M.DamageRangeDecrease(start, stop, damage_type, attack_type)
    error "???"
 end
@@ -201,8 +200,8 @@ end
 --- Effect Damage Range Increase
 -- @param start Start of damage range.
 -- @param stop Start of damage range.
--- @param damage_type DAMAGE_TYPE_* (Default: DAMAGE_TYPE_MAGICAL)
--- @param attack_type ATTACK_TYPE_*
+-- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
+-- @param[opt=ATTACK_TYPE_MISC] attack_type
 function M.DamageRangeIncrease(start, stop, damage_type, attack_type)
    error "???"
 end
@@ -225,7 +224,7 @@ function M.DamageReduction(amount, power, limit)
 end
 
 ---
--- @param damage_type DAMAGE/_TYPE_*
+-- @param damage_type DAMAGE\_TYPE\_*
 -- @param amount Amount
 -- @param[opt=0] limit Limit
 function M.DamageResistance(damage_type, amount, limit)
@@ -238,7 +237,7 @@ end
 ---
 -- @param amount
 -- @param random
--- @param damage_type solstice.DAMAGE_TYPE_*
+-- @param damage_type DAMAGE\_TYPE\_*
 function M.DamageShield(amount, random, damage_type)
    return M.effect_t(C.effect_damage_shield(amount, random,
 					      damage_type),
@@ -290,8 +289,7 @@ function M.Disarm()
 end
 
 --- Create a Disease effect.
--- @param disease The type of disease this effect should apply,
--- chosen from solstice.disease constant.
+-- @param disease DISEASE\_*
 function M.Disease(disease)
    return M.effect_t(C.effect_disease(disease), false)
 end
@@ -365,14 +363,14 @@ function M.Icon(icon)
 end
 
 --- Create an Immunity effect.
--- @param immunity One of the solstice.effect.IMMUNITY\_TYPE\_* constants.
+-- @param immunity One of the IMMUNITY\_TYPE\_* constants.
 -- @param percent Percent immunity.
 function M.Immunity(immunity, percent)
    return M.effect_t(C.effect_immunity(immunity, percent), false)
 end
 
 --- Create an Invisibility effect.
--- @param invisibilty_type One of the solstice.INVISIBILITY\_TYPE\_*
+-- @param invisibilty_type One of the INVISIBILITY\_TYPE\_*
 -- constants defining the type of invisibility to use.
 function M.Invisibility(invisibilty_type)
    return M.effect_t(C.effect_invisibility(invisibilty_type), false)
@@ -395,7 +393,7 @@ end
 
 --- Creates a miss chance effect.
 -- @param percent [1,100].
--- @param[opt=solstice.MISS_CHANCE_TYPE_NORMAL] misstype MISS\_CHANCE\_TYPE\_*
+-- @param[opt=MISS_CHANCE_TYPE_NORMAL] misstype MISS\_CHANCE\_TYPE\_*
 function M.MissChance(percent, misstype)
    misstype = misstype or MISS_CHANCE_TYPE_NORMAL
    return M.effect_t(C.effect_miss_chance(percent, misstype), false)
@@ -435,7 +433,7 @@ function M.Petrify()
 end
 
 --- Create a Poison effect.
--- @param poison The type of poison to use, as defined in the POISON_* constant group.
+-- @param poison The type of poison to use, as defined in the POISON\_* constant group.
 function M.Poison(poison)
    return M.effect_t(C.effect_poison(poison), false)
 end
@@ -486,7 +484,7 @@ function M.Silence()
 end
 
 --- Returns an effect to decrease a skill.
--- @param skill solstice.SKILL_*
+-- @param skill SKILL_*
 -- @param amount The amount to modify the skill by.  If > 0 an increase, if < 0 a decrease.
 function M.Skill(skill, amount)
    return M.effect_t(C.effect_skill(skill, amount), false)
@@ -543,12 +541,12 @@ end
 
 --- Summon Creature Effect
 -- @param resref Identifies the creature to be summoned by resref name.
--- @param[opt=solstice.VFX_NONE] vfx solstice.VFX_*.
+-- @param[opt=VFX_NONE] vfx VFX\_*.
 -- @param[opt=0.0] delay There can be delay between the visual effect being played,
 -- and the creature being added to the area.
 -- @param[opt=false] appear
 function M.SummonCreature(resref, vfx, delay, appear)
-   vfx = vfx or solstice.VFX_NONE
+   vfx = vfx or VFX_NONE
    delay = delay or 0.0
    appear = appear and 1 or 0
    return M.effect_t(C.effect_summon(resref, vfx,delay, appear),

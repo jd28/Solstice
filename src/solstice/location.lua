@@ -48,9 +48,9 @@ function M.Location:ApplyEffect(durtype, eff, duration)
 end
 
 --- Applies a visual effect to a location
--- @param vfx solstice.VFX_*
+-- @param vfx VFX_*
 -- @param[opt] duration Duration in seconds.  If not passed the visual
--- will be applied as solstice.effect.DURATION\_TYPE\_INSTANT.
+-- will be applied as DURATION\_TYPE\_INSTANT.
 function M.Location:ApplyVisual(vfx, duration)
    local durtype = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_INSTANT
    duration = duration or 0
@@ -110,16 +110,16 @@ function M.Location:ToString()
 end
 
 --- Create square trap at location.
--- @param type solstice.nwn.TRAP_BASE_TYPE_*
+-- @param type TRAP_BASE_TYPE_*
 -- @param[opt=2.0] size (Default 2.0)
 -- @param[opt=""] tag Trap tag.
--- @param[opt=solstice.STANDARD_FACTION_HOSTILE] faction Trap faction.
+-- @param[opt=STANDARD_FACTION_HOSTILE] faction Trap faction.
 -- @param[opt=""] on_disarm OnDisarm script.
 -- @param[opt=""] on_trigger OnTriggered script.
 function M.Location:Trap(type, size, tag, faction, on_disarm, on_trigger)
    NWE.StackPushString(on_trigger or "")
    NWE.StackPushString(on_disarm or "")
-   NWE.StackPushInteger(faction or solstice.STANDARD_FACTION_HOSTILE)
+   NWE.StackPushInteger(faction or STANDARD_FACTION_HOSTILE)
    NWE.StackPushString(tag or "")
    NWE.StackPushFloat(size or 2.0)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
@@ -130,8 +130,8 @@ function M.Location:Trap(type, size, tag, faction, on_disarm, on_trigger)
 end
 
 --- Sets the main light colors for a tile.
--- @param color1 solstice.area.TILE_SOURCE_MAIN_COLOR_*
--- @param color2 solstice.area.TILE_SOURCE_MAIN_COLOR_*
+-- @param color1 AREA_TILE_SOURCE_MAIN_COLOR_*
+-- @param color2 AREA_TILE_SOURCE_MAIN_COLOR_*
 function M.Location:SetTileMainLightColor(color1, color2)
    NWE.StackPushInteger(color2)
    NWE.StackPushInteger(color1)
@@ -140,8 +140,8 @@ function M.Location:SetTileMainLightColor(color1, color2)
 end
 
 --- Sets the source light color for a tile.
--- @param color1 solstice.TILE_SOURCE_LIGHT_COLOR_*
--- @param color2 solstice.TILE_SOURCE_LIGHT_COLOR_*
+-- @param color1 AREA_TILE_SOURCE_LIGHT_COLOR_*
+-- @param color2 AREA_TILE_SOURCE_LIGHT_COLOR_*
 function M.Location:SetTileSourceLightColor(color1, color2)
    NWE.StackPushInteger(color2)
    NWE.StackPushInteger(color1)

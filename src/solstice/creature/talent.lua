@@ -18,7 +18,7 @@ function M.Creature:GetHasTalent(talent)
 end
 
 --- Determines the best talent of a creature from a group of talents.
--- @param category solstice.talent.CATEGORY_*
+-- @param category TALENT\_CATEGORY\_*
 -- @param cr_max The maximum Challenge Rating of the talent.
 function M.Creature:GetTalentBest(category, cr_max)
    NWE.StackPushObject(self)
@@ -29,11 +29,10 @@ function M.Creature:GetTalentBest(category, cr_max)
 end
 
 --- Retrieves a random talent from a group of talents that a creature possesses.
--- @param category solstice.talent.CATEGORY_*
+-- @param category TALENT\_CATEGORY\_*
 function M.Creature:GetTalentRandom(category)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(category)
    NWE.ExecuteCommand(307, 2)
    return NWE.StackPopEngineStructure(NWE.STRUCTURE_TALENT)
 end
-

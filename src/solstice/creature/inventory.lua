@@ -18,7 +18,7 @@ local sm  = string.strip_margin
 function M.Creature:Equips(creature)
    local i, _i = 0
    local obj, _obj = pc:GetItemInSlot(i)
-   local max = creature and M.INVENTORY_SLOT_NUM or 14
+   local max = creature and INVENTORY_SLOT_NUM or 14
    return function ()
       while obj and i < max do
          _i, i = i, i + 1

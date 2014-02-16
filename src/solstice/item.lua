@@ -59,12 +59,12 @@ end
 -- @section item
 
 --- Duplicates an item.
--- @param[opt=solstice.object.INVALID] target Create the item within this object's
+-- @param[opt=OBJECT_INVALID] target Create the item within this object's
 -- inventory
 -- @param[opt=false] copy_vars If true, local variables on item are copied.
 function M.Item:Copy(target, copy_vars)
    NWE.StackPushBoolean(copy_vars)
-   NWE.StackPushObject(target or Obj.INVALID)
+   NWE.StackPushObject(target or OBJECT_INVALID)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(584, 3)
 
@@ -125,8 +125,8 @@ function M.Item:GetEntireAppearance()
 end
 
 --- Returns the appearance of an item
--- @param appearance_type solstice.item.APPR_TYPE_*
--- @param index solstice.item.APPR\_WEAPON\_* or solstice.item.APPR\_ARMOR\_*
+-- @param appearance_type ITEM\_APPR\_TYPE\_*
+-- @param index ITEM\_APPR\_WEAPON\_* or ITEM\_APPR\_ARMOR\_*
 function M.Item:GetItemAppearance(appearance_type, index)
    NWE.StackPushInteger(index)
    NWE.StackPushInteger(appearance_type)
@@ -160,14 +160,14 @@ end
 --- Set item
 function M.Item:SetAppearance(index, value)
    if not self:GetIsValid()
-      or index < M.APPR_COLOR_LEATHER_1
-      or index > M.APPR_ARMOR_MODEL_ROBE
+      or index < ITME_APPR_COLOR_LEATHER_1
+      or index > ITME_APPR_ARMOR_MODEL_ROBE
       or value < 0 or value > 255
    then
       return -1
    end
 
-   if index < M.APPR_MODEL_PART_1 then
+   if index < ITME_APPR_MODEL_PART_1 then
       self.obj.it_color[index + 9] = value
    else
       self.obj.it_model[index + 3] = value
