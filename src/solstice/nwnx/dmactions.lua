@@ -1,8 +1,6 @@
 --- NWNX DM Actions
 -- @module nwnx.dmactions
 
-local Mod = require 'solstice.module'
-
 local M = {}
 
 M.DM_ACTION_MESSAGE_TYPE           =  1
@@ -27,7 +25,7 @@ local function get_int(dm, str, spacer)
 end
 
 function M.SetScript(nAction, sScript)
-   local mod = Mod.Get()
+   local mod = Game.GetModule()
    mod:SetLocalString("NWNX!DMACTIONS!SET_ACTION_SCRIPT", nAction .. ":" .. sScript)
    mod:DeleteLocalString("NWNX!DMACTIONS!SET_ACTION_SCRIPT")
 end
@@ -64,12 +62,12 @@ function M.GetPosition(dm)
    return vector_t(x, y, z)
 end
 
-function M.GetTargetsCount(dm) 
-   return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCOUNT", "                ") 
+function M.GetTargetsCount(dm)
+   return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCOUNT", "                ")
 end
 
 function M.GetTargetsCurrent(dm)
-   return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCURRENT", "                ") 
+   return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCURRENT", "                ")
 end
 
 -- NWNX functions cannot be JITed.

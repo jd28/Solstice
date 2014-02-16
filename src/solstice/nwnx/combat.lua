@@ -1,8 +1,6 @@
 --- NWNX Combat
 -- @module nwnx.combat
 
-local Mod = require 'solstice.module'
-
 local M = {}
 
 M.INFO_INVALID       = 0
@@ -19,7 +17,7 @@ M.INFO_ATTACKS       = 0x80
 M.INFO_IMMUNITY_MISC = 0x100
 
 function M.InitializeTables()
-   local mod = Mod.Get()
+   local mod = Game.GetModule()
    mod:SetLocalString("NWNX!COMBAT!INIT_TABLES", " ")
 end
 

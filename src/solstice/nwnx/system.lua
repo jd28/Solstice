@@ -113,24 +113,23 @@ int GetSystemTime () {
 
 --]]
 
-local Mod = require 'solstice.module'
 local mod
 
 local M = {}
 
 function M.GetTMILimit ()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!GETTMILIMIT", "          ")
    return tonumber(mod:GetLocalString("NWNX!SYSTEM!GETTMILIMIT"))
 end
 
 function M.SetTMILimit (nLimit)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!SETTMILIMIT", tostring(nLimit))
 end
 
 function M.ShutdownServer (nForce)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!SYSTEM!SHUTDOWNSERVER", tostring(nForce))
 end
 

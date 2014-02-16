@@ -2,7 +2,6 @@
 -- @module nwnx.database
 
 local CDB = require 'solstice.campaigndb'
-local Mod = require 'solstice.module'
 local M = {}
 
 local DEFAULT_TABLE = "pwdata"
@@ -17,19 +16,19 @@ local mod
 -- Functions for initializing APS and working with result sets
 
 function M.SQLInit()
-   mod = mod or Mod.Get()
+   mod = mod or Game.GetModule()
    mod:SetLocalString("NWNX!ODBC!SPACER", string.rep('.', 8*128))
 end
 
 function M.SQLExecDirect(sql)
-   mod = mod or Mod.Get()
+   mod = mod or Game.GetModule()
    mod:SetLocalString("NWNX!ODBC!EXEC", sql)
 end
 
 local result_set
 
 function M.SQLFetch()
-   mod = mod or Mod.Get()
+   mod = mod or Game.GetModule()
    -- Reset the result set.
    result_set = nil
 
@@ -45,7 +44,7 @@ function M.SQLFetch()
 end
 
 function M.SQLGetData(column)
-   mod = mod or Mod.Get()
+   mod = mod or Game.GetModule()
    if not result_set then
       result_set = string.split(mod:GetLocalString("NWNX_ODBC_CurrentRow"), "¬")
    end
@@ -136,7 +135,7 @@ function M.GetString(object, varname, is_global, table)
    if M.SQLFetch() == M.SQL_SUCCESS then
       return M.SQLDecodeSpecialChars(M.SQLGetData(1))
    end
-      
+
    return ""
 end
 
@@ -264,7 +263,7 @@ function M.DeleteVariable(object, varname, is_global, table)
 
    tag = M.SQLEncodeSpecialChars(tag)
    varname = M.SQLEncodeSpecialChars(varname)
-   
+
    local sql = "DELETE FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
    M.SQLExecDirect(sql)
 end

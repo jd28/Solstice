@@ -1,7 +1,6 @@
 --- NWNX Levels
 -- @module nwnx.level
 
-local Mod = require 'solstice.module'
 local mod
 local M = {}
 
@@ -10,13 +9,13 @@ function M.DumpSpells(oCreature)
 end
 
 function M.GetMaxLevelLimit()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!LEVELS!GETMAXLEVELLIMIT", "none")
    return tonumber(mod:GetLocalString("NWNX!LEVELS!GETMAXLEVELLIMIT"))
 end
 
 function M.SetMaxLevelLimit (nLevel)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!LEVELS!SETMAXLEVELLIMIT", tostring(nLevel))
    return tonumber(mod:GetLocalString("NWNX!LEVELS!SETMAXLEVELLIMIT"))
 end

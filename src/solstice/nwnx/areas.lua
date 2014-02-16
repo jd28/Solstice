@@ -4,19 +4,17 @@
 -- @module nwnx.areas
 -- @alias M
 
-local Mod = require 'solstice.module'
-
 local mod
 local M = {}
 
 function M.CreateArea(sResRef)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!AREAS!CREATE_AREA", sResRef)
    return mod:GetLocalObject("NWNX!AREAS!GET_LAST_AREA_ID")
 end
 
 function M.DestroyArea(oArea)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!AREAS!DESTROY_AREA", oArea:ToString())
 end
 

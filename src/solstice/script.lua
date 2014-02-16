@@ -32,7 +32,7 @@ end
 -- scripting.
 -- @param item Item that caused the event.
 function solstice.nwn.GetItemEventName(item)
-   local mod = Mod.Get()
+   local mod = Game.GetModule()
    local prefix = mod:GetLocalString("MODULE_VAR_TAGBASED_SCRIPT_PREFIX")
 
    if prefix == "" then
@@ -52,12 +52,12 @@ function solstice.nwn.SetItemEventPrefix(prefix)
       error "Item event script prefix must be a string!"
    end
 
-   local mod = Mod.Get()
+   local mod = Game.GetModule()
    mod:SetLocalString("MODULE_VAR_TAGBASED_SCRIPT_PREFIX", prefix)
 end
 
 --- Set script return value.
--- @param object 
+-- @param object
 -- @int[opt=solstice.script.CONTINUE] value Return value.
 function M.SetReturnValue(object, value)
     value = value or M.CONTINUE

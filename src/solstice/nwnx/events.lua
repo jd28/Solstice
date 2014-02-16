@@ -1,7 +1,6 @@
 --- NWNX Events
 -- @module nwnx.events
 
-local Mod = require 'solstice.module'
 local Vec = require 'solstice.vector'
 local Log = require 'solstice.log'
 
@@ -56,9 +55,9 @@ M.LANGUAGE_JAPANESE            = 131
 -- @return see table type NWNXEventInfo
 function M.GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
-   if e == nil then 
+   if e == nil then
       Log.WriteTimestampedLogEntry("GetEventInfo GetLastNWNXEvent is null")
-      return 
+      return
    end
 
    return { type = e.type,
@@ -71,10 +70,10 @@ function M.GetEventInfo()
 end
 
 --- Bypass current event.
--- @param use_return_val If true this tells the plugin to use a value 
+-- @param use_return_val If true this tells the plugin to use a value
 --    passed via M.SetEventReturnValue. (Default: false)
 function M.BypassEvent(use_return_val)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
 
    if not use_return_val then
       mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
@@ -93,7 +92,7 @@ end
 
 --- Register NWNXEvent examine event handler.
 -- TODO FIX THIS
--- @param obj_type 
+-- @param obj_type
 -- @param f A function to handle the event.  When the event fires the function will
 --    be called with two parameters the object and a boolean indicating whether the object
 --    is identified or not..
@@ -105,56 +104,56 @@ end
 --- Sets a value for NWNX Events to return from a hook.
 -- @param val Must be an integer value.
 function M.SetEventReturnValue(val)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!RETURN", tostring(val));
 end
 
 function M.GetCurrentNodeType()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_TYPE", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_TYPE"))
 end
 
 function M.GetCurrentNodeID()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_ID"))
 end
 
 function M.GetCurrentAbsoluteNodeID()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID"))
 end
 
 function M.GetSelectedNodeID()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID"))
 end
 
 function M.GetSelectedAbsoluteNodeID()
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID"))
 end
 
 function M.GetSelectedNodeText(nLangID, nGender)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT", tostring(nLangID*2 + nGender))
    return mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT")
 end
 
 function M.GetCurrentNodeText(nLangID, nGender)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_TEXT", tostring(nLangID*2 + nGender))
    return mod:GetLocalString("NWNX!EVENTS!GET_NODE_TEXT")
 end
 
 function M.SetCurrentNodeText(sText, nLangID, nGender)
-   if not mod then mod = Mod.Get() end
+   if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
    mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "¬" ..sText)
 end
@@ -173,7 +172,7 @@ function NWNXEvents_HandleEvent(event_type)
    -- or script can handle the event.
    local f = EVENT_HANDLERS[event_type]
    if not f then return false end
-   
+
    return f(M.GetEventInfo())
 end
 
