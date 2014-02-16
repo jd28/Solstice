@@ -142,7 +142,7 @@ function _SOL_DESTROY_OBJECT(id, delay)
    -- Remove it immediately, but add delay command to ensure its
    -- removal.
    _SOL_REMOVE_CACHED_OBJECT(id)
-   if not mod then mod = sol_mod.Get() end
+   if not mod then mod = Game.GetModule() end
    mod:DelayCommand(delay+0.1, function () _SOL_REMOVE_CACHED_OBJECT(id) end)
 end
 
