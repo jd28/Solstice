@@ -232,17 +232,17 @@ end
 -- @param damage_type solstice.damage constant.
 -- @param damage solstice.damage.BONUS_*
 function M.DamageBonus(damage_type, damage)
-   damage_type = Dmg.ConvertToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_BONUS, damage_type, 4, damage)
    return eff
 end
 
 --- Creates a damage immunity itemproperty.
--- @param damage_type solstice.damage type constant.
+-- @param damage_type DAMAGE\_TYPE\_*
 -- @param amount IP_CONST_DAMAGEIMMUNITY_*
 function M.DamageImmunity(damage_type, amount)
-   damage_type = Dmg.ConvertToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
    return eff
@@ -257,8 +257,8 @@ function M.DamagePenalty(amount)
 end
 
 --- Creates a damage reduction itemproperty.
--- @param enhancement solstice.itemprop.REDUCTION_*
--- @param soak solstice.itemprop.SOAK_*
+-- @param enhancement IP_CONST_REDUCTION_*
+-- @param soak IP_CONST_SOAK_*
 function M.DamageReduction(enhancement, soak)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_REDUCTION, enhancement, 6, soak)
@@ -267,9 +267,9 @@ end
 
 --- Creates damage resistance item property.
 -- @param damage_type solstice.damage type constant.
--- @param amount solstice.itemprop.RESIST_*
+-- @param amount IP_CONST_RESIST_*
 function M.DamageResistance(damage_type, amount)
-   damage_type = Dmg.ConvertToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_RESISTANCE, damage_type, 7, amount)
    return eff
@@ -279,7 +279,7 @@ end
 -- @param damage_type solstice.damage type constant.
 -- @param amount IP_CONST_DAMAGEVULNERABILITY_*
 function M.DamageVulnerability(damage_type, amount)
-   damage_type = Dmg.ConvertToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
    local eff = M.CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_VULNERABILITY, damage_type, 22, amount)
    return eff
@@ -311,7 +311,7 @@ end
 -- @param[opt=false] is_ranged ExtraRangedDamge if true, melee if false.
 function M.ExtraDamageType(damage_type, is_ranged)
    local eff = M.CreateItempropEffect()
-   damage_type = Dmg.ConvertToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
 
    if is_ranged then
       eff:SetValues(ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE, damage_type, 0)
@@ -349,9 +349,10 @@ function M.HolyAvenger()
 end
 
 --- Creates immunity item property
--- @param immumity_type IP_CONST_IMMUNITYMISC_*
+-- @param immumity_type IMMUNITY\_TYPE\_*
 function M.ImmunityMisc(immumity_type)
    local eff = M.CreateItempropEffect()
+   immumity_type = Rules.ConvertImmunityToIPConstant(immumity_type)
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_MISCELLANEOUS, immumity_type, 0)
    return eff
 end
@@ -486,10 +487,12 @@ function M.Regeneration(amount)
 end
 
 --- Creates saving throw bonus item property
--- @param save_type IP_CONST_SAVEBASETYPE_*
+-- @param save_type SAVING_THROW_*
 -- @param amount [1,20] or [-20, -1]
 function M.SavingThrow(save_type, amount)
    local eff = M.CreateItempropEffect()
+
+   save_type = Rules.ConvertSaveToItempropConstant(save_type)
 
    if amount < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_SAVING_THROWS_SPECIFIC, save_type, 20, math.clamp(-amount, 1, 10))
@@ -501,10 +504,12 @@ function M.SavingThrow(save_type, amount)
 end
 
 --- Creates saving throw bonus vs item property
--- @param save_type IP_CONST_SAVEVS_*
+-- @param save_type SAVING_THROW_VS_*
 -- @param amount [1,20] or [-20, -1]
 function M.SavingThrowVersus(save_type, amount)
    local eff = M.CreateItempropEffect()
+
+   save_type = Rules.ConvertSaveVsToItempropConstant(save_type)
 
    if amount < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_SAVING_THROWS, save_type, 20, math.clamp(-amount, 1, 20))
