@@ -8,12 +8,12 @@ local M = {}
 
 -- Get a cached 2da file.
 -- @param twoda 2da name (minus .2da extention)
-function M.GetCached2da(twoda) 
-   if type(twoda) ~= "string" then 
+function M.GetCached2da(twoda)
+   if type(twoda) ~= "string" then
       error "solstice.2da.GetCached2da: parameter is not a string type!"
    end
 
-   t = C.nwn_GetCached2da(twoda)
+   local t = C.nwn_GetCached2da(twoda)
    if t == nil then
       error("solstice.2da.GetCached2da: invalid 2dA: " .. twoda)
    end
@@ -23,9 +23,9 @@ end
 
 ---
 -- @param twoda 2da file.
-function M.Get2daColumnCount(twoda) 
+function M.Get2daColumnCount(twoda)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)       
+      twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -36,9 +36,9 @@ end
 
 ---
 -- @param twoda 2da file.
-function M.Get2daRowCount(twoda) 
+function M.Get2daRowCount(twoda)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)       
+      twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -53,7 +53,7 @@ end
 -- @param row Row index.
 function M.Get2daFloat(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)       
+      twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -75,7 +75,7 @@ end
 -- @param row Row index.
 function M.Get2daInt(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)       
+      twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -98,7 +98,7 @@ end
 -- @param row Row index.
 function M.Get2daString(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)       
+      twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
