@@ -1,7 +1,6 @@
 --- Modes
 -- @module modes
 
-local Sk = require 'solstice.skill'
 local Ft = require 'solstice.feat'
 local Obj = require 'solstice.object'
 
@@ -61,11 +60,11 @@ function NSToggleMode(cre, mode)
       end
       cre:SetActivity(act, on)
    elseif mode == M.ACTION_STEALTH then
-      if cre.obj.cre_attack_target ~= Obj.INVALID.id
-         or cre.obj.cre_attempted_target ~= Obj.INVALID.id
+      if cre.obj.cre_attack_target ~= OBJECT_INVALID.id
+         or cre.obj.cre_attempted_target ~= OBJECT_INVALID.id
       then
          cre:SendMessageByStrRef(60)
-      elseif cre:CanUseSkill(Sk.HIDE) or cre:CanUseSkill(Sk.MOVE_SILENTLY) then
+      elseif cre:CanUseSkill(SKILL_HIDE) or cre:CanUseSkill(SKILL_MOVE_SILENTLY) then
          if cre.obj.cre_mode_stealth == 1 then
             act, on = 1, 0
          else
@@ -80,7 +79,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.PARRY, false)
       end
    elseif mode == M.ACTION_POWER_ATTACK then
-      if not cre:GetHasFeat(Ft.POWER_ATTACK) then
+      if not cre:GetHasFeat(FEAT_POWER_ATTACK) then
          return false
       end
 
@@ -90,7 +89,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.POWER_ATTACK, false)
       end
    elseif mode == M.ACTION_IMPROVED_POWER_ATTACK then
-      if not cre:GetHasFeat(Ft.IMPROVED_POWER_ATTACK) then
+      if not cre:GetHasFeat(FEAT_IMPROVED_POWER_ATTACK) then
          return false
       end
 
@@ -106,7 +105,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.COUNTERSPELL, true)
       end
    elseif mode == M.ACTION_FLURRY_OF_BLOWS then
-      if not cre:GetHasFeat(Ft.FLURRY_OF_BLOWS) then
+      if not cre:GetHasFeat(FEAT_FLURRY_OF_BLOWS) then
          return false
       end
 
@@ -116,7 +115,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.FLURRY_OF_BLOWS, false)
       end
    elseif mode == M.ACTION_RAPID_SHOT then
-      if not cre:GetHasFeat(Ft.RAPID_SHOT) then
+      if not cre:GetHasFeat(FEAT_RAPID_SHOT) then
          return false
       end
 
@@ -126,7 +125,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.RAPID_SHOT, false)
       end
    elseif mode == M.ACTION_EXPERTISE then
-      if not cre:GetHasFeat(Ft.EXPERTISE) then
+      if not cre:GetHasFeat(FEAT_EXPERTISE) then
          return false
       end
 
@@ -136,7 +135,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.EXPERTISE, false)
       end
    elseif mode == M.ACTION_IMPROVED_EXPERTISE then
-      if not cre:GetHasFeat(Ft.IMPROVED_EXPERTISE) then
+      if not cre:GetHasFeat(FEAT_IMPROVED_EXPERTISE) then
          return false
       end
 
@@ -152,7 +151,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.DEFENSIVE_CASTING, false)
       end
    elseif mode == M.ACTION_DIRTY_FIGHTING then
-      if not cre:GetHasFeat(Ft.DIRTY_FIGHTING) then
+      if not cre:GetHasFeat(FEAT_DIRTY_FIGHTING) then
          return false
       end
 
@@ -162,7 +161,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.DIRTY_FIGHTING, false)
       end
    elseif mode == M.ACTION_DEFENSIVE_STANCE then
-      if not cre:GetHasFeat(Ft.DWARVEN_DEFENDER_DEFENSIVE_STANCE) then
+      if not cre:GetHasFeat(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE) then
          return false
       end
 
@@ -170,7 +169,7 @@ function NSToggleMode(cre, mode)
          cre:SetCombatMode(M.INVALID, true)
       else
          cre:SetCombatMode(M.DEFENSIVE_STANCE, false)
-         cre:DecrementRemainingFeatUses(Ft.DWARVEN_DEFENDER_DEFENSIVE_STANCE)
+         cre:DecrementRemainingFeatUses(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE)
       end
    end
 
