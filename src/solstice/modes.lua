@@ -1,7 +1,6 @@
 --- Modes
 -- @module modes
 
-local Ft = require 'solstice.feat'
 local Obj = require 'solstice.object'
 
 local MODES = {}
