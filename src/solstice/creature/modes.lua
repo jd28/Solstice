@@ -44,10 +44,12 @@ function M.Creature:SetCombatMode(mode, change)
    local off = mode == Mode.INVALID
    if change and self.obj.cre_mode_combat > 11 then
       local f = Mode.Get(self.obj.cre_mode_combat)
-      f(self, mode, true)
-      self.obj.cre_mode_combat = 0
-      -- TODO: Remove all mode effects.
-      return
+      if f then
+         f(self, mode, true)
+         self.obj.cre_mode_combat = 0
+         -- TODO: Remove all mode effects.
+         return
+      end
    end
 
    local function set_activity()
