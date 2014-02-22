@@ -108,6 +108,8 @@ function M.Creature:SetCombatMode(mode, change)
    end
 end
 
+jit.off(M.Creature.SetCombatMode)
+
 --- Sets creature's combat mode
 -- @param cre Creature in question.
 -- @param mode solstice.modes type constant.

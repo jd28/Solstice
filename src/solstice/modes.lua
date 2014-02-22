@@ -2,7 +2,7 @@
 -- @module modes
 
 local Obj = require 'solstice.object'
-
+local jit = require 'jit'
 local MODES = {}
 local M = {}
 
@@ -175,6 +175,8 @@ function NSToggleMode(cre, mode)
    cre:NotifyAssociateActionToggle(mode)
    return true
 end
+
+jit.off(NSToggleMode)
 
 --- Get a registered combat mode
 -- @param mode
