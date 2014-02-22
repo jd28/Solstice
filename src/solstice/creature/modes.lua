@@ -48,8 +48,8 @@ function M.Creature:SetCombatMode(mode, change)
          f(self, mode, true)
          self.obj.cre_mode_combat = 0
          -- TODO: Remove all mode effects.
-         return
       end
+      return
    end
 
    local function set_activity()
