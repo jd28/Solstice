@@ -8,6 +8,39 @@ local Obj = require 'solstice.object'
 local MODES = {}
 local M = {}
 
+M.const = {
+   -- Combat Mode Defines
+   INVALID                 = 0,
+   PARRY                   = 1,
+   POWER_ATTACK            = 2,
+   IMPROVED_POWER_ATTACK   = 3,
+   COUNTER_SPELL           = 4,
+   FLURRY_OF_BLOWS         = 5,
+   RAPID_SHOT              = 6,
+   EXPERTISE               = 7,
+   IMPROVED_EXPERTISE      = 8,
+   DEFENSIVE_CASTING       = 9,
+   DIRTY_FIGHTING          = 10,
+   DEFENSIVE_STANCE        = 11,
+
+   ACTION_DETECT                  = 0,
+   ACTION_STEALTH                 = 1,
+   ACTION_PARRY                   = 2,
+   ACTION_POWER_ATTACK            = 3,
+   ACTION_IMPROVED_POWER_ATTACK   = 4,
+   ACTION_COUNTERSPELL            = 5,
+   ACTION_FLURRY_OF_BLOWS         = 6,
+   ACTION_RAPID_SHOT              = 7,
+   ACTION_EXPERTISE               = 8,
+   ACTION_IMPROVED_EXPERTISE      = 9,
+   ACTION_DEFENSIVE_CAST          = 10,
+   ACTION_DIRTY_FIGHTING          = 11,
+   ACTION_DEFENSIVE_STANCE        = 12,
+}
+
+setmetatable(M, { __index = M.const })
+
+
 --- Internal toggle mode function
 -- @param cre Creature to toggle mode on
 -- @param mode solstice.nwn.ACTION_MODE_*

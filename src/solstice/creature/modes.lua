@@ -10,6 +10,7 @@ local jit = require 'jit'
 
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
+local Mode = require 'solstice.modes'
 
 --- Modes
 -- @section level
