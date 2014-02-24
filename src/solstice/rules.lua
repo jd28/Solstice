@@ -33,7 +33,7 @@ end
 
 local FEAT_USES = {}
 
----
+--- Determines a creatures maximum feat uses.
 -- @param feat
 -- @param[opt] cre Creature instance.
 function M.GetMaximumFeatUses(feat, cre)
@@ -48,10 +48,12 @@ end
 
 --- Register a function to determine maximum feat uses.
 -- @param func A function taking two argument, a Creature instance and
--- and a solstice.feat constant
--- @param ... Vararg list of any number of solstice.feat constant.
+-- and a FEAT\_* constant.
+-- @param ... Vararg list FEAT\_* constants.
 function M.RegisterFeatUses(func, ...)
-   for _, feat in ipairs({...}) do
+   local t = {...}
+   assert(#t > 0)
+   for _, feat in ipairs(t) do
       FEAT_USES[feat] = func
    end
 end
