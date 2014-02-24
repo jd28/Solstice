@@ -96,7 +96,10 @@ function M.Creature:SetCombatMode(mode, change)
 
    if not change and mode == current_mode then
       set_activity()
-   elseif change or self.obj.cre_combat_round.cr_round_started ~= 1 then
+   elseif change or
+      self.obj.cre_combat_round == nil or
+      self.obj.cre_combat_round.cr_round_started ~= 1
+   then
       local f = Mode.Get(mode)
       if f and not f(self, mode, off) then
          return
