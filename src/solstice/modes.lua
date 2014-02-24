@@ -44,6 +44,8 @@ setmetatable(M, { __index = M.const })
 -- @param mode solstice.nwn.ACTION_MODE_*
 function NSToggleMode(cre, mode)
    cre = _SOL_GET_CACHED_OBJECT(cre)
+   if not cre:GetIsValid() then return false end
+
    local bypass = true
    local act, on
 
