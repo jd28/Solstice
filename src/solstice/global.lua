@@ -87,9 +87,6 @@ function _SOL_GET_CACHED_OBJECT(id)
       return Obj.INVALID
    end
 
-   local cache = _OBJECTS[id]
-   if cache then return cache end
-
    local obj = C.nwn_GetObjectByID(id)
    if obj == nil then
       return Obj.INVALID
@@ -101,7 +98,6 @@ function _SOL_GET_CACHED_OBJECT(id)
    if type == OBJECT_TRUETYPE_CREATURE then
       obj = ffi.cast("CNWSCreature*", obj)
       object = sol_cre.creature_t(type, id, obj, obj.cre_stats)
-      _OBJECTS[id] = object
    elseif type == OBJECT_TRUETYPE_MODULE then
       object = sol_mod.module_t(type, id, C.nwn_GetModule())
    elseif type == OBJECT_TRUETYPE_AREA then
