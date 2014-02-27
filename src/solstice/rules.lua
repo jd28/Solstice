@@ -1,133 +1,21 @@
+--- Rules module.
+-- Globally exported as `Rules`.
+-- @alias M
+
 local ffi = require 'ffi'
 local bit = require 'bit'
 local C = ffi.C
 local TLK = require 'solstice.tlk'
-local TDA = require 'solstice.2da'
 
-local M = {}
-
---- Get skill's associated ability.
--- @return solstice.ability type constant
-function M.GetSkillAbility(skill)
-   sk = C.nwn_GetSkill(skill)
-   if sk == nil then return -1 end
-
-   return sk.sk_ability
-end
-
---- Check if skill has armor check penalty.
-function M.SkillHasArmorCheckPenalty(skill)
-   sk = C.nwn_GetSkill(skill)
-   if sk == nil then return false end
-
-   return sk.sk_armor_check ~= 0
-end
-
---- Get Skill name.
-function M.GetSkillName(skill)
-   sk = C.nwn_GetSkill(skill)
-   if sk == nil then return "" end
-
-   return TLK.GetString(sk.sk_name_strref)
-end
-
-local FEAT_USES = {}
-
---- Determines a creatures maximum feat uses.
--- @param feat
--- @param[opt] cre Creature instance.
-function M.GetMaximumFeatUses(feat, cre)
-   local f = FEAT_USES[feat]
-   if not f then
-      local tda = TDA.Get2daString("feat", "USESPERDAY", feat)
-      return tonumber(tda) or 100
-   end
-
-   return f(feat, cre)
-end
-
---- Register a function to determine maximum feat uses.
--- @param func A function taking two argument, a Creature instance and
--- and a FEAT\_* constant.
--- @param ... Vararg list FEAT\_* constants.
-function M.RegisterFeatUses(func, ...)
-   local t = {...}
-   assert(#t > 0)
-   for _, feat in ipairs(t) do
-      FEAT_USES[feat] = func
-   end
-end
-
-function NWNXSolstice_GetMaximumFeatUses(feat, cre)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
-   return M.GetMaximumFeatUses(feat, cre)
-end
-
-_CONSTS = {}
-setmetatable(_G, { __index = _CONSTS })
-
--- Helper function for loading the 2da values.
-local function load(into, lookup)
-   if not lookup.tda or not lookup.column_label then
-      error "sol.consant.Load: invalid tda or column label!"
-   end
-
-   local twoda = TDA.GetCached2da(lookup.tda)
-   local size = TDA.Get2daRowCount(twoda) - 1
-   for i = 0, size do
-      local const = TDA.Get2daString(twoda, lookup.column_label, i)
-      if #const > 0 and const ~= "****" then
-         if lookup.extract then
-            const = string.match(const, lookup.extract)
-         end
-         if const then
-            if lookup.value_label then
-               local val
-               if lookup.value_type == "string" then
-                  val = TDA.Get2daString(twoda, lookup.value_label, i)
-               elseif lookup.value_type == "float" then
-                  val = TDA.Get2daFloat(twoda, lookup.value_label, i)
-               elseif lookup.value_type == "int" then
-                  val = TDA.Get2daInt(twoda, lookup.value_label, i)
-               else
-                  error(string.format("solstice.constant.Load: Invalid value type %s!",
-                                      lookup.value_type))
-               end
-               into[const] = val
-            else
-               into[const] = i
-            end
-         end
-      end
-   end
-end
-
---- Register constant loader.
--- @param module_name Name of the module to load constants into.
--- @param tda 2da name (without .2da)
--- @param column_label Label of the 2da column that contains constant
--- names.
--- @param[opt] extract A lua string.match pattern for extracting a
--- constant name.  E,g: `"FEAT_([%w_]+)"` to strip off 'FEAT_'
--- @param[opt] value_label Label of the 2da column that contains
--- the constants value.  If not passed constant value will be the
--- 2da row number.
--- @param[opt="int"] const_type Constant type.  Only used when
--- value_label is passed. Legal values: "int", "string", "float"
-function M.RegisterConstants(tda, column_label, extract,
-                             value_label, value_type)
-   load(_CONSTS, { tda = tda,
-                   column_label = column_label,
-                   extract = extract,
-                   value_type = value_type,
-                   value_label = value_label })
-end
-
---- Register constant.
-function M.RegisterConstant(name, value)
-   assert(type(name) == "string")
-   _CONSTS[name] = value
-end
+local M = require 'solstice.rules.init'
+require 'solstice.rules.classes'
+require 'solstice.rules.combatmods'
+require 'solstice.rules.conceal'
+require 'solstice.rules.constants'
+require 'solstice.rules.dmgred'
+require 'solstice.rules.feats'
+require 'solstice.rules.skills'
+require 'solstice.rules.weapons'
 
 --- Convert damage type constant to item property damage constant.
 function M.ConvertDamageToItempropConstant(const)
@@ -157,6 +45,37 @@ function M.ConvertDamageToItempropConstant(const)
       return IP_CONST_DAMAGE_SONIC
    else
       error "Unable to convert damage contant to damage IP constant."
+   end
+end
+
+--- Convert damage type constant to item property damage constant.
+function M.ConvertItempropConstantToDamageIndex(const)
+   if const == IP_CONST_DAMAGE_BLUDGEONING then
+      return DAMAGE_TYPE_BLUDGEONING
+   elseif const == IP_CONST_DAMAGE_PIERCING then
+      return DAMAGE_TYPE_PIERCING
+   elseif const == IP_CONST_DAMAGE_SLASHING then
+      return DAMAGE_TYPE_SLASHING
+   elseif const == IP_CONST_DAMAGE_MAGICAL then
+      return DAMAGE_TYPE_MAGICAL
+   elseif const == IP_CONST_DAMAGE_ACID then
+      return DAMAGE_TYPE_ACID
+   elseif const == IP_CONST_DAMAGE_COLD then
+      return DAMAGE_TYPE_COLD
+   elseif const == IP_CONST_DAMAGE_DIVINE then
+      return DAMAGE_TYPE_DIVINE
+   elseif const == IP_CONST_DAMAGE_ELECTRICAL then
+      return DAMAGE_TYPE_ELECTRICAL
+   elseif const == IP_CONST_DAMAGE_FIRE then
+      return DAMAGE_TYPE_FIRE
+   elseif const == IP_CONST_DAMAGE_NEGATIVE then
+      return DAMAGE_TYPE_NEGATIVE
+   elseif const == IP_CONST_DAMAGE_POSITIVE then
+      return DAMAGE_TYPE_POSITIVE
+   elseif const == IP_CONST_DAMAGE_SONIC then
+      return DAMAGE_TYPE_SONIC
+   else
+      return 0
    end
 end
 

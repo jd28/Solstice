@@ -51,6 +51,7 @@ typedef struct {
     bool         is_remove;
     bool         suppress;
     bool         delete_eff;
+    bool         preapply;
 } EventEffect;
 
 typedef struct {

@@ -9,10 +9,10 @@ local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
+local Door = inheritsFrom({}, Obj.Object)
+M.Door = Door
 
-M.Door = inheritsFrom(Obj.Object, "solstice.door.Door")
-
---- Internal ctype
+-- Internal ctype
 M.door_t = ffi.metatype("Door", { __index = M.Door })
 
 --- Class Door

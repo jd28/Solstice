@@ -9,7 +9,7 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = {}
-M.Store = inheritsFrom(Obj.Object, "solstice.store.Store")
+M.Store = inheritsFrom({}, Obj.Object)
 
 --- Internal ctype
 M.store_t = ffi.metatype("Store", { __index = M.Store })

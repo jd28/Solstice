@@ -10,7 +10,7 @@ local Obj = require 'solstice.object'
 
 local M = {}
 
-M.Trap = inheritsFrom( nil, "solstice.trap.Trap" )
+M.Trap = {}
 
 --- Internal ctype
 M.trap_t = ffi.metatype("Trap", { __index = M.Trap })

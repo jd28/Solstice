@@ -13,7 +13,7 @@ local ffi   = require 'ffi'
 local NWE   = require 'solstice.nwn.engine'
 local color = require 'solstice.color'
 local D     = require 'solstice.dice'
-local LOG   = require 'solstice.log'
+local Log   = System.GetLogger()
 
 --- Determines if a creature can use a skill
 -- @param skill SKILL\_*.
@@ -103,10 +103,8 @@ function M.Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, ta
    end
 
    local dbg = "Skill Check: User: %s, Versus: %s, Skill: %s, Rank: %d, Roll: %d, DC: %d, Auto: %d"
-   self:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Rules.GetSkillName(skill),
-            rank, roll, dc, auto)
-   vs:Log("DebugChecks", LOG.LEVEL_DEBUG, dbg, self:GetName(), vs:GetName(), Rules.GetSkillName(skill),
-          rank, roll, dc, auto)
+   Log:debug(dbg, self:GetName(), vs:GetName(), Rules.GetSkillName(skill),
+             rank, roll, dc, auto)
 
    return ret
 end
@@ -132,13 +130,32 @@ end
 function M.Creature:GetSkillPoints()
    if not self:GetIsValid() then return 0 end
 
-   return self.stats.cs_skill_points
+   return self.obj.cre_stats.cs_skill_points
 end
 
 -- Gets creature's skill rank.
 -- @param skill SKILL\_*
 function M.Creature:GetSkillRank(skill, vs, base, no_scale)
-   error "nwnxcombat"
+   if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
+      return 0
+   elseif self:GetIsDM() then
+      return 127
+   end
+   local result = self.obj.cre_stats.cs_skills[skill];
+
+   if result == 0 and not Rules.GetSkillIsUntrained(skill) then
+      return 0
+   end
+
+   if base then return result end
+
+   -- TODO: Effects, ArmorCheckPenalty...
+
+   result = result + self:GetAbilityModifier(Rules.GetSkillAbility(skill))
+   result = result + Rules.GetSkillFeatBonus(self, skill)
+   result = result - self:GetTotalNegativeLevels()
+
+   return math.clamp(result, -127, 127)
 end
 --]]
 
@@ -153,7 +170,7 @@ function M.Creature:ModifySkillRank(skill, amount, level)
       return -1
    end
 
-   amount = self.stats.cs_skills[skill] + amount
+   amount = self.obj.cre_stats.cs_skills[skill] + amount
 
    if amount < 0 then amount = 0
    elseif amount > 127 then amount = 127
@@ -166,9 +183,9 @@ function M.Creature:ModifySkillRank(skill, amount, level)
       ls.ls_skilllist[skill] = cur + amount
    end
 
-   self.stats.cs_skills[skill] = amount
+   self.obj.cre_stats.cs_skills[skill] = amount
 
-   return self.stats.cs_skills[skill]
+   return self.obj.cre_stats.cs_skills[skill]
 end
 
 --- Sets a creatures skillpoints available.
@@ -176,8 +193,8 @@ end
 function M.Creature:SetSkillPoints(amount)
    if not self:GetIsValid() then return 0 end
 
-   self.stats.cs_skill_points = amount
-   return self.stats.cs_skill_points
+   self.obj.cre_stats.cs_skill_points = amount
+   return self.obj.cre_stats.cs_skill_points
 end
 
 --- Sets a creatures skill rank
@@ -194,6 +211,6 @@ function M.Creature:SetSkillRank(skill, amount)
    elseif amount > 127 then amount = 127
    end
 
-   self.stats.cs_skills[skill] = amount
-   return self.stats.cs_skills[skill]
+   self.obj.cre_stats.cs_skills[skill] = amount
+   return self.obj.cre_stats.cs_skills[skill]
 end

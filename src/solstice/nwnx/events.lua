@@ -2,7 +2,7 @@
 -- @module nwnx.events
 
 local Vec = require 'solstice.vector'
-local Log = require 'solstice.log'
+local Log = System.GetLogger()
 
 local M = {}
 
@@ -56,7 +56,7 @@ M.LANGUAGE_JAPANESE            = 131
 function M.GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
    if e == nil then
-      Log.WriteTimestampedLogEntry("GetEventInfo GetLastNWNXEvent is null")
+      Log:error("GetEventInfo GetLastNWNXEvent is null")
       return
    end
 

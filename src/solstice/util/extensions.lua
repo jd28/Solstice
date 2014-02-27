@@ -1,17 +1,54 @@
 --- Lua Extensions
 -- @module util.extensions
 
---- String split.
-function string:split(sep)
-  local sep, fields = sep or " ", {}
-  local pattern = string.format("([^%s]+)", sep)
-  self:gsub(pattern, function(c) fields[#fields+1] = c end)
-  return fields
+local ffi = require 'ffi'
+local C = ffi.C
+
+function string:index(n)
+   return string.sub(self, n, n)
 end
+
+--- String split.
+function string:split(sep, isany)
+   sep = sep or " "
+   isany = isany and true or false
+
+   local array = C.str_split(self, sep, isany);
+   local res = {}
+
+   local i = 0
+   while array[i] ~= nil do
+      local s = ffi.string(array[i])
+      table.insert(res, s)
+      i = i + 1
+   end
+   C.free(array)
+   return res
+end
+
+function string:rtrim()
+   return ffi.string(C.str_rtrim(self))
+end
+
+function string:ltrim()
+   return ffi.string(C.str_ltrim(self))
+end
+
+function string:trim()
+   return ffi.string(C.str_trim(self))
+end
+
 
 --- String starts
 function string:starts(start)
-   return string.find(self, "^" .. start)
+   if #self < #start then return false end
+
+   for i=1, #start do
+      if self:byte(i) ~= start:byte(i) then
+         return false
+      end
+   end
+   return true
 end
 
 --- String strip margins.

@@ -1,8 +1,10 @@
 --- 2da
 -- @module 2da
+-- @alias M
 
 local ffi = require 'ffi'
 local C   = ffi.C
+require 'solstice.nwn.ctypes.2da'
 
 local M = {}
 

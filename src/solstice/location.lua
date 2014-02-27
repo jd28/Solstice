@@ -1,5 +1,6 @@
 --- Location
 -- @module location
+-- @alias M
 
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
@@ -9,7 +10,7 @@ local Eff = require 'solstice.effect'
 
 local M = {}
 
-M.Location = inheritsFrom(nil, "solstice.location.Location")
+M.Location = {}
 
 --- Internal ctype
 M.location_t = ffi.metatype("CScriptLocation",
@@ -28,7 +29,7 @@ function M.Create(position, orientation, area)
    NWE.StackPushFloat(orientation)
    NWE.StackPushVector(position)
    NWE.StackPushObject(area)
-   NWE.ExecuteCommand(215, 3)
+   NWE.ExecuteCommandUnsafe(215, 3)
    return NWE.StackPopEngineStructure(NWE.STRUCTURE_LOCATION)
 end
 

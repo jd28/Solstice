@@ -1,25 +1,22 @@
--- Copyright (C) 2012 jmd ( jmd2028 at gmail dot com )
+require 'fun' ()
 
-local fn = {}
+function irange(start, step)
+   step = step or 1
+   return tabulate(function(n) return start + step * n end)
+end
 
-function fn.map(f, iter, ...)
-   for x in iter(unpack(...)) do
-      table.insert(result, f(x))
+function make_iter_valid(f1, f2)
+   local function it(n)
+      return n == 0 and f1() or f2()
    end
-   return result
+
+   return take_while(function (x) return x ~= OBJECT_INVALID end, tabulate(it))
 end
 
-function fn.compose (f, g)
-    return function (...)
-              return f(g(unpack(...)))
-           end
+function bind1st(f, val)
+   return function (second) return f(val, second) end
 end
 
-function fn.any(f, list)
-    for _, ele in ipairs(list) do
-       if f(ele) then return true end
-    end
-    return false
+function bind2nd(f, val)
+   return function (first) return f(first, val) end
 end
-
-return fn

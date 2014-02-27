@@ -10,7 +10,7 @@ local Obj = require 'solstice.object'
 
 local M = {}
 
-M.Waypoint  = inheritsFrom(Obj.Object, "solstice.waypoint.Waypoint")
+M.Waypoint  = inheritsFrom({}, Obj.Object)
 
 --- Internal ctype.
 M.waypoint_t = ffi.metatype("Waypoint", { __index = M.Waypoint })
@@ -21,14 +21,6 @@ function M.Waypoint:SetMapPinEnabled(enabled)
    NWE.StackPushInteger(enabled)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(386, 2)
-end
-
---- Finds a waypiont by tag
--- @param tag Tag of waypoint.
--- @return solstice.waypoint.Waypoint instance or OBJECT_INVALID
-function M.GetByTag(tag)
-   NWE.StackPushString(tag)
-   return NWE.StackPopObject()
 end
 
 return M

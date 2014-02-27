@@ -10,17 +10,46 @@ local Obj = require 'solstice.object'
 
 local M = {}
 
-M.AoE = inheritsFrom(Obj.Object, 'solstice.aoe.AoE')
-M.aoe_t = ffi.metatype("AoE", { __index = M.AoE })
+local AoE = inheritsFrom({}, Obj.Object)
+M.AoE = AoE
+M.aoe_t = ffi.metatype("AoE", { __index = AoE })
 
 --- Class AoE
 -- @section
 
+--- Gets the first object in an AoE.
+-- Perfer the AoE:ObjectsInEffect iterator.
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @return Next object in AoE and finally OBJECT_INVALID
+function AoE:GetFirstInPersistentObject(object_mask)
+   object_mask = object_mask or OBJECT_TYPE_CREATURE
+
+   NWE.StackPushInteger(0)
+   NWE.StackPushInteger(object_mask)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(262, 3)
+   return NWE.StackPopObject()
+end
+
+--- Gets the next object in an AoE.
+-- Perfer the AoE:ObjectsInEffect iterator.
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @return Next object in AoE and finally OBJECT_INVALID
+function AoE:GetNextInPersistentObject(object_mask)
+   object_mask = object_mask or OBJECT_TYPE_CREATURE
+
+   NWE.StackPushInteger(0)
+   NWE.StackPushInteger(object_mask)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(263, 3)
+   return NWE.StackPopObject()
+end
+
 --- An iterator over all objects in an AoE
--- @param[opt=solstice.object.CREATURE] object_mask solstice.object type constant
--- @return All objects satisfying the object mask.
-function M.AoE:ObjectsInEffect(object_mask)
-   object_mask = object_mask or solstice.object.CREATURE
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @return Iterator of objects satisfying the object mask.
+function AoE:ObjectsInEffect(object_mask)
+   object_mask = object_mask or OBJECT_TYPE_CREATURE
 
    return function ()
       local obj, _obj = self:GetFirstInPersistentObject(object_mask)
@@ -31,53 +60,22 @@ function M.AoE:ObjectsInEffect(object_mask)
    end
 end
 
---- Gets the first object in an AoE.
---    Perfer the solstice.aoe.AoE:ObjectsInEffect iterator.
--- @param[opt=solstice.object.CREATURE] object_mask solstice.object type constant
--- @return First object in AoE or solstice.object.INVALID if none.
-function M.AoE:GetFirstInPersistentObject(object_mask)
-   object_mask = object_mask or solstice.object.CREATURE
-
-   NWE.StackPushInteger(0)
-   NWE.StackPushInteger(object_mask)
-   NWE.StackPushObject(self)
-   NWE.ExecuteCommand(262, 3)
-   return NWE.StackPopObject()
-end
-
---- Gets the next object in an AoE.
---    Perfer the solstice.aoe.AoE:ObjectsInEffect iterator.
--- @param[opt=solstice.object.CREATURE] object_mask solstice.object. type constant.
--- @return Next object in AoE and finally solstice.object.INVALID
-function M.AoE:GetNextInPersistentObject(object_mask)
-   object_mask = object_mask or solstice.object.CREATURE
-
-   NWE.StackPushInteger(0)
-   NWE.StackPushInteger(object_mask)
-   NWE.StackPushObject(self)
-   NWE.ExecuteCommand(263, 3)
-   return NWE.StackPopObject()
-end
-
 --- Get's the creator of the AoE
--- @return The creator or solstice.object.INVALID.
-function M.AoE:GetCreator()
-   if not self:GetIsValid() then
-      return Obj.INVALID
-   end
+-- @return The creator or OBJECT_INVALID.
+function AoE:GetCreator()
+   if not self:GetIsValid() then return OBJECT_INVALID end
    return _SOL_GET_CACHED_OBJECT(self.obj.aoe_creator)
 end
 
----
-function M.AoE:SetSpellDC(dc)
+--- Sets AoEs spell DC.
+function AoE:SetSpellDC(dc)
    if not self:GetIsValid() then return -1 end
-
    self.obj.aoe_spell_dc = dc
    return self.obj.aoe_spell_dc
 end
 
----
-function M.AoE:SetSpellLevel(level)
+--- Sets AoEs spell level.
+function AoE:SetSpellLevel(level)
    if not self:GetIsValid() then return -1 end
 
    self.obj.aoe_spell_level = level

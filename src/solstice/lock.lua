@@ -3,12 +3,13 @@
 -- @copyright 2011-2013
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module lock
+-- @alias M
 
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
-M.Lock = inheritsFrom(nil, "solstice.lock.Lock")
+M.Lock = {}
 
 --- Internal ctype.
 M.lock_t = ffi.metatype("Lock", { __index = M.Lock })
@@ -64,7 +65,7 @@ end
 -- @param key_required If true key is required, if false not.
 function M.Lock:SetKeyRequired(key_required)
    key_required = key_required and 1 or 0
-   local o = lock_get_obj(self)   
+   local o = lock_get_obj(self)
    o.obj.lock_key_required = key_required
 end
 

@@ -37,6 +37,8 @@ function M.SetCommandObject(object)
 end
 
 --- Executes and NWN Script command.
+-- @param cmd Command ID
+-- @param args Number of args on stack
 function M.ExecuteCommand(cmd, args)
    C.nwn_ExecuteCommand(cmd, args)
 end
@@ -45,10 +47,23 @@ end
 -- the plugin will crash constantly.
 jit.off(M.ExecuteCommand)
 
+--- Executes and NWN Script command unsafely.
+-- This is identical to ExecuteCommand with the caveat that the
+-- jit is NOT turned off.  Use this only if you know a command
+-- while NOT call a script, a NWNX hook that might call a script
+-- or back into Lua.
+-- @param cmd Command ID
+-- @param args Number of args on stack
+function M.ExecuteCommandUnsafe(cmd, args)
+   C.nwn_ExecuteCommand(cmd, args)
+end
+
 --- Pops a boolean value from the NWNW stack.
 function M.StackPopBoolean()
    return C.nwn_StackPopBoolean()
 end
+
+local Eff, IP
 
 --- Pop Engine Structure from NWN Stack
 -- Probably should do any casting on this side...
@@ -64,7 +79,8 @@ function M.StackPopEngineStructure(es_type)
    if es == nil then return end
 
    if es_type == M.STRUCTURE_EFFECT then
-      return effect_t(es, false)
+      if not Eff then Eff = require 'solstice.effect' end
+      return Eff.effect_t(es, false)
    elseif es_type == M.STRUCTURE_EVENT then
       es = es
    elseif es_type == M.STRUCTURE_LOCATION then
@@ -76,7 +92,8 @@ function M.StackPopEngineStructure(es_type)
    elseif es_type == M.STRUCTURE_TALENT then
       es = es
    elseif es_type == M.STRUCTURE_ITEMPROPERTY then
-      return itemprop_t(es, false)
+      if not IP then IP = require 'solstice.itemprop' end
+      return IP.itemprop_t(es, false)
    end
 
    es = ffi.gc(es, ffi.C.free)
@@ -155,7 +172,7 @@ function M.StackPushEngineStructure(es_type, value)
       error(debug.traceback())
    end
 
-   if es_type == M.STRUCTURE_EFFECT 
+   if es_type == M.STRUCTURE_EFFECT
       or es_type == M.STRUCTURE_ITEMPROPERTY
    then
       C.nwn_StackPushEngineStructure(es_type, value.eff)

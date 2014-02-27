@@ -7,16 +7,20 @@
 * Ease of modification.  Due to Lua's dynamic nature it's possible to
   overwrite any Solstice function, allowing you to customize every
   aspect of the system.
-* Previous goal of allowing combat/effect Lua replacements has been
-  ditched in favor of C++ NWNX plugins.
-  
+
 ## Dependencies
-* Luajit 2.0 
+* Luajit 2.0
 * luafilesystem
 * nwnx_effects
 * nwnx_combat
 * nwnx_nsevents
 * nwnx_nschat
+* [LuaFun](https://github.com/rtsisyk/luafun)
+
+## Combat Engine Differences
+* No support for weapons with multiple damage types.
+* Little to no support for effects versus targets.  This does not
+  include Favored Enemy, Training Verus, both of which are supported.
 
 ## NWScript Differences
 * Solstice is a more object oriented framework.  e.g. rather than

@@ -10,8 +10,9 @@ setmetatable(M, { __index = M.const })
 
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
+local C = ffi.C
 
-M.Object = inheritsFrom(nil)
+M.Object = {}
 
 --- Internal Object ctype.
 -- See sol/ctypes.lua for definition.
@@ -113,12 +114,8 @@ end
 
 --- Determines if an object is valid
 function M.Object:GetIsValid()
-   if self.id == 0x7F000000 then
-      return false
-   end
-
-   local ob = _SOL_GET_CACHED_OBJECT(self.id)
-   return ob.id ~= 0x7F000000
+   if self.id == 0x7F000000 then return false end
+   return C.nwn_GetObjectByID(self.id) ~= nil
 end
 
 --- Causes object to play a sound

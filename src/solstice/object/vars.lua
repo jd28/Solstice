@@ -95,7 +95,7 @@ end
 function M.Object:GetLocalInt(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(51, 2)
+   NWE.ExecuteCommandUnsafe(51, 2)
    return NWE.StackPopInteger()
 end
 
@@ -104,7 +104,7 @@ end
 function M.Object:GetLocalFloat(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(52, 2)
+   NWE.ExecuteCommandUnsafe(52, 2)
    return NWE.StackPopFloat()
 end
 
@@ -113,7 +113,7 @@ end
 function M.Object:GetLocalLocation(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(153, 2)
+   NWE.ExecuteCommandUnsafe(153, 2)
    return NWE.StackPopLocation()
 end
 
@@ -122,7 +122,7 @@ end
 function M.Object:GetLocalObject(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(54, 2)
+   NWE.ExecuteCommandUnsafe(54, 2)
    return NWE.StackPopObject()
 end
 
@@ -131,7 +131,7 @@ end
 function M.Object:GetLocalString(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(53, 2)
+   NWE.ExecuteCommandUnsafe(53, 2)
    local s = NWE.StackPopString()
    return s
 end

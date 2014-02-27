@@ -25,7 +25,7 @@ function M.Creature:GetSavingThrowBonus(save)
    local bonus = 0
 
    if save == SAVING_THROW_FORT then
-      bonus = self.stats.cs_save_fort
+      bonus = self.obj.cre_stats.cs_save_fort
    elseif save == SAVING_THROW_REFLEX then
       bonus = stats.cs_save_reflex
    elseif save == SAVING_THROW_WILL then
@@ -42,7 +42,7 @@ function M.Creature:SetSavingThrowBonus(save, bonus)
    if not self:GetIsValid() then return 0 end
 
    if save == SAVING_THROW_FORT then
-      self.stats.cs_save_fort = bonus
+      self.obj.cre_stats.cs_save_fort = bonus
    elseif save == SAVING_THROW_REFLEX then
       stats.cs_save_reflex = bonus
    elseif save == SAVING_THROW_WILL then

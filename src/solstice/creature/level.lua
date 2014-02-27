@@ -46,7 +46,7 @@ end
 --- Gets total negative levels
 function M.Creature:GetTotalNegativeLevels()
    if not self:GetIsValid() then return 0 end
-   return C.nwn_GetTotalNegativeLevels(self.stats)
+   return C.nwn_GetTotalNegativeLevels(self.obj.cre_stats)
 end
 
 --- Sets a creatures effective level.

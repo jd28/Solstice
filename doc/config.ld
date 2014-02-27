@@ -11,6 +11,8 @@ topics = 'topics'
 examples = {'../examples'}
 merge=true
 sort=true
+no_summary = true
+wrap = true
 
 file={
 	'../src/solstice',

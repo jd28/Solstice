@@ -6,24 +6,14 @@ local M = require 'solstice.creature.init'
 --- Class
 -- @section class
 
---- Determine's if a creature can use a classes abilities.
--- @param class CLASS\_TYPE\_* constant
-function M.Creature:CanUseClassAbilities(class)
-   return true
---   local f = solstice.nwn.GetClassAbilityRequirements()
---   if not f then return true end
---
---   return f(self)
-end
-
 --- Iterator over creature's classes
 function M.Creature:Classes()
    if not self:GetIsValid() then return end
-   local i, count, _i = 0, self.stats.cs_classes_len
+   local i, count, _i = 0, self.obj.cre_stats.cs_classes_len
    return function ()
       while i < count do
          _i, i = i, i + 1
-         return self.stats.cs_classes[_i]
+         return self.obj.cre_stats.cs_classes[_i]
       end
    end
 end
@@ -54,27 +44,27 @@ function M.Creature:GetClericDomain(domain)
       return -1
    end
 
-   for class in self:Classes() do
-      if class.cl_class == CLASS_TYPE_CLERIC then
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
+      if self.obj.cre_stats.cs_classes[i].cl_class == CLASS_TYPE_CLERIC then
          if domain == 1 then
-            return class.cl_domain_1
+            return self.obj.cre_stats.cs_classes[i].cl_domain_1
          else
-            return class.cl_domain_2
+            return self.obj.cre_stats.cs_classes[i].cl_domain_2
          end
       end
    end
+
    return -1
 end
 
 --- Get number of levels a creature by class
 -- @param class CLASS\_TYPE\_* type constant.
 function M.Creature:GetLevelByClass(class)
-   for cl in self:Classes() do
-      if cl.cl_class == class then
-         return cl.cl_level
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
+      if self.obj.cre_stats.cs_classes[i].cl_class == class then
+         return self.obj.cre_stats.cs_classes[i].cl_level
       end
    end
-
    return 0
 end
 
@@ -87,18 +77,18 @@ function M.Creature:GetLevelByPosition(position)
 
    if not self:GetIsValid() then return 0 end
 
-   local cl = self.stats.cs_classes[position]
+   local cl = self.obj.cre_stats.cs_classes[position]
    if cl == nil then return 0 end
 
    return cl.cl_level
 end
 
 function M.Creature:GetLevelStats(level)
-   if level < 1 or level > self.stats.cs_levelstat_len then
+   if level < 1 or level > self.obj.cre_stats.cs_levelstat_len then
       return
    end
 
-   return self.stats.cs_levelstat[level - 1];
+   return self.obj.cre_stats.cs_levelstat[level - 1];
 end
 
 --- Get class type by position
@@ -110,7 +100,7 @@ function M.Creature:GetClassByPosition(position)
 
    if not self:GetIsValid() then return 0 end
 
-   local cl = self.stats.cs_classes[position]
+   local cl = self.obj.cre_stats.cs_classes[position]
    if cl == nil then return 0 end
 
    return cl.cl_class
@@ -120,12 +110,11 @@ end
 function M.Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
 
-   for class in self:Classes() do
-      if class.cl_class == CLASS_TYPE_WIZARD then
-         return class.cl_specialist
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
+      if self.obj.cre_stats.cs_classes[i].cl_class == CLASS_TYPE_WIZARD then
+         return self.obj.cre_stats.cs_classes[i].cl_specialist
       end
    end
-
    return -1
 end
 
@@ -144,15 +133,15 @@ function M.Creature:SetClericDomain(domain, newdomain)
       return -1
    end
 
-   for class in self:Classes() do
-      if class.cl_class == CLASS_TYPE_CLERIC then
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
+      if self.obj.cre_stats.cs_classes[i].cl_class == CLASS_TYPE_CLERIC then
          if domain == 1 then
-            class.cl_domain_1 = newdomain
+            self.obj.cre_stats.cs_classes[i].cl_domain_1 = newdomain
          else
-            class.cl_domain_2 = newdomain
+            self.obj.cre_stats.cs_classes[i].cl_domain_2 = newdomain
          end
-         return newdomain
       end
+      return newdomain
    end
    return -1
 end
@@ -162,9 +151,9 @@ end
 function M.Creature:SetWizardSpecialization(specialization)
    if not self:GetIsValid() then return -1 end
 
-   for class in self:Classes() do
-      if class.cl_class == CLASS_TYPE_WIZARD then
-         class.cl_specialist = specilization
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
+      if self.obj.cre_stats.cs_classes[i].cl_class == CLASS_TYPE_WIZARD then
+         self.obj.cre_stats.cs_classes[i].cl_specialist = specilization
          return specilization
       end
    end

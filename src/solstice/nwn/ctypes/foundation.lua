@@ -10,7 +10,7 @@ typedef struct {
 
 typedef struct {
 	char resref[16];
-} CResRef; 
+} CResRef;
 
 typedef struct {
     void                *list;
@@ -31,7 +31,7 @@ typedef struct {
     void                       *header;
     uint32_t                    len;
 
- /* 
+ /*
   * CExoLinkedListNode GetFirst (void);
   * void *GetAtPos (CExoLinkedListNode *pos);
   * CExoLinkedListNode GetNext (CExoLinkedListNode *pos);
@@ -50,8 +50,21 @@ typedef struct {
 } CNWSScriptVarTable;
 
 typedef struct {
-    void *list;
+    void *data;
     uint32_t len;
     uint32_t alloc;
 } ArrayList;
 ]]
+
+local al = [[typedef struct {
+    %s *data;
+    uint32_t len;
+    uint32_t alloc;
+} ArrayList_%s;]]
+
+function make_array_list(type, id)
+   ffi.cdef(string.format(al, type, id))
+end
+
+make_array_list('uint32_t', 'uint32')
+make_array_list('uint16_t', 'uint16')

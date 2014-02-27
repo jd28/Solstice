@@ -16,13 +16,13 @@ local NWE = require 'solstice.nwn.engine'
 --- Gets creature's age
 function M.Creature:GetAge()
    if not self:GetIsValid() then return -1 end
-   return self.stats.cs_age
+   return self.obj.cre_stats.cs_age
 end
 
 --- Gets creature's appearance type
 function M.Creature:GetAppearanceType()
    if not self:GetIsValid() then return -1 end
-   return self.stats.cs_appearance
+   return self.obj.cre_stats.cs_appearance
 end
 
 --- Gets creature's body part
@@ -37,7 +37,7 @@ end
 --- Gets creature's conversation resref
 function M.Creature:GetConversation()
    if not self:GetIsValid() then return "" end
-   return ffi.string(self.stats.cs_conv)
+   return ffi.string(self.obj.cre_stats.cs_conv)
 end
 
 --- Determine boss creature.
@@ -54,7 +54,7 @@ end
 --- Gets creature's deity.
 function M.Creature:GetDeity()
    if not self:GetIsValid() then return "" end
-   return ffi.string(self.stats.cs_deity)
+   return ffi.string(self.obj.cre_stats.cs_deity)
 end
 
 --- Gets creature's deity ID.
@@ -66,7 +66,7 @@ end
 function M.Creature:GetIsDM()
    if not self:GetIsValid() then return false end
    
-   return self.stats.cs_is_dm ~= 0
+   return self.obj.cre_stats.cs_is_dm ~= 0
 end
 
 --- Gets if creature is possessed by DM.
@@ -85,7 +85,7 @@ end
 --- Gets creature's gender
 function M.Creature:GetGender()
    if not self:GeIsValid() then return -1 end
-   return self.stats.cs_gender
+   return self.obj.cre_stats.cs_gender
 end
 
 --- Gets PC characters bic file.
@@ -102,19 +102,19 @@ function M.Creature:GetRacialType()
       return M.RACE_INVALID
    end
 
-   return self.stats.cs_race
+   return self.obj.cre_stats.cs_race
 end
 
 --- Gets creature's starting package.
 function M.Creature:GetStartingPackage()
    if not self:GetIsValid() then return -1 end
-   return self.stats.cs_starting_package
+   return self.obj.cre_stats.cs_starting_package
 end
 
 --- Gets creature's subrace
 function M.Creature:GetSubrace()
    if not self:GetIsValid() then return "" end
-   return ffi.string(self.stats.cs_subrace)
+   return ffi.string(self.obj.cre_stats.cs_subrace)
 end
 
 --- Gets creature's subrace id.
@@ -125,20 +125,20 @@ end
 --- Gets creature's tail
 function M.Creature:GetTail()
    if not self:GetIsValid() then return -1 end
-   return self.stats.cs_tail
+   return self.obj.cre_stats.cs_tail
 end
 
 --- Gets creature's wings
 function M.Creature:GetWings()
    if not self:GetIsValid() then return -1 end
-   return self.stats.cs_wings
+   return self.obj.cre_stats.cs_wings
 end
 
 ---
 function M.Creature:SetAge(age)
    if not self:GetIsValid() then return -1 end
-   self.stats.cs_age = age
-   return self.stats.cs_age
+   self.obj.cre_stats.cs_age = age
+   return self.obj.cre_stats.cs_age
 end
 
 --- Sets creature's appearance type
@@ -146,8 +146,8 @@ end
 function M.Creature:SetAppearanceType(type)
    if not self:GetIsValid() then return -1 end
    
-   self.stats.cs_appearance = type
-   return self.stats.cs_appearance
+   self.obj.cre_stats.cs_appearance = type
+   return self.obj.cre_stats.cs_appearance
 end
 
 --- Sets creature's body part
@@ -165,11 +165,11 @@ end
 function M.Creature:SetDeity(deity)
    if not self:GetIsValid() then return "" end
    
-   if self.stats.cs_deity ~= nil then
-      C.free(self.stats.cs_deity)
+   if self.obj.cre_stats.cs_deity ~= nil then
+      C.free(self.obj.cre_stats.cs_deity)
    end
    
-   self.stats.cs_deity = C.strdup(deity)
+   self.obj.cre_stats.cs_deity = C.strdup(deity)
    return deity
 end
 
@@ -177,7 +177,7 @@ end
 -- @param gender New gender
 function M.Creature:SetGender(gender)
    if not self:GetIsValid() then return -1 end
-   self.stats.cs_gender = gender
+   self.obj.cre_stats.cs_gender = gender
    return self:GetGender()
 end
 
@@ -194,11 +194,11 @@ end
 function M.Creature:SetSubrace(subrace)
    if not self:GetIsValid() then return "" end
    
-   if self.stats.cs_deity ~= nil then
-      C.free(self.stats.cs_subrace)
+   if self.obj.cre_stats.cs_deity ~= nil then
+      C.free(self.obj.cre_stats.cs_subrace)
    end
    
-   self.stats.cs_subrace = C.strdup(subrace)
-   self.stats.cs_subrace_len = #subrace
+   self.obj.cre_stats.cs_subrace = C.strdup(subrace)
+   self.obj.cre_stats.cs_subrace_len = #subrace
    return subrace
 end

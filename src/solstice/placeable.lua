@@ -10,7 +10,7 @@ local NWE = require 'solstice.nwn.engine'
 
 local M = {}
 
-M.Placeable = inheritsFrom( Obj.Object, "solstice.placeable.Placeable" )
+M.Placeable = inheritsFrom({}, Obj.Object)
 
 --- Internal ctype.
 M.placeable_t = ffi.metatype("Placeable", { __index = M.Placeable })

@@ -11,7 +11,7 @@ local ffi = require 'ffi'
 --- Gets a creatures XP
 function M.Creature:GetXP()
    if not self:GetIsValid() then return 0 end
-   return self.stats.cs_xp
+   return self.obj.cre_stats.cs_xp
 end
 
 --- Modifies a creatures XP.
@@ -40,7 +40,7 @@ end
 function M.Creature:SetXP(amount, direct)
    if direct then
       if not self:GetIsValid() then return end
-      self.stats.cs_xp = amount
+      self.obj.cre_stats.cs_xp = amount
    else
       ne.StackPushInteger(amount)
       ne.StackPushObject(self)

@@ -9,14 +9,14 @@ local NWE = require 'solstice.nwn.engine'
 
 local M = {}
 
-M.Vector = inheritsFrom(nil, 'solstice.vector.Vector')
+M.Vector = {}
 
 local vector_mt = {
    __add = function (a, b) return M.vector_t(a.x + b.x,
 					     a.y + b.y,
 					     a.z + a.z) end,
    __index = Vector,
-   __sub = function (a, b) return M.vector_t(a.x - b.x, 
+   __sub = function (a, b) return M.vector_t(a.x - b.x,
 					     a.y - b.y,
 					     a.z - a.z) end
 }

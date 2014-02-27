@@ -7,11 +7,11 @@ local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
 
 local M = require 'solstice.creature.init'
+local Creature = inheritsFrom({}, Obj.Object)
+M.Creature  = Creature
 
-M.Creature  = inheritsFrom(Obj.Object, "solstice.creature.Creature" )
-
---- Internal ctype.
-M.creature_t = ffi.metatype("Creature", { __index = M.Creature })
+-- Internal ctype.
+M.creature_t = ffi.metatype("Creature", { __index = Creature })
 
 safe_require 'solstice.creature.ability'
 safe_require 'solstice.creature.action'
@@ -22,8 +22,8 @@ safe_require 'solstice.creature.associate'
 safe_require 'solstice.creature.attack_bonus'
 safe_require 'solstice.creature.class'
 safe_require 'solstice.creature.combat'
-safe_require 'solstice.creature.conceal'
 safe_require 'solstice.creature.cutscene'
+safe_require 'solstice.creature.damage'
 safe_require 'solstice.creature.effects'
 safe_require 'solstice.creature.faction'
 safe_require 'solstice.creature.feats'
@@ -58,7 +58,7 @@ end
 --- Misc
 -- @section misc
 
-function M.Creature:JumpToLimbo()
+function Creature:JumpToLimbo()
    if not self:GetIsValid() then return end
    C.nwn_JumpToLimbo(self.obj)
 end
@@ -67,7 +67,7 @@ end
 -- @param strref String ref (therefore text is translated)
 -- @param[opt=false] broadcast If this is true then only creatures in the same faction
 --  will see the floaty text, and only if they are within range (30 meters).
-function M.Creature:FloatingStrRef(strref, broadcast)
+function Creature:FloatingStrRef(strref, broadcast)
    NWE.StackPushInteger(broadcast)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(strref)
@@ -78,7 +78,7 @@ end
 -- @param msg Text to display
 -- @param[opt=false] broadcast If this is true then only creatures in the same faction
 --  will see the floaty text, and only if they are within range (30 meters).
-function M.Creature:FloatingText(msg, broadcast)
+function Creature:FloatingText(msg, broadcast)
    NWE.StackPushBoolean(broadcast)
    NWE.StackPushObject(self)
    NWE.StackPushString(msg)
@@ -87,21 +87,21 @@ end
 
 --- Fully restores a creature
 -- Gives this creature the benefits of a rest (restored hitpoints, spells, feats, etc..)
-function M.Creature:ForceRest()
+function Creature:ForceRest()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(775, 1)
 end
 
 --- Determines the door that is blocking a creature.
 -- @return Last blocking door encountered by the caller and solstice.object.INVALID if none
-function M.Creature:GetBlockingDoor()
+function Creature:GetBlockingDoor()
    NWE.ExecuteCommand(336, 0)
    return NWE.StackPopObject()
 end
 
 --- Checks if a creature has triggered an OnEnter event
 -- @param subarea Subarea to check
-function M.Creature:GetIsInSubArea(subarea)
+function Creature:GetIsInSubArea(subarea)
    NWE.StackPushObject(subarea)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(768, 2)

@@ -4,7 +4,7 @@
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
-M.Sound = inheritsFrom(nil, "solstice.sound.Sound")
+M.Sound = {}
 
 function M.Sound:Play()
    NWE.StackPushObject(self)

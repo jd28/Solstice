@@ -10,7 +10,7 @@ local Obj = require 'solstice.object'
 
 local M = {}
 
-M.Module = inheritsFrom(Obj.Object, "solstice.module.Module" )
+M.Module = inheritsFrom({}, Obj.Object)
 
 --- Internal ctype.
 M.module_t = ffi.metatype("Module", { __index = M.Module })

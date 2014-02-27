@@ -21,16 +21,16 @@ end
 -- @return FAMILIAR_*
 function M.Creature:GetAnimalCompanionType()
    if not self:GetIsValid() then return Assoc.FAMILIAR_NONE end
-   return self.stats.cs_acomp_type
+   return self.obj.cre_stats.cs_acomp_type
 end
 
 --- Gets a creature's familiar name.
 function M.Creature:GetAnimalCompanionName()
-   if not self:GetIsValid() or self.stats.cs_acomp_name == nil then
+   if not self:GetIsValid() or self.obj.cre_stats.cs_acomp_name == nil then
       return ""
    end
 
-   return ffi.string(self.stats.cs_acomp_name)
+   return ffi.string(self.obj.cre_stats.cs_acomp_name)
 end
 
 --- Returns an object's associate.
@@ -59,16 +59,16 @@ function M.Creature:GetFamiliarType()
       return Assoc.FAMILIAR_NONE
    end
 
-   return self.stats.cs_famil_type
+   return self.obj.cre_stats.cs_famil_type
 end
 
 --- Gets the creature's familiar creature name.
 function M.Creature:GetFamiliarName()
-   if not self:GetIsValid() or self.stats.cs_famil_name == nil then
+   if not self:GetIsValid() or self.obj.cre_stats.cs_famil_name == nil then
       return ""
    end
 
-   return ffi.string(self.stats.cs_famil_name)
+   return ffi.string(self.obj.cre_stats.cs_famil_name)
 end
 
 --- Gets the nth henchman of a PC.

@@ -6,7 +6,7 @@
 
 local M = require 'solstice.object.init'
 
-local LOG = require 'solstice.log'
+local Log = System.GetLogger()
 local Eff = require 'solstice.effect'
 local ffi = require 'ffi'
 local C = ffi.C
@@ -102,7 +102,7 @@ function M.Object:EffectsDirect()
          _i, i = i, i + 1
          if obj.obj_effects[_i] == nil then return end
 
-         return effect_t(obj.obj_effects[_i], true)
+         return Eff.effect_t(obj.obj_effects[_i], true)
       end
    end
 end
@@ -173,7 +173,7 @@ function M.Object:LogEffects()
       table.insert(t, eff:ToString())
    end
 
-   LOG.Log("server", LOG.LEVEL_DEBUG, table.concat(t, '\n\n'))
+   Log:info(table.concat(t, '\n\n'))
 end
 
 --- Removes an effect from object

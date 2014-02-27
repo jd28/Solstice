@@ -18,28 +18,20 @@ function M.Object:DoDamage(amount)
    return C.nwn_DoDamage(self.obj.obj, self.type, amount)
 end
 
---- Get an objects AC
--- This is just a placeholder function, if anyone wants to hook in and give, say, a
--- placeable AC.
--- @param attack Attack instance, just in case.
-function M.Object:GetAC(attack)
-   error "nwnxcombat"
-end
-
 --- Get an objects AC versus
 -- This is just a placeholder function, if anyone wants to hook in and give, say, a
 -- placeable AC.
 -- @param attacker Whoever is attacking the object
 -- @param attack Attack instance, just in case.
 function M.Object:GetACVersus(attacker, attack)
-   error "nwnxcombat"
+   return 0
 end
 
 --- Get an objects concealment
 -- This is just a placeholder function, if anyone wants to hook in and give, say, a
 -- placeable concealment.
 function M.Object:GetConcealment()
-   error "nwnxcombat"
+   return 0
 end
 
 ---
@@ -47,6 +39,11 @@ function M.Object:GetHardness()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(796, 1)
    return NWE.StackPopInteger()
+end
+
+---
+function M.Object:GetIsImmuneToCriticalHits()
+   return false
 end
 
 --- Determine who last attacked a creature, door or placeable object.

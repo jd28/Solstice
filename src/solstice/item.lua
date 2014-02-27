@@ -4,14 +4,16 @@
 -- @copyright 2011-2013
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module item
+-- @alias M
 
 local ffi = require 'ffi'
 local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
+local IP  = require 'solstice.itemprop'
 
 local M = {}
-M.Item = inheritsFrom(Obj.Object, "solstice.item.Item")
+M.Item = inheritsFrom({}, Obj.Object)
 
 --- Internal ctype.
 M.item_t = ffi.metatype("Item", { __index = M.Item })
@@ -233,31 +235,26 @@ function M.Item:GetHasItemProperty(ip_type)
    return C.nwn_HasPropertyType(self.obj, ip_type) ~= 0
 end
 
---- Determines the first itemproperty on an item
--- Prefer using the iterator.
-function M.Item:GetFirstItemProperty()
-   NWE.StackPushObject(self)
-   NWE.ExecuteCommand(612, 1)
-   return NWE.StackPopEngineStructure(NWE.STRUCTURE_ITEMPROPERTY)
+local function ignore_ip(ip)
+   return not (ip.eff.eff_is_exposed == 0 or
+               ip.eff.eff_type == EFFECT_TYPE_ICON or
+               (bit.band(ip.eff.eff_dursubtype, 0x7) ~= 1 and
+                bit.band(ip.eff.eff_dursubtype, 0x7) ~= 2))
 end
 
---- Determines the next itemproperty on an item
-function M.Item:GetNextItemProperty()
-   NWE.StackPushObject(self)
-   NWE.ExecuteCommand(613, 1)
+local function not_nil(x) return x ~= nil end
 
-   return NWE.StackPopEngineStructure(NWE.STRUCTURE_ITEMPROPERTY)
+local function get_next(self)
+   local n = self.obj.obj.obj_effect_index
+   if n >= self.obj.obj.obj_effects_len then return end
+   self.obj.obj.obj_effect_index = n + 1
+   return IP.itemprop_t(self.obj.obj.obj_effects[n], true)
 end
 
 --- Iterates over an items properties
 function M.Item:ItemProperties()
-   ip, _ip = self:GetFirstItemProperty()
-   return function ()
-      while ip:GetIsValid() do
-         _ip, ip = ip, self:GetNextItemProperty()
-         return _ip
-      end
-   end
+   self.obj.obj.obj_effect_index = 0
+   return filter(ignore_ip, take_while(not_nil, map(get_next, duplicate(self))))
 end
 
 --- Removes an item property

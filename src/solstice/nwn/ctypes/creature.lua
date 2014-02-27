@@ -1,17 +1,28 @@
 local ffi = require 'ffi'
 
 ffi.cdef[[
+typedef struct {
+    uint16_t            fu_feat;
+    uint8_t             fu_used;
+    uint8_t             unknown;
+} CNWSStats_FeatUses;
+]]
+
+make_array_list("CNWSStats_FeatUses*", "FeatUses")
+
+ffi.cdef[[
+
 typedef struct  {
-    ArrayList                  ls_spells_known[10];
-    ArrayList                  ls_spells_removed[10];
-    ArrayList                  ls_featlist;
+    ArrayList_uint32            ls_spells_known[10];
+    ArrayList_uint32            ls_spells_removed[10];
+    ArrayList_uint16            ls_featlist;
 
     uint8_t                    *ls_skilllist;
     uint16_t                    ls_skillpoints;              /* 0100 */
 
     uint8_t                     ls_ability;
     uint8_t                     ls_hp;
-    
+
     uint8_t                     ls_class;                    /* 0104 */
     uint8_t                     unknown_3;                   /* 0105 */
     uint8_t                     unknown_4;                   /* 0106 */
@@ -30,8 +41,8 @@ typedef struct {
     uint8_t                     field_A;                /* 000A */  /* 0C32 in CNWSCreatureStats */
     uint8_t                     field_B;                /* 000B */  /* 0C33 in CNWSCreatureStats */
     uint32_t                    cai_chest_obj_id;       /* 000C */  /* 0C34 in CNWSCreatureStats */
-    uint32_t                    cai_head_obj_id;        /* 0010 */  /* 0C38 in CNWSCreatureStats */ 
-    uint16_t                    cai_appearance;         /* 0014 */  /* 0C3C in CNWSCreatureStats */ 
+    uint32_t                    cai_head_obj_id;        /* 0010 */  /* 0C38 in CNWSCreatureStats */
+    uint16_t                    cai_appearance;         /* 0014 */  /* 0C3C in CNWSCreatureStats */
     uint8_t                     field_16;
     uint8_t                     field_17;
     uint8_t                     field_18;
@@ -71,12 +82,9 @@ typedef struct {
 } CNWSCreatureClass;
 
 typedef struct {
-    ArrayList        cs_feats;               /* 0000 */
-    ArrayList        cs_featuses;            /* 000C */         /* CNWSStats_FeatUses * */
-
-    uint32_t                    field_18;
-    uint32_t                    field_1C;
-    uint32_t                    field_20;
+    ArrayList_uint16             cs_feats;               /* 0000 */
+    ArrayList_FeatUses           cs_featuses;            /* 000C */         /* CNWSStats_FeatUses * */
+    ArrayList_uint16             cs_feats_bonus;
 
     void                        *cs_original;            /* 0024 */
 
@@ -154,7 +162,7 @@ typedef struct {
 
     uint8_t                     cs_override_bab;        /* 0411 */
 
-    uint8_t                     cs_override_atks;       /* 0412 -- Seems to be some onhand attack override. 
+    uint8_t                     cs_override_atks;       /* 0412 -- Seems to be some onhand attack override.
                                                                    See SetBaseAttackBonus & RestoreBaseAttackBonus */
     uint8_t                     field_40B;
     uint32_t                    field_40C;
@@ -271,6 +279,10 @@ typedef struct {
 
     char                        *cs_deity;               /* 04E0 */
 } CNWSCreatureStats;
+
+typedef struct CNWSInventory {
+    uint32_t                        equips[18];
+} CNWSInventory;
 
 typedef struct {
     CNWSObject                  obj;
@@ -695,7 +707,7 @@ typedef struct {
     uint32_t                    cre_encounter_obj;      /* 0B68 */
     uint32_t                    cre_encounter_already;  /* 0B6C */
 
-    void              *cre_equipment;          /* 0B70 */
+    CNWSInventory              *cre_equipment;          /* 0B70 */
     void              *cre_inventory;          /* 0B74 */
 
     uint16_t                    cre_inventory_index;    /* 0B78 */
@@ -763,7 +775,7 @@ typedef struct {
     uint32_t                    cre_poly_locked;        /* 0C24 */
 
     CNWSCreatureAppearanceInfo  cre_appearance_info;
-    
+
     CNWSCreatureStats           *cre_stats;             /* 0C68 */
 } CNWSCreature;
 ]]

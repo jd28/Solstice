@@ -4,27 +4,27 @@
 -- is no need to require in user scripts.
 -- @module global
 
---- Inheritance function
--- @param baseClass Base class.
--- @string typename String identifying type.
-function inheritsFrom( baseClass, typename )
-   local new_class = {
-      _type = typename
-   }
-   local class_mt = { __index = new_class }
-
-   function new_class:new( obj_id, obj_pointer )
-      local new_inst = { id = obj_id, pointer = obj_pointer }
-      setmetatable( new_inst, class_mt)
-      return new_inst
+--- Inheritance function.
+-- This VERY crude.  For some reason I'm not altogther sure why,
+-- luajit trace will abort with a bad argument error if there are
+-- nested metatables???  So this simply copies all function values.
+-- Thus: It should be used before any other functions are added to
+-- the class.
+-- @param class New class type.
+-- @param base Base class type.
+function inheritsFrom( class, base )
+   for k, v in pairs(base) do
+      if type(v) == "function" then
+         class[k] = v
+      end
    end
-
-   if baseClass then
-      setmetatable( new_class, { __index = baseClass } )
-   end
-
-   return new_class
+   return class
 end
+
+local tremove = table.remove
+local tinsert = table.insert
+
+require 'solstice.util.fn'
 
 --- Types
 -- @section types
@@ -61,6 +61,7 @@ local sol_trap  = require 'solstice.trap'
 local sol_trig  = require 'solstice.trigger'
 local sol_way   = require 'solstice.waypoint'
 
+local Log = System.GetLogger()
 
 -- 'Private' globals.
 local ffi = require 'ffi'
@@ -69,10 +70,6 @@ local C = ffi.C
 -- Object related functions
 -- Functions/Tables that are mainly for internal bookkeeping use.
 -- No script would even need use these.
-
--- Table to cache NWN objects in.  You should never need to modify
--- this directly.
-local _OBJECTS = { }
 
 -- Get cached Solstice object.
 -- This should, generaly, be considered a private function and used
@@ -84,20 +81,20 @@ function _SOL_GET_CACHED_OBJECT(id)
    end
 
    if id == nil or id == -1 or id == 0x7F000000 then
-      return Obj.INVALID
+      return OBJECT_INVALID
    end
 
    local obj = C.nwn_GetObjectByID(id)
-   if obj == nil then
-      return Obj.INVALID
-   end
+   if obj == nil then return OBJECT_INVALID end
 
    local type = ffi.cast("CGameObject*", obj).type
 
    local object
    if type == OBJECT_TRUETYPE_CREATURE then
-      obj = ffi.cast("CNWSCreature*", obj)
-      object = sol_cre.creature_t(type, id, obj, obj.cre_stats)
+      object = sol_cre.creature_t()
+      object.type = type
+      object.id   = id
+      object.obj  = ffi.cast("CNWSCreature*", obj)
    elseif type == OBJECT_TRUETYPE_MODULE then
       object = sol_mod.module_t(type, id, C.nwn_GetModule())
    elseif type == OBJECT_TRUETYPE_AREA then
@@ -124,34 +121,30 @@ function _SOL_GET_CACHED_OBJECT(id)
    elseif type == OBJECT_TRUETYPE_STORE then
       obj = ffi.cast("CNWSStore*", obj)
       object = sol_store.store_t(type, id, obj)
+   elseif type == OBJECT_TRUETYPE_SOUND then
+      return OBJECT_INVALID
+   elseif type == OBJECT_TRUETYPE_PORTAL then
+      return OBJECT_INVALID
+   elseif type == OBJECT_TRUETYPE_GUI then
+      return OBJECT_INVALID
+   elseif type == OBJECT_TRUETYPE_PROJECTILE then
+      return OBJECT_INVALID
+   elseif type == OBJECT_TRUETYPE_TILE then
+      return OBJECT_INVALID
    else
-      error(string.format("Unknown Object Type: %d!", type))
+      error(string.format("Unknown Object Type: %d \n\n %s!", type, debug.traceback()))
    end
 
    return object
 end
 
-local mod
-function _SOL_DESTROY_OBJECT(id, delay)
-   local obj = _OBJECTS[id]
-   if not obj then return end
-
-   -- Remove it immediately, but add delay command to ensure its
-   -- removal.
-   _SOL_REMOVE_CACHED_OBJECT(id)
-   if not mod then mod = Game.GetModule() end
-   mod:DelayCommand(delay+0.1, function () _SOL_REMOVE_CACHED_OBJECT(id) end)
-end
-
-function _SOL_REMOVE_CACHED_OBJECT(id)
-   _OBJECTS[id] = nil
+function _SOL_REMOVE_CACHED_OBJECT(type, id)
    return 1
 end
 
 -- Entry point for nwnx_solstice run script hook.
 -- Should never be used directly.
 function _SOL_RUN_SCRIPT(script, obj)
-   script = script:lower()
    -- See if the function exist in the global namespace
    local f = _G[script]
    if not f or not type(f) == "function" then

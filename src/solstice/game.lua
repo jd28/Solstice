@@ -1,45 +1,10 @@
-local M = {}
+--- Game module.
+-- @module game
+
 local NWE = require 'solstice.nwn.engine'
 
---- Get Module.
-function M.GetModule()
-   NWE.ExecuteCommand(242, 0)
-   return NWE.StackPopObject()
-end
-
---- Create an object of a specified type at a given location
--- NWScript: CreateObject
--- @param object_type solstice.object.ITEM, solstice.object.CREATURE,
--- solstice.object.PLACEABLE, solstice.object.STORE, solstice.object.WAYPOINT.
--- @param template The resref of the object to create from the pallet.
--- @param loc The location to create the object at.
--- @param[opt=false] appear If `true`, the object will play its spawn in animation.
--- @param[opt=""] newtag If this string is not empty, it will replace the default tag from the template.
--- @return New object or solstice.object.INVALID
-function M.CreateObject(object_type, template, loc, appear, newtag)
-   if appear == nil then appear = false end
-   newtag = newtag or ""
-   NWE.StackPushString(newtag)
-   NWE.StackPushBoolean(appear)
-   NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, loc)
-   NWE.StackPushString(template)
-   NWE.StackPushInteger(object_type)
-   NWE.ExecuteCommand(243, 5)
-
-   return NWE.StackPopObject()
-end
-
---- Gets an object by tag
--- @param tag Tag of object
--- @param[opt=1] nth Nth object.
-function M.GetObjectByTag(tag, nth)
-   nth = nth or 1
-
-   NWE.StackPushInteger(nth)
-   NWE.StackPushString(tag)
-   NWE.ExecuteCommand(200, 2)
-   return NWE.StackPopObject()
-end
+local M = require 'solstice.game.init'
+require 'solstice.game.objects'
 
 --- Export all characters.
 function M.ExportAllCharacters()
@@ -52,35 +17,6 @@ function M.ExportSingleCharacter(player)
    NWE.StackPushObject(player)
    NWE.ExecuteCommand(719, 1)
 end
-
---- Gets first PC
---     This function should probably be passed over in favor
---     of the M.PCs iterator.
--- @return solstice.object.INVALID if no PCs are logged into the server.
--- @see solstice.pc.PCs
-function M.GetFirstPC()
-   NWE.ExecuteCommand(548, 0)
-   return NWE.StackPopObject()
-end
-
---- Get next PC
--- @return solstice.object.INVALID if there are no furter PC
--- @see solstice.pc.PCs
-function M.GetNextPC()
-   NWE.ExecuteCommand(549, 0)
-   return NWE.StackPopObject()
-end
-
-
---- Gets the PC speaker.
-function M.GetPCSpeaker()
-   NWE.ExecuteCommand(238, 0)
-   return NWE.StackPopObject()
-end
-
---- Iterator over all PCs
-function M.PCs() end
-M.PCs = iter_first_next_isvalid(M.GetFirstPC, M.GetNextPC)
 
 --- Get if it's day
 function M.GetIsDay()

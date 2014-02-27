@@ -20,7 +20,7 @@ require 'solstice.effect'
 function M.Creature:GetAbilityIncreaseByLevel(level)
    if not self:GetIsValid() then return -1 end
 
-   local ls = C.nwn_GetLevelStats(self.stats, level)
+   local ls = C.nwn_GetLevelStats(self.obj.cre_stats, level)
    if ls == nil then return -1 end
 
    return ls.ls_ability
@@ -41,18 +41,18 @@ function M.Creature:GetAbilityModifier(ability, base)
         result = (self:GetAbilityScore(ability, base) - 10) / 2
     else
        if ability == ABILITY_STRENGTH then
-          result = self.stats.cs_str_mod
+          result = self.obj.cre_stats.cs_str_mod
        elseif ability == ABILITY_DEXTERITY then
           -- Dex may need to change.
           result = self:GetDexMod()
        elseif ability == ABILITY_CONSTITUTION then
-          result = self.stats.cs_con_mod
+          result = self.obj.cre_stats.cs_con_mod
        elseif ability == ABILITY_INTELLIGENCE then
-          result = self.stats.cs_int_mod
+          result = self.obj.cre_stats.cs_int_mod
        elseif ability == ABILITY_WISDOM then
-          result = self.stats.cs_wis_mod
+          result = self.obj.cre_stats.cs_wis_mod
        elseif ability == ABILITY_CHARISMA then
-          result = self.stats.cs_cha_mod
+          result = self.obj.cre_stats.cs_cha_mod
        end
     end
 
@@ -78,18 +78,18 @@ function M.Creature:GetAbilityScore(ability, base)
       result = NWE.StackPopInteger()
    else
       if ability == ABILITY_STRENGTH then
-         result = self.stats.cs_str
+         result = self.obj.cre_stats.cs_str
       elseif ability == ABILITY_DEXTERITY then
          -- Dex may need to change.
-         result = self.stats.cs_dex
+         result = self.obj.cre_stats.cs_dex
       elseif ability == ABILITY_CONSTITUTION then
-         result = self.stats.cs_con
+         result = self.obj.cre_stats.cs_con
       elseif ability == ABILITY_INTELLIGENCE then
-         result = self.stats.cs_int
+         result = self.obj.cre_stats.cs_int
       elseif ability == ABILITY_WISDOM then
-         result = self.stats.cs_wis
+         result = self.obj.cre_stats.cs_wis
       elseif ability == ABILITY_CHARISMA then
-         result = self.stats.cs_cha
+         result = self.obj.cre_stats.cs_cha
       end
    end
    return result
@@ -98,7 +98,7 @@ end
 --- Gets a creatures dexterity modifier.
 -- @param[opt=false] armor_check If true uses armor check penalty.
 function M.Creature:GetDexMod(armor_check)
-   return C.nwn_GetDexMod(self.stats, armor_check)
+   return C.nwn_GetDexMod(self.obj.cre_stats, armor_check)
 end
 
 --- Modifies the ability score of a specific type for a creature.
@@ -117,7 +117,7 @@ end
 function M.Creature:RecalculateDexModifier()
    if not self:GetIsValid() then return -1 end
 
-   return C.nwn_RecalculateDexModifier(self.stats)
+   return C.nwn_RecalculateDexModifier(self.obj.cre_stats)
 end
 
 --- Sets the ability score of a specific type for a creature.

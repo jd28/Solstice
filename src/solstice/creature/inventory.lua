@@ -59,38 +59,17 @@ function M.Creature:GetIsWeaponEffective(vs, is_offhand)
    return NWE.StackPopBoolean()
 end
 
---- Determines if a creature can finesse a weapon.
--- @param weap The weapon in question.
-function M.Creature:GetIsWeaponFinessable(weap)
-   error "nwnxcombat"
-end
-
---- Determines if a weapon is light for a creature.
--- @param weap The weapon in question.
-function M.Creature:GetIsWeaponLight(weap)
-   if not weap:GetIsValid() or
-      weap:GetIsUnarmedWeapon()
-   then
-      return true
-   end
-   local size = self:GetSize()
-
-   if size < CREATURE_SIZE_TINY or size > CREATURE_SIZE_HUGE then
-      return false
-   end
-
-   local rel = self:GetRelativeWeaponSize(weap)
-
-   return rel < 0
-end
-
 --- Gets an equipped item in creature's inventory.
 -- @param slot INVENTORY_SLOT_*
 function M.Creature:GetItemInSlot(slot)
-   NWE.StackPushObject(self)
-   NWE.StackPushInteger(slot)
-   NWE.ExecuteCommand(155, 2);
-   return NWE.StackPopObject();
+   if not self:GetIsValid() or
+      slot < 0              or
+      slot >= INVENTORY_SLOT_NUM
+   then
+      return OBJECT_INVALID
+   end
+
+   return _SOL_GET_CACHED_OBJECT(self.obj.cre_equipment.equips[slot])
 end
 
 --- Determines a weapons weapon size relative to a creature.

@@ -38,11 +38,14 @@ end
 -- @param handler Function to call on object when effect is applied or removed.
 --    It will be called with three parameters: an effect, an object, and boolean value
 --    indicating whether the effect is being applied (false) or removed (true)
-function M.RegisterEffectHandler(effect_type, handler)
-   if not effect_type then
+function M.RegisterEffectHandler(handler, ...)
+   local types = {...}
+   if #types == 0 then
       print(debug.traceback())
    end
-   EFF_HANDLERS[effect_type] = handler
+   for _, v in ipairs(types) do
+      EFF_HANDLERS[v] = handler
+   end
 end
 
 --- Register NWNXEvent event handler.
@@ -67,7 +70,7 @@ function NWNXEffects_HandleEffectEvent()
    if not h then return 0 end
 
    ev.suppress = true
-   ev.delete_eff = h(eff, obj, ev.is_remove) or false
+   ev.delete_eff = h(eff, obj, ev.is_remove, ev.preapply) or false
 
    return 1
 end
@@ -78,12 +81,12 @@ function NWNXEffects_HandleItemPropEvent(ip_type)
    -- or script can handle the event.
    local f = IP_HANDLERS[ip_type]
    if not f then return 0 end
-   
+
    local info = solstice.nwnx.GetItemproptInfo()
    if not info then return 0 end
 
    f(info)
-   
+
    return 1
 end
 

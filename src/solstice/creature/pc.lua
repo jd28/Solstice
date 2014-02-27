@@ -109,7 +109,7 @@ end
 function M.Creature:GetPCPublicCDKey(single_player)
    ne.StackPushBoolean(single_player)
    ne.StackPushObject(self)
-   ne.ExecuteCommand(369, 2)
+   ne.ExecuteCommandUnsafe(369, 2)
 
    return ne.StackPopString()
 end
@@ -117,7 +117,7 @@ end
 --- Retrieves the IP address of a PC.
 function M.Creature:GetPCIPAddress()
    ne.StackPushObject(self)
-   ne.ExecuteCommand(370, 1)
+   ne.ExecuteCommandUnsafe(370, 1)
 
    return ne.StackPopString()
 end
@@ -125,7 +125,7 @@ end
 --- Retrieves the login name of the player of a PC.
 function M.Creature:GetPCPlayerName()
    ne.StackPushObject(self)
-   ne.ExecuteCommand(371, 1)
+   ne.ExecuteCommandUnsafe(371, 1)
 
    return ne.StackPopString()
 end
