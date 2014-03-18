@@ -1,7 +1,4 @@
 --- Effects module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module effect
 
 local NWE = require 'solstice.nwn.engine'
@@ -12,13 +9,14 @@ local M = require 'solstice.effect.init'
 
 --- Create raw effect.
 -- It's initial type will be EFFECT_TYPE_INVALID
--- @param ints Number of effect integers.
--- @bool show_icon Sets whether an icon is shown... maybe?
-function M.Create(ints, show_icon)
+-- @bool[opt=true] generate_id Generate effect ID.  If false
+-- the effects ID will be 0.
+-- @param[opt=10] ints Number of effect integers.
+local function Create(generate_id, ints)
+   if generate_id == nil then generate_id = true end
    ints = ints or 10
-   show_icon = show_icon or 0
-   local eff = effect_t(C.nwn_CreateEffect(show_icon), false)
-
+   local eff = M.effect_t(C.nwn_CreateEffect(generate_id and 1 or 0),
+                          false)
    eff:SetType(EFFECT_TYPE_INVALID)
    eff:SetCreator(NWE.GetCommandObject())
    eff:SetNumIntegers(ints)
@@ -29,36 +27,76 @@ function M.Create(ints, show_icon)
    return eff
 end
 
+--- Creates simple effect.
+-- NOTE: This is for simple effects, that have less than
+-- 10 integers and always generate a new ID.
+-- @param type EFFECT\_TYPE\_*
+-- @param ... Ints to set on the effect.
+local function CreateSimple(type, ...)
+   local eff = Create()
+   eff:SetType(type)
+   local t = {...}
+   if #t > 0 then
+      for i=0, #t - 1 do
+         eff:SetInt(i, t[i+1])
+      end
+   end
+   return eff
+end
+
+M.Create = Create
+
+local function determine_type_amount(inctype, dectype, amount)
+   if amount < 0 then
+      return dectype, -amount
+   end
+   return inctype, amount
+end
+
 --- Creates a Recurring Effect
 -- This effect when applied is merely a place holder.
 function M.Recurring()
-   error "????"
+   return CreateSimple(EFFECT_TYPE_RECURRING)
 end
 
 --- Creates an ability increase/decrease effect on specified ability score.
 -- @param ability ABILITY_*
--- @param amount If < 0 effect will cause a decrease by amount, it will be
--- and increase if > 0
+-- @param amount If less than 0 effect will cause an ability decrease,
+-- if greater than 0 an ability increase.
+-- @return Invalid effect if amount is 0, or the ability is an invalid type.
 function M.Ability(ability, amount)
-   return M.effect_t(C.effect_ability(ability, amount), false)
+   if ability < 0 or ability >= ABILITY_NUM or amount == 0 then
+      return Create()
+   end
+
+   local type, amt = determine_type_amount(EFFECT_ABILITY_INCREASE,
+                                           EFFECT_ABILITY_DECREASE,
+                                           amount)
+   return CreateSimple(type, ability, amt)
 end
 
 --- Creates an AC increase/decrease effect.
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
 -- @param[opt=AC_DODGE_BONUS] modifier_type AC_*
--- @param[opt=AC_VS_DAMAGE_TYPE_ALL] damage_type DAMAGE\_TYPE\_*
-function M.AC(amount, modifier_type, damage_type)
-   modifier_type = AC_DODGE_BONUS
-   damage_type = AC_VS_DAMAGE_TYPE_ALL
+function M.AC(amount, modifier_type)
+   if amount == 0 or modifier_type < 0 then
+      return Create()
+   end
 
-   return M.effect_t(C.effect_ac(amount, modifier_type, damage_type), false)
+   modifier_type = modifier_type or AC_DODGE_BONUS
+   local damage_type = AC_VS_DAMAGE_TYPE_ALL
+
+   local type, amt = determine_type_amount(EFFECT_AC_INCREASE,
+                                           EFFECT_AC_DECREASE,
+                                           amount)
+   return CreateSimple(type, modifier_type, amt, 28, 0, 0, damage_type)
 end
 
 --- Create a special effect to make the object "fly in".
--- @param animation Use animation
+-- @param[opt=false] animation Use animation
 function M.Appear(animation)
-   return M.effect_t(C.effect_appear(animation), false)
+   return CreateSimple(EFFECT_TYPE_APPEAR, animation and 1 or 0)
 end
 
 --- Returns a new effect object.
@@ -69,18 +107,25 @@ end
 function M.AreaOfEffect(aoe, enter, heartbeat, exit)
    enter = enter or ""
    heartbeat = heartbeat or ""
-   exit = heartbeat or ""
+   exit = exit or ""
 
-   return M.effect_t(C.effect_aoe(aoe, enter, heartbeat, exit), false)
+   local eff = CreateSimple(EFFECT_TYPE_AREA_OF_EFFECT, aoe)
+   eff:SetString(0, enter)
+   eff:SetString(1, heartbeat)
+   eff:SetString(2, exit)
+
+   return eff
 end
 
 --- Create an Attack increase/decrease effect.
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
--- @param[opt=ATTACK_BONUS_MISC] modifier_type ATTACK\_BONUS\_*
+-- @param[opt=ATTACK_TYPE_MISC] modifier_type ATTACK\_TYPE\_*
 function M.AttackBonus(amount, modifier_type)
-   modifier_type = modifier_type or ATTACK_BONUS_MISC
-   return M.effect_t(C.effect_attack(amount, modifier_type), false)
+   local type, amt = determine_type_amount(EFFECT_TYPE_ATTACK_INCREASE,
+                                           EFFECT_TYPE_ATTACK_DECREASE,
+                                           amount)
+   return CreateSimple(type, amt, modifier_type or ATTACK_BONUS_MISC, 28)
 end
 
 --- Create a Beam effect.
@@ -90,37 +135,39 @@ end
 -- @param[opt=false] miss_effect If true, the beam will fire to a random vector near or past the target.
 function M.Beam(beam, creator, bodypart, miss_effect)
    miss_effect = miss_effect and 1 or 0
-   return M.effect_t(C.effect_beam(beam, creator, bodypart,
-				     miss_effect),
-		       false)
+   local eff = CreateSimple(EFFECT_TYPE_BEAM,
+                            beam, bodypart, miss_effect)
+   eff:SetObject(0, creator)
+   return eff
 end
 
 --- Create a Blindness effect.
 function M.Blindness()
-   return M.effect_t(C.effect_blindess(), false)
+   return CreateSimple(EFFECT_TYPE_BLINDNESS, 16)
 end
 
 --- Creates a bonus feat effect.
 function M.BonusFeat (feat)
-   return M.effect_t(C.effect_feat(feat), false)
+   return CreateSimple(EFFECT_TYPE_BONUS_FEAT, feat)
 end
 
 --- Create a Charm effect
 function M.Charmed()
-   return M.effect_t(C.effect_charmed(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 1)
 end
 
 --- Creates a concealment effect.
 -- @param percent [1,100]
--- @param[opt=MISS_CHANCE_TYPE_NORMAL] miss_type MISS\_CHANCE\_TYPE\_*
+-- @param[opt=MISS\_CHANCE\_TYPE\_NORMAL] miss_type MISS\_CHANCE\_TYPE\_*
 function M.Concealment(percent, miss_type)
+   percent = math.clamp(percent, 1, 100)
    miss_type = miss_type or MISS_CHANCE_TYPE_NORMAL
-   return M.effect_t(C.effect_conealment(percent, miss_type), false)
+   return CreateSimple(EFFECT_TYPE_CONCEALMENT, percent, miss_type)
 end
 
 --- Creates a confusion effect.
 function M.Confused()
-   return M.effect_t(C.effect_confuse(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 2)
 end
 
 --- Create a Curse effect.
@@ -131,174 +178,184 @@ end
 -- @param[opt=1] wis wisdom modifier.
 -- @param[opt=1] cha charisma modifier.
 function M.Curse(str, dex, con, int, wis, cha)
-   str = str or 1
-   dex = dex or 1
-   con = con or 1
-   int = int or 1
-   wis = wis or 1
-   cha = cha or 1
-
-   return M.effect_t(C.effect_curse(str, dex, con, int, wis, cha), false)
+   return CreateSimple(EFFECT_TYPE_CURSE,
+                       str or 1,
+                       dex or 1,
+                       con or 1,
+                       int or 1,
+                       wis or 1,
+                       cha or 1)
 end
 
 --- Creates an effect that is guranteed to dominate a creature.
 function M.CutsceneDominated()
-   return M.effect_t(C.effect_cutscene_dominated(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 21)
 end
 
 --- Creates a cutscene ghost effect
 function M.CutsceneGhost()
-   return M.effect_t(C.effect_cutscene_ghost(), false)
+   return CreateSimple(EFFECT_TYPE_CUTSCENEGHOST)
 end
 
 --- Creates a cutscene immobilize effect
 function M.CutsceneImmobilize()
-   return M.effect_t(C.effect_cutscene_immobilize(), false)
+   return CreateSimple(EFFECT_TYPE_CUTSCENEIMMOBILE)
 end
 
 --- Creates an effect that will paralyze a creature for use in a cut-scene.
 function M.CutsceneParalyze()
-   return M.effect_t(C.effect_cutscene_paralyze(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 20)
 end
 
 --- Creates Damage effect.
 -- @param amount amount of damage to be dealt.
--- @param damage_type DAMAGE\_TYPE\_*
--- @param[opt=DAMAGE_POWER_NORMAL] power DAMAGE\_POWER\_*
+-- @param damage_type DAMAGE\_INDEX\_*
+-- @param[opt=DAMAGE\_POWER\_NORMAL] power DAMAGE\_POWER\_*
 function M.Damage(amount, damage_type, power)
-   damage_type = damage_type or DAMAGE_TYPE_MAGICAL
+   damage_type = damage_type or DAMAGE_INDEX_MAGICAL
+   local damage_flag = bit.lshift(1, damage_type)
    power = power or DAMAGE_POWER_NORMAL
 
-   return M.effect_t(C.effect_damage(amount, damage_type, power), false)
+   local eff = CreateSimple(EFFECT_TYPE_DAMAGE)
+   eff:SetNumIntegers(20)
+   for i=0, 13 do
+      eff:SetInt(i, -1)
+   end
+
+   eff:SetInt(damage_type, amount)
+   eff:SetInt(14, 1000)
+   eff:SetInt(15, damage_flag)
+   eff:SetInt(16, power)
+
+   return eff
 end
 
 --- Effect Damage Decrease
--- @param amount Amount
--- @param damage_type DAMAGE\_TYPE\_*
--- @param attack_type
-function M.DamageDecrease(amount, damage_type, attack_type)
-   error "???"
+-- @param amount DAMAGE\_BONUS\_*
+-- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+function M.DamageDecrease(amount, damage_type)
+   damage_type = DAMAGE_INDEX_MAGICAL
+   local damage_flag = bit.lshift(1, damage_type)
+
+   return CreateSimple(EFFECT_TYPE_DAMAGE_DECREASE,
+                       amount, damage_flag, 28)
 end
 
 --- Effect Damage Increase
--- @param amount
--- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
--- @param[opt=ATTACK_TYPE_MISC] attack_type
-function M.DamageIncrease(amount, damage_type, attack_type)
-   error "???"
+-- @param amount DAMAGE\_BONUS\_*
+-- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+function M.DamageIncrease(amount, damage_type)
+   damage_type = DAMAGE_INDEX_MAGICAL
+   local damage_flag = bit.lshift(1, damage_type)
+
+   return CreateSimple(EFFECT_TYPE_DAMAGE_INCREASE,
+                       amount, damage_flag, 28)
 end
 
---- Effect Damage Range Decrease
--- @param start Start of damage range.
--- @param stop Start of damage range.
--- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
--- @param[opt=ATTACK_TYPE_MISC] attack_type
-function M.DamageRangeDecrease(start, stop, damage_type, attack_type)
-   error "???"
+--- Damage immunity effect.
+-- @param damage_type DAMAGE\_INDEX\_*
+-- @param amount [1,100]
+function M.DamageImmunity(damage_type, amount)
+   local type, amt = determine_type_amount(EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE,
+                                           EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE,
+                                           amount)
+   local damage_flag = bit.lshift(1, damage_type)
+   return CreateSimple(type, damage_flag, math.clamp(amt, 1, 100))
 end
 
---- Effect Damage Range Increase
--- @param start Start of damage range.
--- @param stop Start of damage range.
--- @param[opt=DAMAGE_TYPE_MAGICAL] damage_type DAMAGE\_TYPE\_*
--- @param[opt=ATTACK_TYPE_MISC] attack_type
-function M.DamageRangeIncrease(start, stop, damage_type, attack_type)
-   error "???"
-end
-
----
--- @param damage_type DAMAGE_TYPE_*
--- @param percent [1,100]
-function M.DamageImmunity(damage_type, percent)
-   return M.effect_t(C.effect_damage_immunity(damage_type, percent),
-		       false)
-end
-
----
+--- Damage reduction effect.
 -- @param amount Amount
 -- @param power Power
 -- @param[opt=0] limit Limit
 function M.DamageReduction(amount, power, limit)
-   return M.effect_t(C.effect_damage_reduction(amount, power, limit),
-		       false)
+   if not limit or limit < 0 then limit = 0 end
+
+   return CreateSimple(EFFECT_TYPE_DAMAGE_REDUCTION, amount, power, limit)
 end
 
----
--- @param damage_type DAMAGE\_TYPE\_*
+--- Damage resistance effect.
+-- @param damage_type DAMAGE\_INDEX\_*
 -- @param amount Amount
 -- @param[opt=0] limit Limit
 function M.DamageResistance(damage_type, amount, limit)
-   limit = limit or 0
-   return M.effect_t(C.effect_damage_resistance(damage_type,
-						  amount, limit),
-		       false)
+   if not limit or limit < 0 then limit = 0 end
+   local damage_flag = bit.lshift(1, damage_type)
+   return CreateSimple(EFFECT_TYPE_DAMAGE_RESISTANCE, damage_flag, amount, limit)
 end
 
----
+--- Damage Shield effect.
 -- @param amount
 -- @param random
--- @param damage_type DAMAGE\_TYPE\_*
+-- @param damage_type DAMAGE\_INDEX\_*
 function M.DamageShield(amount, random, damage_type)
-   return M.effect_t(C.effect_damage_shield(amount, random,
-					      damage_type),
-		       false)
-
+   local damage_flag = bit.lshift(1, damage_type)
+   return CreateSimple(EFFECT_TYPE_DAMAGE_SHIELD, amount, random, damage_flag)
 end
 
 --- Create a Darkness effect.
 function M.Darkness()
-   return M.effect_t(C.effect_darkness(), false)
+   return CreateSimple(EFFECT_TYPE_DARKNESS)
 end
 
 --- Create a Daze effect.
 function M.Dazed()
-   return M.effect_t(C.effect_dazed(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 5)
 end
 
 --- Create a Deaf effect.
 function M.Deaf()
-   return M.effect_t(C.effect_deaf(), false)
+   return CreateSimple(EFFECT_TYPE_DEAF)
 end
 
----
+--- Death effect
 -- @param spectacular
 -- @param feedback
 function M.Death(spectacular, feedback)
-   return M.effect_t(C.effect_deat(spectacular, feedback), false)
+   local eff = Create()
+   eff:SetType(EFFECT_TYPE_DEATH)
+   eff:SetInt(0, spectacular)
+   eff:SetInt(1, feedback)
+   return eff
 end
 
----
+--- Disappear effect.
 -- @param[opt=false] animation Use animation
 function M.Disappear(animation)
-   animation = animation and 1 or 0
-   return M.effect_t(C.effect_disappear(animation), false)
+   return CreateSimple(EFFECT_TYPE_DISAPPEAR, animation and 1 or 0)
 end
 
----
+--- Disappear Appear effect.
 -- @param location
 -- @param[opt=false] animation Use animation
 function M.DisappearAppear(location, animation)
    animation = animation and 1 or 0
-   return M.effect_t(C.effect_disappear_appear(location, animation),
-		       false)
+
+   local eff = CreateSimple(EFFECT_TYPE_DISAPPEARAPPEAR)
+   eff:SetInt(0, animation)
+   eff:SetObject(0, location.area)
+   eff:SetFloat(0, location.position.x)
+   eff:SetFloat(1, location.position.y)
+   eff:SetFloat(2, location.position.z)
+
+   return eff
 end
 
 --- Create Disarm effect
 function M.Disarm()
-   return M.effect_t(C.effect_disarm(), false)
+   return CreateSimple(EFFECT_TYPE_DISARM)
 end
 
 --- Create a Disease effect.
 -- @param disease DISEASE\_*
 function M.Disease(disease)
-   return M.effect_t(C.effect_disease(disease), false)
+   return CreateSimple(EFFECT_TYPE_DISEASE, disease)
 end
 
 --- Create a Dispel Magic All effect.
 -- @param[opt] caster_level The highest level spell to dispel.
 function M.DispelMagicAll(caster_level)
    caster_level = caster_level or -1
-   return M.effect_t(C.effect_dispel_all(caster_level), false)
+   return CreateSimple(EFFECT_TYPE_DISPEL_ALL_MAGIC, caster_level)
 end
 
 --- Create a Dispel Magic Best effect.
@@ -306,79 +363,78 @@ end
 -- spell to dispel.
 function M.DispelMagicBest(caster_level)
    caster_level = caster_level or -1
-   return M.effect_t(C.effect_dispel_best(caster_level), false)
+   return CreateSimple(EFFECT_TYPE_DISPEL_BEST_MAGIC, caster_level)
 end
 
 --- Create a Dominate effect.
 function M.Dominated()
-   return M.effect_t(C.effect_dominated(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 7)
 end
 
 --- Create an Entangle effect
 function M.Entangle()
-   return M.effect_t(C.effect_entangle(), false)
+   return CreateSimple(EFFECT_TYPE_ENTANGLE)
 end
 
 --- Creates a Sanctuary effect but the observers get no saving throw.
 function M.Ethereal()
-   return M.effect_t(C.effect_ethereal(), false)
+   local eff = CreateSimple(EFFECT_TYPE_SANCTUARY)
+   eff:SetInt(0, 8)
+   eff:SetInt(1, 28)
+   return eff
 end
 
 --- Create a frightened effect for use in making creatures shaken or flee.
 function M.Frightened()
-   return M.effect_t(C.effect_frightened(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 3)
 end
 
 --- Create a Haste effect.
 function M.Haste()
-   return M.effect_t(C.effect_haste(), false)
+   return CreateSimple(EFFECT_TYPE_HASTE)
 end
 
 --- Creates a healing effect.
 -- @param amount Hit points to heal.
 function M.Heal(amount)
-   return M.effect_t(C.effect_heal(amount), false)
+   if amount <= 0 then return Create() end
+   return CreateSimple(EFFECT_TYPE_HEAL, amount)
 end
 
 --- Create a Hit Point Change When Dying effect.
 -- @param hitpoint_change Positive or negative, but not zero.
 function M.HitPointChangeWhenDying(hitpoint_change)
-   return M.effect_t(C.effect_hp_change_when_dying(hitpoint_change),
-		       false)
-end
-
---- Create a hit point effect
-function M.HitPointDecrease(amount)
-   error "???"
-end
-
---- Create a hit point effect
-function M.HitPointIncrease(amount)
-   error "???"
+   local eff = CreateSimple(EFFECT_TYPE_HITPOINTCHANGEWHENDYING)
+   eff:SetFloat(0, hitpoint_change)
+   return eff
 end
 
 --- Creates an icon effect
 function M.Icon(icon)
-   return M.effect_t(C.effect_icon(icon), false)
+   return CreateSimple(EFFECT_TYPE_ICON, icon)
 end
 
 --- Create an Immunity effect.
 -- @param immunity One of the IMMUNITY\_TYPE\_* constants.
--- @param percent Percent immunity.
-function M.Immunity(immunity, percent)
-   return M.effect_t(C.effect_immunity(immunity, percent), false)
+-- @param amount Percent immunity.
+function M.Immunity(immunity, amount)
+   local type, amt = determine_type_amount(EFFECT_TYPE_IMMUNITY,
+                                           EFFECT_TYPE_IMMUNITY_DECREASE,
+                                           amount)
+   amt = math.clamp(amt, 1, 100)
+   return CreateSimple(type, immunity, amt)
 end
 
 --- Create an Invisibility effect.
 -- @param invisibilty_type One of the INVISIBILITY\_TYPE\_*
 -- constants defining the type of invisibility to use.
 function M.Invisibility(invisibilty_type)
-   return M.effect_t(C.effect_invisibility(invisibilty_type), false)
+   return CreateSimple(EFFECT_TYPE_INVISIBILITY, invisibilty_type)
 end
 
 --- Create a Knockdown effect
 function M.Knockdown()
-   return M.effect_t(C.effect_knockdown(), false)
+   return CreateSimple(EFFECT_TYPE_KNOCKDOWN)
 end
 
 --- Creates one new effect object from two seperate effect objects.
@@ -396,108 +452,123 @@ end
 -- @param[opt=MISS_CHANCE_TYPE_NORMAL] misstype MISS\_CHANCE\_TYPE\_*
 function M.MissChance(percent, misstype)
    misstype = misstype or MISS_CHANCE_TYPE_NORMAL
-   return M.effect_t(C.effect_miss_chance(percent, misstype), false)
+   return CreateSimple(EFFECT_TYPE_MISS_CHANCE, percent, misstype)
 end
 
 --- Create a Modify Attacks effect that adds attacks to the target.
 -- @param attacks Maximum is 5, even with the effect stacked
 function M.ModifyAttacks(attacks)
-   if attacks < 0 or attacks > 5 then
-      error "EffectModifyAttacks: Invalid argument must be [1,5]"
-   end
-   return M.effect_t(C.effect_additional_attacks(attacks), false)
+   if attacks < 0 or attacks > 5 then return Create() end
+   return CreateSimple(EFFECT_TYPE_MODIFYNUMATTACKS, attacks)
 end
 
 --- Create a Movement Speed Increase/Decrease effect to slow target.
--- @param percent If < 0 effect will cause a decrease by amount, it
+-- @param amount If < 0 effect will cause a decrease by amount, it
 -- will be and increase if > 0
-function M.MovementSpeed(percent)
-   return M.effect_t(C.effect_move_speed(percent), false)
+function M.MovementSpeed(amount)
+   local type, amt = determine_type_amount(EFFECT_TYPE_MOVEMENT_SPEED_INCREASE,
+                                           EFFECT_TYPE_MOVEMENT_SPEED_DECREASE,
+                                           amount)
+   return CreateSimple(type, math.clamp(amt, 1, 100))
 end
 
 --- Create a Negative Level effect that will decrease the level of the target.
 -- @param amount Number of levels
 -- @param hp_bonus
 function M.NegativeLevel(amount, hp_bonus)
-   return M.effect_t(C.effect_negative_level(amount, hp_bonus), false)
+   return CreateSimple(EFFECT_TYPE_NEGATIVE_LEVEL, amount, hp_bonus)
 end
 
 --- Create a Paralyze effect.
 function M.Paralyze()
-   return M.effect_t(C.effect_paralyze(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 8)
 end
 
 --- Creates an effect that will petrify a creature.
 function M.Petrify()
-   return M.effect_t(C.effect_petrify(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 15)
 end
 
 --- Create a Poison effect.
 -- @param poison The type of poison to use, as defined in the POISON\_* constant group.
 function M.Poison(poison)
-   return M.effect_t(C.effect_poison(poison), false)
+   return CreateSimple(EFFECT_TYPE_POISON, poison)
 end
 
 --- Create a Polymorph effect that changes the target into a different type of creature.
 -- @param polymorph POLYMORPH_TYPE_*
 -- @param[opt=false] locked If true, player can't cancel polymorph.
 function M.Polymorph(polymorph, locked)
-   return M.effect_t(C.effect_polymorph(polymorph, locked), false)
+   local eff = CreateSimple(EFFECT_TYPE_POLYMORPH)
+   eff:SetInt(0, polymorph)
+   eff:SetInt(2, locked)
+   return eff
 end
 
 --- Create a Regenerate effect.
 -- @param amount Amount of damage to be regenerated per time interval
 -- @param interval Length of interval in seconds
 function M.Regenerate(amount, interval)
-   return M.effect_t(C.effect_regenerate(amount, interval), false)
+   return CreateSimple(EFFECT_TYPE_REGENERATE, amount, 1000 * interval)
 end
 
 --- Create a Resurrection effect.
 function M.Resurrection()
-   return M.effect_t(C.effect_resurrection(), false)
+   return CreateSimple(EFFECT_TYPE_RESURRECTION)
 end
 
 --- Creates a sanctuary effect.
 -- @param dc Must be a non-zero, positive number.
 function M.Sanctuary(dc)
-   return M.effect_t(C.effect_sanctuary(dc), false)
+   return CreateSimple(EFFECT_TYPE_SANCTUARY, 8, 28, dc, 1)
 end
 
 --- Create a Saving Throw Increase/Decrease effect to modify one Saving Throw type.
 -- @param save The Saving Throw to affect, as defined by the SAVING_THROW_* constants group.
 -- @param amount The amount to modify the saving throws by.  If > 0 an increase, if < 0 a decrease.
 -- @param[opt=SAVING_THROW_TYPE_ALL] save_type The type of resistance this effect applies to as
--- defined by the SAVING\_THROW\_TYPE\_* constants group.
+-- defined by the SAVING\_THROW\_VS\_* constants group.
 function M.SavingThrow(save, amount, save_type)
-   save_type = save_type or SAVING_TYROW_TYPE_ALL
-   return M.effect_t(C.effect_save(save, amount, save_type), false)
+   local type, amt = determine_type_amount(EFFECT_TYPE_SAVING_THROW_INCREASE,
+                                           EFFECT_TYPE_SAVING_THROW_DECREASE,
+                                           amount)
+   local eff = CreateSimple(type)
+   save_type = save_type or SAVING_TYROW_VS_ALL
+   eff:SetInt(0, amt)
+   eff:SetInt(1, save)
+   eff:SetInt(2, save_type)
+   eff:SetInt(3, 28)
+   return eff
 end
 
 --- Create a See Invisible effect.
 function M.SeeInvisible()
-   return M.effect_t(C.effect_see_invisible(), false)
+   return CreateSimple(EFFECT_TYPE_SEEINVISIBLE)
 end
 
 --- Create a Silence effect
 function M.Silence()
-   return M.effect_t(C.effect_silence(), false)
+   return CreateSimple(EFFECT_TYPE_SILENCE)
 end
 
 --- Returns an effect to decrease a skill.
 -- @param skill SKILL_*
 -- @param amount The amount to modify the skill by.  If > 0 an increase, if < 0 a decrease.
 function M.Skill(skill, amount)
-   return M.effect_t(C.effect_skill(skill, amount), false)
+   local type, amt = determine_type_amount(EFFECT_TYPE_SKILL_INCREASE,
+                                           EFFECT_TYPE_SKILL_DECREASE,
+                                           amount)
+   return CreateSimple(type, skill, amount, 28)
 end
 
 --- Creates a sleep effect.
 function M.Sleep()
-   return M.effect_t(C.effect_sleep(), false)
+   return CreateSimpe(EFFECT_TYPE_SETSTATE, 9)
 end
 
 --- Creates a slow effect.
 function M.Slow()
-   return M.effect_t(C.effect_slow(), false)
+   return CreateSimple(EFFECT_TYPE_SLOW)
 end
 
 --- Creates an effect that inhibits spells.
@@ -506,14 +577,13 @@ end
 function M.SpellFailure(percent, spell_school)
    percent = percent or 100
    spell_school = spell_school or SPELL_SCHOOL_GENERAL
-   return M.effect_t(C.effect_spell_failure(percent, spell_school), false)
+   return CreateSimple(EFFECT_TYPE_SPELL_FAILURE, percent, spell_school)
 end
 
 --- Returns an effect of spell immunity.
 -- @param[opt=SPELL_ALL_SPELLS] spell SPELL_*
 function M.SpellImmunity(spell)
-   spell = spell or SPELL_ALL_SPELLS
-   return M.effect_t(C.effect_spell_immunity(spell), false)
+   return CreateSimple(EFFECT_TYPE_SPELL_IMMUNITY, spell or SPELL_ALL_SPELLS)
 end
 
 --- Creates a Spell Level Absorption effect
@@ -523,20 +593,23 @@ end
 function M.SpellLevelAbsorption(max_level, max_spells, school)
    max_spells = max_spells or 0
    school = school or SPELL_SCHOOL_GENERAL
-   return M.effect_t(C.effect_spell_absorbtion(max_level,
-						 max_spells, school),
-		       false)
+
+   return CreateSimple(EFFECT_TYPE_SPELL_LEVEL_ABSORPTION,
+                       max_level, max_spells, school)
 end
 
 --- Modify Creature Spell Resistance
--- @param value If > 0 an increase, if < 0 a decrease
-function M.SpellResistance(value)
-   return M.effect_t(C.effect_spell_resistance(value), false)
+-- @param amount If > 0 an increase, if < 0 a decrease
+function M.SpellResistance(amount)
+   local type, amt = determine_type_amount(EFFECT_TYPE_SPELL_RESISTANCE_INCREASE,
+                                           EFFECT_TYPE_SPELL_RESISTANCE_DECREASE,
+                                           amount)
+   return CreateSimple(type, amt)
 end
 
 --- Creates a Stunned effect.
 function M.Stunned()
-   return M.effect_t(C.effect_stunned(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 6)
 end
 
 --- Summon Creature Effect
@@ -549,8 +622,11 @@ function M.SummonCreature(resref, vfx, delay, appear)
    vfx = vfx or VFX_NONE
    delay = delay or 0.0
    appear = appear and 1 or 0
-   return M.effect_t(C.effect_summon(resref, vfx,delay, appear),
-		       false)
+
+   local eff = CreateSimple(EFFECT_TYPE_SUMMON_CREATURE, vfx, appear)
+   eff:SetFloat(3, delay)
+   eff:SetString(0, resref)
+   return eff
 end
 
 --- Summon swarm effect.
@@ -563,44 +639,51 @@ end
 -- @param[opt=""] resref3 Optional blueprint for third creature to spawn.
 -- @param[opt=""] resref4 Optional blueprint for fourth creature to spawn.
 function M.Swarm(looping, resref1, resref2, resref3, resref4)
-   resref2 = resref2 or ""
-   resref3 = resref3 or ""
-   resref4 = resref4 or ""
-   return M.effect_t(C.effect_swarm(looping, resref1,
-				      resref2, resref3, resref4),
-		       false)
+   local eff = CreateSimple(EFFECT_TYPE_SWARM, looping)
+   eff:SetString(0, resref1)
+   eff:SetString(1, resref2)
+   eff:SetString(2, resref3)
+   eff:SetString(3, resref4)
+   return eff
 end
 
 --- Create a Temporary Hitpoints effect that raises the Hitpoints of the target.
--- @param hitpoints A positive integer
-function M.TemporaryHitpoints(hitpoints)
-   return M.effect_t(C.effect_hp_temporary(hitpoints), false)
+-- @param amount A positive integer
+function M.Hitpoints(amount, temporary)
+   if amount <= 0 then return Create() end
+   if temporary then
+      return CreateSimple(EFFECT_TYPE_TEMPORARY_HITPOINTS, amount)
+   end
+   return CreateSimple(EFFECT_TYPE_HITPOINTS, amount)
 end
 
 --- Create a Time Stop effect.
 function M.TimeStop()
-   return M.effect_t(C.effect_time_stop(), false)
+   return CreateSimple(EFFECT_TYPE_TIMESTOP)
 end
 
 --- Creats a True Seeing effect.
 function M.TrueSeeing()
-   return M.effect_t(C.effect_true_seeing(), false)
+   return CreateSimple(EFFECT_TYPE_TRUESEEING)
 end
 
 --- Create a Turned effect.
 function M.Turned()
-   return M.effect_t(C.effect_turned(), false)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 4)
 end
 
 --- Create a Turn Resistance Increase/Decrease effect that can make creatures more susceptible to turning.
--- @param hitdice If > 0 an increase, if < 0 a decrease.
-function M.TurnResistance(hitdice)
-   return M.effect_t(C.effect_turn_resistance(hitdice), false)
+-- @param amount If > 0 an increase, if < 0 a decrease.
+function M.TurnResistance(amount)
+   local type, amt = determine_type_amount(EFFECT_TYPE_TURN_RESISTANCE_INCREASE,
+                                           EFFECT_TYPE_TURN_RESISTANCE_DECREASE,
+                                           amount)
+   return CreateSimple(type, amt)
 end
 
 --- Creates an Ultravision effect
 function M.Ultravision()
-   return M.effect_t(C.effect_ultravision(), false)
+   return Create(EFFECT_TYPE_ULTRAVISION)
 end
 
 --- Creates a new visual effect
@@ -609,11 +692,14 @@ end
 -- target will be generated, on which to play the effect.
 function M.VisualEffect(id, miss)
    miss = miss and 1 or 0
-   return M.effect_t(C.effect_visual(id, miss), false)
+   local eff = CreateSimple(EFFECT_TYPE_VISUALEFFECT)
+   eff:SetInt(0, id)
+   eff:SetInt(1, miss)
+   return eff
 end
 
 --- Creates a wounding effect
 -- @param amount Amount of damage to do each round
 function M.Wounding (amount)
-   return M.effect_t(C.effect_wounding (amount), false)
+   return CreateSimple(EFFECT_TYPE_WOUNDING, amount)
 end
