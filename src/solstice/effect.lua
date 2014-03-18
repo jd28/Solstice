@@ -12,12 +12,13 @@ require 'solstice.effect.creation'
 local Effect = {}
 M.Effect = Effect
 
-local effect_mt = { __index = M.Effect,
-                    __gc = function(eff)
-                       if not eff.direct and eff.eff ~= nil then
-                          C.free(eff.eff)
-                       end
-                    end
+local effect_mt = {
+   __index = Effect,
+   __gc = function(eff)
+      if not eff.direct and eff.eff ~= nil then
+         C.free(eff.eff)
+      end
+   end
 }
 
 -- Internal ctype.
@@ -81,6 +82,12 @@ function Effect:GetDurationType()
    return bit.band(self.eff.eff_dursubtype, 0x7)
 end
 
+--- Get float
+-- @param index Index
+function Effect:GetFloat(index)
+   return self.eff.eff_floats[index]
+end
+
 --- Gets the specifed effects Id
 function Effect:GetId()
    return self.eff.eff_id
@@ -88,9 +95,7 @@ end
 
 --- Determines whether an effect is valid.
 function Effect:GetIsValid()
-    NWE.StackPushEngineStructure(NWE.STRUCTURE_EFFECT, self)
-    NWE.ExecuteCommand(88, 1)
-    return NWE.StackPopBoolean()
+   return self.eff.eff_type ~= EFFECT_TYPE_INVALID
 end
 
 --- Returns the internal effect integer at the index specified.
@@ -99,14 +104,31 @@ function Effect:GetInt(index)
    if index < 0 or index >= self.eff.eff_num_integers then
       print(debug.traceback())
       error "Effect integer index is out of bounds."
-      return -1
    end
    return self.eff.eff_integers[index]
+end
+
+--- Get effect object
+-- @param index Index to store the string.  [0, 3]
+function Effect:GetObject(index)
+   if index < 0 or index > 3 then
+      error "Effect:GetObject must be between 0 and 3"
+   end
+   return _SOL_GET_CACHED_OBJECT(self.eff.eff_objects[index])
 end
 
 --- Gets Spell Id associated with effect
 function Effect:GetSpellId()
    return self.eff.eff_spellid
+end
+
+--- Gets a string on an effect.
+-- @param index Index to store the string.  [0, 5]
+function Effect:GetString(index, str)
+   if index < 0 or index > 5 then
+      error "Effect:SetString must be between 0 and 5"
+   end
+   return ffi.string(self.eff.eff_strings[index].text)
 end
 
 --- Get the subtype of the effect.
@@ -148,6 +170,16 @@ function Effect:SetDurationType(dur)
    return self.eff.eff_dursubtype
 end
 
+--- Set effect float
+-- @param index Index. [0, 3]
+-- @param float Float
+function Effect:SetFloat(index, float)
+   if index < 0 or index > 3 then
+      error "Effect:SetObject must be between 0 and 3"
+   end
+   self.eff.eff_floats[index] = float
+end
+
 --- Sets the internal effect integer at the specified index to the
 -- value specified. Source: nwnx_structs by Acaos
 function Effect:SetInt(index, value)
@@ -165,6 +197,16 @@ function Effect:SetNumIntegers(num)
    C.nwn_EffectSetNumIntegers(self.eff, num)
 end
 
+--- Set effect object
+-- @param index Index. [0, 3]
+-- @param object Object
+function Effect:SetObject(index, object)
+   if index < 0 or index > 3 then
+      error "Effect:SetObject must be between 0 and 3"
+   end
+   self.eff.eff_objects[index] = object.id
+end
+
 --- Sets the effect's spell id as specified, which will later be returned
 -- with Effect:GetSpellId(). Source: nwnx_structs by Acaos
 function Effect:SetSpellId (spellid)
@@ -177,7 +219,6 @@ end
 function Effect:SetString(index, str)
    if index < 0 or index > 5 then
       error "Effect:SetString must be between 0 and 5"
-      return
    end
    self.eff.eff_strings[index].text = C.strdup(str)
    self.eff.eff_strings[index].len = #str
@@ -195,181 +236,6 @@ end
 function Effect:SetType(value)
    self.eff.eff_type = value
    return self.eff.eff_type
-end
-
---- Sets an effect versus a specified alignment
--- @param[opt=ALIGNMENT_ALL] lawchaos Law / Chaos
--- @param[opt=ALIGNMENT_ALL] goodevil Good / Evil
-function Effect:SetVersusAlignment(lawchaos, goodevil)
-   local lcidx
-   local geidx
-   local type = self.eff.eff_type
-   lawchaos = lawchaos or ALIGNMENT_ALL
-   goodevil = goodevil or ALIGNMENT_ALL
-
-   if type == EFFECT_TYPE_ATTACK_INCREASE
-      or type == EFFECT_TYPE_ATTACK_DECREASE
-      or type == EFFECT_TYPE_DAMAGE_INCREASE
-      or type == EFFECT_TYPE_DAMAGE_DECREASE
-      or type == EFFECT_TYPE_AC_INCREASE
-      or type == EFFECT_TYPE_AC_DECREASE
-      or type == EFFECT_TYPE_SKILL_INCREASE
-      or type == EFFECT_TYPE_SKILL_DECREASE
-   then
-      lcidx, geidx = 3, 4
-   elseif type == EFFECT_TYPE_CONCEALMENT
-      or type == EFFECT_TYPE_IMMUNITY
-      or type == EFFECT_TYPE_INVISIBILITY
-      or type == EFFECT_TYPE_SANCTUARY
-   then
-      lcidx, geidx = 2, 3
-   else
-      error(string.format("Effect Type (%d) does not support versus alignment", type))
-      return
-   end
-
-   self:SetInt(lcidx, lawchaos)
-   self:SetInt(geidx, goodevil)
-end
-
---- Set an effect versus a specified deity.
--- see Creature:GetDeityId()
--- @param deity An integer value indicating a deity id.
--- This value is server dependent.
-function Effect:SetVersusDeity(deity)
-   local idx
-   local type = self.eff.eff_type
-
-   if type == EFFECT_TYPE_ATTACK_INCREASE
-      or type == EFFECT_TYPE_ATTACK_DECREASE
-      or type == EFFECT_TYPE_SKILL_INCREASE
-      or type == EFFECT_TYPE_SKILL_DECREASE
-   then
-      idx = 6
-   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
-      or type == EFFECT_TYPE_DAMAGE_DECREASE
-      or type == EFFECT_TYPE_AC_INCREASE
-      or type == EFFECT_TYPE_AC_DECREASE
-   then
-      idx = 7
-   elseif type == EFFECT_TYPE_IMMUNITY then
-
-   else
-      error(string.format("Effect Type (%d) does not support versus deity", type))
-      return
-   end
-
-   self:SetInt(idx, deity)
-end
-
---- Sets an effect 'versus' a percentage.
--- That is the effect has a specified % of being applicable.
--- A value of 60% would mean that the creature must roll a 1d100 <= 60.
--- @param perc Percent: [0, 100).  Value 0 is always applicable.
-function Effect:SetVersusPercentage(perc)
-   if perc < 0 or perc >= 100 then
-      error "Versus percentage takes a value [0, 100)"
-   end
-
-   local idx
-   local type = self:GetType()
-
-   if type == EFFECT_TYPE_IMMUNITY then
-      idx = 1
-   else
-      error(string.format("Effect Type (%d) does not support versus subrace", type))
-      return
-   end
-
-   self:SetInt(idx, subrace)
-end
-
---- Sets an effect versus a race
--- @param race solstice.RACIAL_TYPE_*
-function Effect:SetVersusRace(race)
-   local idx
-   local type = self:GetType()
-
-  if type == EFFECT_TYPE_ATTACK_INCREASE
-      or type == EFFECT_TYPE_ATTACK_DECREASE
-      or type == EFFECT_TYPE_DAMAGE_INCREASE
-      or type == EFFECT_TYPE_DAMAGE_DECREASE
-      or type == EFFECT_TYPE_AC_INCREASE
-      or type == EFFECT_TYPE_AC_DECREASE
-      or type == EFFECT_TYPE_SKILL_INCREASE
-      or type == EFFECT_TYPE_SKILL_DECREASE
-   then
-      idx = 2
-   elseif type == EFFECT_TYPE_CONCEALMENT
-      or type == EFFECT_TYPE_IMMUNITY
-      or type == EFFECT_TYPE_INVISIBILITY
-      or type == EFFECT_TYPE_SANCTUARY
-   then
-      idx = 1
-      error(string.format("Effect Type (%d) does not support versus race", type))
-      return
-   end
-
-   self:SetInt(idx, race)
-end
-
---- Set an effect versus a specified subrace.
--- see Creature:GetSubraceId()
--- @param subrace An integer value indicating a subrace id.
---    This value is server dependent.
-function Effect:SetVersusSubrace(subrace)
-   local idx
-   local type = self:GetType()
-
-   if type == EFFECT_TYPE_ATTACK_INCREASE
-      or type == EFFECT_TYPE_ATTACK_DECREASE
-      or type == EFFECT_TYPE_SKILL_INCREASE
-      or type == EFFECT_TYPE_SKILL_DECREASE
-   then
-      idx = 5
-   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
-      or type == EFFECT_TYPE_DAMAGE_DECREASE
-      or type == EFFECT_TYPE_AC_INCREASE
-      or type == EFFECT_TYPE_AC_DECREASE
-   then
-      idx = 6
-   elseif type == EFFECT_TYPE_CONCEALMENT then
-   elseif type == EFFECT_TYPE_IMMUNITY then
-   else
-      error(string.format("Effect Type (%d) does not support versus subrace", type))
-      return
-   end
-
-   self:SetInt(idx, subrace)
-end
-
---- Sets an effect versus a particular target.
--- @param target Target creature.
-function Effect:SetVersusTarget(target)
-   if not target:GetIsValid() then return end
-
-   local idx
-   local type = self.eff.eff_type
-
-   if type == EFFECT_TYPE_ATTACK_INCREASE
-      or type == EFFECT_TYPE_ATTACK_DECREASE
-      or type == EFFECT_TYPE_SKILL_INCREASE
-      or type == EFFECT_TYPE_SKILL_DECREASE
-   then
-      idx = 7
-   elseif type == EFFECT_TYPE_DAMAGE_INCREASE
-      or type == EFFECT_TYPE_DAMAGE_DECREASE
-      or type == EFFECT_TYPE_AC_INCREASE
-      or type == EFFECT_TYPE_AC_DECREASE
-   then
-      idx = 8
-   elseif type == EFFECT_TYPE_IMMUNITY then
-   else
-      error(string.format("Effect Type (%d) does not support versus target", type))
-      return
-   end
-
-   self:SetInt(idx, target.id)
 end
 
 return M
