@@ -145,8 +145,8 @@ end
 --- Create Ability bonus/penalty item property.
 -- @param ability ABILITY_*
 -- @param mod Bonus: [1, 12], Penalty [-12, -1]
-function AbilityScore(ability, mod)
-   local eff = M.CreateItempropEffect()
+function M.AbilityScore(ability, mod)
+   local eff = CreateItempropEffect()
 
    if mod < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_ABILITY_SCORE, ability, 21, math.clamp(-mod, 1, 12))
@@ -159,8 +159,8 @@ end
 
 --- Create AC item property
 -- @param value Bonus: [1,20] Penaly [-20, -1]
-function AC(value)
-   local eff = M.CreateItempropEffect()
+function M.AC(value)
+   local eff = CreateItempropEffect()
 
    if value < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_AC, -1, 20, math.clamp(-value, 1, 20))
@@ -173,24 +173,24 @@ end
 
 --- Creates additional item property
 -- @param addition IP_CONST_ADDITIONAL_*
-function Additional(addition)
-   local eff = M.CreateItempropEffect()
+function M.Additional(addition)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ADDITIONAL, nil, 30, addition)
    return eff
 end
 
 --- Create arcane spell failure item property
 -- @param value
-function ArcaneSpellFailure(value)
-   local eff = M.CreateItempropEffect()
+function M.ArcaneSpellFailure(value)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ARCANE_SPELL_FAILURE, nil, 27, value)
    return eff
 end
 
 --- Creatures attack modifier item property
 -- @param value [1,20] or [-5, -1]
-function AttackModifier(value)
-   local eff = M.CreateItempropEffect()
+function M.AttackModifier(value)
+   local eff = CreateItempropEffect()
 
    if value < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_ATTACK_MODIFIER, nil, 25, math.clamp(value, 1, 5))
@@ -202,8 +202,8 @@ end
 
 --- Item Property Bonus Feat
 -- @param feat IP_CONST_FEAT_*
-function BonusFeat(feat)
-   local eff = M.CreateItempropEffect()
+function M.BonusFeat(feat)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_BONUS_FEAT, nil, 0, feat)
    return eff
 end
@@ -211,8 +211,8 @@ end
 --- Creates a "bonus spell of a specified level" itemproperty.
 -- @param class solstice.class constant
 -- @param level [0, 9]
-function BonusLevelSpell(class, level)
-   local eff = M.CreateItempropEffect()
+function M.BonusLevelSpell(class, level)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_BONUS_SPELL_SLOT_OF_LEVEL_N, class, 13, level)
    return eff
 end
@@ -220,16 +220,16 @@ end
 --- Creates a "cast spell" itemproperty.
 -- @param spell IP_CONST_CASTSPELL_*
 -- @param uses IP_CONST_CASTSPELL_NUMUSES_*
-function CastSpell(spell, uses)
-   local eff = M.CreateItempropEffect()
+function M.CastSpell(spell, uses)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_CAST_SPELL, spell, 3, uses)
    return eff
 end
 
 --- Create a "reduced weight container" itemproperty.
 -- @param amount IP_CONST_CONTAINERWEIGHTRED_*
-function ContainerReducedWeight(amount)
-   local eff = M.CreateItempropEffect()
+function M.ContainerReducedWeight(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ENHANCED_CONTAINER_REDUCED_WEIGHT, nil, 15, amount)
    return eff
 end
@@ -237,9 +237,9 @@ end
 --- Creates a damage bonus itemproperty.
 -- @param damage_type solstice.damage constant.
 -- @param damage solstice.damage.BONUS_*
-function DamageBonus(damage_type, damage)
+function M.DamageBonus(damage_type, damage)
    damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
-   local eff = M.CreateItempropEffect()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_BONUS, damage_type, 4, damage)
    return eff
 end
@@ -247,17 +247,17 @@ end
 --- Creates a damage immunity itemproperty.
 -- @param damage_type DAMAGE\_TYPE\_*
 -- @param amount IP_CONST_DAMAGEIMMUNITY_*
-function DamageImmunity(damage_type, amount)
+function M.DamageImmunity(damage_type, amount)
    damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
-   local eff = M.CreateItempropEffect()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
    return eff
 end
 
 --- Creatses a damage penalty itemproperty.
 -- @param amount [1,5]
-function DamagePenalty(amount)
-   local eff = M.CreateItempropEffect()
+function M.DamagePenalty(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DECREASED_DAMAGE, nil, 20, amount)
    return eff
 end
@@ -265,8 +265,8 @@ end
 --- Creates a damage reduction itemproperty.
 -- @param enhancement IP_CONST_REDUCTION_*
 -- @param soak IP_CONST_SOAK_*
-function DamageReduction(enhancement, soak)
-   local eff = M.CreateItempropEffect()
+function M.DamageReduction(enhancement, soak)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_REDUCTION, enhancement, 6, soak)
    return eff
 end
@@ -274,9 +274,9 @@ end
 --- Creates damage resistance item property.
 -- @param damage_type solstice.damage type constant.
 -- @param amount IP_CONST_RESIST_*
-function DamageResistance(damage_type, amount)
+function M.DamageResistance(damage_type, amount)
    damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
-   local eff = M.CreateItempropEffect()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_RESISTANCE, damage_type, 7, amount)
    return eff
 end
@@ -284,24 +284,24 @@ end
 --- Creates damage vulnerability item property.
 -- @param damage_type solstice.damage type constant.
 -- @param amount IP_CONST_DAMAGEVULNERABILITY_*
-function DamageVulnerability(damage_type, amount)
+function M.DamageVulnerability(damage_type, amount)
    damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
-   local eff = M.CreateItempropEffect()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_VULNERABILITY, damage_type, 22, amount)
    return eff
 end
 
 --- Creates Darkvision Item Property
-function Darkvision()
-   local eff = M.CreateItempropEffect()
+function M.Darkvision()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DARKVISION, nil, 0)
    return eff
 end
 
 --- Item Property Enhancement Bonus
 -- @param amount If greater than 0 enhancment bonus, else penalty
-function EnhancementModifier(amount)
-   local eff = M.CreateItempropEffect()
+function M.EnhancementModifier(amount)
+   local eff = CreateItempropEffect()
 
    if amount < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_ENHANCEMENT_MODIFIER, nil, 20, math.clamp(-amount, 1, 20))
@@ -315,8 +315,8 @@ end
 --- Creates an "extra damage type" item property.
 -- @param damage_type solstice.damage constant
 -- @param[opt=false] is_ranged ExtraRangedDamge if true, melee if false.
-function ExtraDamageType(damage_type, is_ranged)
-   local eff = M.CreateItempropEffect()
+function M.ExtraDamageType(damage_type, is_ranged)
+   local eff = CreateItempropEffect()
    damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
 
    if is_ranged then
@@ -328,51 +328,51 @@ function ExtraDamageType(damage_type, is_ranged)
 end
 
 --- Creates a free action (freedom of movement) itemproperty.
-function Freedom()
-   local eff = M.CreateItempropEffect()
+function M.Freedom()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_FREEDOM_OF_MOVEMENT, nil, 0)
    return eff
 end
 
 --- Creates haste item property.
-function Haste()
+function M.Haste()
    return NWE.CreateItemPropery( 647, 0)
 end
 
 --- Creates a healers' kit item property.
 -- @param modifier [1,12]
-function HealersKit(modifier)
-   local eff = M.CreateItempropEffect()
+function M.HealersKit(modifier)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_HEALERS_KIT, nil, 25, modifier)
    return eff
 end
 
 --- Creates Holy Avenger item propety.
-function HolyAvenger()
-   local eff = M.CreateItempropEffect()
+function M.HolyAvenger()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_HOLY_AVENGER, nil, 0)
    return eff
 end
 
 --- Creates immunity item property
 -- @param immumity_type IMMUNITY\_TYPE\_*
-function ImmunityMisc(immumity_type)
-   local eff = M.CreateItempropEffect()
+function M.ImmunityMisc(immumity_type)
+   local eff = CreateItempropEffect()
    immumity_type = Rules.ConvertImmunityToIPConstant(immumity_type)
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_MISCELLANEOUS, immumity_type, 0)
    return eff
 end
 
 --- Creates Improved evasion item property.
-function ImprovedEvasion()
-   local eff = M.CreateItempropEffect()
+function M.ImprovedEvasion()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMPROVED_EVASION, nil, 0)
    return eff
 end
 
 --- Creates keen item property
-function Keen()
-   local eff = M.CreateItempropEffect()
+function M.Keen()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_KEEN, nil, 0)
    return eff
 end
@@ -380,32 +380,32 @@ end
 --- Creates a light item property.
 -- @param brightness IP_CONST_LIGHTBRIGHTNESS_*
 -- @param color IP_CONST_LIGHTCOLOR_*
-function Light(brightness, color)
-   local eff = M.CreateItempropEffect()
+function M.Light(brightness, color)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_LIGHT, nil, 18, brightness, 9, color)
    return eff
 end
 
 --- Creates a class use limitation item property
 -- @param class CLASS\_TYPE\_*
-function LimitUseByClass(class)
-   local eff = M.CreateItempropEffect()
+function M.LimitUseByClass(class)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_USE_LIMITATION_CLASS, class, 0)
    return eff
 end
 
 --- Creates a race use limitation item property
 -- @param race Racial type
-function LimitUseByRace(race)
-   local eff = M.CreateItempropEffect()
+function M.LimitUseByRace(race)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_USE_LIMITATION_RACIAL_TYPE, race, 0)
    return eff
 end
 
 --- Creates a massive criticals item property.
 -- @param damage DAMAGE\_BONUS\_*
-function MassiveCritical(damage)
-   local eff = M.CreateItempropEffect()
+function M.MassiveCritical(damage)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MASSIVE_CRITICALS, nil, 4, damage)
    return eff
 end
@@ -413,31 +413,31 @@ end
 --- Creates material item property
 -- @param material The material type should be [0, 77] based on
 -- iprp_matcost.2da.
-function Material(material)
-   local eff = M.CreateItempropEffect()
+function M.Material(material)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MATERIAL, nil, 28, material)
    return eff
 end
 
 --- Creates a mighty item property.
 -- @param value [1,20]
-function Mighty(value)
-   local eff = M.CreateItempropEffect()
+function M.Mighty(value)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MIGHTY, nil, 2, math.clamp(value, 1, 20))
    return eff
 end
 
 --- Creates Monster Damage effect.
 -- @param damage IP_CONST_MONSTERDAMAGE_*
-function MonsterDamage(damage)
-   local eff = M.CreateItempropEffect()
+function M.MonsterDamage(damage)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MONSTER_DAMAGE, nil, 19, damage)
    return eff
 end
 
 --- Creates no damage item property
-function NoDamage()
-   local eff = M.CreateItempropEffect()
+function M.NoDamage()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_NO_DAMAGE, nil, 0)
    return eff
 end
@@ -445,8 +445,8 @@ end
 --- Creates an "on hit cast spell" item property.
 -- @param spell IP_CONST_ONHIT_CASTSPELL_*
 -- @param level Level spell is cast at.
-function OnHitCastSpell(spell, level)
-   local eff = M.CreateItempropEffect()
+function M.OnHitCastSpell(spell, level)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ONHITCASTSPELL, spell, 26, level)
    return eff
 end
@@ -455,8 +455,8 @@ end
 -- NOTE: Item property is bugged.  See NWN Lexicon.
 -- @param prop IP_CONST_ONMONSTERHIT_*
 -- @param special ???
-function OnHitMonster(prop, special)
-   local eff = M.CreateItempropEffect()
+function M.OnHitMonster(prop, special)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ON_MONSTER_HIT, prop, 0, special)
    return eff
 end
@@ -465,8 +465,8 @@ end
 -- @param prop IP_CONST_ONHIT_*
 -- @param dc IP_CONST_ONHIT_SAVEDC_*
 -- @param special Meaning varies with type. (Default: 0)
-function OnHitProps(prop, dc, special)
-   local eff = M.CreateItempropEffect()
+function M.OnHitProps(prop, dc, special)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_ON_HIT_PROPERTIES,
 		 prop,
 		 24,
@@ -478,16 +478,16 @@ end
 
 --- Creates quality item property
 -- @param quality IP_CONST_QUALITY_*
-function Quality(quality)
-   local eff = M.CreateItempropEffect()
+function M.Quality(quality)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_QUALITY, nil, 29, quality)
    return eff
 end
 
 --- Creates a regeneration item property.
 -- @param amount [1, 20]
-function Regeneration(amount)
-   local eff = M.CreateItempropEffect()
+function M.Regeneration(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_REGENERATION, nil, 2, math.clamp(amount, 1, 20))
    return eff
 end
@@ -495,8 +495,8 @@ end
 --- Creates saving throw bonus item property
 -- @param save_type SAVING_THROW_*
 -- @param amount [1,20] or [-20, -1]
-function SavingThrow(save_type, amount)
-   local eff = M.CreateItempropEffect()
+function M.SavingThrow(save_type, amount)
+   local eff = CreateItempropEffect()
 
    save_type = Rules.ConvertSaveToItempropConstant(save_type)
 
@@ -512,8 +512,8 @@ end
 --- Creates saving throw bonus vs item property
 -- @param save_type SAVING_THROW_VS_*
 -- @param amount [1,20] or [-20, -1]
-function SavingThrowVersus(save_type, amount)
-   local eff = M.CreateItempropEffect()
+function M.SavingThrowVersus(save_type, amount)
+   local eff = CreateItempropEffect()
 
    save_type = Rules.ConvertSaveVsToItempropConstant(save_type)
 
@@ -528,8 +528,8 @@ end
 --- Creates skill modifier item property
 -- @param skill solstice.skill type constant.
 -- @param amount [1, 50] or [-10, -1]
-function SkillModifier(skill, amount)
-   local eff = M.CreateItempropEffect()
+function M.SkillModifier(skill, amount)
+   local eff = CreateItempropEffect()
 
    if amount < 0 then
       eff:SetValues(ITEM_PROPERTY_DECREASED_SKILL_MODIFIER, skill, 21, math.clamp(-amount, 1, 10))
@@ -542,49 +542,49 @@ end
 
 --- Creates a special walk itemproperty.
 -- @param[opt=0] walk Only 0 is a valid argument
-function SpecialWalk(walk)
+function M.SpecialWalk(walk)
    walk = walk or 0
-   local eff = M.CreateItempropEffect()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_SPECIAL_WALK, walk)
    return eff
 end
 
 --- Create an "immunity to spell level" item property.
 -- @param level Spell level [1,9]
-function SpellImmunityLevel(level)
-   local eff = M.CreateItempropEffect()
+function M.SpellImmunityLevel(level)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_SPELLS_BY_LEVEL, nil, 23, level)
    return eff
 end
 
 --- Creates an "immunity to specific spell" itemproperty.
 -- @param spell IP_CONST_IMMUNITYSPELL_*
-function SpellImmunitySpecific(spell)
-   local eff = M.CreateItempropEffect()
+function M.SpellImmunitySpecific(spell)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_SPECIFIC_SPELL, nil, 16, spell)
    return eff
 end
 
 --- Creates an "immunity against spell school" itemproperty.
 -- @param school IP_CONST_SPELLSCHOOL_*
-function SpellImmunitySchool(school)
-   local eff = M.CreateItempropEffect()
+function M.SpellImmunitySchool(school)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_SPECIFIC_SPELL, school, 0)
    return eff
 end
 
 --- Creates a spell resistince item property
 -- @param amount IP_CONST_SPELLRESISTANCEBONUS_*
-function SpellResistance(amount)
-   local eff = M.CreateItempropEffect()
+function M.SpellResistance(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_SPELL_RESISTANCE, nil, 11, amount)
    return eff
 end
 
 --- Creates a thieves tool item property
 -- @param modifier [1, 12]
-function ThievesTools(modifier)
-   local eff = M.CreateItempropEffect()
+function M.ThievesTools(modifier)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_THIEVES_TOOLS, nil, 25, math.clamp(modifier, 1, 12))
    return eff
 end
@@ -592,63 +592,63 @@ end
 --- Creates a trap item property
 -- @param level IP_CONST_TRAPSTRENGTH_*
 -- @param trap_type IP_CONST_TRAPTYPE_*
-function Trap(level, trap_type)
-   local eff = M.CreateItempropEffect()
+function M.Trap(level, trap_type)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_TRAP, trap_type, 17, level)
    return eff
 end
 
 --- Creates true seeing item property
-function TrueSeeing()
-   local eff = M.CreateItempropEffect()
+function M.TrueSeeing()
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_TRUE_SEEING, nil, 0)
    return eff
 end
 
 --- Creates a turn resistance item property.
 -- @param modifier [1, 50]
-function TurnResistance(modifier)
-   local eff = M.CreateItempropEffect()
+function M.TurnResistance(modifier)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_TURN_RESISTANCE, nil, 25, math.clamp(modifier, 1, 50))
    return eff
 end
 
 --- Creates an unlimited ammo itemproperty.
 -- @param ammo IP_CONST_UNLIMITEDAMMO_* (Default: IP_CONST_UNLIMITEDAMMO_BASIC)
-function UnlimitedAmmo(ammo)
-   local eff = M.CreateItempropEffect()
+function M.UnlimitedAmmo(ammo)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_UNLIMITED_AMMUNITION, ammo or IP_CONST_UNLIMITEDAMMO_BASIC, 14)
    return eff
 end
 
 --- Creates vampiric regeneration effect.
 -- @param amount [1,20]
-function VampiricRegeneration(amount)
-   local eff = M.CreateItempropEffect()
+function M.VampiricRegeneration(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_REGENERATION_VAMPIRIC, nil, 2, math.clamp(amount, 1, 20))
    return eff
 end
 
 --- Creates a visual effect item property
 -- @param effect IP_CONST_VISUAL_*
-function VisualEffect(effect)
-   local eff = M.CreateItempropEffect()
+function M.VisualEffect(effect)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_VISUALEFFECT, effect)
    return eff
 end
 
 --- Item Property Weight Increase
 -- @param amount IP_CONST_WEIGHTINCREASE_*
-function WeightIncrease(amount)
-   local eff = M.CreateItempropEffect()
+function M.WeightIncrease(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_WEIGHT_INCREASE, nil, 0, nil, 11, amount)
    return eff
 end
 
 --- Item Property Weight Reuction
 -- @param amount IP_CONST_REDUCEDWEIGHT_*
-function WeightReduction(amount)
-   local eff = M.CreateItempropEffect()
+function M.WeightReduction(amount)
+   local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_BASE_ITEM_WEIGHT_REDUCTION, nil, 10, amount)
    return eff
 end
