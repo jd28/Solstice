@@ -53,8 +53,10 @@ function NWNXEffects_HandleEffectEvent()
    local h = EFF_HANDLERS[eff_type]
    if not h then return 0 end
 
-   ev.suppress = true
-   ev.delete_eff = h(eff, obj, ev.is_remove, ev.preapply) or false
+   local del, sup = h(eff, obj, ev.is_remove, ev.preapply)
+
+   ev.suppress = sup and true or false
+   ev.delete_eff = del and true or false
 
    return 1
 end
