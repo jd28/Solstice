@@ -98,7 +98,7 @@ end
 --- Gets a creatures dexterity modifier.
 -- @param[opt=false] armor_check If true uses armor check penalty.
 function M.Creature:GetDexMod(armor_check)
-   return C.nwn_GetDexMod(self.obj.cre_stats, armor_check)
+   return C.nwn_GetDexMod(self.obj.cre_stats, armor_check and 1 or 0)
 end
 
 --- Modifies the ability score of a specific type for a creature.
