@@ -10,12 +10,18 @@ local M = {}
 -- @param dice Number of dice to roll
 -- @param sides Number of sides the dice have
 -- @param bonus Bonus added to roll
-local function Roll(dice, sides, bonus)
+local function Roll(dice, sides, bonus, times)
+   if not times or times <= 1 then
+      times = 1
+   end
+
    bonus = bonus or 0
    local result = 0
 
-   for i = 1, dice do
-      result = result + random(sides)
+   for j = 1, times do
+      for i = 1, dice do
+         result = result + random(sides)
+      end
    end
 
    return result + bonus
@@ -102,8 +108,11 @@ end
 
 --- Do a dice roll.
 -- @param roll DiceRoll ctype
-function M.DoRoll(roll)
-   return Roll(roll.dice, roll.sides, roll.bonus)
+function M.DoRoll(roll, times)
+   if not times or times <= 1 then
+      times = 1
+   end
+   return Roll(roll.dice, roll.sides, roll.bonus, times)
 end
 
 --- Converts a dice roll to formatted string.

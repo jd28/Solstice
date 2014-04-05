@@ -42,7 +42,7 @@ function M.Object:GetHardness()
 end
 
 ---
-function M.Object:GetIsImmuneToCriticalHits()
+function M.Object:GetIsImmune(immunity)
    return false
 end
 
@@ -95,4 +95,16 @@ function M.Object:SetLastHostileActor(actor)
    if not self:GetIsValid() or not actor:GetIsValid() then return end
 
    self.obj.obj.obj_last_hostile_actor = actor.id
+end
+
+function M.Object:GetDamageReductionAdj(base_damage, damage_power, burn_eff)
+   return base_damage, 0
+end
+
+function M.Object:GetDamageResistAdj(amt, dmgidx, burn_eff)
+   return amt, 0
+end
+
+function M.Object:GetDamageImmunityAdj(amt, dmgidx)
+   return amt, 0
 end

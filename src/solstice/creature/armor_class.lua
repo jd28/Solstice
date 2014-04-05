@@ -20,7 +20,7 @@ end
 -- @param touch If true it's a touch attack.
 -- @param[opt] attack
 -- @param[opt] is_ranged
-function M.Creature:GetACVersus(vs, touch, attack, is_ranged)
+function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    vs = vs or OBJECT_INVALID
    -- 10 base AC
    local ac = 10
@@ -62,12 +62,12 @@ function M.Creature:GetACVersus(vs, touch, attack, is_ranged)
 
       -- Attacker is invis and target doesn't have blindfight or target is Flatfooted
       -- then target gets no Dex mod.
-      if bit.band(COMBAT_TARGET_STATE_ATTACKER_INVIS, attack.target_state) == 0 and
-         bit.band(COMBAT_TARGET_STATE_FLATFOOTED, attack.target_state) == 0
+      if bit.band(COMBAT_TARGET_STATE_ATTACKER_INVIS, state) == 0 and
+         bit.band(COMBAT_TARGET_STATE_FLATFOOTED, state) == 0
       then
          -- Attacker is seen or target has Blindfight and it's not a ranged attack then target
          -- gets dex_mod and dodge AC
-         if bit.band(COMBAT_TARGET_STATE_ATTACKER_UNSEEN, attack.target_state) == 0
+         if bit.band(COMBAT_TARGET_STATE_ATTACKER_UNSEEN, state) == 0
             or (self:GetHasFeat(FEAT_BLIND_FIGHT) and is_ranged)
          then
             if dex_mod > 0 then
@@ -132,22 +132,6 @@ function M.Creature:GetACVersus(vs, touch, attack, is_ranged)
 
 
    if touch then return ac + dodge end
-
-   if OPT.USE_VERSUS then
-      -- Only necessary if versus target is valid.  If it's not all the
-      -- appropriate bonuses have already been determined.
-      if vs:GetIsValid() then
-         eff_nat, eff_armor, eff_shield, eff_deflect, eff_dodge =
-            self:GetEffectArmorClassBonus(vs, touch)
-
-         nat     = max(nat, eff_nat)
-         armor   = max(armor, eff_armor)
-         deflect = max(deflect, eff_deflect)
-         shield  = max(shield, eff_shield)
-
-         dodge = dodge + eff_dodge
-      end
-   end
 
    dodge = clamp(dodge, min_mod, max_mod)
    ac = ac + nat + armor + shield + deflect + dodge

@@ -32,6 +32,16 @@ function M.Creature:GetDamageImmunityAdj(amt, dmgidx)
    return amt - imm_adj, imm_adj
 end
 
+function M.Creature:GetDamageImmunity(dmgidx)
+   -- If the damage index is invalid... skip it.
+   if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM then
+      return 0
+   end
+   return math.clamp(self.ci.defense.immunity[dmgidx] +
+                     self.ci.defense.immunity_base[dmgidx],
+                     0, 100)
+end
+
 --- Determines a creatures damage resistance.
 -- @param amt Damage amount
 -- @param dmgidx Damage index DAMAGE\_INDEX\_*
@@ -49,8 +59,8 @@ function M.Creature:GetDamageResistAdj(amt, dmgidx, burn_eff)
    local total = 0
    local resist_adj = 0
 
-   local resist = self.ci.resist[dmgidx]
-   local eff_idx = self.ci.eff_resist[dmgidx]
+   local resist = self.ci.defense.resist[dmgidx]
+   local eff_idx = self.ci.defense.resist_eff[dmgidx]
    -- If there is a resist effect for this damage, use it.
    if eff_idx >= 0 then
       eff = self:GetEffectAtIndex(eff_idx)
@@ -115,7 +125,7 @@ function M.Creature:GetDamageReductionAdj(base_damage, damage_power, burn_eff)
 
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.
-   local highest_soak = self.ci.soak
+   local highest_soak = self.ci.defense.soak
    local use_eff
 
    -- If damage power is greater then 20 or less than zero something is most
@@ -124,7 +134,7 @@ function M.Creature:GetDamageReductionAdj(base_damage, damage_power, burn_eff)
       -- Loop through the soak effects and find a soak that is a) higher than innate soak
       -- and b) is greater than the damage power.
       for i = damage_power + 1, 20 do
-         local eff_idx = self.ci.eff_soak[i]
+         local eff_idx = self.ci.defense.soak_eff[i]
          if eff_idx >= 0 then
             local eff = self:GetEffectAtIndex(eff_idx)
             local eff_amount = eff:GetInt(0)

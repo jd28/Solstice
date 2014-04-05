@@ -30,12 +30,8 @@ function M.Creature:GetAttackBonusVs(target, equip)
       ab = ab - self.ci.offense.offhand_penalty_off
    end
 
-   for i = 1, COMBAT_MOD_SKILL do
+   for i = 0, COMBAT_MOD_SKILL do
       ab = ab + self.ci.mods[i].ab
-   end
-
-   if USE_VERSUS then
-      error "Unimplimented"
    end
 
    return ab
@@ -61,7 +57,7 @@ function M.Creature:GetRangedAttackMod(target, distance)
       -- Ranged Attack in Melee Target Range
       local max = target:GetMaxAttackRange(self)
       local weap = target:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-      if self.ci.target_distance <= max * max
+      if distance <= max * max
          and weap:GetIsValid()
          and not weap:GetIsRangedWeapon()
       then

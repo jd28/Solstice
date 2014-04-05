@@ -16,12 +16,13 @@ local C = ffi.C
 -- total hit dice.
 function M.Creature:GetHitDice(use_neg_levels)
    local total = 0
-   for cl in self:Classes() do
+   for i=0, self.obj.cre_stats.cs_classes_len -1 do
       -- Class level can never be negative.
       if use_neg_levels then
-         total = total + math.max(0, cl.cl_level - cl.cl_negative_level)
+         total = total + math.max(0, self.obj.cre_stats.cs_classes[i].cl_level -
+                                  self.obj.cre_stats.cs_classes[i].cl_negative_level)
       else
-         total = total + cl.cl_level
+         total = total + self.obj.cre_stats.cs_classes[i].cl_level
       end
    end
    return total

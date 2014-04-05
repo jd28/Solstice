@@ -3,6 +3,7 @@
 
 local NWE = require 'solstice.nwn.engine'
 local M = require 'solstice.effect.init'
+local C = require('ffi').C
 
 --- Effect Creation
 -- @section
@@ -233,9 +234,19 @@ end
 --- Effect Damage Decrease
 -- @param amount DAMAGE\_BONUS\_*
 -- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
-function M.DamageDecrease(amount, damage_type)
-   damage_type = DAMAGE_INDEX_MAGICAL
+function M.DamageDecrease(amount, damage_type, critical, unblockable)
+   damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
+
+   local mask = 1
+   if critical then
+      mask = bit.bor(mask, 2)
+   end
+
+   if unblockable then
+      mask = bit.bor(mask, 4)
+   end
+
 
    return CreateSimple(EFFECT_TYPE_DAMAGE_DECREASE,
                        amount, damage_flag, 28)
@@ -244,17 +255,26 @@ end
 --- Effect Damage Increase
 -- @param amount DAMAGE\_BONUS\_*
 -- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
-function M.DamageIncrease(amount, damage_type)
-   damage_type = DAMAGE_INDEX_MAGICAL
+function M.DamageIncrease(amount, damage_type, critical, unblockable)
+   damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
 
+   local mask = 0
+   if critical then
+      mask = bit.bor(mask, 2)
+   end
+
+   if unblockable then
+      mask = bit.bor(mask, 4)
+   end
+
    return CreateSimple(EFFECT_TYPE_DAMAGE_INCREASE,
-                       amount, damage_flag, 28)
+                       amount, damage_flag, 28, 0, 0)
 end
 
 --- Damage immunity effect.
 -- @param damage_type DAMAGE\_INDEX\_*
--- @param amount [1,100]
+-- @param amount [-100, -1] or [1,100]
 function M.DamageImmunity(damage_type, amount)
    local type, amt = determine_type_amount(EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE,
                                            EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE,

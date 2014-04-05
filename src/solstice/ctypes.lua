@@ -6,11 +6,33 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
-require 'solstice.nwn.funcs'
-
 local function interp(s, tab)
   return (s:gsub('($%b{})', function(w) return tab[w:sub(3, -2)] or w end))
 end
+
+require 'solstice.nwn.ctypes.foundation'
+require 'solstice.nwn.ctypes.2da'
+require 'solstice.nwn.ctypes.vector'
+require 'solstice.nwn.ctypes.location'
+require 'solstice.nwn.ctypes.effect'
+require 'solstice.nwn.ctypes.itemprop'
+require 'solstice.nwn.ctypes.object'
+require 'solstice.nwn.ctypes.area'
+require 'solstice.nwn.ctypes.aoe'
+require 'solstice.nwn.ctypes.client'
+require 'solstice.nwn.ctypes.combat'
+require 'solstice.nwn.ctypes.creature'
+require 'solstice.nwn.ctypes.door'
+require 'solstice.nwn.ctypes.encounter'
+require 'solstice.nwn.ctypes.feat'
+require 'solstice.nwn.ctypes.item'
+require 'solstice.nwn.ctypes.module'
+require 'solstice.nwn.ctypes.nwnx'
+require 'solstice.nwn.ctypes.skill'
+require 'solstice.nwn.ctypes.placeable'
+require 'solstice.nwn.ctypes.store'
+require 'solstice.nwn.ctypes.trigger'
+require 'solstice.nwn.ctypes.waypoint'
 
 ffi.cdef(interp([[
 typedef struct {
@@ -27,6 +49,7 @@ typedef struct {
 
 typedef struct {
     int32_t    damages[${DAMAGE_INDEX_NUM}];
+    int32_t    damages_unblocked[${DAMAGE_INDEX_NUM}];
     int32_t    immunity_adjust[${DAMAGE_INDEX_NUM}];
     int32_t    resist_adjust[${DAMAGE_INDEX_NUM}];
     int32_t    mod_adjust[${DAMAGE_INDEX_NUM}];
@@ -74,8 +97,11 @@ typedef struct {
 typedef struct {
     int32_t       ab_base;
     int32_t       ab_transient;
+    int32_t       attacks_on;
+    int32_t       attacks_off;
     int32_t       offhand_penalty_on;
     int32_t       offhand_penalty_off;
+    int32_t       ranged_type;
     int32_t       weapon_type;
     DamageRoll    damage[20];
     int32_t       damage_len;
@@ -85,7 +111,6 @@ typedef struct {
     int32_t       concealment;
     int32_t       hp_eff;
     int32_t       hp_max;
-    bool          hp_update;
 
     int32_t       soak;
     int32_t       soak_eff[${DAMAGE_POWER_NUM}];
@@ -104,11 +129,18 @@ typedef struct {
 } Defense;
 
 typedef struct {
-   Offense         offense;
-   Defense         defense;
-   CombatWeapon    equips[${EQUIP_TYPE_NUM}];
-   CombatMod       mods[${COMBAT_MOD_NUM}];
-   CombatMod       mod_situ[${SITUATION_NUM}];
+    Offense         offense;
+    Defense         defense;
+    CombatWeapon    equips[${EQUIP_TYPE_NUM}];
+    CombatMod       mods[${COMBAT_MOD_NUM}];
+    CombatMod       mod_situ[${SITUATION_NUM}];
+    int32_t            effective_level;
+    int32_t            first_custom_eff;
+    uint32_t           fe_mask;
+    uint32_t           training_vs_mask;
+    int32_t            skill_eff[${SKILL_NUM}];
+    int32_t            ability_eff[${ABILITY_NUM}];
+    int32_t            update_flags;
 } CombatInfo;
 
 typedef struct {
@@ -127,14 +159,7 @@ typedef struct Creature {
     uint32_t           type;
     uint32_t           id;
     CNWSCreature      *obj;
-    int32_t            effective_level;
-    int32_t            first_custom_eff;
-    uint32_t           fe_mask;
-    uint32_t           training_vs_mask;
-    int32_t            skill_eff[${SKILL_NUM}];
-    int32_t            ability_eff[${ABILITY_NUM}];
-    CombatInfo         ci;
-    int32_t            update_flags;
+    CombatInfo        *ci;
 } Creature;
 
 typedef struct Encounter {
@@ -214,24 +239,31 @@ typedef struct Waypoint {
 } Waypoint;
 
 typedef struct {
-   int32_t  current_attack;
-   int32_t  attack_id;
-   int32_t  target_state;
-   int32_t  situational_flags;
-   int32_t  weapon;
-   double   target_distance;
-   bool     is_offhand;
-   bool     is_sneak;
-   bool     is_death;
-   bool     is_killing;
+    CNWSCreature         *attacker_nwn;
+    CNWSObject           *target_nwn;
 
-   CNWSCombatRound  *attacker_cr;
-   CNWSCombatRound  *target_cr;
-   CNWSCombatAttackData *attack;
+    CombatInfo           *attacker_ci;
+    CombatInfo           *target_ci;
+    CNWSCombatAttackData *attack;
+    int32_t               weapon;
+    int32_t               target_state;
+    int32_t               situational_flags;
+    double                target_distance;
+    bool                  is_offhand;
+    bool                  is_sneak;
+    bool                  is_death;
+    bool                  is_killing;
 
-   DamageResult dmg_result;
-} AttackInfo;
+    int32_t               damage_total;
+    DamageResult          dmg_result;
+
+    int32_t               effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
+    int32_t               effects_to_remove_len;
+} Attack;
+
 ]], _CONSTS))
+
+require 'solstice.nwn.funcs'
 
 combat_info_t = ffi.typeof('CombatInfo')
 combat_mod_t = ffi.typeof('CombatMod')
@@ -239,4 +271,3 @@ damage_result_t = ffi.typeof('DamageResult')
 dice_roll_t = ffi.typeof('DiceRoll')
 damage_roll_t = ffi.typeof('DamageRoll')
 spell_duration_impact_t = ffi.typeof('SpellDurationImpact')
-attack_info_t = ffi.typeof("AttackInfo")

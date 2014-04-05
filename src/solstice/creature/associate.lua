@@ -82,7 +82,7 @@ end
 --- Retrieves the controller status of a familiar.
 function M.Creature:GetIsPossessedFamiliar()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(714, 1)
+   NWE.ExecuteCommandUnsafe(714, 1)
    return NWE.StackPopBoolean()
 end
 

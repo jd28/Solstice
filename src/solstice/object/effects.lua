@@ -53,9 +53,9 @@ function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff
    dur_type = duration and DURATION_TYPE_TEMPORARY or DURATION_TYPE_PERMANENT
    duration = duration or 0
    interval = interval or 6
-   eff_recur = eff_recur or solstice.nwn.EffectRecurring()
+   eff_recur = eff_recur or ffi.Recurring()
 
-   if eff_recur:GetCustomType() ~= solstice.nwn.EFFECT_CUSTOM_RECURRING_EFFECT then
+   if eff_recur:GetType() ~= EFFECT_CUSTOM_RECURRING_EFFECT then
       error "eff_recur MUST be of custom effect type solstice.nwn.EFFECT_CUSTOM_RECURRING_EFFECT"
       return
    end
@@ -64,7 +64,7 @@ function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff
 
    print(id, eff_type, duration, dur_type, interval)
 
-   if dur_type == Eff.DURATION_TYPE_INSTANT then
+   if dur_type == DURATION_TYPE_INSTANT then
       error "Recurring effects must have a duration type temporary or permanent"
       return
    else
@@ -112,7 +112,7 @@ function M.Object:GetEffectAtIndex(idx)
    if idx < 0 or idx >= obj.obj_effects_len then
       return
    end
-   return effect_t(obj.obj_effects[idx], true)
+   return Eff.effect_t(obj.obj_effects[idx], true)
 end
 
 function M.Object:GetEffectCount()
@@ -190,3 +190,5 @@ function M.Object:RemoveEffectByID(id)
    if not self:GetIsValid() then return end
    C.nwn_RemoveEffectById(self.obj.obj, id)
 end
+
+jit.off(M.Object.RemoveEffectByID)

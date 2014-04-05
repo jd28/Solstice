@@ -14,8 +14,25 @@ require 'solstice.rules.conceal'
 require 'solstice.rules.constants'
 require 'solstice.rules.dmgred'
 require 'solstice.rules.feats'
+require 'solstice.rules.hitpoints'
+require 'solstice.rules.situations'
+require 'solstice.rules.specattack'
 require 'solstice.rules.skills'
 require 'solstice.rules.weapons'
+
+local TDA = require 'solstice.2da'
+
+local DMG_VFX = {}
+for i = 0, TDA.Get2daRowCount("damagehitvisual") - 1 do
+   DMG_VFX[i] = TDA.Get2daInt("damagehitvisual", "VisualEffectID", i)
+end
+
+--- Get damage impact visual.
+-- See damagehitvisual.2da
+-- @param dmg DAMAGE\_INDEX\_*
+function M.GetDamageVisual(dmg)
+   return DMG_VFX[dmg] or 0
+end
 
 --- Convert damage type constant to item property damage constant.
 function M.ConvertDamageToItempropConstant(const)

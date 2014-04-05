@@ -40,9 +40,30 @@ local function GetBaseAttackBonus(cre)
    local t = {0, 0, 0}
    local hd = cre:GetHitDice()
 
-   for i = 1, math.min(20, hd) do
-      local c = cre:GetClassByLevel(i)
-      t[_TIERS[c]] = t[_TIERS[c]] + 1
+   if not cre:GetIsPC() or cre:GetIsPossessedFamiliar() then
+      local l = math.min(20, cre:GetLevelByPosition(0))
+      local remaining = 20 - l
+      local c = cre:GetClassByPosition(0)
+      t[_TIERS[c]] = t[_TIERS[c]] + l
+
+      if remaining > 0 and cre.obj.cre_stats.cs_classes_len > 1 then
+         l = math.min(remaining, cre:GetLevelByPosition(1))
+         remaining = remaining - l
+         c = cre:GetClassByPosition(1)
+         t[_TIERS[c]] = t[_TIERS[c]] + l
+      end
+
+      if remaining > 0 and cre.obj.cre_stats.cs_classes_len > 2 then
+         l = math.min(remaining, cre:GetLevelByPosition(2))
+         remaining = remaining - l
+         c = cre:GetClassByPosition(2)
+         t[_TIERS[c]] = t[_TIERS[c]] + l
+      end
+   else
+      for i = 1, math.min(20, hd) do
+         local c = cre:GetClassByLevel(i)
+         t[_TIERS[c]] = t[_TIERS[c]] + 1
+      end
    end
 
    local res = t[1] + _TIER2[t[2]] + _TIER3[t[3]]
