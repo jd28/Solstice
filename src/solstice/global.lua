@@ -71,6 +71,8 @@ local C = ffi.C
 -- Functions/Tables that are mainly for internal bookkeeping use.
 -- No script would even need use these.
 
+local _OBJECTS = {}
+
 -- Get cached Solstice object.
 -- This should, generaly, be considered a private function and used
 -- only when necessary.
@@ -85,52 +87,92 @@ function _SOL_GET_CACHED_OBJECT(id)
    end
 
    local obj = C.nwn_GetObjectByID(id)
-   if obj == nil then return OBJECT_INVALID end
+   if obj == nil then
+      _OBJECTS[id] = nil -- ensure this is out of the cache.
+      return OBJECT_INVALID
+   end
 
    local type = ffi.cast("CGameObject*", obj).type
-
    local object
+
+   if _OBJECTS[id] then
+      object = _OBJECTS[id]
+   else
+      if type == OBJECT_TRUETYPE_CREATURE then
+         object = sol_cre.creature_t(type, id)
+      elseif type == OBJECT_TRUETYPE_MODULE then
+         object = sol_mod.module_t(type, id)
+      elseif type == OBJECT_TRUETYPE_AREA then
+         object = sol_area.area_t(type, id)
+      elseif type == OBJECT_TRUETYPE_ITEM then
+         object = sol_item.item_t(type, id)
+      elseif type == OBJECT_TRUETYPE_TRIGGER then
+         object = sol_trig.trigger_t(type, id)
+      elseif type == OBJECT_TRUETYPE_PLACEABLE then
+         object = sol_plc.placeable_t(type, id)
+      elseif type == OBJECT_TRUETYPE_DOOR then
+         object = sol_door.door_t(type, id)
+      elseif type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
+         object = sol_aoe.aoe_t(type, id)
+      elseif type == OBJECT_TRUETYPE_WAYPOINT then
+         object = sol_way.waypoint_t(type, id)
+      elseif type == OBJECT_TRUETYPE_ENCOUNTER then
+         object = sol_enc.encounter_t(type, id)
+      elseif type == OBJECT_TRUETYPE_STORE then
+         object = sol_store.store_t(type, id)
+      elseif type == OBJECT_TRUETYPE_SOUND then
+         return OBJECT_INVALID
+      elseif type == OBJECT_TRUETYPE_PORTAL then
+         return OBJECT_INVALID
+      elseif type == OBJECT_TRUETYPE_GUI then
+         return OBJECT_INVALID
+      elseif type == OBJECT_TRUETYPE_PROJECTILE then
+         return OBJECT_INVALID
+      elseif type == OBJECT_TRUETYPE_TILE then
+         return OBJECT_INVALID
+      else
+         error(string.format("Unknown Object Type: %d \n\n %s!", type, debug.traceback()))
+      end
+      _OBJECTS[id] = object
+   end
+
+   -- Always refresh the cached objects NWN server object.
    if type == OBJECT_TRUETYPE_CREATURE then
-      object = sol_cre.creature_t()
-      object.type = type
-      object.id   = id
-      object.obj  = ffi.cast("CNWSCreature*", obj)
+      object.obj  = C.nwn_GetCreatureByID(id)
+      object.ci   = C.Local_GetCombatInfo(id)
+      assert(object.ci ~= nil, "CombatInfo cannot be nil...")
    elseif type == OBJECT_TRUETYPE_MODULE then
-      object = sol_mod.module_t(type, id, C.nwn_GetModule())
+      object.obj = C.nwn_GetModule()
    elseif type == OBJECT_TRUETYPE_AREA then
-      object = sol_area.area_t(type, id, C.nwn_GetAreaByID(id))
+      object.obj = C.nwn_GetAreaByID(id)
    elseif type == OBJECT_TRUETYPE_ITEM then
-      object = sol_item.item_t(type, id, C.nwn_GetItemByID(id))
+      object.obj = C.nwn_GetItemByID(id)
    elseif type == OBJECT_TRUETYPE_TRIGGER then
-      obj = ffi.cast("CNWSTrigger*", obj)
-      object = sol_trig.trigger_t(type, id, obj)
+      object.obj = ffi.cast("CNWSTrigger*", obj)
    elseif type == OBJECT_TRUETYPE_PLACEABLE then
-      obj = ffi.cast("CNWSPlaceable*", obj)
-      object = sol_plc.placeable_t(type, id, obj)
+      object.obj = ffi.cast("CNWSPlaceable*", obj)
    elseif type == OBJECT_TRUETYPE_DOOR then
-      obj = ffi.cast("CNWSDoor*", obj)
-      object = sol_door.door_t(type, id, obj)
+      object.obj = ffi.cast("CNWSDoor*", obj)
    elseif type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
-      obj = ffi.cast("CNWSAreaOfEffectObject*", obj)
-      object = sol_aoe.aoe_t(type, id, obj)
+      object.obj = ffi.cast("CNWSAreaOfEffectObject*", obj)
    elseif type == OBJECT_TRUETYPE_WAYPOINT then
-      object = sol_way.waypoint_t(type, id, C.nwn_GetWaypointByID(id))
+      object.obj = C.nwn_GetWaypointByID(id)
    elseif type == OBJECT_TRUETYPE_ENCOUNTER then
-      obj = ffi.cast("CNWSEncounter*", obj)
-      object = sol_enc.encounter_t(type, id, obj)
+      object.obj = ffi.cast("CNWSEncounter*", obj)
    elseif type == OBJECT_TRUETYPE_STORE then
-      obj = ffi.cast("CNWSStore*", obj)
-      object = sol_store.store_t(type, id, obj)
+      object.obj = ffi.cast("CNWSStore*", obj)
+   --[[
    elseif type == OBJECT_TRUETYPE_SOUND then
-      return OBJECT_INVALID
+      object.obj =
    elseif type == OBJECT_TRUETYPE_PORTAL then
-      return OBJECT_INVALID
+      object.obj =
    elseif type == OBJECT_TRUETYPE_GUI then
-      return OBJECT_INVALID
+      object.obj =
    elseif type == OBJECT_TRUETYPE_PROJECTILE then
-      return OBJECT_INVALID
+      object.obj =
    elseif type == OBJECT_TRUETYPE_TILE then
-      return OBJECT_INVALID
+      object.obj =
+   --]]
    else
       error(string.format("Unknown Object Type: %d \n\n %s!", type, debug.traceback()))
    end
@@ -138,7 +180,8 @@ function _SOL_GET_CACHED_OBJECT(id)
    return object
 end
 
-function _SOL_REMOVE_CACHED_OBJECT(type, id)
+function _SOL_REMOVE_CACHED_OBJECT(id)
+   _OBJECTS[id] = nil
    return 1
 end
 

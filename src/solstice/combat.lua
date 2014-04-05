@@ -5,7 +5,6 @@ local fmt = string.format
 local sm = string.strip_margin
 
 local Attack = safe_require 'solstice.attack'
-
 ---
 function GetAttackTypeFromEquipNum(num)
    if num == 0 then
@@ -46,24 +45,20 @@ function NSGetCriticalHitRoll(attacker, is_offhand)
    return 21 - attacker:GetCriticalHitRange(is_offhand == 1)
 end
 
-function NSInitializeNumberOfAttacks(cre)
+function NWNXSolstice_InitializeNumberOfAttacks(cre)
    cre = _SOL_GET_CACHED_OBJECT(cre)
    if not cre:GetIsValid() then return end
-   cre:InitializeNumberOfAttacks()
+   cre:UpdateCombatInfo(true)
+   Rules.InitializeNumberOfAttacks(cre)
 end
 
-function NWNXSolstice_ResolveMeleeAttack(attacker, target, attack_count, anim)
+function NWNXSolstice_UpdateCombatInfo(attacker, target)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
-   target = _SOL_GET_CACHED_OBJECT(target)
-   attacker:UpdateCombatInfo()
-   Attack.ResolveAttack(attacker, target, attack_count, anim, false)
-end
-
-function NWNXSolstice_ResolveRangedAttack(attacker, target, attack_count, anim)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
-   target = _SOL_GET_CACHED_OBJECT(target)
-   attacker:UpdateCombatInfo()
-   Attack.ResolveAttack(attacker, target, attack_count, anim, true)
+   target   = _SOL_GET_CACHED_OBJECT(target)
+   attacker:UpdateCombatInfo(true)
+   if target.type == OBJECT_TRUETYPE_CREATURE then
+      target:UpdateCombatInfo(true)
+   end
 end
 
 -- This function is called by others get worst faction AC...

@@ -1,27 +1,3 @@
-require 'solstice.nwn.ctypes.foundation'
-require 'solstice.nwn.ctypes.2da'
-require 'solstice.nwn.ctypes.vector'
-require 'solstice.nwn.ctypes.location'
-require 'solstice.nwn.ctypes.effect'
-require 'solstice.nwn.ctypes.itemprop'
-require 'solstice.nwn.ctypes.object'
-require 'solstice.nwn.ctypes.area'
-require 'solstice.nwn.ctypes.aoe'
-require 'solstice.nwn.ctypes.client'
-require 'solstice.nwn.ctypes.combat'
-require 'solstice.nwn.ctypes.creature'
-require 'solstice.nwn.ctypes.door'
-require 'solstice.nwn.ctypes.encounter'
-require 'solstice.nwn.ctypes.feat'
-require 'solstice.nwn.ctypes.item'
-require 'solstice.nwn.ctypes.module'
-require 'solstice.nwn.ctypes.nwnx'
-require 'solstice.nwn.ctypes.skill'
-require 'solstice.nwn.ctypes.placeable'
-require 'solstice.nwn.ctypes.store'
-require 'solstice.nwn.ctypes.trigger'
-require 'solstice.nwn.ctypes.waypoint'
-
 local ffi = require 'ffi'
 
 -- clib functions
@@ -76,7 +52,8 @@ CNWSkill *nwn_GetSkill(uint32_t skill);
 ffi.cdef[[
 void nwn_AddCombatMessageData(CNWSCombatAttackData *attack, int32_t type, int32_t num_obj, uint32_t obj1, uint32_t obj2,
                               int32_t num_int, int32_t int1, int32_t int2, int32_t int3, int32_t int4);
-CNWSCombatAttackData *nwn_GetAttack(CNWSCreature *cre);
+void nwn_AddOnHitEffect(CNWSCreature *cre, CGameEffect *eff);
+CNWSCombatAttackData *nwn_GetAttack(CNWSCreature *cre, int32_t attack);
 CNWSItem *nwn_GetCurrentAttackWeapon(CNWSCreature *cre, int32_t attack_type);
 void nwn_SignalMeleeDamage(CNWSCreature *cre, CNWSObject *target, uint32_t attack_count);
 void nwn_SignalRangedDamage(CNWSCreature *cre, CNWSObject *target, uint32_t attack_count);
@@ -86,8 +63,11 @@ void nwn_ResolveMeleeAnimations(CNWSCreature *attacker, int32_t i, int32_t attac
                                 CNWSObject *target, int32_t anim);
 void nwn_ResolveRangedAnimations(CNWSCreature *attacker, CNWSObject *target,
                                  int32_t anim);
+void nwn_ResolveRangedMiss(CNWSCreature *attacker, CNWSObject *target);
 void nwn_AddCircleKickAttack(CNWSCreature *cre, uint32_t target);
-void nwn_AddCleaveAttack(CNWSCreature *cre, uint32_t target);
+void nwn_AddCleaveAttack(CNWSCreature *cre, uint32_t target, bool great);
+void nwn_ResolveOnHitEffect(CNWSCreature *cre, CNWSObject* target, bool offhand,
+                            bool critical);
 ]]
 
 -- creature.h
@@ -119,7 +99,7 @@ int32_t   nwn_GetHasNthFeat(CNWSCreature *cre, uint16_t start, uint16_t stop);
 bool      nwn_GetIsInvisible(CNWSCreature *cre, CNWSObject *obj);
 bool      nwn_GetIsVisible(CNWSCreature *cre, nwn_objid_t target);
 CNWSItem *nwn_GetItemInSlot(CNWSCreature *cre, uint32_t slot);
-double    nwn_GetMaxAttackRange(CNWSCreature *cre, nwn_objid_t target);
+float     nwn_GetMaxAttackRange(CNWSCreature *cre, nwn_objid_t target);
 int32_t       nwn_GetMaxSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level);
 int32_t       nwn_GetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx);
 uint32_t      nwn_GetNearestTarget(CNWSCreature *cre, float max_range, nwn_objid_t target);
@@ -142,6 +122,7 @@ void      nwn_SetAnimation(CNWSCreature *cre, uint32_t anim);
 void      nwn_SetCombatMode(CNWSCreature *cre, uint8_t mode);
 int32_t       nwn_SetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_id);
 int32_t       nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_spell, uint32_t sp_meta, uint32_t sp_flags);
+void      nwn_SetMovementRate(CNWSCreature *cre, int rate);
 int32_t       nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
 void      nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
 ]]
@@ -489,6 +470,8 @@ void ns_AddOnHitSpells(CNWSCombatAttackData *data,
                        CNWSItem *item,
                        bool from_target);
 
+uint32_t ns_GetAmmunitionAvailable(CNWSCreature *attacker, int32_t num_attacks, int32_t ranged_type, bool equip);
+
 ChatMessage   *Local_GetLastChatMessage();
 CombatMessage *Local_GetLastCombatMessage();
 EquipEvent    *Local_GetLastEquipEvent();
@@ -497,4 +480,6 @@ EventItemprop *Local_GetLastItemPropEvent();
 CGameEffect   *Local_GetLastDamageEffect();
 Event         *Local_GetLastNWNXEvent();
 void           Local_NWNXLog(int32_t level, const char* log);
+CombatInfo    *Local_GetCombatInfo(uint32_t id);
+Attack        *Local_GetAttack();
 ]]

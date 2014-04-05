@@ -92,70 +92,67 @@ typedef struct {
     uint32_t      cad_feedback_alloc;      /* 00A4 */
 } CNWSCombatAttackData;
 
-typedef struct {
-    CNWSCombatAttackData AttackData[50];              /* 0x0000 - 0x20CC*/
-    uint16_t            *cr_special_attack;           /* 20D0 */
-    uint32_t             cr_special_attack_len;       /* 20D0 */
-    uint32_t             cr_special_attack_alloc;     /* 20D4 */
-    uint16_t            *cr_special_attack_id;        /* 20D8 */
-    uint32_t             cr_special_attack_id_len;    /* 20E0 */
-    uint32_t             cr_special_attack_id_alloc;  /* 20E4 */
-    int16_t AttackID[2];
-    uint8_t              cr_round_started;             /* 0x20EC */
-    uint8_t field_30;
-    uint8_t field_31;
-    uint8_t field_32;
-    uint8_t SpellCastRound;           /* 0x20f0 */
-    uint8_t field_34;
-    uint8_t field_35;
-    uint8_t field_36;
-    uint32_t Timer;
-    uint32_t RoundLength;
-    uint32_t OverlapAmount;
-    uint32_t BleedTimer;               /* 0x2100 */
-    uint8_t cr_round_paused;
-    uint8_t field_54;
-    uint8_t field_55;
-    uint8_t field_56;
-    uint32_t RoundPausedBy;
-    uint32_t PauseTimer;
-    uint8_t InfinitePause;
-    uint8_t field_66;
-    uint8_t field_67;
-    uint8_t field_68;
-    uint8_t              cr_current_attack;             /* 0x2114 */
-    uint8_t AttackGroup;
-    uint8_t field_71;
-    uint8_t field_72;
-    uint8_t cr_deflect_arrow;              /* 0x2118 */
-    uint8_t field_74;
-    uint8_t field_75;
-    uint8_t field_76;
-    uint8_t WeaponSucks;               /* 0x211c */
-    uint8_t field_78;
-    uint8_t field_79;
-    uint8_t field_80;
-    uint8_t cr_epic_dodge_used;             /* 0x2120 */
-    uint8_t field_82;
-    uint8_t field_83;
-    uint8_t field_84;
-    uint32_t ParryIndex;               /* 0x2124 */
-    uint32_t NumAOOs;                  /* 0x2128 */
-    uint32_t NumCleaves;               /* 0x212C */
-    uint32_t NumCircleKicks;           /* 0x2130 */
-    uint32_t NewAttackTarget;
-    uint32_t cr_onhand_atks;            /* 0x2138 */
-    uint32_t cr_offhand_atks;           /* 0x213C */
-    uint32_t cr_offhand_taken;          /* 0x2140 */
-    uint32_t cr_extra_taken;               /* 0x2144 */
-    uint32_t cr_additional_atks;       /* 0x2148 */
-    uint32_t cr_effect_atks;         /* 0x214C */
-    uint8_t cr_parry_actions;              /* 0x2150 */
-    uint8_t field_130;                 /* 0x2151 */
-    uint8_t field_131;                 /* 0x2152 */
-    uint8_t field_132;                 /* 0x2153 */
-    uint32_t cr_dodge_target;              /* 0x2154 */ 
-    uint32_t **SchedActionList;        /* 0x2158 */
-    void    *org_nwcreature;      /* 0x215C */
+typedef struct CNWSCombatRound_s {
+    CNWSCombatAttackData          cr_attack_data[50];           /* 0x0000 - 0x20CC*/
+    ArrayList_uint16          cr_special_attack;            /* 20D0 */
+    ArrayList_uint16          cr_special_attack_id;         /* 20D8 */
+    int16_t                       cr_attack_id_1;
+    int16_t                       cr_attack_id_2;
+    uint8_t                       cr_round_started;             /* 0x20EC */
+    uint8_t                       field_30;
+    uint8_t                       field_31;
+    uint8_t                       field_32;
+    uint8_t                       cr_spellcast_round;           /* 0x20f0 */
+    uint8_t                       field_34;
+    uint8_t                       field_35;
+    uint8_t                       field_36;
+    uint32_t                      cr_timer;
+    uint32_t                      cr_round_length;
+    uint32_t                      cr_overlap_amount;
+    uint32_t                      cr_bleed_timer;               /* 0x2100 */
+    uint8_t                       cr_round_paused;
+    uint8_t                       field_54;
+    uint8_t                       field_55;
+    uint8_t                       field_56;
+    uint32_t                      cr_round_pauser;
+    uint32_t                      cr_pause_timer;
+    uint8_t                       cr_infinite_pause;
+    uint8_t                       field_66;
+    uint8_t                       field_67;
+    uint8_t                       field_68;
+    uint8_t                       cr_current_attack;             /* 0x2114 */
+    uint8_t                       cr_attack_group;
+    uint8_t                       field_71;
+    uint8_t                       field_72;
+    uint8_t                       cr_deflect_arrow;              /* 0x2118 */
+    uint8_t                       field_74;
+    uint8_t                       field_75;
+    uint8_t                       field_76;
+    uint8_t                       cr_weapon_ineffective;         /* 0x211c */
+    uint8_t                       field_78;
+    uint8_t                       field_79;
+    uint8_t                       field_80;
+    uint8_t                       cr_epic_dodge_used;             /* 0x2120 */
+    uint8_t                       field_82;
+    uint8_t                       field_83;
+    uint8_t                       field_84;
+    uint32_t                      cr_parry_index;                /* 0x2124 */
+    uint32_t                      cr_num_AOOs;                   /* 0x2128 */
+    uint32_t                      cr_num_cleaves;                /* 0x212C */
+    uint32_t                      cr_num_circle_kicks;           /* 0x2130 */
+    uint32_t                      cr_new_target;
+    uint32_t                      cr_onhand_atks;                /* 0x2138 */
+    uint32_t                      cr_offhand_atks;               /* 0x213C */
+    uint32_t                      cr_offhand_taken;              /* 0x2140 */
+    uint32_t                      cr_extra_taken;                /* 0x2144 */
+    uint32_t                      cr_additional_atks;            /* 0x2148 */
+    uint32_t                      cr_effect_atks;                /* 0x214C */
+    uint8_t                       cr_parry_actions;              /* 0x2150 */
+    uint8_t                       field_130;                     /* 0x2151 */
+    uint8_t                       field_131;                     /* 0x2152 */
+    uint8_t                       field_132;                     /* 0x2153 */
+    uint32_t                      cr_dodge_target;               /* 0x2154 */
+    uint32_t                    **cr_sched_action_lst;           /* 0x2158 */
+    void                         *cr_original;                   /* 0x215C */
 } CNWSCombatRound;
 ]]

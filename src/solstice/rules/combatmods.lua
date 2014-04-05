@@ -17,9 +17,9 @@ local function ZeroCombatModifier(cre, mod)
    cre.ci.mods[mod].ac = 0
    cre.ci.mods[mod].hp = 0
    cre.ci.mods[mod].dmg.roll.dice = 0
-   cre.ci.mods[mod].dmg.roll.dice = 0
+   cre.ci.mods[mod].dmg.roll.sides = 0
    cre.ci.mods[mod].dmg.roll.bonus = 0
-   cre.ci.mods[mod].dmg.type = -1
+   cre.ci.mods[mod].dmg.type = 12
 end
 
 local function GetAreaCombatModifier(cre)
@@ -173,15 +173,18 @@ end
 
 local function GetTrainingVsCombatModifier(cre)
    ZeroCombatModifier(cre, COMBAT_MOD_TRAINING_VS)
-   if cre.training_vs_mask == 0 then return end
+   if cre.ci.training_vs_mask == 0 then return end
    cre.ci.mods[COMBAT_MOD_TRAINING_VS].ab = 1
    cre.ci.mods[COMBAT_MOD_TRAINING_VS].ac = 4
 end
 
 local function GetFavoredEnemyCombatModifier(cre)
    ZeroCombatModifier(cre, COMBAT_MOD_FAVORED_ENEMY)
-   if fe_mask == 0 then return end
+   if cre.ci.fe_mask == 0 then return end
+
    local r = cre:GetLevelByClass(CLASS_TYPE_RANGER)
+   if r == 0 then return end
+
    local bonus = 1 + math.floor(r / 5)
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab = bonus
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.bonus = bonus

@@ -34,6 +34,18 @@ function M.Creature:SetMaxHitPointsByLevel(level, hp)
    if ls == nil then return 0 end
 
    ls.ls_hp = hp
-   
+
    return ls.ls_hp
+end
+
+--- Get cretures maximum hit points.
+function M.Creature:GetMaxHitPoints()
+   self.ci.defense.hp_max = Rules.GetMaxHitPoints(self)
+   return self.ci.defense.hp_max + self.ci.defense.hp_eff
+end
+
+function NWNXSolstice_GetMaxHitpoints(id)
+   local cre = _SOL_GET_CACHED_OBJECT(id)
+   if not cre:GetIsValid() then return 0 end
+   return cre:GetMaxHitPoints()
 end

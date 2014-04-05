@@ -4,10 +4,12 @@
 local ffi = require 'ffi'
 local C = ffi.C
 local random = math.random
+local floor  = math.floor
 
-local bit  = require 'bit'
-local bor  = bit.bor
-local band = bit.band
+local bit    = require 'bit'
+local bor    = bit.bor
+local band   = bit.band
+local lshift = bit.lshift
 
 local Eff = require 'solstice.effect'
 
@@ -27,14 +29,16 @@ end
 -- @param attacker Attacking creature.
 -- @param eff Effect ctype.
 local function AddEffect(info, attacker, eff)
-   C.ns_AddOnHitEffect(info.attack, attacker.id, eff.eff)
+   eff.direct = true
+   eff:SetCreator(attacker.id)
+   C.nwn_AddOnHitEffect(attacker.obj, eff.eff)
 end
 
 --- Adds an onhit visual effect to an attack.
 -- @param info AttackInfo ctype.
 -- @param vfx VFX\_*
-local function AddVFX(info, vfx)
-   C.ns_AddOnHitVisual(info.attack, info.attacker.id, vfx)
+local function AddVFX(info, attacker, vfx)
+   AddEffect(info, attacker, Eff.VisualEffect(vfx))
 end
 
 --- Clear special attack.
@@ -46,8 +50,8 @@ end
 --- Copy damage to NWN Attack Data.
 -- @param info AttackInfo ctype.
 -- @param attacker Attacking creature.
-local function CopyDamageToNWNAttackData(info, attacker)
-   for i = 0, 12 do
+local function CopyDamageToNWNAttackData(info, attacker, target)
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
       if i < 13 then
          if info.dmg_result.damages[i] <= 0 then
             info.attack.cad_damage[i] = -1
@@ -56,8 +60,7 @@ local function CopyDamageToNWNAttackData(info, attacker)
          end
       else
          if info.dmg_result.damages[i] > 0 then
-            local flag = bit.lshift(1, i)
-            local eff = nwn.EffectDamage(flag, info.dmg_result.damages[i])
+            local eff = Eff.Damage(i, info.dmg_result.damages[i])
             -- Set effect to direct so that Lua will not delete the
             -- effect.  It will be deleted by the combat engine.
             eff.direct = true
@@ -67,40 +70,26 @@ local function CopyDamageToNWNAttackData(info, attacker)
          end
       end
    end
-end
-
---- Create Attack Info holder.
--- @param attacker Attacking creature.
--- @param target Attack target.
-local function CreateAttackInfo(attacker, target)
-   local attack_info = ffi.new("AttackInfo")
-   local cr = attacker.obj.cre_combat_round
-   attack_info.attacker_cr = cr
-   attack_info.current_attack = cr.cr_current_attack
-   attack_info.attack = C.nwn_GetAttack(attacker.obj)
-   attack_info.attack.cad_attack_group = attack_info.attack.cad_attack_group
-   attack_info.attack.cad_target = target.id
-   attack_info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   attack_info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attacker.obj)
-   attack_info.is_offhand = cr.cr_current_attack + 1 > cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
-
-   -- Get equip number
-   local weapon = C.nwn_GetCurrentAttackWeapon(attacker.obj, attack_info.attack.cad_attack_type)
-   attack_info.weapon = EQUIP_TYPE_UNARMED
-   if weapon ~= nil then
-      for i = 0, EQUIP_TYPE_NUM - 1 do
-         if attacker.ci.equips[i].id == weapon.obj.obj_id then
-            attack_info.weapon = i
-            break
-         end
+--[[
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      if info.dmg_result.immunity_adjust[i] > 0 then
+         AddCCMessage(info, nil, { target.id },
+                      { 62, info.dmg_result.immunity_adjust[i],
+                        bit.lshift(1, i)})
       end
    end
 
-   if target.type == OBJECT_TRUETYPE_CREATURE then
-      attack_info.target_cr = target.obj.cre_combat_round
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      if info.dmg_result.resist_adjust[i] > 0 then
+         AddCCMessage(info, nil, { target.id },
+                      { 63, info.dmg_result.resist_adjust[i], 0})
+      end
    end
-
-   return attack_info
+   if info.dmg_result.soak_adjust > 0 then
+      AddCCMessage(info, nil, { target.id },
+                   { 67, info.dmg_result.soak_adjust, 0})
+   end
+--]]
 end
 
 --- Returns attack result.
@@ -114,25 +103,6 @@ end
 local function GetType(info)
    return info.attack.cad_attack_type
 end
-
-
---- Forces people to equip ammunition.
--- NWN just doesn't seem to like letting Throwaxes, shurikens, darts... so we're forcing them
--- to auto-equip them (if they have none they will default to normal behavior, unarmed attacks)
--- @param attacker Attacking creature.
--- @param attack_count Number of attacks in attack group.
-local function ForceEquipAmmunition(attacker, attack_count)
-   C.ns_ForceEquipAmmunition(attacker.obj, attack_count, attacker.ci.ranged_type)
-end
-
---- Determines if creature has ammunition available.
--- @param attacker Attacking creature.
--- @param attack_count Number of attacks in attack group.
-local function GetAmmunitionAvailable(attacker, attack_count)
-   return C.ns_GetAmmunitionAvailable(attacker.obj, attack_count,
-                                      attacker.ci.ranged_type)
-end
-
 
 --- Gets the total attack roll.
 -- @param info AttackInfo
@@ -187,11 +157,11 @@ end
 --- Determine if current attack is an offhand attack.
 -- @param info AttackInfo
 local function GetIsOffhandAttack(info)
-   local cr = info.attacker_cr
-   return info.attacker_cr.cr_current_attack + 1 >
-      info.attacker_cr.cr_effect_atks
-      + info.attacker_cr.cr_additional_atks
-      + info.attacker_cr.cr_onhand_atks
+   local cr = attacker.obj.cre_combat_round
+   return attacker.obj.cre_combat_round.cr_current_attack + 1 >
+      attacker.obj.cre_combat_round.cr_effect_atks
+      + attacker.obj.cre_combat_round.cr_additional_atks
+      + attacker.obj.cre_combat_round.cr_onhand_atks
 end
 
 --- Determines if attack is ranged.
@@ -224,11 +194,11 @@ local function GetSpecialAttack(info)
    return info.attack.cad_special_attack
 end
 
-local function GetTotalAttacks(info)
-  local res = info.attacker_cr.cr_effect_atks
-     + info.attacker_cr.cr_additional_atks
-     + info.attacker_cr.cr_onhand_atks
-     + info.attacker_cr.cr_offhand_atks;
+local function GetTotalAttacks(info, attacker)
+  local res = attacker.obj.cre_combat_round.cr_effect_atks
+     + attacker.obj.cre_combat_round.cr_additional_atks
+     + attacker.obj.cre_combat_round.cr_onhand_atks
+     + attacker.obj.cre_combat_round.cr_offhand_atks;
 
   return res < 1 and 1 or res
 end
@@ -243,9 +213,9 @@ local function GetIterationPenalty(info, attacker)
    -- Deterimine the iteration penalty for an attack.  Not all attack types are
    -- have it.
    if att_type == ATTACK_TYPE_OFFHAND then
-      iter_pen = 5 * info.attacker_cr.cr_offhand_taken
-      info.attacker_cr.cr_offhand_taken = info.attacker_cr.cr_offhand_taken + 1
-   elseif info.attacker_cr.current_attack > info.attacker_cr.cr_onhand_atks then
+      iter_pen = 5 * attacker.obj.cre_combat_round.cr_offhand_taken
+      attacker.obj.cre_combat_round.cr_offhand_taken = attacker.obj.cre_combat_round.cr_offhand_taken + 1
+   elseif attacker.obj.cre_combat_round.cr_current_attack > attacker.obj.cre_combat_round.cr_onhand_atks then
       -- Normally this would have checked for ATTACK_TYPE_EXTRA1 or
       -- ATTACK_TYPE_EXTRA1, but those seemed superfluous.
 
@@ -253,11 +223,11 @@ local function GetIterationPenalty(info, attacker)
          spec_att ~= 868 or
          spec_att ~= 391
       then
-         iter_pen = 5 * info.attacker_cr.cr_extra_taken
+         iter_pen = 5 * attacker.obj.cre_combat_round.cr_extra_taken
       end
-      info.attacker_cr.cr_extra_taken = info.attacker_cr.cr_extra_taken + 1
+      attacker.obj.cre_combat_round.cr_extra_taken = attacker.obj.cre_combat_round.cr_extra_taken + 1
    elseif spec_att ~= 65002 and spec_att ~= 6 and spec_att ~= 391 then
-      iter_pen = info.current_attack * attacker.ci.equips[info.weapon].iter
+      iter_pen = attacker.obj.cre_combat_round.cr_current_attack * attacker.ci.equips[info.weapon].iter
    end
 
    return iter_pen
@@ -348,7 +318,7 @@ end
 -- @param attacker Attacker
 -- @param target Target
 local function ResolveArmorClass(info, attacker, target)
-   return target:GetACVersus(attacker, false, info, GetIsRangedAttack(info))
+   return target:GetACVersus(attacker, false, info, GetIsRangedAttack(info), info.target_state)
 end
 
 --- Resolves that attack bonus of the creature.
@@ -397,7 +367,7 @@ local function ResolveMissChance(info, attacker, target, hit, use_cached)
    else
       SetResult(info, attack_result)
       -- Show the modified conceal/miss chance in the combat log.
-      SetConcealment(math.floor(info, (chance ^ 2) / 100))
+      SetConcealment(info, math.floor((chance ^ 2) / 100))
       SetMissedBy(info, 1)
       return true
    end
@@ -414,7 +384,7 @@ local function ResolveDeflectArrow(info, attacker, target, hit)
    end
    -- Deflect Arrow
    if hit
-      and info.attacker_cr.cr_deflect_arrow == 1
+      and attacker.obj.cre_combat_round.cr_deflect_arrow == 1
       and info.attack.cad_ranged_attack ~= 0
       and bit.band(info.target_state, COMBAT_TARGET_STATE_FLATFOOTED) == 0
       and target:GetHasFeat(FEAT_DEFLECT_ARROWS)
@@ -443,7 +413,7 @@ local function ResolveDeflectArrow(info, attacker, target, hit)
                             target.obj.obj.obj_position.z)
 
          C.nwn_CalculateProjectileTimeToTarget(attacker.obj, v, bow)
-         info.attacker_cr.cr_deflect_arrow = 0
+         attacker.obj.cre_combat_round.cr_deflect_arrow = 0
          SetResult(info, 2)
          info.attack.cad_attack_deflected = 1
          return true
@@ -462,8 +432,8 @@ local function ResolveParry(info, attacker, target, hit)
 
    if info.attack.cad_attack_roll == 20
       or attacker.obj.cre_mode_combat ~= COMBAT_MODE_PARRY
-      or info.attacker_cr.cr_parry_actions == 0
-      or info.attacker_cr.cr_round_paused ~= 0
+      or attacker.obj.cre_combat_round.cr_parry_actions == 0
+      or attacker.obj.cre_combat_round.cr_round_paused ~= 0
       or info.attack.cad_ranged_attack ~= 0
    then
       return false
@@ -476,7 +446,7 @@ local function ResolveParry(info, attacker, target, hit)
    end
 
    local roll = random(20) + target:GetSkillRank(SKILL_PARRY)
-   info.target_cr.cr_parry_actions = info.target_cr.cr_parry_actions - 1
+   target.obj.cre_combat_round.cr_parry_actions = target.obj.cre_combat_round.cr_parry_actions - 1
 
    if roll >= info.attack.cad_attack_roll + info.attack.cad_attack_mod then
       if roll - 10 >= info.attack.cad_attack_roll + info.attack.cad_attack_mod then
@@ -486,7 +456,7 @@ local function ResolveParry(info, attacker, target, hit)
       return true
    end
 
-   C.nwn_AddParryIndex(info.target_cr)
+   C.nwn_AddParryIndex(target.obj.cre_combat_round)
    return false
 end
 
@@ -498,15 +468,20 @@ local function ResolveAttackRoll(info, attacker, target)
    local attack_type = info.attack.cad_attack_type
 
    -- Determine attack modifier
-   local ab = ResolveAttackModifier(info, attacker, target)
-      - GetIterationPenalty(info, attacker)
+   local ab = ResolveAttackModifier(info, attacker, target) -
+      GetIterationPenalty(info, attacker)
+
+   if GetIsSpecialAttack(info) then
+      ab = ab + Rules.GetSpecialAttackModifier(GetSpecialAttack(info), attacker, target)
+   end
+
    SetAttackMod(info, ab)
 
    -- Determine AC
    local ac = ResolveArmorClass(info, attacker, target)
 
    -- If there is a Coup De Grace, automatic hit.  Effects are dealt with in
-   -- NSResolvePostMelee/RangedDamage
+   -- ResolvePostMelee/RangedDamage
    if GetIsCoupDeGrace(info) then
       SetResult(info, 7)
       SetAttackRoll(info, 20)
@@ -543,7 +518,7 @@ local function ResolveAttackRoll(info, attacker, target)
       SetCriticalResult(info, threat, 1)
 
       if threat + ab >= ac then
-         if not target:GetIsImmuneToCriticalHits(attacker) then
+         if not target:GetIsImmune(IMMUNITY_TYPE_CRITICAL_HIT) then
             -- Is critical hit
             SetResult(info, 3)
          else
@@ -555,14 +530,24 @@ local function ResolveAttackRoll(info, attacker, target)
 end
 
 local function AddDamageToResult(info, dmg, mult)
-   if dmg.mask == 0 or (mult > 1 and band(dmg.mask, 2) ~= 0) then
+   local pass = false
+   if mult > 1 and band(dmg.mask, 2) ~= 0 then
+      mult = 1
+      pass = true
+   end
+
+   if dmg.mask == 0 or pass then
+      local roll = DoRoll(dmg.roll, mult)
+
       -- penalty
       if band(dmg.mask, 1) ~= 0 then
-         info.dmg_result.damages[dmg.type] = info.dmg_result.damages[dmg.type]
-            - DoRoll(dmg.roll)
+         roll = -roll
+      end
+
+      if band(dmg.mask, 4) == 0 then
+         info.dmg_result.damages[dmg.type] = info.dmg_result.damages[dmg.type] + roll
       else
-         info.dmg_result.damages[dmg.type] = info.dmg_result.damages[dmg.type]
-            + DoRoll(dmg.roll)
+         info.dmg_result.damages_unblocked[dmg.type] = info.dmg_result.damages_unblocked[dmg.type] + roll
       end
    end
 end
@@ -582,10 +567,60 @@ local function ResolveDamageResult(info, attacker, mult, ki_strike)
    end
 
    info.dmg_result.damages[12] = info.dmg_result.damages[12]
-      + DoRoll(attacker.ci.equips[info.weapon].base_dmg_roll)
+      + DoRoll(attacker.ci.equips[info.weapon].base_dmg_roll, mult)
 
    info.dmg_result.damages[12] = info.dmg_result.damages[12]
       + (attacker.ci.equips[info.weapon].dmg_ability * mult)
+end
+
+--- Resolve damage modifications.
+-- @param info AttackInfo ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
+local function ResolveDamageModifications(info, attacker, target)
+   if GetIsCriticalHit(info) and target.type == OBJECT_TRUETYPE_CREATURE and target:GetIsPC() then
+      local parry = math.min(target:GetSkillRank(SKILL_PARRY, attacker,
+                                                 true))
+      if parry > 0 then
+         for i=0, DAMAGE_INDEX_NUM - 1 do
+            info.dmg_result.damages[i] = info.dmg_result.damages[i] -
+               math.floor((info.dmg_result.damages[i] * parry) / 100)
+         end
+      end
+   end
+
+   for i=0, DAMAGE_INDEX_NUM - 1 do
+      local idx = i
+      if i == 12 then
+         idx = attacker.ci.equips[info.weapon].base_dmg_flags
+      end
+      local amt, adj, eff = target:GetDamageResistAdj(info.dmg_result.damages[i],
+                                                      idx, true)
+      info.dmg_result.damages[i], info.dmg_result.resist_adjust[i] = amt, adj
+      if eff then
+         info.effects_to_remove[info.effects_to_remove_len] = eff
+         info.effects_to_remove_len = info.effects_to_remove_len + 1
+      end
+   end
+
+   for i=0, DAMAGE_INDEX_NUM - 1 do
+      local idx = i
+      if i == 12 then
+         idx = attacker.ci.equips[info.weapon].base_dmg_flags
+      end
+      local amt, adj = target:GetDamageImmunityAdj(info.dmg_result.damages[i], idx)
+      info.dmg_result.damages[i], info.dmg_result.immunity_adjust[i] = amt, adj
+   end
+
+   local amt, adj, eff = target:GetDamageReductionAdj(info.dmg_result.damages[12],
+                                                      attacker.ci.equips[info.weapon].power,
+                                                      true)
+   if eff then
+      info.effects_to_remove[info.effects_to_remove_len] = eff
+      info.effects_to_remove_len = info.effects_to_remove_len + 1
+   end
+
+   info.dmg_result.damages[12], info.dmg_result.soak_adjust = amt, adj
 end
 
 --- Resolve item cast spell.
@@ -623,34 +658,42 @@ end
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveOnHitEffect(info, attacker, target)
-   -- TODO: FIX
-   --C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, info.is_offhand,
-   --                         GetIsCriticalHit(info))
+   C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, info.is_offhand,
+                            GetIsCriticalHit(info))
 end
 
 --- Resolve on hit visual effects.
--- TODO: FIX
--- This is not default behavior.
+--    This is not default behavior.
 -- @param info AttackInfo ctype.
-function ResolveOnHitVFX(info)
-   return
---[[
-   local flag, highest_vfx, vfx
-   local highest = 0
-
-   for i = 0, 12 do
-      flag = bit.lshift(1, i)
-      vfx = nwn.GetDamageVFX(flag, info:GetIsRangedAttack())
-      if vfx and info.dmg_result.damages[i] > highest then
-         highest_vfx = vfx
-         highest = info.dmg_result.damages[i]
+function ResolveOnHitVFX(info, attacker)
+   -- No ffects on ranged attacks...
+   if GetIsRangedAttack(info) then return end
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      local vfx = Rules.GetDamageVisual(i)
+      if vfx > 0 and info.dmg_result.damages[i] > 0 then
+         AddVFX(info, attacker, vfx)
       end
    end
+end
 
-   if highest_vfx then
-      AddVFX(info, highest_vfx)
+--- Compact physical damages.
+-- All phsyicals are applied as base weapon damage.
+-- @param info Attack ctype.
+local function CompactPhysicalDamage(info)
+   info.dmg_result.damages[12] = info.dmg_result.damages[12] +
+      info.dmg_result.damages[0] +
+      info.dmg_result.damages[1] +
+      info.dmg_result.damages[2]
+
+   info.dmg_result.damages[0] = 0
+   info.dmg_result.damages[1] = 0
+   info.dmg_result.damages[2] = 0
+end
+
+local function AddUnblockables(info)
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      info.dmg_result.damages[i] = info.dmg_result.damages[i] + info.dmg_result.damages_unblocked[i]
    end
-   --]]
 end
 
 --- Resolves that damage of the creature.
@@ -667,36 +710,65 @@ local function ResolveDamage(info, attacker, target)
    end
 
    ResolveDamageResult(info, attacker, mult, ki_strike)
+   -- Modes
+   for i = 0, COMBAT_MOD_NUM - 1 do
+      if RollValid(attacker.ci.mods[i].dmg.roll) then
+         AddDamageToResult(info, attacker.ci.mods[i].dmg, mult)
+      end
+   end
+
+   -- Special attacks
+   if GetIsSpecialAttack(info) then
+      local d = Rules.GetSpecialAttackDamage(GetSpecialAttack(info), attacker, target)
+      if RollValid(d.roll) then
+         AddDamageToResult(info, d, mult)
+      end
+   end
+
+   for i = 0, SITUATION_NUM - 1 do
+      if band(lshift(1, i), info.situational_flags) ~= 0 then
+         -- Don't multiply situational damage.
+         if RollValid(attacker.ci.mod_situ[i].dmg.roll) then
+            AddDamageToResult(info, attacker.ci.mod_situ[i].dmg, 1)
+         end
+      end
+   end
+
+   CompactPhysicalDamage(info)
+   ResolveDamageModifications(info, attacker, target)
+   AddUnblockables(info)
+
    local total = GetDamageTotal(info)
 
    -- Defensive Roll
    if target.type == OBJECT_TRUETYPE_CREATURE
       and target:GetCurrentHitPoints() - total <= 0
       and band(info.target_state, COMBAT_TARGET_STATE_FLATFOOTED) == 0
-      and target:GetHasFeat(FEAT_DEFENSIVE_ROLL)
+      and target:GetHasFeat(FEAT_DEFENSIVE_ROLL, true)
    then
       target:DecrementRemainingFeatUses(FEAT_DEFENSIVE_ROLL)
 
-      if target:ReflexSave(total, SAVING_THROW_TYPE_DEATH, attacker) then
-         --dmg_roll:MapResult(function (amt) return math.floor(amt / 2) end)
+      if target:ReflexSave(total, SAVING_THROW_VS_DEATH, attacker) then
+         for i=0, DAMAGE_INDEX_NUM - 1 do
+            info.dmg_result.damages[i] = floor(info.dmg_result.damages[i] / 2)
+         end
       end
    end
 
-   local total = GetDamageTotal(info)
+   total = GetDamageTotal(info)
 
    -- Add the damage result info to the CNWSCombatAttackData
-   CopyDamageToNWNAttackData(info)
+   CopyDamageToNWNAttackData(info, attacker, target)
 
    -- Epic Dodge : Don't want to use it unless we take damage.
    if target.type == OBJECT_TRUETYPE_CREATURE
       and total > 0
-      and info.target_cr.cr_epic_dodge_used == 0
+      and target.obj.cre_combat_round.cr_epic_dodge_used == 0
       and target:GetHasFeat(FEAT_EPIC_DODGE)
    then
-      -- TODO: Send Epic Dodge Message
-
+      AddCCMessage(info, 2, { target.id }, { 234 })
       SetResult(info, 4)
-      info.target_cr.cr_epic_dodge_used = 1
+      target.obj.cre_combat_round.cr_epic_dodge_used = 1
    else
       if target.obj.obj.obj_is_invulnerable == 1 then
          total = 0
@@ -708,11 +780,16 @@ local function ResolveDamage(info, attacker, target)
 
       if total > 0 then
          ResolveOnHitEffect(info, attacker, target)
-         ResolveOnHitVFX(info, dmg_roll)
+         ResolveOnHitVFX(info, attacker)
       end
    end
 end
 
+--- Resolves Coup De Grace.
+-- Applies death effect if applicable.
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 function ResolveCoupDeGrace(info, attacker, target)
    if bit.band(info.target_state, COMBAT_TARGET_STATE_ASLEEP) == 0             or
       (target.type == OBJECT_TRUETYPE_CREATURE and target.obj.cre_is_immortal) or
@@ -725,11 +802,15 @@ function ResolveCoupDeGrace(info, attacker, target)
    info.is_killing = true
 end
 
+--- Resolves Devastating Critical.
+-- Applies death effect if applicable, whether this used is determined by
+-- settings.
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 function ResolveDevCrit(info, attacker, target)
    if not GetIsCriticalHit(info)
-   -- TODO: FIX
-   --or NS_OPT_DEVCRIT_DISABLE_ALL
-   --or (NS_OPT_DEVCRIT_DISABLE_PC and attacker:GetIsPC())
+      or OPT.DEVCRIT_DISABLE_ALL
    then
       return
    end
@@ -737,53 +818,16 @@ function ResolveDevCrit(info, attacker, target)
    local dc = 10 + math.floor(attacker:GetHitDice() / 2) + attacker:GetAbilityModifier(ABILITY_STRENGTH)
 
    if target:FortitudeSave(dc, SAVING_THROW_VS_DEATH, attacker) == 0 then
-      local eff = Eff.EffectDeath(true, true)
-      eff:SetSubType(SUBTYPE_SUPERNATURAL)
-      target:ApplyEffect(DURATION_TYPE_INSTANT, eff)
-
-      info:SetResult(10)
+      AddEffect(info, attacker, Eff.Death(true, true))
+      SetResult(info, 10)
+      info.is_killing = true
    end
 end
 
---- Resolve Epic Dodge.
--- probably broken.
--- @param info AttackInfo ctype.
+--- Resolves Crippling Strike
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
-local function ResolveEpicDodge(info, attacker, target)
-   if info.target.type ~= OBJECT_TRUETYPE_CREATURE then return false end
-
-   -- Epic Dodge : Don't want to use it unless we take damage.
-   if attacker_cr.cr_epic_dodge_used == 0
-      and target:GetHasFeat(FEAT_EPIC_DODGE)
-   then
-      -- TODO: Send Epic Dodge Message
-      SetResult(info, 4)
-      attacker_cr.cr_epic_dodge_used = 1
-      return true
-   end
-
-   return false
-end
-
---- Resolve melee animations
--- @param attacker Attacking creature.
--- @param target Target object.
--- @param i
--- @param attack_count
--- @param anim
-local function ResolveMeleeAnimations(attacker, target, i, attack_count, anim)
-   C.nwn_ResolveMeleeAnimations(attacker.obj, i, attack_count, target.obj.obj, anim)
-end
-
---- Resolve out of ammo.
--- @param attacker Attacking creature.
-local function ResolveOutOfAmmo(attacker)
-   C.nwn_SetRoundPaused(attacker.obj.cre_combat_round, 0, 0x7F000000)
-   C.nwn_SetPauseTimer(attacker.obj.cre_combat_round, 0, 0)
-   C.nwn_SetAnimation(attacker.obj, 1)
-end
-
 local function ResolveCripplingStrike(info, attacker, target)
    if band(info.situational_flags, SITUATION_FLAG_SNEAK_ATTACK) == 0 or
       not attacker:GetHasFeat(FEAT_CRIPPLING_STRIKE)
@@ -796,6 +840,10 @@ local function ResolveCripplingStrike(info, attacker, target)
    AddEffect(info, attacker, e)
 end
 
+--- Resolves Death Attack
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 local function ResolveDeathAttack(info, attacker, target)
    if band(info.situational_flags, SITUATION_FLAG_DEATH_ATTACK) == 0 then
       return
@@ -808,6 +856,10 @@ local function ResolveDeathAttack(info, attacker, target)
    end
 end
 
+--- Resolves Quivering Palm
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 local function ResolveQuiveringPalm(info, attacker, target)
    if GetSpecialAttack(info) ~= SPECIAL_ATTACK_QUIVERING_PALM or
       target:GetHitDice() >= attacker:GetHitDice()            or
@@ -823,12 +875,17 @@ local function ResolveQuiveringPalm(info, attacker, target)
    AddEffect(info, attacker, e)
 end
 
+--- Resolves Circle Kick.
+-- Can be disabled with `DISABLE_CIRCLE_KICK` setting.
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 local function ResolveCircleKick(info, attacker, target)
-   if OPT.DISABLE_CIRCLE_KICK           or
-      GetIsSpecialAttack(info)          or
-      GetTotalAttacks(info) >= 49       or
-      info.weapon ~= EQUIP_TYPE_UNARMED or
-      not Attacker:GetHasFeat(FEAT_CIRCLE_KICK)
+   if OPT.DISABLE_CIRCLE_KICK               or
+      GetIsSpecialAttack(info)              or
+      GetTotalAttacks(info, attacker) >= 49 or
+      info.weapon ~= EQUIP_TYPE_UNARMED     or
+      not attacker:GetHasFeat(FEAT_CIRCLE_KICK)
    then
       return
    end
@@ -837,38 +894,42 @@ local function ResolveCircleKick(info, attacker, target)
    local nearest = C.nwn_GetNearestEnemy(attacker.obj, max_range, target.obj.obj.obj_id)
    if nearest == OBJECT_INVALID.id then return end
 
-   info.attacker_cr.cr_new_target = nearest
+   attacker.obj.cre_combat_round.cr_new_target = nearest
    C.nwn_AddCircleKickAttack(attacker.obj, nearest)
    attacker.obj.cre_passive_attack_beh = 1
-   info.attacker_cr.cr_num_circle_kicks = info.attacker_cr.cr_num_circle_kicks - 1
+   attacker.obj.cre_combat_round.cr_num_circle_kicks = attacker.obj.cre_combat_round.cr_num_circle_kicks - 1
 end
 
+--- Resolves (Great) Cleave.
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
+-- @param target Target object.
 local function ResolveCleave(info, attacker, target)
    if GetSpecialAttack(info) == FEAT_WHIRLWIND_ATTACK   or
       GetSpecialAttack(info) == FEAT_IMPROVED_WHIRLWIND or
-      GetTotalAttacks(info) >= 49
+      GetTotalAttacks(info, attacker) >= 49
    then
       return
    end
 
    if attacker:GetHasFeat(FEAT_GREAT_CLEAVE) then
       local max_range = C.nwn_GetMaxAttackRange(attacker.obj, OBJECT_INVALID.id)
-      local nearest = C.nwn_GetNearestEnemy(attacker.obj, max_range, target.obj.obj.obj_id)
+      local nearest = C.nwn_GetNearestTarget(attacker.obj, max_range, target.obj.obj.obj_id)
       if nearest == OBJECT_INVALID.id then return end
 
-      info.attacker_cr.cr_new_target = nearest
-      C.nwn_AddCleaveAttack(attacker.obj, nearest)
+      attacker.obj.cre_combat_round.cr_new_target = nearest
+      C.nwn_AddCleaveAttack(attacker.obj, nearest, true)
       attacker.obj.cre_passive_attack_beh = 1
 
-   elseif attacker:GetHasFeat(FEAT_CLEAVE) then
+   elseif attacker.obj.cre_combat_round.cr_num_cleaves > 0 and attacker:GetHasFeat(FEAT_CLEAVE) then
       local max_range = C.nwn_GetMaxAttackRange(attacker.obj, OBJECT_INVALID.id)
-      local nearest = C.nwn_GetNearestEnemy(attacker.obj, max_range, target.obj.obj.obj_id)
+      local nearest = C.nwn_GetNearestTarget(attacker.obj, max_range, target.obj.obj.obj_id)
       if nearest == OBJECT_INVALID.id then return end
 
-      info.attacker_cr.cr_new_target = nearest
-      C.nwn_AddCleaveAttack(attacker.obj, nearest)
+      attacker.obj.cre_combat_round.cr_new_target = nearest
+      C.nwn_AddCleaveAttack(attacker.obj, nearest, false)
       attacker.obj.cre_passive_attack_beh = 1
-      info.attacker_cr.cr_num_cleaves = info.attacker_cr.cr_num_cleaves - 1
+      attacker.obj.cre_combat_round.cr_num_cleaves = attacker.obj.cre_combat_round.cr_num_cleaves - 1
    end
 end
 
@@ -894,21 +955,6 @@ local function ResolvePostDamage(info, attacker, target, is_ranged)
    else
       ResolveCleave(info, attacker, target)
    end
-end
-
---- Resolve ranged attack animations.
--- @param attacker Attacking creature.
--- @param target Target object.
--- @param anim Animation.
-local function ResolveRangedAnimations(attacker, target, anim)
-   C.nwn_ResolveRangedAnimations(attacker.obj, target.obj.obj, anim)
-end
-
---- Resolve ranged attack miss.
--- @param attacker Attacking creature.
--- @param target Target object.
-local function ResolveRangedMiss(attacker, target)
-   C.nwn_ResolveRangedMiss(attacker.obj, target.obj.obj)
 end
 
 --- Resolve situations.
@@ -958,75 +1004,53 @@ local function ResolveSituations(info, attacker, target)
             SetSneakAttack(info, true, false)
          end
       else
-         --TODO: Immune to sneaks message.
-         --CNWCCMessageData *msg = CNWCCMessageData_create();
-         --CExoArrayList_int32_add(&msg->integers, 134);
-         --CExoArrayList_uint32_add(&msg->objects, target_nwn->obj_id);
-         --attack_data_.addCCMessage(msg);
+         AddCCMessage(info, nil, { target.id }, { 134 })
       end
    end
    return flags
 end
 
---- Signal Damage
-local function SignalDamage(attacker, target, attack_count, is_ranged)
-   if is_ranged then
-      C.nwn_SignalRangedDamage(attacker.obj, target.obj.obj, attack_count)
+local info, attacker, target
+
+function NWNXSolstice_ResolvePreAttack(attacker_, target_)
+   info     = C.Local_GetAttack();
+   attacker = _SOL_GET_CACHED_OBJECT(attacker_)
+   target   = _SOL_GET_CACHED_OBJECT(target_)
+
+   info.attacker_ci = attacker.ci
+
+   -- If the target is a creature detirmine it's state and any situational modifiers that
+   -- might come into play.  This only needs to be done once per attack group because
+   -- the values can't change.
+   if target.type == OBJECT_TRUETYPE_CREATURE then
+      info.target_state = attacker:GetTargetState(target)
+      info.situational_flags = ResolveSituations(info, attacker, target)
+      info.target_ci = target.ci
    else
-      C.nwn_SignalMeleeDamage(attacker.obj, target.obj.obj, attack_count)
-   end
-end
-
---- Update attack info.
--- @param info AttackInfo ctype.
--- @param attacker Attacking creature.
--- @param target Target object.
-local function UpdateInfo(info, attacker, target)
-   local cr = info.attacker_cr
-
-   cr.cr_current_attack = cr.cr_current_attack + 1
-   info.current_attack = cr.cr_current_attack
-   info.attack = C.nwn_GetAttack(attacker.obj)
-   info.attack.cad_attack_group = info.attack.cad_attack_group
-   info.attack.cad_target = target.id
-   info.attack.cad_attack_mode = attacker.obj.cre_mode_combat
-   info.attack.cad_attack_type = C.nwn_GetWeaponAttackType(attacker.obj)
-   info.is_offhand = cr.cr_current_attack + 1 > cr.cr_effect_atks + cr.cr_additional_atks + cr.cr_onhand_atks
-
-   -- Get equip number
-   local weapon = C.nwn_GetCurrentAttackWeapon(attacker.obj, info.attack.cad_attack_type)
-   info.weapon = EQUIP_TYPE_UNARMED
-   if weapon ~= nil then
-      for i = 0, EQUIP_TYPE_NUM - 1 do
-         if attacker.ci.equips[i].id == weapon.obj.obj_id then
-            info.weapon = i
-            break
-         end
-      end
+      info.target_ci = nil
    end
 end
 
 --- Do melee attack.
--- @param info AttackInfo ctype.
--- @param attacker Attacking creature.
--- @param target Target object.
--- @param i The current attack in the flurry.
--- @param attack_count Number of attacks in flurry.
--- @param anim
-local function do_melee_attack(info, attacker, target, i, attack_count, anim)
+local function DoMeleeAttack()
    ResolvePreRoll(info, attacker, target)
    ResolveAttackRoll(info, attacker, target)
 
-   if GetIsHit(info) then
-      ResolveDamage(info, attacker, target)
-      ResolvePostDamage(info, attacker, target, false)
+   if not GetIsHit(info) then return end
+   ResolveDamage(info, attacker, target)
+
+   if target:GetCurrentHitPoints() <= GetDamageTotal(info) then
+      info.is_killing = true
+   else
+      info.is_killing = false
    end
-   ResolveMeleeAnimations(attacker, target, i, attack_count, anim)
+
+   ResolvePostDamage(info, attacker, target, false)
 
    -- Attempt to resolve a special attack one was
    -- a) Used
    -- b) The attack is a hit.
-   if GetIsSpecialAttack(info) and GetIsHit(info) then
+   if GetIsSpecialAttack(info) then
       -- Special attacks only apply when the target is a creature
       -- and damage is greater than zero.
       if target.type == OBJECT_TRUETYPE_CREATURE and GetDamageTotal(info) > 0 then
@@ -1034,7 +1058,7 @@ local function do_melee_attack(info, attacker, target, i, attack_count, anim)
 
          -- The resolution of Special Attacks will return an effect to be applied
          -- or nil.
-         local success, eff = false --TODO: NSSpecialAttack(SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, info)
+         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), attacker, target)
          if success then
             -- Check to makes sure an effect was returned.
             if eff then
@@ -1056,33 +1080,33 @@ local function do_melee_attack(info, attacker, target, i, attack_count, anim)
          SetResult(info, 6)
       end
    end
+end
 
-   UpdateInfo(info, attacker, target)
+function NWNXSolstice_DoMeleeAttack()
+   DoMeleeAttack()
 end
 
 --- Do ranged attack.
--- @param info AttackInfo ctype.
--- @param attacker Attacking creature.
--- @param target Target object.
--- @param i The current attack in the flurry.
--- @param anim
-local function do_ranged_attack(info, attacker, target, i, anim)
+local function DoRangedAttack()
    ResolvePreRoll(info, attacker, target)
-
    ResolveAttackRoll(info, attacker, target)
 
-   if GetIsHit(info) then
-      ResolveDamage(info, attacker, target)
-      ResolvePostDamage(info, attacker, target, true)
+   if not GetIsHit(info) then return end
+
+   ResolveDamage(info, attacker, target)
+
+   if target:GetCurrentHitPoints() <= GetDamageTotal(info) then
+      info.is_killing = true
    else
-      ResolveRangedMiss(attacker, target)
+      info.is_killing = false
    end
-   ResolveRangedAnimations(attacker, target, anim)
+
+   ResolvePostDamage(info, attacker, target, true)
 
    -- Attempt to resolve a special attack one was
    -- a) Used
    -- b) The attack is a hit.
-   if GetIsSpecialAttack(info) and GetIsHit(info) then
+   if GetIsSpecialAttack(info) then
       -- Special attacks only apply when the target is a creature
       -- and damage is greater than zero.
       if target.type == OBJECT_TRUETYPE_CREATURE
@@ -1092,7 +1116,7 @@ local function do_ranged_attack(info, attacker, target, i, anim)
 
          -- The resolution of Special Attacks will return an effect to be applied
          -- or nil.
-         local success, eff = false --TODO: NSSpecialAttack(SPECIAL_ATTACK_EVENT_RESOLVE, attacker, target, info)
+         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), attacker, target)
          if success then
             -- Check to makes sure an effect was returned.
             if eff then
@@ -1114,51 +1138,10 @@ local function do_ranged_attack(info, attacker, target, i, anim)
          SetAttackResult(info, 6)
       end
    end
-   UpdateInfo(info, attacker, target)
 end
 
---- Resolve attack.
--- @param attacker Attacking creature.
--- @param target Target object.
--- @param attack_count Number of attacks in flurry.
--- @param anim
--- @param is_ranged Is ranged attack.
-local function ResolveAttack(attacker, target, attack_count, anim, is_ranged)
-   if not target:GetIsValid() then return end
-
-   local info = CreateAttackInfo(attacker, target)
-   local use_cached = false
-
-   -- If the target is a creature detirmine it's state and any situational modifiers that
-   -- might come into play.  This only needs to be done once per attack group because
-   -- the values can't change.
-   if target.type == OBJECT_TRUETYPE_CREATURE then
-      info.target_state = attacker:GetTargetState(target)
-      info.situational_flags = ResolveSituations(info, attacker, target)
-   end
-
-   for i=0, attack_count - 1 do
-      if is_ranged then
-         -- Attack count can be modified if, say, a creature only has less arrows left than attacks
-         -- or none at all.
-         attack_count = GetAmmunitionAvailable(info, attack_count)
-         if attack_count == 0 then
-            ResolveOutOfAmmo(info)
-            return
-         end
-
-         do_ranged_attack(info, attacker, target, i, anim)
-         ForceEquipAmmunition(attack, attack_count)
-      else
-         do_melee_attack(info, attacker, target, i, attack_count, anim)
-      end
-   end
-
-   SignalDamage(attacker, target, attack_count, is_ranged)
+function NWNXSolstice_DoRangedAttack()
+   DoRangedAttack()
 end
-
-local M = {
-   ResolveAttack = ResolveAttack
-}
 
 return M

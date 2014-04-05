@@ -65,7 +65,7 @@ end
 -- Determines if Creature is a DM
 function M.Creature:GetIsDM()
    if not self:GetIsValid() then return false end
-   
+
    return self.obj.cre_stats.cs_is_dm ~= 0
 end
 
@@ -145,7 +145,7 @@ end
 -- @param type Appearance type.
 function M.Creature:SetAppearanceType(type)
    if not self:GetIsValid() then return -1 end
-   
+
    self.obj.cre_stats.cs_appearance = type
    return self.obj.cre_stats.cs_appearance
 end
@@ -164,11 +164,11 @@ end
 -- @param deity New deity
 function M.Creature:SetDeity(deity)
    if not self:GetIsValid() then return "" end
-   
+
    if self.obj.cre_stats.cs_deity ~= nil then
       C.free(self.obj.cre_stats.cs_deity)
    end
-   
+
    self.obj.cre_stats.cs_deity = C.strdup(deity)
    return deity
 end
@@ -189,15 +189,22 @@ function M.Creature:SetLootable(lootable)
    NWE.ExecuteCommand(740, 2)
 end
 
+--- Set creatures movement rate.
+-- @param rate MOVE\_RATE\_*
+function M.Creature:SetMovementRate(rate)
+   if not self:GetIsValid() then return end
+   C.nwn_SetMovementRate(self.obj, rate)
+end
+
 --- Set creature's subrace
 -- @param subrace New subrace
 function M.Creature:SetSubrace(subrace)
    if not self:GetIsValid() then return "" end
-   
+
    if self.obj.cre_stats.cs_deity ~= nil then
       C.free(self.obj.cre_stats.cs_subrace)
    end
-   
+
    self.obj.cre_stats.cs_subrace = C.strdup(subrace)
    self.obj.cre_stats.cs_subrace_len = #subrace
    return subrace

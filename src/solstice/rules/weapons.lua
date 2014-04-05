@@ -468,6 +468,14 @@ local function GetWeaponBaseDamage(item, cre)
             b = b + 12
          end
       end
+
+      local wm = cre:GetLevelByClass(CLASS_TYPE_WEAPON_MASTER)
+      if wm >= 3 then
+         feat = GetWeaponFeat(MASTERWEAPON_FEAT_CHOICE, item)
+         if feat ~= -1 and cre:GetHasFeat(feat) then
+            b = b + math.floor(wm / 3)
+         end
+      end
    end
 
    if not found then
@@ -641,6 +649,99 @@ local function AttackTypeToEquipType(atype)
    return EQUIP_TYPE_ONHAND
 end
 
+--- Get number of attacks.
+-- @param cre Creature object.
+local function GetOnhandAttacks(cre)
+   local rh   = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+   local iter = GetWeaponIteration(cre, rh)
+   local bab  = M.GetBaseAttackBonus(cre)
+   local res  = math.clamp(math.floor(bab/iter), 1, 6)
+
+   if TA then
+      local style = cre:GetLocalInt("pc_style_fighting")
+      if not rh:GetIsValid() then
+         if style == 7 then res = res + 1 end
+         if cre:GetKnowsFeat(2001) then res = res + 1 end
+      elseif style == 3 then
+         local lh = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+         if lh:GetIsValid() and
+            (lh:GetBaseType() == BASE_ITEM_SMALLSHIELD or
+             lh:GetBaseType() == BASE_ITEM_LARGESHIELD or
+             lh:GetBaseType() == BASE_ITEM_TOWERSHIELD)
+         then
+            res = res + 1
+         end
+      end
+   end
+
+   return res
+end
+
+local function GetOffhandAttacks(cre)
+   local item = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+   if BaseitemToWeapon(item) then return 0 end
+   local res = 1
+   if cre:GetHasFeat(FEAT_IMPROVED_TWO_WEAPON_FIGHTING) then
+      res = res + 1
+   end
+
+   if TA then
+      local ranger = cre:GetLevelByClass(CLASS_TYPE_RANGER)
+      local monk   = cre:GetLevelByClass(CLASS_TYPE_MONK)
+
+      if res > 0 and ranger >= 40 and
+         (monk == 0 or not GetIsMonkWeapon(cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND), cre))
+      then
+         res = res + 1
+      end
+   end
+
+   return res
+end
+
+local function InitializeNumberOfAttacks(cre)
+   local add = 0
+   local rh  = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+   local rbi = rh:GetIsValid() and rh:GetBaseType() or -1
+
+   local on, off = cre.ci.offense.attacks_on, cre.ci.offense.attacks_off
+
+   if (rbi == BASE_ITEM_HEAVYCROSSBOW or
+       rbi == BASE_ITEM_LIGHTCROSSBOW) and
+      not cre:GetHasFeat(FEAT_RAPID_RELOAD)
+   then
+      on = 1
+   end
+
+   if cre.obj.cre_stats.cs_override_atks > 0 then
+      on = cre.obj.cre_stats.cs_override_atks
+   end
+
+   -- Dirty Fighting
+   if cre.obj.cre_mode_combat == 10 then
+      cre:SetCombatMode(0)
+      on, off = 1, 0
+   -- Rapid Shot
+   elseif cre.obj.cre_mode_combat == 6 then
+      add = add + 1
+   -- Flurry can only be toggled on IFF the monk weapon reqs are met.
+   elseif cre.obj.cre_mode_combat == 5 then
+      add = add + 1
+   end
+
+   if cre.obj.cre_hasted ~= 0 then
+      add = add + 1
+   end
+
+   cre.obj.cre_combat_round.cr_additional_atks = add
+   cre.obj.cre_combat_round.cr_onhand_atks = on
+   cre.obj.cre_combat_round.cr_offhand_atks = off
+
+   cre.obj.cre_combat_round.cr_offhand_taken = 0
+   cre.obj.cre_combat_round.cr_extra_taken = 0
+
+end
+
 -- Exports.
 M.GetWeaponAttackAbility          = GetWeaponAttackAbility
 M.SetWeaponAttackAbilityOverride  = SetWeaponAttackAbilityOverride
@@ -668,3 +769,6 @@ M.GetUnarmedDamageBonus           = GetUnarmedDamageBonus
 
 M.UnpackItempropDamageRoll        = UnpackItempropDamageRoll
 M.AttackTypeToEquipType           = AttackTypeToEquipType
+M.GetOnhandAttacks                = GetOnhandAttacks
+M.GetOffhandAttacks               = GetOffhandAttacks
+M.InitializeNumberOfAttacks       = InitializeNumberOfAttacks
