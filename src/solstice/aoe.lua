@@ -1,7 +1,4 @@
 --- Area of Effects
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module aoe
 
 local ffi = require 'ffi'

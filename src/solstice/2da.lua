@@ -1,4 +1,7 @@
---- 2da
+---
+-- This module is for working with cached 2da files.
+-- Note that it depends on nwserver to do any parsing,
+-- it is not useable outside of the that currently.
 -- @module 2da
 -- @alias M
 
@@ -23,7 +26,7 @@ function M.GetCached2da(twoda)
    return t
 end
 
----
+--- Get number of columns in 2da.
 -- @param twoda 2da file.
 function M.Get2daColumnCount(twoda)
    if type(twoda) == "string" then
@@ -36,7 +39,7 @@ function M.Get2daColumnCount(twoda)
    return C.nwn_Get2daColumnCount(twoda);
 end
 
----
+--- Get number of rows in 2da.
 -- @param twoda 2da file.
 function M.Get2daRowCount(twoda)
    if type(twoda) == "string" then
@@ -49,7 +52,7 @@ function M.Get2daRowCount(twoda)
    return C.nwn_Get2daRowCount(twoda);
 end
 
----
+--- Get float value.
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
@@ -71,7 +74,7 @@ function M.Get2daFloat(twoda, col, row)
    end
 end
 
----
+--- Get int value.
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
@@ -94,7 +97,7 @@ function M.Get2daInt(twoda, col, row)
 
 end
 
----
+--- Get string value.
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.

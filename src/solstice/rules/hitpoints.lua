@@ -1,10 +1,12 @@
 --- Rules
 -- @module rules
 
---- Class.
+--- Hitpoints.
 -- The following functions.
--- @section Hit Points
+-- @section hp
 
+--- Determine Maximum Hitpoints.
+-- @param cre Creature
 local function GetMaxHitPoints(cre)
    local res = 0
    local not_pc = not cre:GetIsPC() or cre:GetIsPossessedFamiliar()

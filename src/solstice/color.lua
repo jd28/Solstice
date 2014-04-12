@@ -1,7 +1,4 @@
 ﻿--- Colors
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module color
 
 -- NOTE: Colors MUST be encoded with rgb values, string constants

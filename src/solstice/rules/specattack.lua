@@ -1,3 +1,6 @@
+--- Rules
+-- @module rules
+
 local Eff = require 'solstice.effect'
 local C = require('ffi').C
 

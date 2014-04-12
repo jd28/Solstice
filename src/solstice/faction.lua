@@ -1,11 +1,8 @@
---- Faction
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
--- @module faction
-
+--- Faction.
 -- TODO: this all needs to be redone /if/ there is going to be a proxy faction
 -- object
+-- @module faction
+
 
 local NWE = require 'solstice.nwn.engine'
 

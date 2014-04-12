@@ -44,6 +44,9 @@ local function load(into, lookup)
    end
 end
 
+--- Constants
+-- @section
+
 --- Register constant loader.
 -- @param tda 2da name (without .2da)
 -- @param column_label Label of the 2da column that contains constant

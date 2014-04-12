@@ -1,7 +1,4 @@
 --- Door
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module door
 
 local ffi = require 'ffi'

@@ -23,12 +23,12 @@ function M.GetIsEffectHandlerRegistered(eff_type)
 end
 
 --- Register an effect handler.
--- @param effect_type solstice.effect constant or some other custom event type.
 -- @param handler Function to call on object when effect is applied or removed.
--- It will be called with three parameters: an effect, an object, and boolean value
+-- It will be called with three parameters: a RAW effect, an object, and boolean value
 -- indicating whether the effect is being applied (false) or removed (true).
 -- If the effect cannot applied, say the target is dead, then the function should
 -- return true to delete the effect, returning false explicitly is not necessary.
+-- @param ... List of CUSTOM\_EFFECT\_TYPE\_*.
 function M.RegisterEffectHandler(handler, ...)
    local types = {...}
    if #types == 0 then
@@ -39,7 +39,7 @@ function M.RegisterEffectHandler(handler, ...)
    end
 end
 
----
+--
 function NWNXEffects_HandleEffectEvent()
    local ev = C.Local_GetLastEffectEvent()
    if ev == nil then return 0 end

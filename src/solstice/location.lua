@@ -9,14 +9,15 @@ local Obj = require 'solstice.object'
 local Eff = require 'solstice.effect'
 
 local M = {}
+local Location = {}
+M.Location = Location
 
-M.Location = {}
-
---- Internal ctype
+-- Internal ctype
 M.location_t = ffi.metatype("CScriptLocation",
                             { __index = M.Location })
 
 --- Invalid location.
+-- Aliased globally as LOCATION_INVALID.
 M.INVALID = M.location_t(Vec.vector_t(0,0,0),
                          Vec.vector_t(0,0,0),
                          Obj.INVALID.id)
@@ -33,12 +34,14 @@ function M.Create(position, orientation, area)
    return NWE.StackPopEngineStructure(NWE.STRUCTURE_LOCATION)
 end
 
+--- Class Location
+-- @section
 
 --- Applies an effect to a location
 -- @param durtype Duration type.
 -- @param eff Effect to apply.
 -- @param[opt=0.0] duration Duration of an effect.
-function M.Location:ApplyEffect(durtype, eff, duration)
+function Location:ApplyEffect(durtype, eff, duration)
    duration = duration or 0.0
 
    NWE.StackPushFloat(duration)
@@ -52,7 +55,7 @@ end
 -- @param vfx VFX_*
 -- @param[opt] duration Duration in seconds.  If not passed the visual
 -- will be applied as DURATION\_TYPE\_INSTANT.
-function M.Location:ApplyVisual(vfx, duration)
+function Location:ApplyVisual(vfx, duration)
    local durtype = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_INSTANT
    duration = duration or 0
 
@@ -63,7 +66,7 @@ end
 --- Gets nearest object to location
 -- @param mask solstice.object type mask.
 -- @param[opt=1] nth Which object to find.
-function M.Location:GetNearestObject(mask, nth)
+function Location:GetNearestObject(mask, nth)
    nth = nth or 1
 
    NWE.StackPushInteger(nth)
@@ -82,7 +85,7 @@ end
 -- @param[opt=-1] value2 Second criteria value.
 -- @param[opt=-1] type3 Third criteria type.
 -- @param[opt=-1] value3 Third criteria value.
-function M.Location:GetNearestCreature(type1, value1, nth, ...)
+function Location:GetNearestCreature(type1, value1, nth, ...)
    local type2, value2, type3, value3 = ...
 
    NWE.StackPushInteger(value3 or -1)
@@ -100,7 +103,7 @@ end
 
 
 --- Convert location to string
-function M.Location:ToString()
+function Location:ToString()
    local area = self:GetArea()
    if not area:GetIsValid() then return "" end
 
@@ -117,7 +120,7 @@ end
 -- @param[opt=STANDARD_FACTION_HOSTILE] faction Trap faction.
 -- @param[opt=""] on_disarm OnDisarm script.
 -- @param[opt=""] on_trigger OnTriggered script.
-function M.Location:Trap(type, size, tag, faction, on_disarm, on_trigger)
+function Location:Trap(type, size, tag, faction, on_disarm, on_trigger)
    NWE.StackPushString(on_trigger or "")
    NWE.StackPushString(on_disarm or "")
    NWE.StackPushInteger(faction or STANDARD_FACTION_HOSTILE)
@@ -133,7 +136,7 @@ end
 --- Sets the main light colors for a tile.
 -- @param color1 AREA_TILE_SOURCE_MAIN_COLOR_*
 -- @param color2 AREA_TILE_SOURCE_MAIN_COLOR_*
-function M.Location:SetTileMainLightColor(color1, color2)
+function Location:SetTileMainLightColor(color1, color2)
    NWE.StackPushInteger(color2)
    NWE.StackPushInteger(color1)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
@@ -143,7 +146,7 @@ end
 --- Sets the source light color for a tile.
 -- @param color1 AREA_TILE_SOURCE_LIGHT_COLOR_*
 -- @param color2 AREA_TILE_SOURCE_LIGHT_COLOR_*
-function M.Location:SetTileSourceLightColor(color1, color2)
+function Location:SetTileSourceLightColor(color1, color2)
    NWE.StackPushInteger(color2)
    NWE.StackPushInteger(color1)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
@@ -152,7 +155,7 @@ end
 
 --- Determines the color of the first main light of a tile.
 -- @return AREA_TILE_SOURCE_MAIN_COLOR_*
-function M.Location:GetTileMainLight1Color()
+function Location:GetTileMainLight1Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(517, 1)
 
@@ -161,7 +164,7 @@ end
 
 --- Determines the color of the second main light of a tile.
 -- @return AREA_TILE_SOURCE_MAIN_COLOR_*
-function M.Location:GetTileMainLight2Color()
+function Location:GetTileMainLight2Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(518, 1)
 
@@ -170,7 +173,7 @@ end
 
 --- Determines the color of the first source light of a tile.
 -- @return AREA_TILE_SOURCE_LIGHT_COLOR_*
-function M.Location:GetTileSourceLight1Color()
+function Location:GetTileSourceLight1Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(519, 1)
    return NWE.StackPopInteger()
@@ -178,14 +181,14 @@ end
 
 --- Determines the color of the second source light of a tile.
 -- @return AREA_TILE_SOURCE_LIGHT_COLOR_*
-function M.Location:GetTileSourceLight2Color()
+function Location:GetTileSourceLight2Color()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(520, 1)
    return NWE.StackPopInteger()
 end
 
 --- Get area from location.
-function M.Location:GetArea()
+function Location:GetArea()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(224, 1)
    return NWE.StackPopObject()
@@ -193,7 +196,7 @@ end
 
 --- Gets distance between two locations.
 -- @param to The location to get the distance from.
-function M.Location:GetDistanceBetween(to)
+function Location:GetDistanceBetween(to)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, to)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(298, 2)
@@ -202,7 +205,7 @@ function M.Location:GetDistanceBetween(to)
 end
 
 --- Gets orientation of a location
-function M.Location:GetFacing()
+function Location:GetFacing()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(225, 1)
 
@@ -210,7 +213,7 @@ function M.Location:GetFacing()
 end
 
 --- Gets position vector of a location
-function M.Location:GetPosition()
+function Location:GetPosition()
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, self)
    NWE.ExecuteCommand(223, 1)
 

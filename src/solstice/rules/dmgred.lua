@@ -4,6 +4,9 @@
 local _DMG_IMM = {}
 local _DMG_RED = {}
 
+--- Damage Modifiers
+-- @section
+
 --- Get base damage immunity.
 -- @param cre Creature object.
 -- @param dmgidx DAMAGE\_INDEX\_*

@@ -77,11 +77,17 @@ local function GetIsRangedWeapon(item)
    return TDA.Get2daInt(tda, "Ranged", BaseitemToWeapon(item)) ~= 0
 end
 
+--- Determine if weapon is light.
+-- @param item The weapon in question.
+-- @param cre Creature weilding weapon
 function GetIsWeaponLight(item, cre)
    if GetWeaponType(item) == 8 then return true end
    return cre:GetRelativeWeaponSize(item) < 0
 end
 
+--- Determine if weapon is finessable.
+-- @param item The weapon in question.
+-- @param cre Creature weilding weapon
 function GetIsWeaponFinessable(item, cre)
    if GetIsWeaponLight(item, cre) then return true end
    local size = cre:GetSize()
@@ -93,7 +99,8 @@ function GetIsWeaponFinessable(item, cre)
    return size < 3 and rel <= 0
 end
 
-
+--- Determine unarmed damage bonus.
+-- @param cre Creature unarmed.
 local function GetUnarmedDamageBonus(cre)
    local d, s, b = 0, 0, 0
    local dmgtype = DAMAGE_TYPE_BLUDGEONING
@@ -142,7 +149,9 @@ local function GetUnarmedDamageBonus(cre)
    return d, s, b
 end
 
-
+--- Determine Weapon Iteration.
+-- @param cre Creature weilding weapon
+-- @param item The weapon in question.
 local function GetWeaponIteration(cre, item)
    local can, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
    if can and GetIsMonkWeapon(item, cre) then
@@ -374,6 +383,9 @@ local function GetWeaponAttackBonus(cre, weap)
    return ab
 end
 
+--- Determine weapons damage power.
+-- @param cre Creature weilding weapon
+-- @param item The weapon in question.
 local function GetWeaponPower(cre, item)
    local power = 0
 
@@ -444,6 +456,9 @@ local function GetWeaponBaseDamageType(item)
    return type
 end
 
+--- Determine weapons base damage roll.
+-- @param item Weapon.
+-- @param cre Creature
 local function GetWeaponBaseDamage(item, cre)
    local tda = TDA.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
@@ -497,6 +512,9 @@ local function GetWeaponBaseDamage(item, cre)
    return d, s, b
 end
 
+--- Determine weapons critical hit range.
+-- @param cre Creature
+-- @param item Weapon.
 local function GetWeaponCritRange(cre, item)
    local base = item
    local tda = TDA.GetCached2da("wpnprops")
@@ -540,6 +558,9 @@ local function GetWeaponCritRange(cre, item)
    return threat
 end
 
+--- Determine weapons critical hit multiplier.
+-- @param cre Creature
+-- @param item Weapon.
 local function GetWeaponCritMultiplier(cre, item)
    local base = item
    local tda = TDA.GetCached2da("wpnprops")
@@ -565,6 +586,7 @@ local function GetWeaponCritMultiplier(cre, item)
 end
 
 --- Get dual wielding penalty.
+-- @param cre Creature
 -- @return onhand penalty, offhand penalty
 local function GetDualWieldPenalty(cre)
    local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
@@ -649,8 +671,8 @@ local function AttackTypeToEquipType(atype)
    return EQUIP_TYPE_ONHAND
 end
 
---- Get number of attacks.
--- @param cre Creature object.
+--- Determine number of onhand attacks.
+-- @param cre Creature
 local function GetOnhandAttacks(cre)
    local rh   = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
    local iter = GetWeaponIteration(cre, rh)
@@ -677,6 +699,8 @@ local function GetOnhandAttacks(cre)
    return res
 end
 
+--- Determine number of offhand attacks.
+-- @param cre Creature
 local function GetOffhandAttacks(cre)
    local item = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
    if BaseitemToWeapon(item) then return 0 end
@@ -699,6 +723,8 @@ local function GetOffhandAttacks(cre)
    return res
 end
 
+--- Initialize combat rounds attack counts.
+-- @param cre Creature
 local function InitializeNumberOfAttacks(cre)
    local add = 0
    local rh  = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)

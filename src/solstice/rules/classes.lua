@@ -90,6 +90,8 @@ local function CanUseClassAbilities(cre, class)
    return r1, assert(r2, "CanUseClassAbilities overrides must return class level!")
 end
 
+--- Registers a class ability handler.
+-- @param class CLASS\_TYPE\_*
 -- @func func A function that takes a creature and
 -- optionally a CLASS\_TYPE\_* argument and returns
 -- a boolean indicating whether the creature can use

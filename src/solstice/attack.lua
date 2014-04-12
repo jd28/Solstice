@@ -25,7 +25,7 @@ local function AddCCMessage(info, type, objs, ints)
 end
 
 --- Adds an onhit effect to an attack.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param eff Effect ctype.
 local function AddEffect(info, attacker, eff)
@@ -35,20 +35,21 @@ local function AddEffect(info, attacker, eff)
 end
 
 --- Adds an onhit visual effect to an attack.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
 -- @param vfx VFX\_*
 local function AddVFX(info, attacker, vfx)
    AddEffect(info, attacker, Eff.VisualEffect(vfx))
 end
 
 --- Clear special attack.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 local function ClearSpecialAttack(info)
    info.attack.cad_special_attack = 0
 end
 
 --- Copy damage to NWN Attack Data.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 local function CopyDamageToNWNAttackData(info, attacker, target)
    for i = 0, DAMAGE_INDEX_NUM - 1 do
@@ -322,7 +323,7 @@ local function ResolveArmorClass(info, attacker, target)
 end
 
 --- Resolves that attack bonus of the creature.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 function ResolveAttackModifier(info, attacker, target)
@@ -374,7 +375,7 @@ local function ResolveMissChance(info, attacker, target, hit, use_cached)
 end
 
 --- Resolves deflect arrow.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 -- @param hit Is hit.
@@ -423,7 +424,7 @@ local function ResolveDeflectArrow(info, attacker, target, hit)
 end
 
 --- Resolve parry
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 -- @param hit is hit.
@@ -461,7 +462,7 @@ local function ResolveParry(info, attacker, target, hit)
 end
 
 --- Resolve attack roll.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveAttackRoll(info, attacker, target)
@@ -553,7 +554,7 @@ local function AddDamageToResult(info, dmg, mult)
 end
 
 --- Resolve damage result.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param mult crit multiplier
 -- @param ki_strike Is WM Ki Strike.
@@ -574,7 +575,7 @@ local function ResolveDamageResult(info, attacker, mult, ki_strike)
 end
 
 --- Resolve damage modifications.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveDamageModifications(info, attacker, target)
@@ -624,7 +625,7 @@ local function ResolveDamageModifications(info, attacker, target)
 end
 
 --- Resolve item cast spell.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveItemCastSpell(info, attacker, target)
@@ -654,7 +655,7 @@ local function ResolveItemCastSpell(info, attacker, target)
 end
 
 --- Resolve on hit effects...
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveOnHitEffect(info, attacker, target)
@@ -664,8 +665,9 @@ end
 
 --- Resolve on hit visual effects.
 --    This is not default behavior.
--- @param info AttackInfo ctype.
 function ResolveOnHitVFX(info, attacker)
+-- @param info Attack ctype.
+-- @param attacker Attacking creature.
    -- No ffects on ranged attacks...
    if GetIsRangedAttack(info) then return end
    for i = 0, DAMAGE_INDEX_NUM - 1 do
@@ -697,7 +699,7 @@ local function AddUnblockables(info)
 end
 
 --- Resolves that damage of the creature.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 -- NOTE: This function is only ever called by the combat engine.
@@ -934,7 +936,7 @@ local function ResolveCleave(info, attacker, target)
 end
 
 --- Resolve post damage stuff.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 -- @param is_ranged
@@ -958,7 +960,7 @@ local function ResolvePostDamage(info, attacker, target, is_ranged)
 end
 
 --- Resolve situations.
--- @param info AttackInfo ctype.
+-- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveSituations(info, attacker, target)

@@ -50,7 +50,7 @@ end
 ---
 -- @param spell SPELL\_* constant.
 -- @param target Location to cast spell at.
--- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
 function M.Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -66,11 +66,11 @@ function M.Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
 end
 
 ---
--- @param spell solstice.spell constant.
+-- @param spell SPELL\_* constant.
 -- @param target Location to cast spell at.
--- @param[opt=METAMAGIC_ANY] metamagic METAMAGIC_*.
+-- @param[opt=METAMAGIC\_ANY] metamagic METAMAGIC\_*.
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
--- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
+-- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
 -- @param[opt=false] instant If true spell can instantaneously.
 function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()

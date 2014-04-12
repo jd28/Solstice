@@ -1,3 +1,6 @@
+--- Rules
+-- @module rules
+
 local function ZeroSituationMod(cre, situ)
    cre.ci.mod_situ[situ].ab = 0
    cre.ci.mod_situ[situ].ac = 0
@@ -18,8 +21,7 @@ local function sneak_attack(cre)
    local feat
    local normal = false
 
-   --- Normal sneak.
-
+   -- Normal sneak.
    feat = cre:GetHighestFeatInRange(FEAT_SNEAK_ATTACK_11,
                                     FEAT_SNEAK_ATTACK_20)
 

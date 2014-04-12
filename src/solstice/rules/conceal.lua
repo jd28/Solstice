@@ -1,9 +1,19 @@
+--- Rules
+-- @module rules
+
 local TA = OPT.TA
 local USE_VERSUS = OPT.USE_VERSUS
 
 local max = math.max
 local floor = math.floor
 
+--- Concealment.
+-- @section conc
+
+--- Determine concealment.
+-- @param cre Creature
+-- @param vs Attacker
+-- @param is_ranged Is ranged attack.
 local function GetConcealment(cre, vs, is_ranged)
    local total = 0
 
@@ -68,7 +78,9 @@ local function GetConcealment(cre, vs, is_ranged)
    return total
 end
 
---- Get creatures miss chance
+--- Determine Miss Chance.
+-- @param cre Creature
+-- @param is_ranged Is ranged attack.
 function GetMissChance(cre, is_ranged)
    local total = 0
    local eff_type, amount, miss_type
