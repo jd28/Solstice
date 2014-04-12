@@ -572,6 +572,8 @@ local function ResolveDamageResult(info, attacker, mult, ki_strike)
 
    info.dmg_result.damages[12] = info.dmg_result.damages[12]
       + (attacker.ci.equips[info.weapon].dmg_ability * mult)
+
+   AddDamageToResult(info, attacker.ci.mod_mode.dmg, mult)
 end
 
 --- Resolve damage modifications.
