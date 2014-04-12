@@ -36,6 +36,7 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    -- Shield AC
    ac = ac + self.obj.cre_stats.cs_ac_shield_base
 
+   ac = ac + self.ci.mod_mode.ac
 
    -- Area, class, feat, race, size bonuses.
    for i=0, COMBAT_MOD_SKILL - 1 do

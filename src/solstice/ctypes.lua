@@ -134,6 +134,7 @@ typedef struct {
     CombatWeapon    equips[${EQUIP_TYPE_NUM}];
     CombatMod       mods[${COMBAT_MOD_NUM}];
     CombatMod       mod_situ[${SITUATION_NUM}];
+    CombatMod       mod_mode;
     int32_t            effective_level;
     int32_t            first_custom_eff;
     uint32_t           fe_mask;

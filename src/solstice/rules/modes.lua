@@ -1,14 +1,17 @@
 --- Modes
--- @module modes
+-- @module rules
 
-local Obj = require 'solstice.object'
+--- Modes
+-- @section modes
+
+local ffi = require 'ffi'
 local jit = require 'jit'
 local MODES = {}
-local M = {}
+local M = require 'solstice.rules.init'
 
---- Internal toggle mode function
+-- Internal toggle mode function
 -- @param cre Creature to toggle mode on
--- @param mode solstice.nwn.ACTION_MODE_*
+-- @param mode ACTION\_MODE\_*
 function NSToggleMode(cre, mode)
    cre = _SOL_GET_CACHED_OBJECT(cre)
    if not cre:GetIsValid() then return false end
@@ -147,23 +150,27 @@ end
 
 jit.off(NSToggleMode)
 
---- Get a registered combat mode
--- @param mode
-function M.Get(mode)
-   return MODES[mode]
-end
-
 --- Register a combat mode.
--- See examples/modes.lua
 -- @param mode
--- @param f A function taking object, mode, and a boolean indicating whether the mode is being
--- turned on or off.
-function M.Register(mode, f)
+-- @param f A function taking a creature object returning a boolean value
+-- indicating whether the mode was useable.
+local function RegisterMode(mode, f)
    MODES[mode] = f
 end
 
---- Convert solstice.modes constants to solstice.modes.ACTION_*
--- @param mode solstice.modes constant.
+--- Updates combat modifer when mode changes.
+-- @param mode COMBAT\_MODE\_*.
+-- @param cre Creature object
+-- @bool[opt=false] off True if the mode is being turned off.
+function M.ResolveMode(mode, cre, off)
+   ffi.fill(cre.ci.mod_mode, ffi.sizeof("CombatMod"))
+   local f = MODES[mode]
+   if not f then return end
+   return f(cre, mode, off)
+end
+
+--- Convert COMBAT\_MODE\_\* to ACTION\_MODE\_\*.
+-- @param mode COMBAT\_MODE\_\*.
 -- @return -1 on error.
 function M.ToAction(mode)
    if mode == COMBAT_MODE_PARRY then
@@ -193,4 +200,147 @@ function M.ToAction(mode)
    return -1
 end
 
+--Defensive Cast--------------------------------------------------------
+local function def_cast(cre, mode, off)
+   -- Nothing to be done but return true really
+   -- Concentration checks are dealt with during damage application.
+   return true
+end
+
+RegisterMode(COMBAT_MODE_DEFENSIVE_CASTING, def_cast)
+
+--Defensive Stance-------------------------------------------------------
+local function def_stance(cre, mode, off)
+   return true
+end
+RegisterMode(COMBAT_MODE_DEFENSIVE_STANCE, def_stance)
+
+--Dirty Fighting--------------------------------------------------------
+local function dirty(cre, mode, off)
+   if off then return true end
+   -- Really is worthless but there you go.  Attack number modifications
+   -- are dealth with in Rules.InitializeNumberOfAttacks
+   cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
+   cre.ci.mod_mode.dmg.dice = 1
+   cre.ci.mod_mode.dmg.sides = 4
+
+   return true
+end
+
+RegisterMode(COMBAT_MODE_DIRTY_FIGHTING, dirty)
+
+--Expertise-------------------------------------------------------------
+
+local function expertise(cre, mode, off)
+   if off then return true end
+
+   if mode == COMBAT_MODE_IMPROVED_EXPERTISE then
+      cre.ci.mod_mode.ab = -10
+      cre.ci.mod_mode.ac = 10
+   else
+      cre.ci.mod_mode.ab = -5
+      cre.ci.mod_mode.ac = 5
+   end
+
+   return true
+end
+
+RegisterMode(COMBAT_MODE_EXPERTISE, expertise)
+RegisterMode(COMBAT_MODE_IMPROVED_EXPERTISE, expertise)
+
+--Flurry of Blows-------------------------------------------------------
+local function flurry(cre, mode, off)
+   if off then return true end
+
+   local result = false
+   local monk = cre:GetLevelByClass(CLASS_TYPE_MONK)
+   local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+
+   if not rh:GetIsValid() then
+      -- Creature is unarmed
+      result = true
+   elseif Rules.GetIsRangedWeapon(rh) then
+      -- Right hand is valid and is a ranged weapon.
+      result = false
+   else
+      -- If it's a monk weapon and creature has enough levels of monk to
+      -- use it, then check if there is an offhand weapon.
+      if Rules.GetIsMonkWeapon(rh) then
+         local lh = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+         if not lh:GetIsValid() then
+            -- lefthand weapon if invalid
+            -- righthand weapon is a monk weapon
+            result = true
+         else
+            result = Rules.GetIsMonkWeapon(lh)
+         end
+      else
+         -- righthand weapon is not a monk weapon.
+         result = false
+      end
+   end
+
+   if result then
+      -- Addition onhand attack is dealt with in NSInitializeNumberOfAttacks.
+      -- So only the AB needs to be set here.
+      cre.ci.mod_mode.ab = -2
+   else
+      cre:SendMessageByStrRef(66246)
+   end
+
+   return result
+end
+
+RegisterMode(COMBAT_MODE_FLURRY_OF_BLOWS, flurry)
+
+--Power Attack----------------------------------------------------------
+local function power_attack(cre, mode, off)
+   if off then return true end
+
+   cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
+   if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
+      cre.ci.mod_mode.ab = -10
+      cre.ci.mod_mode.dmg.bonus = 10
+   else
+      cre.ci.mod_mode.ab = -5
+      cre.ci.mod_mode.dmg.bonus = 5
+   end
+
+   return true
+end
+
+RegisterMode(COMBAT_MODE_POWER_ATTACK, power_attack)
+RegisterMode(COMBAT_MODE_IMPROVED_POWER_ATTACK, power_attack)
+
+--Rapid Shot------------------------------------------------------------
+local function rapid_shot(cre, mode, off)
+   if off then return true end
+
+   local weap = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+   if not Rules.GetIsRangedWeapon(weap) then
+      cre:SendMessageByStrRef(66246)
+      return false
+   end
+
+   -- Addition onhand attack is dealt with in Rules.InitializeNumberOfAttacks.
+   -- So only the AB needs to be set here.
+   cre.ci.mod_mode.ab = -2
+
+   return true
+end
+
+RegisterMode(COMBAT_MODE_RAPID_SHOT, rapid_shot)
+
+
+--Parry-----------------------------------------------------------------
+local function parry(cre, mode, off)
+   -- The parry ripostes are dealth with in the attack roll.
+   -- Nothing to be done but return true.
+   return true
+end
+
+RegisterMode(COMBAT_MODE_PARRY, parry)
+
+-- Exports
+M.RegisterMode = RegisterMode
 return M

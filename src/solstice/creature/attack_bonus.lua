@@ -34,6 +34,8 @@ function M.Creature:GetAttackBonusVs(target, equip)
       ab = ab + self.ci.mods[i].ab
    end
 
+   ab = ab + self.ci.mod_mode.ab
+
    return ab
 end
 

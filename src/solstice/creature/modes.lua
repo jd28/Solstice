@@ -10,7 +10,6 @@ local jit = require 'jit'
 
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
-local Mode = require 'solstice.modes'
 
 --- Modes
 -- @section level
@@ -41,14 +40,9 @@ jit.off(M.Creature.SetActivity)
 -- @param change If false the combat mode is already active.
 function M.Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
-   local off = mode == Mode.INVALID
+   local off = mode == COMBAT_MODE_INVALID
    if change and self.obj.cre_mode_combat > 11 then
-      local f = Mode.Get(self.obj.cre_mode_combat)
-      if f then
-         f(self, mode, true)
-         self.obj.cre_mode_combat = 0
-         -- TODO: Remove all mode effects.
-      end
+      Rules.ResolveMode(mode, self, off)
       return
    end
 
@@ -100,12 +94,9 @@ function M.Creature:SetCombatMode(mode, change)
       self.obj.cre_combat_round == nil or
       self.obj.cre_combat_round.cr_round_started ~= 1
    then
-      local f = Mode.Get(mode)
-      if f and not f(self, mode, off) then
-         return
+      if off or Rules.ResolveMode(mode, self, off) then
+         set_activity()
       end
-
-      set_activity()
    else
       self.obj.cre_mode_desired = mode
    end
