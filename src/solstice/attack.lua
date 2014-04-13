@@ -5,6 +5,8 @@ local ffi = require 'ffi'
 local C = ffi.C
 local random = math.random
 local floor  = math.floor
+local min    = math.min
+local max    = math.max
 
 local bit    = require 'bit'
 local bor    = bit.bor
@@ -582,48 +584,57 @@ end
 -- @param target Target object.
 local function ResolveDamageModifications(info, attacker, target)
    if GetIsCriticalHit(info) and target.type == OBJECT_TRUETYPE_CREATURE and target:GetIsPC() then
-      local parry = math.min(target:GetSkillRank(SKILL_PARRY, attacker,
-                                                 true))
+      local parry = min(target:GetSkillRank(SKILL_PARRY, attacker, true), 50)
+
       if parry > 0 then
          for i=0, DAMAGE_INDEX_NUM - 1 do
-            info.dmg_result.damages[i] = info.dmg_result.damages[i] -
-               math.floor((info.dmg_result.damages[i] * parry) / 100)
+            local adj = floor((info.dmg_result.damages[i] * parry) / 100)
+            info.dmg_result.damages[i] = info.dmg_result.damages[i] - adj
          end
       end
    end
 
+   local eff
+   local start
+
+   if target.type == OBJECT_TRUETYPE_CREATURE then
+      start = target.obj.cre_stats.cs_first_dresist_eff
+   end
+
+   eff, start = target:GetBestDamageResistEffect(attacker.ci.equips[info.weapon].base_dmg_flags, start)
+   info.dmg_result.damages[12] = target:DoDamageResistance(info.dmg_result.damages[12], eff, 12, info)
    for i=0, DAMAGE_INDEX_NUM - 1 do
-      local idx = i
-      if i == 12 then
-         idx = attacker.ci.equips[info.weapon].base_dmg_flags
-      end
-      local amt, adj, eff = target:GetDamageResistAdj(info.dmg_result.damages[i],
-                                                      idx, true)
-      info.dmg_result.damages[i], info.dmg_result.resist_adjust[i] = amt, adj
-      if eff then
-         info.effects_to_remove[info.effects_to_remove_len] = eff
-         info.effects_to_remove_len = info.effects_to_remove_len + 1
+      if info.dmg_result.damages[i] > 0 and i ~= 12 then
+         eff, start = target:GetBestDamageResistEffect(i, start)
+         info.dmg_result.damages[i] = target:DoDamageResistance(info.dmg_result.damages[i], eff, i, info)
       end
    end
 
-   for i=0, DAMAGE_INDEX_NUM - 1 do
-      local idx = i
-      if i == 12 then
-         idx = attacker.ci.equips[info.weapon].base_dmg_flags
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      if info.dmg_result.damages[i] > 0 then
+         local idx = i
+         if i == 12 then
+            idx = attacker.ci.equips[info.weapon].base_dmg_flags
+         end
+         local amt, adj = target:DoDamageImmunity(info.dmg_result.damages[i], idx, info)
+         info.dmg_result.damages[i] = amt
+         --AddCCMessage(info, nil, { target.id }, { 62, adj, bit.lshift(1, i)})
       end
-      local amt, adj = target:GetDamageImmunityAdj(info.dmg_result.damages[i], idx)
-      info.dmg_result.damages[i], info.dmg_result.immunity_adjust[i] = amt, adj
    end
 
-   local amt, adj, eff = target:GetDamageReductionAdj(info.dmg_result.damages[12],
-                                                      attacker.ci.equips[info.weapon].power,
-                                                      true)
-   if eff then
-      info.effects_to_remove[info.effects_to_remove_len] = eff
-      info.effects_to_remove_len = info.effects_to_remove_len + 1
-   end
+   if attacker.ci.equips[info.weapon].power > 0 then
+      if target.type == OBJECT_TRUETYPE_CREATURE then
+         start = target.obj.cre_stats.cs_first_dred_eff
+      else
+         start = nil
+      end
 
-   info.dmg_result.damages[12], info.dmg_result.soak_adjust = amt, adj
+      eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
+      info.dmg_result.damages[12] = target:DoDamageReduction(info.dmg_result.damages[12],
+                                                             eff,
+                                                             attacker.ci.equips[info.weapon].power,
+                                                             info)
+   end
 end
 
 --- Resolve item cast spell.

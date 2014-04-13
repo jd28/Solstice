@@ -20,6 +20,50 @@ local NWE = require 'solstice.nwn.engine'
 --- Combat
 -- @section
 
+local M = require 'solstice.creature.init'
+
+--- Get creatures base/innate resistance.
+-- @param dmgidx DAMAMGE\_INDEX\_*
+function M.Creature:GetBaseResist(dmgidx)
+   return self.ci.defense.resist[dmgidx]
+end
+
+--- Get creatures total damage immunity.
+-- @param dmgidx DAMAMGE\_INDEX\_*
+function M.Creature:GetDamageImmunity(dmgidx)
+   -- If the damage index is invalid... skip it.
+   if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM then
+      return 0
+   end
+   return math.clamp(self.ci.defense.immunity[dmgidx] +
+                     self.ci.defense.immunity_base[dmgidx],
+                     0, 100)
+end
+
+--- Gets innate damage immunity.
+-- @param dmg_idx damage type index
+function Creature:GetInnateDamageImmunity(dmg_idx)
+   return Rules.GetBaseDamageImmunity(self, dmg_idx)
+end
+
+--- Gets innate damage immunity.
+function Creature:GetInnateDamageReduction()
+   return Rules.GetBaseDamageReduction()
+end
+
+--- Get innate/feat damage resistance.
+-- @param dmg_idx
+function Creature:GetInnateDamageResistance(dmg_idx)
+   return Rules.GetBaseDamageResistance(self, dmg_idx)
+end
+
+--- Get creatures innate soak.
+-- Note: This name was chosen to match other
+-- on creature objects, that have Hardness.
+function M.Creature:GetHardness()
+   return self.ci.defense.soak
+end
+
 --- Adds parry attack.
 -- @param attacker Attacker to do parry attack against.
 function M.Creature:AddParryAttack(attacker)
