@@ -50,10 +50,6 @@ typedef struct {
 typedef struct {
     int32_t    damages[${DAMAGE_INDEX_NUM}];
     int32_t    damages_unblocked[${DAMAGE_INDEX_NUM}];
-    int32_t    immunity_adjust[${DAMAGE_INDEX_NUM}];
-    int32_t    resist_adjust[${DAMAGE_INDEX_NUM}];
-    int32_t    mod_adjust[${DAMAGE_INDEX_NUM}];
-    int32_t    soak_adjust;
 } DamageResult;
 
 typedef struct {
@@ -113,7 +109,6 @@ typedef struct {
     int32_t       hp_max;
 
     int32_t       soak;
-    int32_t       soak_eff[${DAMAGE_POWER_NUM}];
     int32_t       soak_stack[${DAMAGE_POWER_NUM}];
 
     int32_t       immunity[${DAMAGE_INDEX_NUM}];
@@ -122,7 +117,6 @@ typedef struct {
     int32_t       immunity_misc[${IMMUNITY_TYPE_NUM}];
 
     int32_t       resist[${DAMAGE_INDEX_NUM}];
-    int32_t       resist_eff[${DAMAGE_INDEX_NUM}];
     int32_t       resist_stack[${DAMAGE_INDEX_NUM}];
 
     /*Saves         saves;*/
