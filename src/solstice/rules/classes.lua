@@ -36,7 +36,8 @@ end
 
 --- Get base attack bonus
 -- @param cre Creature object.
-local function GetBaseAttackBonus(cre)
+-- @param[opt=false] pre_epic Only calculate pre-epic BAB.
+local function GetBaseAttackBonus(cre, pre_epic)
    local t = {0, 0, 0}
    local hd = cre:GetHitDice()
 
@@ -67,6 +68,7 @@ local function GetBaseAttackBonus(cre)
    end
 
    local res = t[1] + _TIER2[t[2]] + _TIER3[t[3]]
+   if pre_epic then return res end
 
    if hd > 20 then
       local epic = math.floor((hd - 20) / 2)
