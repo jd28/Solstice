@@ -647,8 +647,8 @@ local function UnpackItempropDamageRoll(ip)
       end
    end
 
-   if ip <= 0 or ip >= _ROLLS_LEN then
-      error "Invalid IP Const"
+   if ip < 0 or ip >= _ROLLS_LEN then
+      error(string.format("Invalid IP Const: %d, %s", ip, debug.traceback()))
    end
 
    return _ROLLS[ip].dice, _ROLLS[ip].sides, _ROLLS[ip].bonus
@@ -676,8 +676,18 @@ end
 local function GetOnhandAttacks(cre)
    local rh   = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
    local iter = GetWeaponIteration(cre, rh)
-   local bab  = M.GetBaseAttackBonus(cre)
-   local res  = math.clamp(math.floor(bab/iter), 1, 6)
+   local bab  = M.GetBaseAttackBonus(cre, true)
+   local res  = math.ceil(bab / iter)
+
+   if iter == 5 then
+      if cre:GetHitDice(cre) >= 55 then
+         res = res + 2
+      elseif cre:GetHitDice(cre) >= 45 then
+         res = res + 1
+      end
+   end
+
+   res = math.clamp(res, 1, 6)
 
    if TA then
       local style = cre:GetLocalInt("pc_style_fighting")
@@ -702,8 +712,14 @@ end
 --- Determine number of offhand attacks.
 -- @param cre Creature
 local function GetOffhandAttacks(cre)
-   local item = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
-   if BaseitemToWeapon(item) then return 0 end
+   local rh   = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+   local tda  = TDA.GetCached2da("wpnprops")
+   if tda == nil then error "Unable to locate wpnprops.2da!" end
+
+   local is_double = TDA.Get2daInt(tda, "Type", BaseitemToWeapon(rh)) == 7
+   local item      = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+   if BaseitemToWeapon(item) == 0 and not is_double then return 0 end
+
    local res = 1
    if cre:GetHasFeat(FEAT_IMPROVED_TWO_WEAPON_FIGHTING) then
       res = res + 1
