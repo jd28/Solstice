@@ -15,11 +15,13 @@ function M.Creature:GetArmorCheckPenalty()
    return self.obj.cre_stats.cs_acp_armor + self.obj.cre_stats.cs_acp_shield
 end
 
----- Determines AC vs creature
+---- Determines AC vs creature.
+-- The last three parameters should only be used from the combat engine.
 -- @param vs Attacking creature
 -- @param touch If true it's a touch attack.
--- @param[opt] attack
--- @param[opt] is_ranged
+-- @param[opt] is_ranged From ranged attack.
+-- @bool[opt] attack Attack ctype
+-- @param[opt] target Creature state.
 function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    vs = vs or OBJECT_INVALID
    -- 10 base AC
