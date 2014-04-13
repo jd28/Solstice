@@ -328,7 +328,7 @@ end
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
-function ResolveAttackModifier(info, attacker, target)
+local function ResolveAttackModifier(info, attacker, target)
    return attacker:GetAttackBonusVs(target, info.weapon)
 end
 
@@ -370,7 +370,7 @@ local function ResolveMissChance(info, attacker, target, hit, use_cached)
    else
       SetResult(info, attack_result)
       -- Show the modified conceal/miss chance in the combat log.
-      SetConcealment(info, math.floor((chance ^ 2) / 100))
+      SetConcealment(info, floor((chance ^ 2) / 100))
       SetMissedBy(info, 1)
       return true
    end
@@ -678,9 +678,9 @@ end
 
 --- Resolve on hit visual effects.
 --    This is not default behavior.
-function ResolveOnHitVFX(info, attacker)
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
+local function ResolveOnHitVFX(info, attacker)
    -- No ffects on ranged attacks...
    if GetIsRangedAttack(info) then return end
    for i = 0, DAMAGE_INDEX_NUM - 1 do
@@ -805,7 +805,7 @@ end
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
-function ResolveCoupDeGrace(info, attacker, target)
+local function ResolveCoupDeGrace(info, attacker, target)
    if bit.band(info.target_state, COMBAT_TARGET_STATE_ASLEEP) == 0             or
       (target.type == OBJECT_TRUETYPE_CREATURE and target.obj.cre_is_immortal) or
       target.obj.obj.obj_is_invulnerable == 1
@@ -823,14 +823,14 @@ end
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
-function ResolveDevCrit(info, attacker, target)
+local function ResolveDevCrit(info, attacker, target)
    if not GetIsCriticalHit(info)
       or OPT.DEVCRIT_DISABLE_ALL
    then
       return
    end
 
-   local dc = 10 + math.floor(attacker:GetHitDice() / 2) + attacker:GetAbilityModifier(ABILITY_STRENGTH)
+   local dc = 10 + floor(attacker:GetHitDice() / 2) + attacker:GetAbilityModifier(ABILITY_STRENGTH)
 
    if target:FortitudeSave(dc, SAVING_THROW_VS_DEATH, attacker) == 0 then
       AddEffect(info, attacker, Eff.Death(true, true))
