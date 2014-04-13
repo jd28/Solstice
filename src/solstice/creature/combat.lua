@@ -218,7 +218,7 @@ end
 -- @param target Creature target.
 function M.Creature:GetTargetState(target)
    if not target:GetIsValid() or
-      not target.type ~= OBJECT_TRUETYPE_CREATURE
+      target.type ~= OBJECT_TRUETYPE_CREATURE
    then
       return 0
    end
@@ -226,10 +226,6 @@ function M.Creature:GetTargetState(target)
    local res = 0
    if target:GetIsBlind() then
       res = bor(res, COMBAT_TARGET_STATE_BLIND)
-   end
-
-   if target:GetIsInvisible() then
-      res = bor(res, COMBAT_TARGET_STATE_ATTACKER_INVIS)
    end
 
    if target:GetIsInvisible(self) then
@@ -240,15 +236,11 @@ function M.Creature:GetTargetState(target)
       res = bor(res, COMBAT_TARGET_STATE_INVIS)
    end
 
-   if target:GetIsInvisible(self) then
-      res = bor(res, COMBAT_TARGET_STATE_ATTACKER_INVIS)
-   end
-
-   if not self:GetIsVisible(target) then
+   if not self:GetIsSeen(target) then
       res = bor(res, COMBAT_TARGET_STATE_ATTACKER_UNSEEN)
    end
 
-   if not target:GetIsVisible(self) then
+   if not target:GetIsSeen(self) then
       res = bor(res, COMBAT_TARGET_STATE_UNSEEN)
    end
 
@@ -275,11 +267,11 @@ function M.Creature:GetTargetState(target)
        res = bor(res, COMBAT_TARGET_STATE_ASLEEP)
     end
 
-    if target:GetFlanked(attacker) then
+    if self:GetIsFlanked(target) then
        res = bor(res, COMBAT_TARGET_STATE_FLANKED)
     end
 
-    if target:GetFlatFooted() then
+    if target:GetIsFlatfooted() then
        res = bor(res, COMBAT_TARGET_STATE_FLATFOOTED)
     end
 
@@ -610,7 +602,7 @@ function M.Creature:UpdateCriticalDamage(equip_num, item)
                              DAMAGE_INDEX_BASE_WEAPON,
                              d, s, b,
                              2)
-            break;
+            break
          end
       end
    end
