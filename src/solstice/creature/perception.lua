@@ -12,18 +12,18 @@ local NWE = require 'solstice.nwn.engine'
 
 --- Determines whether an object sees another object.
 -- @param target Object to determine if it is seen.
-function Creature:GetIsSeen(target)
+function M.Creature:GetIsSeen(target)
    NWE.StackPushObject(self)
    NWE.StackPushObject(target)
-   NWE.ExecuteCommand(289, 2)
-   return NWE.StackPopInteger()
+   NWE.ExecuteCommandUnsafe(289, 2)
+   return NWE.StackPopBoolean()
 end
 
 --- Determines if an object can hear another object.
 -- @param target The object that may be heard.
-function Creature:GetIsHeard(target)
+function M.Creature:GetIsHeard(target)
    NWE.StackPushObject(self)
    NWE.StackPushObject(target)
-   NWE.ExecuteCommand(290, 2)
+   NWE.ExecuteCommandUnsafe(290, 2)
    return NWE.StackPopBoolean()
 end

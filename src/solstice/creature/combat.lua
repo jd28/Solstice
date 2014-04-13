@@ -118,13 +118,6 @@ function M.Creature:GetIsInCombat()
    return self.obj.cre_combat_state ~= 0
 end
 
---- Determines if creature is visible to another creature.
--- @param target Target to test.
-function M.Creature:GetIsVisibile(target)
-   if not self:GetIsValid() then return false end
-   return C.nwn_GetIsVisible(self.obj, target.id)
-end
-
 --- Get's last attack type used by creature.
 function M.Creature:GetLastAttackType()
    if not self:GetIsValid() then return 0 end
