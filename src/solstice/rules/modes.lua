@@ -221,8 +221,8 @@ local function dirty(cre, mode, off)
    -- Really is worthless but there you go.  Attack number modifications
    -- are dealth with in Rules.InitializeNumberOfAttacks
    cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
-   cre.ci.mod_mode.dmg.dice = 1
-   cre.ci.mod_mode.dmg.sides = 4
+   cre.ci.mod_mode.dmg.roll.dice = 1
+   cre.ci.mod_mode.dmg.roll.sides = 4
 
    return true
 end
@@ -300,10 +300,10 @@ local function power_attack(cre, mode, off)
    cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
    if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
       cre.ci.mod_mode.ab = -10
-      cre.ci.mod_mode.dmg.bonus = 10
+      cre.ci.mod_mode.dmg.roll.bonus = 10
    else
       cre.ci.mod_mode.ab = -5
-      cre.ci.mod_mode.dmg.bonus = 5
+      cre.ci.mod_mode.dmg.roll.bonus = 5
    end
 
    return true
