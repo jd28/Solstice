@@ -24,7 +24,7 @@ local function Roll(dice, sides, bonus, times)
       end
    end
 
-   return result + bonus
+   return result + (bonus * times)
 end
 
 --- Rolls a d2
