@@ -533,26 +533,23 @@ local function ResolveAttackRoll(info, attacker, target)
 end
 
 local function AddDamageToResult(info, dmg, mult)
-   local pass = false
    if mult > 1 and band(dmg.mask, 2) ~= 0 then
       mult = 1
-      pass = true
    end
 
-   if dmg.mask == 0 or pass then
-      local roll = DoRoll(dmg.roll, mult)
+   local roll = DoRoll(dmg.roll, mult)
 
-      -- penalty
-      if band(dmg.mask, 1) ~= 0 then
-         roll = -roll
-      end
-
-      if band(dmg.mask, 4) == 0 then
-         info.dmg_result.damages[dmg.type] = info.dmg_result.damages[dmg.type] + roll
-      else
-         info.dmg_result.damages_unblocked[dmg.type] = info.dmg_result.damages_unblocked[dmg.type] + roll
-      end
+   -- penalty
+   if band(dmg.mask, 1) ~= 0 then
+      roll = -roll
    end
+
+   if band(dmg.mask, 4) == 0 then
+      info.dmg_result.damages[dmg.type] = info.dmg_result.damages[dmg.type] + roll
+   else
+      info.dmg_result.damages_unblocked[dmg.type] = info.dmg_result.damages_unblocked[dmg.type] + roll
+   end
+
 end
 
 --- Resolve damage result.
@@ -703,6 +700,15 @@ local function CompactPhysicalDamage(info)
    info.dmg_result.damages[0] = 0
    info.dmg_result.damages[1] = 0
    info.dmg_result.damages[2] = 0
+
+  info.dmg_result.damages_unblocked[12] = info.dmg_result.damages_unblocked[12] +
+      info.dmg_result.damages_unblocked[0] +
+      info.dmg_result.damages_unblocked[1] +
+      info.dmg_result.damages_unblocked[2]
+
+   info.dmg_result.damages_unblocked[0] = 0
+   info.dmg_result.damages_unblocked[1] = 0
+   info.dmg_result.damages_unblocked[2] = 0
 end
 
 local function AddUnblockables(info)
