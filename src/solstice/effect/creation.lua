@@ -234,6 +234,8 @@ end
 --- Effect Damage Decrease
 -- @param amount DAMAGE\_BONUS\_*
 -- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+-- @bool critical Only applicable on critical hits.
+-- @bool unblockable Not modified by damage protections.
 function M.DamageDecrease(amount, damage_type, critical, unblockable)
    damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
@@ -246,15 +248,15 @@ function M.DamageDecrease(amount, damage_type, critical, unblockable)
    if unblockable then
       mask = bit.bor(mask, 4)
    end
-
-
    return CreateSimple(EFFECT_TYPE_DAMAGE_DECREASE,
-                       amount, damage_flag, 28)
+                       amount, damage_flag, 28, 0, 0, 0, mask)
 end
 
 --- Effect Damage Increase
 -- @param amount DAMAGE\_BONUS\_*
 -- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+-- @bool critical Only applicable on critical hits.
+-- @bool unblockable Not modified by damage protections.
 function M.DamageIncrease(amount, damage_type, critical, unblockable)
    damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
@@ -269,7 +271,7 @@ function M.DamageIncrease(amount, damage_type, critical, unblockable)
    end
 
    return CreateSimple(EFFECT_TYPE_DAMAGE_INCREASE,
-                       amount, damage_flag, 28, 0, 0)
+                       amount, damage_flag, 28, 0, 0, 0, mask)
 end
 
 --- Damage immunity effect.
