@@ -8,27 +8,74 @@ local _SPEC_DMG = {}
 local _SPEC_AB = {}
 local _SPEC_EFF = {}
 
-local function GetSpecialAttackDamage(special_attack, attacker, target)
+--- Special Attacks
+-- @section
+
+--- Determine special attack damage.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @param info Attack ctype from combat engine.
+-- @param attacker Attacking creature.
+-- @param target Attacked creature.
+local function GetSpecialAttackDamage(special_attack, info, attacker, target)
    local f = _SPEC_DMG[special_attack]
    if not f then return damage_roll_t() end
-   return f(info, attacker, target)
+   return f(special_attack, info, attacker, target)
 end
 
-local function GetSpecialAttackEffect(special_attack, attacker, target)
+--- Determine special attack effect.
+-- This determines both the effect to apply if any and whether the special
+-- attack was resisted.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @param info Attack ctype from combat engine.
+-- @param attacker Attacking creature.
+-- @param target Attacked creature.
+-- @return True if special attack was successful.
+local function GetSpecialAttackEffect(special_attack, info, attacker, target)
    local f = _SPEC_EFF[special_attack]
    if not f then return true end
-   return f(info, attacker, target)
+   return f(special_attack, info, attacker, target)
 end
 
+--- Determine special attack bonus modifier.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @param info Attack ctype from combat engine.
+-- @param attacker Attacking creature.
+-- @param target Attacked creature.
 local function GetSpecialAttackModifier(special_attack, info, attacker, target)
    local f = _SPEC_AB[special_attack]
    if not f then return 0 end
    return f(special_attack, info, attacker, target)
 end
 
+--- Register special attack handlers.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @func damage See Rules.GetSpecialAttackDamage
+-- @func effect See Rules.GetSpecialAttackEffect
+-- @func attack See Rules.GetSpecialAttackModifier
 local function RegisterSpecialAttack(special_attack, damage, effect, attack)
    _SPEC_DMG[special_attack] = damage
    _SPEC_AB[special_attack]  = effect
+   _SPEC_EFF[special_attack] = effect
+end
+
+--- Register special attack handlers.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @func attack See Rules.GetSpecialAttackModifier
+local function RegisterSpecialAttackModifier(special_attack, attack)
+   _SPEC_AB[special_attack]  = effect
+end
+
+--- Register special attack handlers.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @func damage See Rules.GetSpecialAttackDamage
+local function RegisterSpecialDamageModifier(special_attack, damage)
+   _SPEC_DMG[special_attack] = damage
+end
+
+--- Register special attack handlers.
+-- @param special_attack SPECIAL\_ATTACK\_*
+-- @func effect See Rules.GetSpecialAttackEffect
+local function RegisterSpecialImpact(special_attack, effect)
    _SPEC_EFF[special_attack] = effect
 end
 
@@ -208,9 +255,28 @@ local function sap_impact(special_attack, info, attacker, target)
    return true
 end
 
+local function kd_impact(special_attack, info, attacker, target)
+   local size_bonus = special_attack == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
+   if target:GetSize() > attacker:GetSize() + size_bonus then return false end
+
+   if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
+      target:GetSkillRank(SKILL_DISCIPLINE)
+   then
+      local eff = Eff.Knockdown()
+      eff.direct = true
+      eff:SetCreator(attacker.id)
+      eff:SetDurationType(DURATION_TYPE_TEMPORARY)
+      eff:SetDuration(6)
+      C.nwn_AddOnHitEffect(attacker.obj, eff.eff)
+      return true
+   end
+
+   return false
+end
+
 RegisterSpecialAttack(SPECIAL_ATTACK_SAP, nil, sap_impact, minus_four)
-RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, nil, nil, minus_four)
-RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, nil, nil, minus_four)
+RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, nil, kd_impact, minus_four)
+RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, nil, kd_impact, minus_four)
 RegisterSpecialAttack(SPECIAL_ATTACK_CALLED_SHOT_ARM, nil, called_shot_impact, minus_four)
 RegisterSpecialAttack(SPECIAL_ATTACK_CALLED_SHOT_LEG, nil, called_shot_impact, minus_four)
 RegisterSpecialAttack(SPECIAL_ATTACK_STUNNING_FIST, nil, nil, minus_four)
@@ -225,3 +291,7 @@ M.GetSpecialAttackDamage   = GetSpecialAttackDamage
 M.GetSpecialAttackEffect   = GetSpecialAttackEffect
 M.GetSpecialAttackModifier = GetSpecialAttackModifier
 M.RegisterSpecialAttack    = RegisterSpecialAttack
+
+M.RegisterSpecialAttackModifier = RegisterSpecialAttackModifier
+M.RegisterSpecialDamageModifier = RegisterSpecialDamageModifier
+M.RegisterSpecialImpact         = RegisterSpecialImpact
