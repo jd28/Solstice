@@ -77,8 +77,8 @@ local function GetClassCombatModifier(cre)
 
       ac = ac + 2
 
-      if TA and (cre:AbilityModifier(ABILITY_STRENGTH) >= 25 or
-                 cre:AbilityModifier(ABILITY_DEXTERITY) >= 25)
+      if TA and (cre:GetAbilityModifier(ABILITY_STRENGTH) >= 25 or
+                 cre:GetAbilityModifier(ABILITY_DEXTERITY) >= 25)
       then
          ac = ac + pm
       else
@@ -156,19 +156,19 @@ end
 
 local function GetSkillCombatModifier(cre)
    ZeroCombatModifier(cre, COMBAT_MOD_SKILL)
-   local ac = cre:GetSkillRank(SKILL_TUMBLE, OBJECT_INVALID, true) / 5
+   local ac = math.floor(cre:GetSkillRank(SKILL_TUMBLE, OBJECT_INVALID, true) / 5)
    local ab = 0
 
    if TA then
       -- TODO modifiy tumble by PM and Rdd...
-      ac = ac + cre:GetSkillRank(SKILL_CRAFT_ARMOR, OBJECT_INVALID) / 40
+      ac = ac + math.floor(cre:GetSkillRank(SKILL_CRAFT_ARMOR, OBJECT_INVALID) / 40)
       local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
       if rh:GetIsValid() then
-         ab = cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40
+         ab = math.floor(cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40)
       end
    end
-   cre.ci.mods[COMBAT_MOD_SKILL].ab = math.floor(ab)
-   cre.ci.mods[COMBAT_MOD_SKILL].ac = math.floor(ab)
+   cre.ci.mods[COMBAT_MOD_SKILL].ab = ab
+   cre.ci.mods[COMBAT_MOD_SKILL].ac = ac
 end
 
 local function GetTrainingVsCombatModifier(cre)
