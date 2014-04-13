@@ -39,24 +39,17 @@ function M.RegisterEffectHandler(handler, ...)
    end
 end
 
---
 function NWNXEffects_HandleEffectEvent()
    local ev = C.Local_GetLastEffectEvent()
    if ev == nil then return 0 end
 
    obj = _SOL_GET_CACHED_OBJECT(ev.obj.obj_id)
 
-   -- The effect should be treated as a direct effect.  So Lua doesn't delete it.
-   local eff = Eff.effect_t(ev.eff, true)
-   local eff_type = eff:GetType()
-
-   local h = EFF_HANDLERS[eff_type]
+   local h = EFF_HANDLERS[ev.eff.eff_integers[1]]
    if not h then return 0 end
 
-   local del, sup = h(eff, obj, ev.is_remove, ev.preapply)
-
-   ev.suppress = sup and true or false
-   ev.delete_eff = del and true or false
+   local del = h(ev.eff, obj, ev.is_remove)
+   ev.delete_eff = del and 1 or 0
 
    return 1
 end
