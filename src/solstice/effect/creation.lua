@@ -692,12 +692,9 @@ end
 
 --- Create a Temporary Hitpoints effect that raises the Hitpoints of the target.
 -- @param amount A positive integer
-function M.Hitpoints(amount, temporary)
+function M.TemporaryHitpoints(amount)
    if amount <= 0 then return Create() end
-   if temporary then
-      return CreateSimple(EFFECT_TYPE_TEMPORARY_HITPOINTS, amount)
-   end
-   return CreateSimple(EFFECT_TYPE_HITPOINTS, amount)
+   return CreateSimple(EFFECT_TYPE_TEMPORARY_HITPOINTS, amount)
 end
 
 --- Create a Time Stop effect.
