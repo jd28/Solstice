@@ -6,8 +6,14 @@
 
 local M = require 'solstice.creature.init'
 
+local TDA = require 'solstice.2da'
 local ffi = require 'ffi'
 local C = ffi.C
+
+local random = math.random
+local floor  = math.floor
+local min    = math.min
+local max    = math.max
 
 local bit    = require 'bit'
 local lshift = bit.lshift
@@ -16,6 +22,8 @@ local band   = bit.band
 local sm     = string.strip_margin
 
 local NWE = require 'solstice.nwn.engine'
+
+local Creature = M.Creature
 
 --- Combat
 -- @section
@@ -48,7 +56,7 @@ end
 
 --- Gets innate damage immunity.
 function Creature:GetInnateDamageReduction()
-   return Rules.GetBaseDamageReduction()
+   return Rules.GetBaseDamageReduction(self)
 end
 
 --- Get innate/feat damage resistance.
@@ -362,13 +370,34 @@ function M.Creature:DebugCombatEquips()
    return table.concat(t, '\n\n')
 end
 
-function M.Creature:UpdateAttacks()
+----------------------------------------------------------------------
+-- Combat information update functions.
+
+---
+local function UpdateDamageImmunity(self)
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      self.ci.defense.immunity_base[i] = self:GetInnateDamageImmunity(i)
+   end
+end
+
+---
+local function UpdateDamageResistance(self)
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      self.ci.defense.resist[i] = self:GetInnateDamageReduction(i)
+   end
+end
+
+local function UpdateDamageReduction(self)
+   self.ci.defense.soak = self:GetInnateDamageReduction()
+end
+
+local function UpdateAttacks(self)
    self.ci.offense.attacks_on  = Rules.GetOnhandAttacks(self)
    self.ci.offense.attacks_off = Rules.GetOffhandAttacks(self)
 end
 
 --- Updates equipped weapon object IDs.
-function M.Creature:UpdateCombatEquips()
+local function UpdateCombatEquips(self)
    -- Determine the ranged weapon type, this is used in the combat engine
    -- to check if we can load more ammunition
    local rng_type = RANGED_TYPE_INVALID
@@ -391,9 +420,14 @@ function M.Creature:UpdateCombatEquips()
       self.ci.offense.ranged_type = rng_type
    end
 
+   local is_double = TDA.Get2daInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
 
    self.ci.equips[0].id = rh.id
-   self.ci.equips[1].id = self:GetItemInSlot(INVENTORY_SLOT_LEFTHAND).id
+   if is_double then
+      self.ci.equips[1].id = rh.id
+   else
+      self.ci.equips[1].id = self:GetItemInSlot(INVENTORY_SLOT_LEFTHAND).id
+   end
    self.ci.equips[2].id = self:GetItemInSlot(INVENTORY_SLOT_ARMS).id
    self.ci.equips[3].id = self:GetItemInSlot(INVENTORY_SLOT_CWEAPON_L).id
    self.ci.equips[4].id = self:GetItemInSlot(INVENTORY_SLOT_CWEAPON_R).id
@@ -409,7 +443,7 @@ function get_equip(cre, creator)
    return -1
 end
 
-function M.Creature:UpdateAttackBonus()
+local function UpdateAttackBonus(self)
    self.ci.offense.ab_base = self:GetBaseAttackBonus()
 
    self.ci.offense.offhand_penalty_on,
@@ -462,44 +496,6 @@ function M.Creature:UpdateAttackBonus()
 
    self.ci.equips[EQUIP_TYPE_CREATURE_3].transient_ab_mod =
       (bon[ATTACK_TYPE_CWEAPON3] or 0) - (pen[ATTACK_TYPE_CWEAPON3] or 0)
-
-end
-
---- Updates a creature's combat modifiers.
--- See ConbatMod ctype.
--- @param update_flags
-function M.Creature:UpdateCombatInfo(all)
-   if all then
-      self:UpdateCombatEquips()
-      self:UpdateCombatWeaponInfo()
-      Rules.ResolveCombatModifiers(self)
-      Rules.ResolveSituationModifiers(self)
-      self:UpdateAttacks()
-   end
-
-   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE) then
-      self:UpdateDamage()
-      for i = 0, EQUIP_TYPE_NUM - 1 do
-         weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
-         self:UpdateCriticalDamage(i, weap)
-      end
-   end
-
-   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_ATTACK_BONUS) then
-      self:UpdateAttackBonus()
-   end
-
-   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_REDUCTION) then
-      self:UpdateDamageReduction()
-      self:UpdateDamageReductionEffects()
-   end
-
-   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_RESISTANCE) then
-      self:UpdateDamageResistance()
-      self:UpdateDamageResistanceEffects()
-   end
-
-   self.ci.update_flags = 0
 end
 
 local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)
@@ -512,8 +508,8 @@ local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)
    self.ci.equips[equip_num].damage_len = len + 1
 end
 
---- Determines creature's weapon combat info.
-function M.Creature:UpdateCombatWeaponInfo()
+-- Determines creature's weapon combat info.
+local function UpdateCombatWeaponInfo(self)
    local weap
    for i = 0, EQUIP_TYPE_NUM - 1 do
       weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
@@ -553,7 +549,34 @@ function M.Creature:UpdateCombatWeaponInfo()
    end
 end
 
-function M.Creature:UpdateDamage()
+
+local function UpdateAmmoDamage(self)
+   local obj
+   if self.ci.offense.ranged_type == RANGED_TYPE_BOW then
+      obj = self:GetItemInSlot(INVENTORY_SLOT_ARROWS)
+   elseif self.ci.offense.ranged_type == RANGED_TYPE_SLING then
+      obj = self:GetItemInSlot(INVENTORY_SLOT_BULLETS)
+   elseif self.ci.offense.ranged_type == RANGED_TYPE_CROSSBOW then
+      obj = self:GetItemInSlot(INVENTORY_SLOT_BOLTS)
+   else
+      return
+   end
+
+   if not obj:GetIsValid() then return end
+
+   for _it, ip in obj:ItemProperties() do
+      if ip:GetPropertyType() == ITEM_PROPERTY_DAMAGE_BONUS then
+         local type = ip:GetPropertySubType()
+         if type > 2 then type = type - 2 end
+         local dice, sides, bonus = Rules.UnpackItempropDamageRoll(ip:GetCostTableValue())
+
+         AddDamageToEquip(self, 0, type, dice, sides, bonus, 0)
+      end
+   end
+
+end
+
+local function UpdateDamage(self)
    self.ci.offense.damage_len = 0
 
    for i = self.obj.cre_stats.cs_first_dmg_eff, self.obj.obj.obj_effects_len - 1 do
@@ -567,12 +590,11 @@ function M.Creature:UpdateDamage()
       local race      = self.obj.obj.obj_effects[i].eff_integers[2]
       local lawchaos  = self.obj.obj.obj_effects[i].eff_integers[3]
       local goodevil  = self.obj.obj.obj_effects[i].eff_integers[4]
-      local mask      = self.obj.obj.obj_effects[i].eff_integers[5]
+      local att_type  = self.obj.obj.obj_effects[i].eff_integers[5]
+      local mask      = self.obj.obj.obj_effects[i].eff_integers[6]
 
       if race == 28 and lawchaos == 0 and goodevil == 0 then
-         local creator = self.obj.obj.obj_effects[i].eff_creator
-         local e = get_equip(self, creator)
-         if e == -1 then
+         if att_type == ATTACK_TYPE_MISC then
             local len = self.ci.offense.damage_len
 
             if self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_DECREASE then
@@ -580,11 +602,13 @@ function M.Creature:UpdateDamage()
             else
                self.ci.offense.damage[len].mask = mask
             end
+            self.ci.offense.damage[len].type = type
             self.ci.offense.damage[len].roll.dice,
             self.ci.offense.damage[len].roll.sides,
             self.ci.offense.damage[len].roll.bonus = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
             self.ci.offense.damage_len = len + 1
          else
+            local e = Rules.AttackTypeToEquipType(att_type)
             local d, s, b = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
             AddDamageToEquip(self, e, type, d, s, b,
                              self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_DECREASE and 1 or 0)
@@ -593,7 +617,7 @@ function M.Creature:UpdateDamage()
    end
 end
 
-function M.Creature:UpdateCriticalDamage(equip_num, item)
+local function UpdateCriticalDamage(self, equip_num, item)
    if item:GetIsValid() then
       for _it, ip in item:ItemProperties() do
          if ip:GetPropertyType() == ITEM_PROPERTY_MASSIVE_CRITICALS then
@@ -616,4 +640,50 @@ function M.Creature:UpdateCriticalDamage(equip_num, item)
                        0,
                        2)
    end
+end
+
+--- Updates a creature's combat modifiers.
+-- See ConbatMod ctype.
+-- @bool all Force all combat information to be updated.
+function M.Creature:UpdateCombatInfo(all)
+   if not all and self.ci.update_flags == 0 then return end
+
+   if self.ci.update_flags == -1 then
+      all = true
+   end
+
+   if all then
+      UpdateCombatEquips(self)
+      UpdateCombatWeaponInfo(self)
+      self.ci.fe_mask = self:GetFavoredEnemenyMask()
+      self.ci.training_vs_mask = self:GetTrainingVsMask()
+      Rules.ResolveCombatModifiers(self)
+      Rules.ResolveSituationModifiers(self)
+      UpdateAttacks(self)
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE) then
+      UpdateDamage(self)
+      if self.ci.offense.ranged_type > 0 then
+         UpdateAmmoDamage(self)
+      end
+      for i = 0, EQUIP_TYPE_NUM - 1 do
+         weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
+         UpdateCriticalDamage(self, i, weap)
+      end
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_ATTACK_BONUS) then
+      UpdateAttackBonus(self)
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_REDUCTION) then
+      UpdateDamageReduction(self)
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_RESISTANCE) then
+      UpdateDamageResistance(self)
+   end
+
+   self.ci.update_flags = 0
 end
