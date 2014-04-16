@@ -26,7 +26,25 @@ end
 --- Get base damage reduction.
 -- @param cre Creature object.
 local function GetBaseDamageReduction(cre)
-   return 0
+   local res = 0
+   if cre:GetHasFeat(FEAT_EPIC_DAMAGE_REDUCTION_9) then
+      res = res + 9
+   elseif cre:GetHasFeat(FEAT_EPIC_DAMAGE_REDUCTION_6) then
+      res = res + 6
+   elseif cre:GetHasFeat(FEAT_EPIC_DAMAGE_REDUCTION_3) then
+      res = res + 3
+   end
+
+   local barb = cre:GetLevelByClass(CLASS_TYPE_BARBARIAN)
+   if barb > 10 then
+      res = res + math.ceil((barb - 10) / 3)
+   end
+
+   local dd =  cre:GetLevelByClass(CLASS_TYPE_DWARVEN_DEFENDER)
+   if dd > 5 then
+      res = res + 3 + (math.floor((dd - 5) / 5) * 3)
+   end
+   return res
 end
 
 --- Sets a damage resistance override function.
