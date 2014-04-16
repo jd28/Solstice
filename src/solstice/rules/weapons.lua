@@ -823,3 +823,4 @@ M.AttackTypeToEquipType           = AttackTypeToEquipType
 M.GetOnhandAttacks                = GetOnhandAttacks
 M.GetOffhandAttacks               = GetOffhandAttacks
 M.InitializeNumberOfAttacks       = InitializeNumberOfAttacks
+M.BaseitemToWeapon                = BaseitemToWeapon
