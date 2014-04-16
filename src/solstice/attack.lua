@@ -1018,12 +1018,11 @@ local function ResolveSituations(info, attacker, target)
          -- Death Attack.  If it's a Death Attack it's also a sneak attack.
          if death then
             flags = bor(flags, SITUATION_FLAG_DEATH_ATTACK)
-            flags = bor(flags, SITUATION_FLAG_SNEAK_ATTACK)
-            SetSneakAttack(info, true, true)
-         elseif sneak then
-            flags = bor(flags, SITUATION_FLAG_SNEAK_ATTACK)
-            SetSneakAttack(info, true, false)
          end
+         if sneak then
+            flags = bor(flags, SITUATION_FLAG_SNEAK_ATTACK)
+         end
+         SetSneakAttack(info, sneak, death)
       else
          AddCCMessage(info, nil, { target.id }, { 134 })
       end
