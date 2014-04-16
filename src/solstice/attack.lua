@@ -580,9 +580,8 @@ end
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveDamageModifications(info, attacker, target)
-   if GetIsCriticalHit(info) and target.type == OBJECT_TRUETYPE_CREATURE and target:GetIsPC() then
+   if GetIsCriticalHit(info) and target.type == OBJECT_TRUETYPE_CREATURE then
       local parry = min(target:GetSkillRank(SKILL_PARRY, attacker, true), 50)
-
       if parry > 0 then
          for i=0, DAMAGE_INDEX_NUM - 1 do
             local adj = floor((info.dmg_result.damages[i] * parry) / 100)
