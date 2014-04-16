@@ -610,7 +610,9 @@ local function GetDualWieldPenalty(cre)
       on, off = -6, -10
    end
 
-   if cre:GetHasFeat(374) then -- Ranger dual.
+   -- Ranger dual.
+   if cre.obj.cre_stats.cs_ac_armour_base <= 3
+      and cre:GetLevelByClass(CLASS_TYPE_RANGER) > 0 then
       on, off = on + 2, off + 6
    else
       if cre:GetHasFeat(FEAT_TWO_WEAPON_FIGHTING) then
@@ -720,8 +722,15 @@ local function GetOffhandAttacks(cre)
    local item      = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
    if BaseitemToWeapon(item) == 0 and not is_double then return 0 end
 
+   local ranger_9 = cre:GetLevelByClass(CLASS_TYPE_RANGER) >= 9
+
    local res = 1
-   if cre:GetHasFeat(FEAT_IMPROVED_TWO_WEAPON_FIGHTING) then
+
+   if ranger_9 and cre.obj.cre_stats.cs_ac_armour_base > 3 then
+      return res
+   end
+
+   if ranger_9 or cre:GetHasFeat(FEAT_IMPROVED_TWO_WEAPON_FIGHTING) then
       res = res + 1
    end
 
