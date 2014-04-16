@@ -125,9 +125,10 @@ end
 
 function M.GetString(object, varname, is_global, table)
    local tag = get_tag(object, is_global)
+   table = table or DEFAULT_TABLE
 
-   tag = SQLEncodeSpecialChars(tag)
-   varname = SQLEncodeSpecialChars(varname)
+   tag = M.SQLEncodeSpecialChars(tag)
+   varname = M.SQLEncodeSpecialChars(varname)
 
    local sql = "SELECT val FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
    M.SQLExecDirect(sql)
@@ -141,6 +142,7 @@ end
 
 function M.SetString(object, varname, value, expires, is_global, table)
    local tag = get_tag(object, is_global)
+   table = table or DEFAULT_TABLE
 
    tag = M.SQLEncodeSpecialChars(tag)
    varname = M.SQLEncodeSpecialChars(varname)
