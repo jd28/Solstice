@@ -45,7 +45,28 @@ local function CreateSimple(type, ...)
    return eff
 end
 
+--- Creates simple custom effect.
+-- NOTE: This is for simple custom effects, that have less than
+-- 8 integers and always generate a new ID.
+-- @see nwnx.effects
+-- @param type CUSTOM\_EFFECT\_TYPE\_*
+-- @param ... Ints to set on the effect.
+local function CreateSimpleCustom(type, ...)
+   local eff = Create()
+   eff:SetType(EFFECT_TYPE_MODIFYNUMATTACKS)
+   eff:SetInt(1, type)
+   local t = {...}
+   if #t > 0 then
+      for i=2, #t - 1 do
+         eff:SetInt(i, t[i+1])
+      end
+   end
+   return eff
+end
+
 M.Create = Create
+M.CreateSimple = CreateSimple
+M.CreateSimpleCustom = CreateSimpleCustom
 
 local function determine_type_amount(inctype, dectype, amount)
    if amount < 0 then
