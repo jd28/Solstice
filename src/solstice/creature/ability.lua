@@ -125,5 +125,5 @@ end
 -- (otherwise -1).
 function M.Creature:SetAbilityScore(ability, value)
    value = math.clamp(value, 3, 255)
-   return C.nwn_SetAbilityScore(self, ability, value)
+   return C.nwn_SetAbilityScore(self.obj.cre_stats, ability, value)
 end
