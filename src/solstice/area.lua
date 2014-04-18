@@ -78,24 +78,19 @@ function Area:GetObjectAtIndex(idx)
    return OBJECT_INVALID
 end
 
---- An iterator returning all objects in a specified area.
--- @func[opt] predicate A function taking one parameter (an object)
--- returning a boolean.  This function can be used to filter the
--- iterator in arbitrary ways.
-function Area:Objects(predicate)
-   local function t(obj) return true end
-   predicate = predicate or t
-   local i, _i = 0
 
-   return function ()
-      while self:GetIsValid() and i < self.obj.area_objects_len do
-         _i, i = i, i + 1
-         local o = _SOL_GET_CACHED_OBJECT(self.obj.area_objects[_i])
-         if predicate(o) then
-            return o
-         end
-      end
-          end
+local function area_objs_gen(max, state)
+   if state >= max then return nil end
+   return state + 1, _SOL_GET_CACHED_OBJECT(self.obj.area_objects[state])
+end
+
+local function area_objs(max)
+   return area_objs_gen, max, 0
+end
+
+--- LuaFun iterator returning all objects in a specified area.
+function Area:Objects()
+   return iter(area_obj(self.obj.area_objects_len))
 end
 
 --- Changes the ambient soundtracks of an area.
