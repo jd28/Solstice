@@ -30,12 +30,6 @@ local Creature = M.Creature
 
 local M = require 'solstice.creature.init'
 
---- Get creatures base/innate resistance.
--- @param dmgidx DAMAMGE\_INDEX\_*
-function M.Creature:GetBaseResist(dmgidx)
-   return self.ci.defense.resist[dmgidx]
-end
-
 --- Get creatures total damage immunity.
 -- @param dmgidx DAMAMGE\_INDEX\_*
 function M.Creature:GetDamageImmunity(dmgidx)
@@ -421,7 +415,7 @@ end
 ---
 local function UpdateDamageResistance(self)
    for i = 0, DAMAGE_INDEX_NUM - 1 do
-      self.ci.defense.resist[i] = self:GetInnateDamageReduction(i)
+      self.ci.defense.resist[i] = self:GetInnateDamageResistance(i)
    end
 end
 

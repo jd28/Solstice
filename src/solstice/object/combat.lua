@@ -134,11 +134,11 @@ function M.Object:GetBestDamageResistEffect(dmgidx, start)
 
    for i = start, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_RESISTANCE then
-         return cur
+         return cur, i
       end
 
       if self.obj.obj.obj_effects[i].eff_integers[0] > flag then
-         return cur, start
+         return cur, i
       end
 
       local amount = self.obj.obj.obj_effects[i].eff_integers[1]
@@ -167,21 +167,19 @@ function M.Object:GetBestDamageReductionEffect(power, start)
       if self.obj.obj.obj_effects[i].eff_type ~=
          EFFECT_TYPE_DAMAGE_REDUCTION then return cur end
 
-      if self.obj.obj.obj_effects[i].eff_integers[1] >= power then
-         return cur
-      end
-
       local amount = self.obj.obj.obj_effects[i].eff_integers[0]
       local dmg_power = self.obj.obj.obj_effects[i].eff_integers[1]
       local limit = self.obj.obj.obj_effects[i].eff_integers[2]
 
-      if not cur and amount > 0 then
-         cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
-      else
-         -- If the soak amount is higher, set the soak effect list to the effect index.
-         -- If they are equal prefer the one with the highest damage limit.
-         if amount > camount or (amount == camount and limit > climit) then
+      if dmg_power > power then
+         if not cur and amount > 0 then
             cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+         else
+            -- If the soak amount is higher, set the soak effect list to the effect index.
+            -- If they are equal prefer the one with the highest damage limit.
+            if amount > camount or (amount == camount and limit > climit) then
+               cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+            end
          end
       end
    end
@@ -194,7 +192,10 @@ end
 function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
    if amt <= 0 then return amt end
 
-   local resist = self:GetBaseResist(dmgidx)
+   local resist = 0
+   if self.type == OBJBECT_TRUETYPE_CREATURE then
+      resist = self.ci.defense.resist[dmgidx]
+   end
 
    local total = 0
    local resist_adj = 0
@@ -226,7 +227,7 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
       end
       resist_adj = resist_adj + eff_resist_adj
    end
-   return amt - resist_adj
+   return amt - resist_adj, resist_adj
 end
 
 function M.Object:DoDamageReduction(amt, eff, power, info)
@@ -267,5 +268,5 @@ function M.Object:DoDamageReduction(amt, eff, power, info)
       end
    end
 
-   return amt - highest_soak
+   return amt - highest_soak, highest_soak
 end
