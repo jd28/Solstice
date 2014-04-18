@@ -233,14 +233,6 @@ local function default_dmg(cre, item)
       end
    end
 
-   if TA then
-      -- Ki strike replacement
-      local feat = GetWeaponFeat(MASTERWEAPON_FEAT_CHOICE, item)
-      if feat ~= -1 and cre:GetHasFeat(feat) then
-         str = str + math.floor(cre:GetLevelByClass(CLASS_TYPE_WEAPON_MASTER) / 3)
-      end
-   end
-
    return mighty and math.clamp(str, 0, mighty) or str
 end
 
