@@ -48,17 +48,12 @@ end
 function NWNXSolstice_InitializeNumberOfAttacks(cre)
    cre = _SOL_GET_CACHED_OBJECT(cre)
    if not cre:GetIsValid() then return end
-   cre:UpdateCombatInfo(true)
    Rules.InitializeNumberOfAttacks(cre)
 end
 
-function NWNXSolstice_UpdateCombatInfo(attacker, target)
+function NWNXSolstice_UpdateCombatInfo(attacker)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
-   target   = _SOL_GET_CACHED_OBJECT(target)
    attacker:UpdateCombatInfo(true)
-   if target.type == OBJECT_TRUETYPE_CREATURE then
-      target:UpdateCombatInfo(true)
-   end
 end
 
 -- This function is called by others get worst faction AC...
