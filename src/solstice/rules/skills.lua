@@ -61,14 +61,9 @@ local function get_skill_focus_bonus(cre, focus, epic)
    else return 0 end
 end
 
-local GetSkillFeatBonusOverride
-
 --- Get Skill Bonuses from feats.
 function M.GetSkillFeatBonus(cre, skill)
    local res = 0
-   if GetSkillFeatBonusOverride then
-      return GetSkillFeatBonusOverride(cre, skill)
-   end
 
    if skill == SKILL_ANIMAL_EMPATHY then
       res = res + get_skill_focus_bonus(cre, FEAT_SKILL_FOCUS_ANIMAL_EMPATHY,
@@ -156,8 +151,26 @@ function M.GetSkillFeatBonus(cre, skill)
    return res
 end
 
---- Set GetSkillFeatBonus override function
--- @func func (cre, skill) -> int
-function M.SetSkillFeatBonusOverride(func)
-   GetSkillFeatBonusOverride = func
+--- Get skill modification from effects.
+-- @param cre Creature object.
+-- @param skill SKILL\_*
+function M.GetSkillEffectModifier(cre, skill)
+   local eff = 0
+   if cre.obj.cre_stats.cs_first_skill_eff > 0 then
+      for i = cre.obj.cre_stats.cs_first_skill_eff, cre.obj.obj.obj_effects_len - 1 do
+         if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_INCREASE
+            or cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_DECREASE
+         then
+            break
+         end
+         if cre.obj.obj.obj_effects[i].eff_integers[0] == skill then
+            if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_SKILL_INCREASE then
+               eff = eff + cre.obj.obj.obj_effects[i].eff_integers[1]
+            else
+               eff = eff - cre.obj.obj.obj_effects[i].eff_integers[1]
+            end
+         end
+      end
+   end
+   return math.clamp(eff, -50, 50)
 end

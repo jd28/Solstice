@@ -149,15 +149,14 @@ function M.Creature:GetSkillRank(skill, vs, base, no_scale)
 
    if base then return result end
 
-   -- TODO: Effects, ArmorCheckPenalty...
-
+   -- TODO: ArmorCheckPenalty...
+   result = result + Rules.GetSkillEffectModifier(self, skill)
    result = result + self:GetAbilityModifier(Rules.GetSkillAbility(skill))
    result = result + Rules.GetSkillFeatBonus(self, skill)
    result = result - self:GetTotalNegativeLevels()
 
    return math.clamp(result, -127, 127)
 end
---]]
 
 --- Modifies skill rank.
 -- @param skill SKILL\_*
