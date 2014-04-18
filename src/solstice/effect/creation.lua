@@ -91,8 +91,8 @@ function M.Ability(ability, amount)
       return Create()
    end
 
-   local type, amt = determine_type_amount(EFFECT_ABILITY_INCREASE,
-                                           EFFECT_ABILITY_DECREASE,
+   local type, amt = determine_type_amount(EFFECT_TYPE_ABILITY_INCREASE,
+                                           EFFECT_TYPE_ABILITY_DECREASE,
                                            amount)
    return CreateSimple(type, ability, amt)
 end
@@ -102,15 +102,14 @@ end
 -- and increase if > 0
 -- @param[opt=AC_DODGE_BONUS] modifier_type AC_*
 function M.AC(amount, modifier_type)
+   modifier_type = modifier_type or AC_DODGE_BONUS
    if amount == 0 or modifier_type < 0 then
       return Create()
    end
+   local damage_type = 4103
 
-   modifier_type = modifier_type or AC_DODGE_BONUS
-   local damage_type = AC_VS_DAMAGE_TYPE_ALL
-
-   local type, amt = determine_type_amount(EFFECT_AC_INCREASE,
-                                           EFFECT_AC_DECREASE,
+   local type, amt = determine_type_amount(EFFECT_TYPE_AC_INCREASE,
+                                           EFFECT_TYPE_AC_DECREASE,
                                            amount)
    return CreateSimple(type, modifier_type, amt, 28, 0, 0, damage_type)
 end
@@ -486,8 +485,8 @@ end
 function M.LinkEffects(child, parent)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_EFFECT, parent)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_EFFECT, child)
-
-   return CreateEffect(199, 2)
+   NWE.ExecuteCommandUnsafe(199, 2)
+   return NWE.StackPopEngineStructure(NWE.STRUCTURE_EFFECT)
 end
 
 --- Creates a miss chance effect.
@@ -546,6 +545,10 @@ function M.Polymorph(polymorph, locked)
    eff:SetInt(0, polymorph)
    eff:SetInt(2, locked)
    return eff
+end
+
+function M.RacialType(race)
+   return CreateSimple(EFFECT_TYPE_RACIAL_TYPE, race)
 end
 
 --- Create a Regenerate effect.
