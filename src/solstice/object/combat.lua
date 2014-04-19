@@ -190,7 +190,7 @@ function M.Object:GetBaseResist(dmgidx)
 end
 
 function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
-   if amt <= 0 then return amt end
+   if amt <= 0 then return amt, 0 end
 
    local resist = 0
    if self.type == OBJBECT_TRUETYPE_CREATURE then
@@ -231,7 +231,7 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
 end
 
 function M.Object:DoDamageReduction(amt, eff, power, info)
-   if amt <= 0 or power <= 0 then return amt end
+   if amt <= 0 or power <= 0 then return amt, 0 end
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.
    local highest_soak = self:GetHardness()
