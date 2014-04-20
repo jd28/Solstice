@@ -54,7 +54,7 @@ end
 -- @func attack See Rules.GetSpecialAttackModifier
 local function RegisterSpecialAttack(special_attack, damage, effect, attack)
    _SPEC_DMG[special_attack] = damage
-   _SPEC_AB[special_attack]  = effect
+   _SPEC_AB[special_attack]  = attack
    _SPEC_EFF[special_attack] = effect
 end
 
@@ -62,7 +62,7 @@ end
 -- @param special_attack SPECIAL\_ATTACK\_*
 -- @func attack See Rules.GetSpecialAttackModifier
 local function RegisterSpecialAttackModifier(special_attack, attack)
-   _SPEC_AB[special_attack]  = effect
+   _SPEC_AB[special_attack]  = attack
 end
 
 --- Register special attack handlers.

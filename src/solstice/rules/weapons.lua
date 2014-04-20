@@ -135,7 +135,7 @@ local function GetUnarmedDamageBonus(cre)
       end
       if TA then
          if can and cre:GetLocalInt("pc_style_fighting") == 8 then
-            bonus = bonus + math.floor(monk / 6)
+            b = b + math.floor(monk / 6)
          end
       end
    else
