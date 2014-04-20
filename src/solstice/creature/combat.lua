@@ -540,6 +540,24 @@ local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)
    self.ci.equips[equip_num].damage_len = len + 1
 end
 
+local function UpdateImmunities(self)
+   if self.obj.cre_stats.cs_first_imm_eff < 0 then return end
+   for i = self.obj.cre_stats.cs_first_imm_eff, self.obj.obj.obj_effects_len - 1 do
+      if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_IMMUNITY then break end
+
+      if self.obj.obj.obj_effects[i].eff_integers[1] == 28
+         and self.obj.obj.obj_effects[i].eff_integers[2] == 0
+         and self.obj.obj.obj_effects[i].eff_integers[3] == 0
+      then
+         local amt = self.obj.obj.obj_effects[i].eff_integers[4]
+         amt = amt == 0 and 100 or amt
+
+         self.ci.defense.immunity_misc[self.obj.obj.obj_effects[i].eff_integers[0]] =
+            self.ci.defense.immunity_misc[self.obj.obj.obj_effects[i].eff_integers[0]] + amt
+      end
+   end
+end
+
 -- Determines creature's weapon combat info.
 local function UpdateCombatWeaponInfo(self)
    local weap
@@ -716,6 +734,8 @@ function M.Creature:UpdateCombatInfo(all)
    if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_RESISTANCE) then
       UpdateDamageResistance(self)
    end
+
+   UpdateImmunities(self)
 
    self.ci.update_flags = 0
 end
