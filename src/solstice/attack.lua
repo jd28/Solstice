@@ -455,7 +455,7 @@ local function ResolveAttackRoll(info, attacker, target)
       GetIterationPenalty(info, attacker)
 
    if GetIsSpecialAttack(info) then
-      ab = ab + Rules.GetSpecialAttackModifier(GetSpecialAttack(info), attacker, target)
+      ab = ab + Rules.GetSpecialAttackModifier(GetSpecialAttack(info), info, attacker, target)
    end
 
    SetAttackMod(info, ab)
@@ -743,7 +743,7 @@ local function ResolveDamage(info, attacker, target)
 
    -- Special attacks
    if GetIsSpecialAttack(info) then
-      local d = Rules.GetSpecialAttackDamage(GetSpecialAttack(info), attacker, target)
+      local d = Rules.GetSpecialAttackDamage(GetSpecialAttack(info), info, attacker, target)
       if RollValid(d.roll) then
          AddDamageToResult(info, d, mult)
       end
@@ -1081,7 +1081,7 @@ local function DoMeleeAttack()
 
          -- The resolution of Special Attacks will return an effect to be applied
          -- or nil.
-         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), attacker, target)
+         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), info, attacker, target)
          if success then
             -- Check to makes sure an effect was returned.
             if eff then
@@ -1139,7 +1139,7 @@ local function DoRangedAttack()
 
          -- The resolution of Special Attacks will return an effect to be applied
          -- or nil.
-         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), attacker, target)
+         local success, eff = Rules.GetSpecialAttackEffect(GetSpecialAttack(info), info, attacker, target)
          if success then
             -- Check to makes sure an effect was returned.
             if eff then
