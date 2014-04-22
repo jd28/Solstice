@@ -14,6 +14,10 @@ function M.SendEffects(obj)
    obj:SetLocalString("NWNX!EFFECTS!SENDEFFECTS", " ")
 end
 
+function M.Log(obj)
+   obj:SetLocalString("NWNX!EFFECTS!LOGEFFECTS", " ")
+end
+
 function M.GetIsEffectHandlerRegistered(eff_type)
    local h = EFF_HANDLERS[eff_type]
    if not h then
