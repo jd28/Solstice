@@ -84,7 +84,7 @@ end
 
 --- An iterator that iterates directly over applied effects
 function M.Object:Effects()
-   eff, _eff = self:GetFirstEffect()
+   local eff, _eff = self:GetFirstEffect()
    return function()
       while eff:GetIsValid() do
          _eff, eff = eff, self:GetNextEffect()
@@ -96,7 +96,7 @@ end
 --- An iterator that iterates directly over applied effects
 function M.Object:EffectsDirect()
    local obj = self.obj.obj
-   i, _i = 0
+   local i, _i = 0
    return function()
       while i < obj.obj_effects_len do
          _i, i = i, i + 1
