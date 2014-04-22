@@ -125,6 +125,9 @@ int32_t       nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint3
 void      nwn_SetMovementRate(CNWSCreature *cre, int rate);
 int32_t       nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
 void      nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
+void      nwn_EquipItem(CNWSCreature *cre, int32_t slot, CNWSItem *it, int32_t a, int32_t b);
+void      nwn_UnequipItem(CNWSCreature *cre, CNWSItem *it, int32_t a);
+void      nwn_CreateItemAndEquip(CNWSCreature *cre, const char *resref, int32_t slot);
 ]]
 
 -- effect.h
@@ -145,6 +148,7 @@ uint8_t          nwn_GetItemSize(CNWSItem *item);
 CNWItemProperty *nwn_GetPropertyByType(CNWSItem *item, uint16_t type);
 bool             nwn_HasPropertyType(CNWSItem *item, uint16_t type);
 CNWBaseItem     *nwn_GetBaseItem(uint32_t basetype);
+void             nwn_DestroyItem(CNWSItem *it);
 ]]
 
 -- message.h
@@ -470,6 +474,8 @@ void ns_AddOnHitSpells(CNWSCombatAttackData *data,
                        CNWSItem *item,
                        bool from_target);
 
+void ns_PostPolymorph(CNWSCreature *cre, int32_t ignore_pos, bool is_apply);
+
 uint32_t ns_GetAmmunitionAvailable(CNWSCreature *attacker, int32_t num_attacks, int32_t ranged_type, bool equip);
 
 ChatMessage   *Local_GetLastChatMessage();
@@ -483,4 +489,8 @@ void           Local_NWNXLog(int32_t level, const char* log);
 void           Local_DeleteCreature(uint32_t id);
 CombatInfo    *Local_GetCombatInfo(uint32_t id);
 Attack        *Local_GetAttack();
+
+C2DA          *Local_GetPoly2da();
+CGameEffect   *Local_GetPolyEffect();
+
 ]]

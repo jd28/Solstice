@@ -31,12 +31,16 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
 
    local min_mod, max_mod = self:GetMinArmorClassMod(), self:GetMaxArmorClassMod()
 
-   -- Armor AC
-   ac = ac + self.obj.cre_stats.cs_ac_natural_base
+
    -- Natural AC
-   ac = ac + self.obj.cre_stats.cs_ac_armour_base
-   -- Shield AC
-   ac = ac + self.obj.cre_stats.cs_ac_shield_base
+   ac = ac + self.obj.cre_stats.cs_ac_natural_base
+
+   if not self:GetIsPolymorphed() then
+      -- Armor AC
+      ac = ac + self.obj.cre_stats.cs_ac_armour_base
+      -- Shield AC
+      ac = ac + self.obj.cre_stats.cs_ac_shield_base
+   end
 
    ac = ac + self.ci.mod_mode.ac
 
@@ -56,11 +60,11 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
       ac = ac + self.ci.mods[COMBAT_MOD_SKILL].ac
 
       -- Dex Mod.
-      val = self:GetDexMod(true)
+      val = self:GetDexMod(not self:GetIsPolymorphed())
       ac = ac + val
    else
       -- Dex Modifier
-      local dex_mod = self:GetDexMod(true)
+      local dex_mod = self:GetDexMod(not self:GetIsPolymorphed())
       local dexed = false
 
       -- Attacker is invis and target doesn't have blindfight or target is Flatfooted

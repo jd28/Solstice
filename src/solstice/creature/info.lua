@@ -82,6 +82,11 @@ function M.Creature:GetIsEncounterCreature()
    return self.obj.cre_encounter_obj ~= 0x7f000000
 end
 
+--- Get if creature is polymorphed
+function M.Creature:GetIsPolymorphed()
+   return self:GetIsValid() and self.obj.cre_is_poly ~= 0
+end
+
 --- Gets creature's gender
 function M.Creature:GetGender()
    if not self:GeIsValid() then return -1 end
