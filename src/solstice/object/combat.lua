@@ -114,7 +114,7 @@ end
 -- @param dmgidx Damage index DAMAGE\_INDEX\_*
 -- @return Both the adjusted damage amt and the amount resisted will
 -- be returned.
-function M.Object:DoDamageImmunity(amt, dmgidx, info)
+function M.Object:DoDamageImmunity(amt, dmgidx)
    -- If the damage index is invalid... skip it.
    if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM or amt <= 0 then
       return amt, 0
@@ -199,7 +199,13 @@ function M.Object:GetBaseResist(dmgidx)
    return 0
 end
 
-function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
+--- Resolves damage resistance.
+-- @param amt Damage amount.
+-- @param eff Damage Resistance effect if any.
+-- @param dmgidx DAMAGE\_INDEX\_*
+-- @return Adjusted damage amount.
+-- @return Adjustment amount.
+function M.Object:DoDamageResistance(amt, eff, dmgidx)
    if amt <= 0 then return amt, 0 end
 
    local resist = 0
@@ -240,7 +246,13 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx, info)
    return amt - resist_adj, resist_adj
 end
 
-function M.Object:DoDamageReduction(amt, eff, power, info)
+--- Resolves damage reduction.
+-- @param amt Damage amount.
+-- @param eff Damage reduction effect if any.
+-- @param dmgidx DAMAGE\_POWER\_*
+-- @return Adjusted damage amount.
+-- @return Adjustment amount.
+function M.Object:DoDamageReduction(amt, eff, power)
    if amt <= 0 or power <= 0 then return amt, 0 end
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.
