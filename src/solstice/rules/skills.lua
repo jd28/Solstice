@@ -6,7 +6,7 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
-
+local TLK   = require 'solstice.tlk'
 local M = require 'solstice.rules.init'
 
 --- Get skill's associated ability.
@@ -51,6 +51,14 @@ function M.GetSkillName(skill)
    if sk == nil then return "" end
 
    return TLK.GetString(sk.sk_name_strref)
+end
+
+--- Determin penalty from armor/shield.
+function M.GetSkillArmorCheckPenalty(cre, skill)
+   if not M.GetSkillHasArmorCheckPenalty(skill) then
+      return 0
+   end
+   return cre.obj.cre_stats.cs_acp_shield + cre.obj.cre_stats.cs_acp_armor
 end
 
 local epic_bonus = 13
@@ -151,15 +159,25 @@ function M.GetSkillFeatBonus(cre, skill)
    return res
 end
 
+--- Get the limits of skill effects
+-- @param cre Creature object.
+-- @param skill SKILL\_*
+-- @return Minimum Default: -50
+-- @return Maximum Default: 50
+function M.GetSkillEffectLimits(cre, skill)
+   return -50, 50
+end
+
 --- Get skill modification from effects.
 -- @param cre Creature object.
 -- @param skill SKILL\_*
+-- @return Total amount, uncapped
 function M.GetSkillEffectModifier(cre, skill)
    local eff = 0
    if cre.obj.cre_stats.cs_first_skill_eff > 0 then
       for i = cre.obj.cre_stats.cs_first_skill_eff, cre.obj.obj.obj_effects_len - 1 do
          if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_INCREASE
-            or cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_DECREASE
+            and cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_DECREASE
          then
             break
          end
@@ -172,5 +190,5 @@ function M.GetSkillEffectModifier(cre, skill)
          end
       end
    end
-   return math.clamp(eff, -50, 50)
+   return eff
 end

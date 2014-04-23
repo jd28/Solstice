@@ -149,8 +149,10 @@ function M.Creature:GetSkillRank(skill, vs, base, no_scale)
 
    if base then return result end
 
-   -- TODO: ArmorCheckPenalty...
-   result = result + Rules.GetSkillEffectModifier(self, skill)
+   local eff = Rules.GetSkillEffectModifier(self, skill)
+   local min, max = Rules.GetSkillEffectLimits(self, skill)
+   result = result + math.clamp(eff, min, max)
+   result = result + Rules.GetSkillArmorCheckPenalty(self, skill)
    result = result + self:GetAbilityModifier(Rules.GetSkillAbility(skill))
    result = result + Rules.GetSkillFeatBonus(self, skill)
    result = result - self:GetTotalNegativeLevels()
@@ -212,4 +214,29 @@ function M.Creature:SetSkillRank(skill, amount)
 
    self.obj.cre_stats.cs_skills[skill] = amount
    return self.obj.cre_stats.cs_skills[skill]
+end
+
+--- Creates debug string for creature's skills.
+function M.Creature:DebugSkills()
+   local t = {}
+   table.insert(t, "Skills: ")
+   for i = 0, SKILL_NUM - 1 do
+      local min, max = Rules.GetSkillEffectLimits(self, i)
+      local eff = Rules.GetSkillEffectModifier(self, i)
+      table.insert(t, string.format("  %s: Base: %d, Effects: %d, Clamp: (%d, %d, %d), Ability: %d, Feats: %d, " ..
+                                    "Armor Check: %d, Negative Levels: -%d,  Total: %d",
+                                    Rules.GetSkillName(i),
+                                    self:GetSkillRank(i, OBJECT_INVALID, true),
+                                    math.clamp(eff, min, max),
+                                    eff,
+                                    min,
+                                    max,
+                                    self:GetAbilityModifier(Rules.GetSkillAbility(i)),
+                                    Rules.GetSkillFeatBonus(self, i),
+                                    Rules.GetSkillArmorCheckPenalty(self, i),
+                                    self:GetTotalNegativeLevels(),
+                                    self:GetSkillRank(i, OBJECT_INVALID, false)))
+
+   end
+   return table.concat(t, "\n")
 end
