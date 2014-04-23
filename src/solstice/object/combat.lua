@@ -42,14 +42,16 @@ function M.Object:GetConcealment()
    return 0
 end
 
----
+--- Determine object's 'hardness'
 function M.Object:GetHardness()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(796, 1)
    return NWE.StackPopInteger()
 end
 
----
+--- Determines if object is immune to an effect.
+-- @param immunity IMMUNITY\_TYPE\_*
+-- @return Always `false`.
 function M.Object:GetIsImmune(immunity)
    return false
 end
@@ -105,6 +107,9 @@ function M.Object:SetLastHostileActor(actor)
    self.obj.obj.obj_last_hostile_actor = actor.id
 end
 
+--- Get objects damage immunity.
+-- NOTE: Not default behavior
+-- @param dmgidx DAMAGE\_INDEX\_*
 function M.Object:GetDamageImmunity(dmgidx)
    return 0
 end
@@ -195,6 +200,9 @@ function M.Object:GetBestDamageReductionEffect(power, start)
    end
 end
 
+--- Get objects base damage resistance.
+-- @param dmgidx DAMAGE\_INDEX\_*
+-- @return Always 0
 function M.Object:GetBaseResist(dmgidx)
    return 0
 end
