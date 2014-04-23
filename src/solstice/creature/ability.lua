@@ -67,27 +67,26 @@ end
 function M.Creature:GetAbilityScore(ability, base)
    local result = -1
 
+   if ability == ABILITY_STRENGTH then
+      result = self.obj.cre_stats.cs_str
+   elseif ability == ABILITY_DEXTERITY then
+      result = self.obj.cre_stats.cs_dex
+   elseif ability == ABILITY_CONSTITUTION then
+      result = self.obj.cre_stats.cs_con
+   elseif ability == ABILITY_INTELLIGENCE then
+      result = self.obj.cre_stats.cs_int
+   elseif ability == ABILITY_WISDOM then
+      result = self.obj.cre_stats.cs_wis
+   elseif ability == ABILITY_CHARISMA then
+      result = self.obj.cre_stats.cs_cha
+   end
+
+   result = result + Rules.GetRaceAbilityBonus(self:GetRacialType(), ability)
+
    if not base then
-      NWE.StackPushBoolean(base)
-      NWE.StackPushInteger(ability)
-      NWE.StackPushObject(self)
-      NWE.ExecuteCommand(139, 3)
-      result = NWE.StackPopInteger()
-   else
-      if ability == ABILITY_STRENGTH then
-         result = self.obj.cre_stats.cs_str
-      elseif ability == ABILITY_DEXTERITY then
-         -- Dex may need to change.
-         result = self.obj.cre_stats.cs_dex
-      elseif ability == ABILITY_CONSTITUTION then
-         result = self.obj.cre_stats.cs_con
-      elseif ability == ABILITY_INTELLIGENCE then
-         result = self.obj.cre_stats.cs_int
-      elseif ability == ABILITY_WISDOM then
-         result = self.obj.cre_stats.cs_wis
-      elseif ability == ABILITY_CHARISMA then
-         result = self.obj.cre_stats.cs_cha
-      end
+      local min, max = Rules.GetAbilityEffectLimits(self, ability)
+      local eff = Rules.GetAbilityEffectModifier(self, ability)
+      result = result + math.clamp(eff, min, max)
    end
    return result
 end
@@ -126,4 +125,32 @@ end
 function M.Creature:SetAbilityScore(ability, value)
    value = math.clamp(value, 3, 255)
    return C.nwn_SetAbilityScore(self.obj.cre_stats, ability, value)
+end
+
+local fmt = string.format
+local sm = string.strip_margin
+local tinsert = table.insert
+
+--- Create Ability debug string.
+function M.Creature:DebugAbilities()
+   local t = {}
+   tinsert(t, "Abilities: ")
+   for i = 0, ABILITY_NUM - 1 do
+      local min, max = Rules.GetAbilityEffectLimits(self, i)
+      local eff = Rules.GetAbilityEffectModifier(self, i)
+      tinsert(t, fmt("  %s: Base: %d, Effects: %d, Clamp: (%d, %d, %d), Total: %d",
+                     Rules.GetAbilityName(i),
+                     self:GetAbilityScore(i, true),
+                     math.clamp(eff, min, max),
+                     eff,
+                     min,
+                     max,
+                     self:GetAbilityScore(i, false)))
+
+      tinsert(t, fmt("    Modifer: %d, Base: %d",
+                     self:GetAbilityModifier(i, false),
+                     self:GetAbilityModifier(i, true)))
+
+   end
+   return table.concat(t, "\n")
 end
