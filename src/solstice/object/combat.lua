@@ -126,6 +126,9 @@ function M.Object:DoDamageImmunity(amt, dmgidx, info)
    return amt - imm_adj, imm_adj
 end
 
+--- Determine best damage reduction effect.
+-- @param dmgidx DAMAGE\_INDEX\_*
+-- @param[opt=0] start Place in object effect array to start looking.
 function M.Object:GetBestDamageResistEffect(dmgidx, start)
    start = start or 0
 
@@ -133,52 +136,59 @@ function M.Object:GetBestDamageResistEffect(dmgidx, start)
    local flag = bit.lshift(1, dmgidx)
 
    for i = start, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_RESISTANCE then
+      if self.obj.obj.obj_effects[i].eff_type > EFFECT_TYPE_DAMAGE_RESISTANCE then
          return cur, i
       end
 
-      if self.obj.obj.obj_effects[i].eff_integers[0] > flag then
-         return cur, i
-      end
+      if self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_RESISTANCE then
+         if self.obj.obj.obj_effects[i].eff_integers[0] > flag then
+            return cur, i
+         end
 
-      local amount = self.obj.obj.obj_effects[i].eff_integers[1]
-      local limit = self.obj.obj.obj_effects[i].eff_integers[2]
+         local amount = self.obj.obj.obj_effects[i].eff_integers[1]
+         local limit = self.obj.obj.obj_effects[i].eff_integers[2]
 
-      if amount > 0 and self.obj.obj.obj_effects[i].eff_integers[0] == flag then
-         if not cur then
-            cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
-         else
-            -- If the resist amount is higher, set the resist effect list to the effect index.
-            -- If they are equal prefer the one with the highest damage limit.
-            if amount > camount or (amount == camount and limit > climit) then
+         if amount > 0 and self.obj.obj.obj_effects[i].eff_integers[0] == flag then
+            if not cur then
                cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+            else
+               -- If the resist amount is higher, set the resist effect list to the effect index.
+               -- If they are equal prefer the one with the highest damage limit.
+               if amount > camount or (amount == camount and limit > climit) then
+                  cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+               end
             end
          end
       end
    end
 end
 
+--- Determine best damage reduction effect.
+-- @param power Damage power.
+-- @param[opt=0] start Place in object effect array to start looking.
 function M.Object:GetBestDamageReductionEffect(power, start)
    local cur, camount, climit
    start = start or 0
 
    for i = start, self.obj.obj.obj_effects_len - 1 do
       -- Only check damage reduction effects.
-      if self.obj.obj.obj_effects[i].eff_type ~=
+      if self.obj.obj.obj_effects[i].eff_type >
          EFFECT_TYPE_DAMAGE_REDUCTION then return cur end
 
-      local amount = self.obj.obj.obj_effects[i].eff_integers[0]
-      local dmg_power = self.obj.obj.obj_effects[i].eff_integers[1]
-      local limit = self.obj.obj.obj_effects[i].eff_integers[2]
+      if self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_REDUCTION then
+         local amount = self.obj.obj.obj_effects[i].eff_integers[0]
+         local dmg_power = self.obj.obj.obj_effects[i].eff_integers[1]
+         local limit = self.obj.obj.obj_effects[i].eff_integers[2]
 
-      if dmg_power > power then
-         if not cur and amount > 0 then
-            cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
-         else
-            -- If the soak amount is higher, set the soak effect list to the effect index.
-            -- If they are equal prefer the one with the highest damage limit.
-            if amount > camount or (amount == camount and limit > climit) then
+         if dmg_power > power then
+            if not cur and amount > 0 then
                cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+            else
+               -- If the soak amount is higher, set the soak effect list to the effect index.
+               -- If they are equal prefer the one with the highest damage limit.
+               if amount > camount or (amount == camount and limit > climit) then
+                  cur, camount, climit = self.obj.obj.obj_effects[i], amount, limit
+               end
             end
          end
       end
