@@ -39,6 +39,13 @@ function M.GetModule()
    return mod
 end
 
+--- Get object by ID.
+-- @param id Object ID.
+-- @return An object or OBJECT_INVALID
+function M.GetObjectByID(id)
+   return _SOL_GET_CACHED_OBJECT(id)
+end
+
 --- Gets an object by tag
 -- @param tag Tag of object
 -- @param[opt=1] nth Nth object.
