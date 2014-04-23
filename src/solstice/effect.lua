@@ -124,7 +124,7 @@ end
 
 --- Gets a string on an effect.
 -- @param index Index to store the string.  [0, 5]
-function Effect:GetString(index, str)
+function Effect:GetString(index)
    if index < 0 or index > 5 then
       error "Effect:SetString must be between 0 and 5"
    end

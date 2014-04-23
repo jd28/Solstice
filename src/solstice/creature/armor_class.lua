@@ -21,7 +21,7 @@ end
 -- @param touch If true it's a touch attack.
 -- @param[opt] is_ranged From ranged attack.
 -- @bool[opt] attack Attack ctype
--- @param[opt] target Creature state.
+-- @param[opt] state Creature state.
 function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    vs = vs or OBJECT_INVALID
    -- 10 base AC

@@ -10,6 +10,7 @@ local M = {}
 -- @param dice Number of dice to roll
 -- @param sides Number of sides the dice have
 -- @param bonus Bonus added to roll
+-- @param times Number of times to do roll.
 local function Roll(dice, sides, bonus, times)
    if not times or times <= 1 then
       times = 1
@@ -91,6 +92,8 @@ function M.d100(count)
 end
 
 --- Determines the highest maximum roll
+-- @param roll1 DiceRoll ctype
+-- @param roll2 DiceRoll ctype
 function M.DetermineBestDiceRoll(roll1, roll2)
    local r1 = (roll1.dice * roll1.sides) + roll1.bonus
    local r2 = (roll2.dice * roll2.sides) + roll2.bonus
@@ -102,12 +105,15 @@ function M.DetermineBestDiceRoll(roll1, roll2)
    end
 end
 
+--- Determines if roll is valid.
+-- @param roll DiceRoll ctype
 function M.IsValid(roll)
    return (roll.dice > 0 and roll.sides > 0) or roll.bonus > 0
 end
 
 --- Do a dice roll.
 -- @param roll DiceRoll ctype
+-- @param times Number of times to do roll.
 function M.DoRoll(roll, times)
    if not times or times <= 1 then
       times = 1
@@ -116,6 +122,7 @@ function M.DoRoll(roll, times)
 end
 
 --- Converts a dice roll to formatted string.
+-- @param roll DiceRoll ctype
 function M.DiceRollToString(roll)
    return string.format("%dd%d + %d", roll.dice, roll.sides, roll.bonus)
 end

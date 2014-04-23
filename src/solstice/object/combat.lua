@@ -257,7 +257,7 @@ end
 --- Resolves damage reduction.
 -- @param amt Damage amount.
 -- @param eff Damage reduction effect if any.
--- @param dmgidx DAMAGE\_POWER\_*
+-- @param power DAMAGE\_POWER\_*
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
 function M.Object:DoDamageReduction(amt, eff, power)
