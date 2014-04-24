@@ -66,5 +66,8 @@ function make_array_list(type, id)
    ffi.cdef(string.format(al, type, id))
 end
 
+make_array_list('int32_t', 'int32')
 make_array_list('uint32_t', 'uint32')
 make_array_list('uint16_t', 'uint16')
+make_array_list('float', 'float')
+make_array_list('CExoString', 'string')

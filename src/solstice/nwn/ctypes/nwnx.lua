@@ -14,7 +14,7 @@ typedef struct {
     int type;
     int subtype;
     uint32_t to;
-    void *msg_data;
+    CNWCCMessageData *msg_data;
     bool suppress;
 } CombatMessage;
 
