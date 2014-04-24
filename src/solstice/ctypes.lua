@@ -52,6 +52,10 @@ typedef struct {
 typedef struct {
     int32_t    damages[${DAMAGE_INDEX_NUM}];
     int32_t    damages_unblocked[${DAMAGE_INDEX_NUM}];
+    int32_t    immunity[${DAMAGE_INDEX_NUM}];
+    int32_t    resist[${DAMAGE_INDEX_NUM}];
+    int32_t    resist_remaining[${DAMAGE_INDEX_NUM}];
+    int32_t    reduction, reduction_remaining, parry;
 } DamageResult;
 
 typedef struct {

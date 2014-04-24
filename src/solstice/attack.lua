@@ -21,9 +21,10 @@ local RollValid = Dice.IsValid
 local GetIsRangedWeapon = Rules.GetIsRangedWeapon
 
 --- Adds combat message to an attack.
-local function AddCCMessage(info, type, objs, ints)
+local function AddCCMessage(info, type, objs, ints, str)
    C.nwn_AddCombatMessageData(info.attack, type or 0, #objs, objs[1] or 0, objs[2] or 0,
-                              #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0)
+                              #ints, ints[1] or 0, ints[2] or 0, ints[3] or 0, ints[4] or 0,
+                              str or "")
 end
 
 --- Adds an onhit effect to an attack.
@@ -73,6 +74,12 @@ local function CopyDamageToNWNAttackData(info, attacker, target)
          end
       end
    end
+   local s = ffi.string(C.ns_GetCombatDamageString(
+                           attacker:GetName(),
+                           target:GetName(),
+                           info.dmg_result))
+
+   AddCCMessage(info, 11, {}, { 0xCC }, s)
 end
 
 --- Returns attack result.
@@ -567,6 +574,7 @@ local function ResolveDamageModifications(info, attacker, target)
             local adj = floor((info.dmg_result.damages[i] * parry) / 100)
             info.dmg_result.damages[i] = info.dmg_result.damages[i] - adj
          end
+         info.dmg_result.parry = parry
       end
    end
 
@@ -578,21 +586,27 @@ local function ResolveDamageModifications(info, attacker, target)
    end
 
    eff, start = target:GetBestDamageResistEffect(attacker.ci.equips[info.weapon].base_dmg_flags, start)
-   info.dmg_result.damages[12] = target:DoDamageResistance(info.dmg_result.damages[12], eff, 12, info)
+   local amt, adj = target:DoDamageResistance(info.dmg_result.damages[12], eff, 12)
+   info.dmg_result.damages[12] = amt
+
+   if adj > 0 then
+      info.dmg_result.resist[12] = adj
+      if eff and eff.eff_integers[2] > 0 then
+         info.dmg_result.resist_remaining[12] = eff.eff_integers[2]
+      end
+   end
+
    for i=0, DAMAGE_INDEX_NUM - 1 do
       if info.dmg_result.damages[i] > 0 and i ~= 12 then
          eff, start = target:GetBestDamageResistEffect(i, start)
 
-         local amt, adj = target:DoDamageResistance(info.dmg_result.damages[i],
+         amt, adj = target:DoDamageResistance(info.dmg_result.damages[i],
                                                     eff, i, info)
          info.dmg_result.damages[i] = amt
          if adj > 0 then
-            if eff and  eff.eff_integers[2] > 0 then
-               AddCCMessage(info, nil, { target.id },
-                            { 66, adj, eff.eff_integers[2]})
-            else
-               AddCCMessage(info, nil, { target.id },
-                            { 63, adj, 0})
+            info.dmg_result.resist[i] = adj
+            if eff and eff.eff_integers[2] > 0 then
+               info.dmg_result.resist_remaining[i] = eff.eff_integers[2]
             end
          end
       end
@@ -604,10 +618,10 @@ local function ResolveDamageModifications(info, attacker, target)
          if i == 12 then
             idx = attacker.ci.equips[info.weapon].base_dmg_flags
          end
-         local amt, adj = target:DoDamageImmunity(info.dmg_result.damages[i], idx, info)
+         local amt, adj = target:DoDamageImmunity(info.dmg_result.damages[i], idx)
          info.dmg_result.damages[i] = amt
          if adj > 0 then
-            AddCCMessage(info, nil, { target.id }, { 62, adj, bit.lshift(1, idx)})
+            info.dmg_result.immunity[i] = adj
          end
       end
    end
@@ -622,16 +636,12 @@ local function ResolveDamageModifications(info, attacker, target)
       eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
       local amt, adj = target:DoDamageReduction(info.dmg_result.damages[12],
                                                 eff,
-                                                attacker.ci.equips[info.weapon].power,
-                                                info)
+                                                attacker.ci.equips[info.weapon].power)
       info.dmg_result.damages[12] = amt
       if adj > 0 then
+         info.dmg_result.reduction = adj
          if eff and eff.eff_integers[2] > 0 then
-            AddCCMessage(info, nil, { target.id },
-                         { 67, adj, eff.eff_integers[2] })
-         else
-            AddCCMessage(info, nil, { target.id },
-                         { 64, adj })
+            info.dmg_result.reduction_remaining = eff.eff_integers[2]
          end
       end
    end
