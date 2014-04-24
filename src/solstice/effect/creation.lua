@@ -53,7 +53,7 @@ end
 -- @param ... Ints to set on the effect.
 local function CreateSimpleCustom(type, ...)
    local eff = Create()
-   eff:SetType(EFFECT_TYPE_MODIFYNUMATTACKS)
+   eff:SetType(EFFECT_TYPE_MODIFY_NUM_ATTACKS)
    eff:SetInt(1, type)
    local t = {...}
    if #t > 0 then
@@ -78,7 +78,7 @@ end
 --- Creates a Recurring Effect
 -- This effect when applied is merely a place holder.
 function M.Recurring()
-   return CreateSimple(EFFECT_TYPE_RECURRING)
+   return CreateSimpleCustom(CUSTOM_EFFECT_TYPE_RECURRING)
 end
 
 --- Creates an ability increase/decrease effect on specified ability score.
