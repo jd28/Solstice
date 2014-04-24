@@ -221,7 +221,7 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx)
       resist = self.ci.defense.resist[dmgidx]
    end
 
-   local total = 0
+   local total = amt
    local resist_adj = 0
 
    -- Innate / Feat resistance.  In the case of damage reduction these stack
