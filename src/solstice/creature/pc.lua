@@ -8,6 +8,7 @@ local M = require 'solstice.creature.init'
 local ffi = require 'ffi'
 local C = ffi.C
 local ne = require 'solstice.nwn.engine'
+local Color = require 'solstice.color'
 
 --- PC
 -- @section
@@ -222,4 +223,16 @@ end
 function M.Creature:SendServerMessage(message)
    if not self:GetIsValid() then return end
    self:SendChatMessage(5, self, message)
+end
+
+--- Send error message on server channel.
+-- @param message Text to send.
+function M.Creature:ErrorMessage(message)
+   self:SendServerMessage(Color.RED .. message .. "</c>")
+end
+
+--- Send success message on server channel.
+-- @param message Text to send.
+function M.Creature:SuccessMessage(message)
+   self:SendServerMessage(Color.GREEN .. message .. "</c>")
 end
