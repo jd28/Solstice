@@ -114,6 +114,60 @@ function M.Object:GetDamageImmunity(dmgidx)
    return 0
 end
 
+function M.Object:DebugDamageResistance()
+   local t = {}
+   local eff
+   local start = self.obj.cre_stats.cs_first_dresist_eff
+   if start <= 0 then start = 0 end
+
+   table.insert(t, "Damage Resist:")
+
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      eff, start = self:GetBestDamageResistEffect(i, start)
+
+      if eff then
+        table.insert(t, string.format('  %d: Innate: %d, Effect: %d/- Limit: %d, Stacking: %d',
+                                       i,
+                                       self.ci.defense.resist[i],
+                                       eff.eff_integers[1],
+                                       eff.eff_integers[2],
+                                       self.ci.defense.resist_stack[i]))
+      else
+         table.insert(t, string.format('  %d: Innate: %d, Stacking: %d',
+                                       i,
+                                       self.ci.defense.resist[i],
+                                       self.ci.defense.resist_stack[i]))
+      end
+   end
+   return table.concat(t, '\n')
+end
+
+function M.Object:DebugDamageReduction()
+   local t = {}
+   local eff
+   local start = self.obj.cre_stats.cs_first_dred_eff
+   if start <= 0 then start = 0 end
+
+   table.insert(t, "Damage Reduction:")
+   table.insert(t, string.format('  Innate: %d', self:GetHardness()))
+
+   for i=0, DAMAGE_POWER_NUM - 1 do
+      eff, start = self:GetBestDamageReductionEffect(i, start)
+      if eff then
+         table.insert(t, string.format('  %d: Effect: %d/+%d Limit: %d, Stacking: %d',
+                                       i,
+                                       eff.eff_integers[0],
+                                       i,
+                                       eff.eff_integers[2],
+                                       self.ci.defense.soak_stack[i]))
+      else
+         table.insert(t, string.format('  %d: Stacking: %d',
+                                       i, self.ci.defense.soak_stack[i]))
+      end
+   end
+   return table.concat(t, '\n')
+end
+
 --- Determines damage immunity adjustment.
 -- @param amt Damage amount.
 -- @param dmgidx Damage index DAMAGE\_INDEX\_*
