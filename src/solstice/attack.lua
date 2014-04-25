@@ -601,7 +601,7 @@ local function ResolveDamageModifications(info, attacker, target)
          eff, start = target:GetBestDamageResistEffect(i, start)
 
          amt, adj = target:DoDamageResistance(info.dmg_result.damages[i],
-                                                    eff, i, info)
+                                              eff, i)
          info.dmg_result.damages[i] = amt
          if adj > 0 then
             info.dmg_result.resist[i] = adj
