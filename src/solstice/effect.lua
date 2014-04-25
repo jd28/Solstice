@@ -231,9 +231,11 @@ function Effect:SetSubType(value)
    return self.eff.eff_dursubtype
 end
 
---- Sets effects internal 'true' type.
--- Source: nwnx_structs by Acaos
+--- Sets effects type.
 function Effect:SetType(value)
+   if not value then
+      error(debug.traceback())
+   end
    self.eff.eff_type = value
    return self.eff.eff_type
 end
