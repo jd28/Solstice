@@ -734,7 +734,7 @@ function M.Creature:UpdateCombatInfo(all)
    if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_RESISTANCE) then
       UpdateDamageResistance(self)
    end
-
+   UpdateDamageImmunity(self)
    UpdateImmunities(self)
 
    self.ci.update_flags = 0
