@@ -114,6 +114,19 @@ function M.Object:GetDamageImmunity(dmgidx)
    return 0
 end
 
+
+--- Debug damage immunities.
+function M.Object:DebugDamageImmunities()
+   table.insert(t, "Damage Immunity:")
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      table.insert(t, string.format('  %s: Innate: %d, Effect: %d',
+                                    Rules.GetDamageName(i),
+                                    self.ci.defense.immunity_base[i],
+                                    self.ci.defense.immunity[i]))
+   end
+end
+
+--- Debug damage resistance.
 function M.Object:DebugDamageResistance()
    local t = {}
    local eff
@@ -126,15 +139,15 @@ function M.Object:DebugDamageResistance()
       eff, start = self:GetBestDamageResistEffect(i, start)
 
       if eff then
-        table.insert(t, string.format('  %d: Innate: %d, Effect: %d/- Limit: %d, Stacking: %d',
-                                       i,
-                                       self.ci.defense.resist[i],
-                                       eff.eff_integers[1],
-                                       eff.eff_integers[2],
-                                       self.ci.defense.resist_stack[i]))
+        table.insert(t, string.format('  %s: Innate: %d, Effect: %d/- Limit: %d, Stacking: %d',
+                                      Rules.GetDamageName(i),
+                                      self.ci.defense.resist[i],
+                                      eff.eff_integers[1],
+                                      eff.eff_integers[2],
+                                      self.ci.defense.resist_stack[i]))
       else
-         table.insert(t, string.format('  %d: Innate: %d, Stacking: %d',
-                                       i,
+         table.insert(t, string.format('  %s: Innate: %d, Stacking: %d',
+                                       Rules.GetDamageName(i),
                                        self.ci.defense.resist[i],
                                        self.ci.defense.resist_stack[i]))
       end
@@ -142,6 +155,7 @@ function M.Object:DebugDamageResistance()
    return table.concat(t, '\n')
 end
 
+--- Debug damage reduction.
 function M.Object:DebugDamageReduction()
    local t = {}
    local eff
@@ -353,4 +367,49 @@ function M.Object:DoDamageReduction(amt, eff, power)
    end
 
    return amt - highest_soak, highest_soak
+end
+
+-- Bridge functions.
+
+function NWNXSolstice_DoDamageImmunity(obj, vs, amt, dmgidx, no_feedback)
+   obj = _SOL_GET_CACHED_OBJECT(obj)
+   vs = _SOL_GET_CACHED_OBJECT(vs)
+   local new, adj = obj:DoDamageImmunity(amt, dmgidx)
+
+   return new
+end
+
+function NWNXSolstice_DoDamageReduction(obj, vs, amt, power, no_feedback)
+   obj = _SOL_GET_CACHED_OBJECT(obj)
+   vs = _SOL_GET_CACHED_OBJECT(vs)
+
+   local start = 0
+   if obj.type == OBJECT_TRUETYPE_CREATURE
+      and obj.obj.cre_stats.cs_first_dred_eff > 0
+   then
+      start = obj.obj.cre_stats.cs_first_dred_eff
+   end
+
+   local eff = obj:GetBestDamageReductionEffect(power, start)
+
+   local new, adj = obj:DoDamageResistance(amt, eff, power)
+
+   return new
+end
+
+function NWNXSolstice_DoDamageResistance(obj, vs, amt, dmgidx, no_feedback)
+   obj = _SOL_GET_CACHED_OBJECT(obj)
+   vs = _SOL_GET_CACHED_OBJECT(vs)
+
+   local start = 0
+   if obj.type == OBJECT_TRUETYPE_CREATURE
+      and obj.obj.cre_stats.cs_first_dresist_eff > 0
+   then
+      start = obj.obj.cre_stats.cs_first_dresist_eff
+   end
+
+   local eff = obj:GetBestDamageResistEffect(dmgidx, start)
+   local new, adj = obj:DoDamageReduction(amt, eff, power)
+
+   return new
 end
