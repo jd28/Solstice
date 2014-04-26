@@ -17,11 +17,27 @@ local function GetBaseDamageImmunity(cre, dmgidx)
 end
 
 --- Sets a damage immunity override function.
--- @param dmgidx DAMAGE\_INDEX\_*
 -- @func func (creature) -> int
-local function SetBaseDamageImmunityOverride(dmgidx, func)
-   _DMG_IMM[dmgidx] = func
+-- @param ... DAMAGE\_INDEX\_*
+local function SetBaseDamageImmunityOverride(func, ...)
+   local t = {...}
+   assert(#t > 0, "At least one DAMAGE_INDEX_* constant must be specified!")
+
+   for _, v in ipairs({...}) do
+      _DMG_IMM[v] = func
+   end
 end
+
+local function rdd(cre)
+   local res = 0
+   if cre:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) >= 10 then
+      res = 100
+   end
+   return res
+end
+
+SetBaseDamageImmunityOverride(rdd, DAMAGE_INDEX_FIRE)
+
 
 --- Get base damage reduction.
 -- @param cre Creature object.
@@ -47,12 +63,6 @@ local function GetBaseDamageReduction(cre)
    return res
 end
 
---- Sets a damage resistance override function.
--- @func func (creature) -> int
-local function SetBaseDamageReductionOverride(func)
-   GetBaseDamageReductionOverride = func
-end
-
 --- Get base damage reduction.
 -- @param cre Creature object.
 -- @param dmgidx DAMAGE\_INDEX\_*
@@ -63,9 +73,9 @@ local function GetBaseDamageResistance(cre, dmgidx)
 end
 
 --- Sets a damage resistance override function.
--- @param dmgidx DAMAGE\_INDEX\_*
 -- @func func (creature) -> int
-local function SetBaseDamageResistanceOverride(dmgidx, func)
+-- @param ... DAMAGE\_INDEX\_*
+local function SetBaseDamageResistanceOverride(func, ...)
    _DMG_RED[dmgidx] = func
 end
 
