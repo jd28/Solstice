@@ -293,6 +293,7 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx)
 
    local total = amt
    local resist_adj = 0
+   local remove_effect = false
 
    -- Innate / Feat resistance.  In the case of damage reduction these stack
    -- with damage resistance effects.
@@ -314,14 +315,15 @@ function M.Object:DoDamageResistance(amt, eff, dmgidx)
          -- Else modifiy the effects damage limit by the resist amount.
          if eff_limit <= eff_resist_adj then
             eff_resist_adj = eff_limit
-            self:RemoveEffectByID(use_eff.eff_id)
+            C.nwn_RemoveEffectById(self.obj.obj, eff.eff_id)
+            remove_effect = true
          else
             eff.eff_integers[2] = eff_limit - eff_resist_adj
          end
       end
       resist_adj = resist_adj + eff_resist_adj
    end
-   return amt - resist_adj, resist_adj
+   return amt - resist_adj, resist_adj, remove_effect
 end
 
 --- Resolves damage reduction.
@@ -336,6 +338,7 @@ function M.Object:DoDamageReduction(amt, eff, power)
    -- Dwarven Defender, and/or Barbarian Soak.
    local highest_soak = self:GetHardness()
    local use_eff
+   local remove_effect = false
 
    if eff then
       use_eff = eff.eff_integers[0] > highest_soak
@@ -346,29 +349,26 @@ function M.Object:DoDamageReduction(amt, eff, power)
    -- the base damage.  I.e. you can't soak more than your damamge.
    highest_soak = min(amt, highest_soak)
 
+
    -- If using a soak effect determine if the effect has a limit and adjust it if so.
    if use_eff then
-      --- Don't destroy the effect unless this is a REAL attack.
-      if attack then
-         local eff_limit = eff.eff_integers[2]
-         if eff_limit > 0 then
-            -- If the effect damage limit is less than the highest soak amount then
-            -- the effect needs to be remove and the highest soak amount adjusted. I.e.
-            -- You can't soak more than the remaing limit on soak damage.
-            -- Else the current limit must be adjusted by the highest soak amount.
-            if eff_limit <= highest_soak then
-               highest_soak = eff_limit
-               if burn_eff then
-                  self:RemoveEffectByID(use_eff.eff_id)
-               end
-            elseif burn_eff then
-               use_eff.eff_integers[2] = eff_limit - highest_soak
-            end
+      local eff_limit = eff.eff_integers[2]
+      if eff_limit > 0 then
+         -- If the effect damage limit is less than the highest soak amount then
+         -- the effect needs to be remove and the highest soak amount adjusted. I.e.
+         -- You can't soak more than the remaing limit on soak damage.
+         -- Else the current limit must be adjusted by the highest soak amount.
+         if eff_limit <= highest_soak then
+            highest_soak = eff_limit
+            C.nwn_RemoveEffectById(self.obj.obj, eff.eff_id)
+            remove_effect = true
+         else
+            eff.eff_integers[2] = eff_limit - highest_soak
          end
       end
    end
 
-   return amt - highest_soak, highest_soak
+   return amt - highest_soak, highest_soak, remove_effect
 end
 
 -- Bridge functions.

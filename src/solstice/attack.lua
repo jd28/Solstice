@@ -586,12 +586,12 @@ local function ResolveDamageModifications(info, attacker, target)
    end
 
    eff, start = target:GetBestDamageResistEffect(attacker.ci.equips[info.weapon].base_dmg_flags, start)
-   local amt, adj = target:DoDamageResistance(info.dmg_result.damages[12], eff, 12)
+   local amt, adj, removed = target:DoDamageResistance(info.dmg_result.damages[12], eff, 12)
    info.dmg_result.damages[12] = amt
 
    if adj > 0 then
       info.dmg_result.resist[12] = adj
-      if eff and eff.eff_integers[2] > 0 then
+      if not removed and eff and eff.eff_integers[2] > 0 then
          info.dmg_result.resist_remaining[12] = eff.eff_integers[2]
       end
    end
@@ -600,12 +600,11 @@ local function ResolveDamageModifications(info, attacker, target)
       if info.dmg_result.damages[i] > 0 and i ~= 12 then
          eff, start = target:GetBestDamageResistEffect(i, start)
 
-         amt, adj = target:DoDamageResistance(info.dmg_result.damages[i],
-                                              eff, i)
+         amt, adj, removed = target:DoDamageResistance(info.dmg_result.damages[i], eff, i)
          info.dmg_result.damages[i] = amt
          if adj > 0 then
             info.dmg_result.resist[i] = adj
-            if eff and eff.eff_integers[2] > 0 then
+            if not removed and eff and eff.eff_integers[2] > 0 then
                info.dmg_result.resist_remaining[i] = eff.eff_integers[2]
             end
          end
@@ -634,13 +633,13 @@ local function ResolveDamageModifications(info, attacker, target)
       end
 
       eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
-      local amt, adj = target:DoDamageReduction(info.dmg_result.damages[12],
-                                                eff,
-                                                attacker.ci.equips[info.weapon].power)
+      local amt, adj, removed = target:DoDamageReduction(info.dmg_result.damages[12],
+                                                         eff,
+                                                         attacker.ci.equips[info.weapon].power)
       info.dmg_result.damages[12] = amt
       if adj > 0 then
          info.dmg_result.reduction = adj
-         if eff and eff.eff_integers[2] > 0 then
+         if not removed and eff and eff.eff_integers[2] > 0 then
             info.dmg_result.reduction_remaining = eff.eff_integers[2]
          end
       end
