@@ -117,6 +117,7 @@ end
 
 --- Debug damage immunities.
 function M.Object:DebugDamageImmunities()
+   local t = {}
    table.insert(t, "Damage Immunity:")
    for i = 0, DAMAGE_INDEX_NUM - 1 do
       table.insert(t, string.format('  %s: Innate: %d, Effect: %d',
@@ -124,6 +125,7 @@ function M.Object:DebugDamageImmunities()
                                     self.ci.defense.immunity_base[i],
                                     self.ci.defense.immunity[i]))
    end
+   return table.concat(t, '\n')
 end
 
 --- Debug damage resistance.
