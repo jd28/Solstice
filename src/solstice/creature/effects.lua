@@ -39,7 +39,10 @@ function Creature:GetEffectImmunity(imm_type, vs)
       error "Net yet implimented"
    end
 
-   return self.ci.defense.immunity_misc[imm_type]
+   local innate = Rules.GetInnateImmunity(imm_type, self)
+
+   return math.max(self.ci.defense.immunity_misc[imm_type] + innate,
+                   innate)
 end
 
 --- Determins if creature has a feat effect.
