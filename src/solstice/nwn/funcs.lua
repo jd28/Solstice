@@ -500,5 +500,5 @@ Attack        *Local_GetAttack();
 
 C2DA          *Local_GetPoly2da();
 CGameEffect   *Local_GetPolyEffect();
-
+void           Local_SetDamageInfo(int32_t index, const char* name, const char* color);
 ]]
