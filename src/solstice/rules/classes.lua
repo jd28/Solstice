@@ -41,7 +41,9 @@ local function GetBaseAttackBonus(cre, pre_epic)
    local t = {0, 0, 0}
    local hd = cre:GetHitDice()
 
-   if not cre:GetIsPC() or cre:GetIsPossessedFamiliar() then
+   if not cre:GetIsPC() or cre:GetIsPossessedFamiliar()
+      or cre:GetIsDMPossessed()
+   then
       local l = math.min(20, cre:GetLevelByPosition(0))
       local remaining = 20 - l
       local c = cre:GetClassByPosition(0)
@@ -63,6 +65,7 @@ local function GetBaseAttackBonus(cre, pre_epic)
    else
       for i = 1, math.min(20, hd) do
          local c = cre:GetClassByLevel(i)
+         if c == -1 then break end
          t[_TIERS[c]] = t[_TIERS[c]] + 1
       end
    end
