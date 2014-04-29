@@ -27,3 +27,33 @@ function M.Creature:GetIsHeard(target)
    NWE.ExecuteCommandUnsafe(290, 2)
    return NWE.StackPopBoolean()
 end
+
+--- Determines the last perceived creature in an OnPerception event.
+function M.Creature:GetLastPerceived()
+   if not self:GetIsValid() then return OBJECT_INVALID end
+   return Game.GetObjectByID(self.obj.cre_last_perceived)
+end
+
+--- Determines if the last perceived object was heard.
+function M.Creature:GetLastPerceptionHeard()
+   if not self:GetIsValid() then return false end
+   return self.obj.cre_last_perc_heard == 1
+end
+
+--- Determines whether the last perceived object is no longer heard.
+function M.Creature:GetLastPerceptionInaudible()
+   if not self:GetIsValid() then return false end
+   return self.obj.cre_last_perc_inaudible == 1
+end
+
+--- Determines the last perceived creature has vanished.
+function M.Creature:GetLastPerceptionVanished()
+   if not self:GetIsValid() then return false end
+   return self.obj.cre_last_perc_vanished == 1
+end
+
+--- Determines if the last perceived object was seen.
+function M.Creature:GetLastPerceptionSeen()
+   if not self:GetIsValid() then return false end
+   return self.obj.cre_last_perc_seen == 1
+end
