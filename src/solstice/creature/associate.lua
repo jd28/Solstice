@@ -20,7 +20,7 @@ end
 --- Get a creature's familiar creature type.
 -- @return FAMILIAR_*
 function M.Creature:GetAnimalCompanionType()
-   if not self:GetIsValid() then return Assoc.FAMILIAR_NONE end
+   if not self:GetIsValid() then return FAMILIAR_NONE end
    return self.obj.cre_stats.cs_acomp_type
 end
 
@@ -56,7 +56,7 @@ end
 -- @return FAMILIAR_*
 function M.Creature:GetFamiliarType()
    if not self:GetIsValid() then
-      return Assoc.FAMILIAR_NONE
+      return FAMILIAR_NONE
    end
 
    return self.obj.cre_stats.cs_famil_type
@@ -88,9 +88,8 @@ end
 
 --- Determines who controls a creature.
 function M.Creature:GetMaster()
-   NWE.StackPushObject(self)
-   NWE.ExecuteCommand(319, 1)
-   return NWE.StackPopObject()
+   if not self:GetIsValid() then return OBJECT_INVALID end
+   return Game.GetObjectByID(self.obj.cre_master_id)
 end
 
 --- Get the last command issued to a given associate.
