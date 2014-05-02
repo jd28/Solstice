@@ -39,6 +39,7 @@ safe_require 'solstice.creature.skills'
 safe_require 'solstice.creature.spells'
 safe_require 'solstice.creature.state'
 safe_require 'solstice.creature.talent'
+safe_require 'solstice.creature.vars'
 safe_require 'solstice.creature.xp'
 
 --- Functions
