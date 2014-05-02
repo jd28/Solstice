@@ -65,54 +65,6 @@ function M.SQLDecodeSpecialChars(text)
    return string.gsub(text, "~", "'")
 end
 
---[[
-void SQLExecStatement(string sql, string sStr0="",
-            string sStr1="", string sStr2="", string sStr3="", string sStr4="",
-            string sStr5="", string sStr6="", string sStr7="", string sStr8="",
-            string sStr9="", string sStr10="", string sStr11="", string sStr12="",
-            string sStr13="", string sStr14="", string sStr15="");
-
-void SQLExecStatement(string sql, string sStr0="",
-            string sStr1="", string sStr2="", string sStr3="", string sStr4="",
-            string sStr5="", string sStr6="", string sStr7="", string sStr8="",
-            string sStr9="", string sStr10="", string sStr11="", string sStr12="",
-            string sStr13="", string sStr14="", string sStr15="")
-{
-    int nPos, nCount = 0;
-
-    string sLeft = "", sRight = sql;
-
-    while ((nPos = FindSubString(sRight, "?")) >= 0) {
-        string sInsert;
-
-        switch (nCount++) {
-            case 0:  sInsert = sStr0; break;
-            case 1:  sInsert = sStr1; break;
-            case 2:  sInsert = sStr2; break;
-            case 3:  sInsert = sStr3; break;
-            case 4:  sInsert = sStr4; break;
-            case 5:  sInsert = sStr5; break;
-            case 6:  sInsert = sStr6; break;
-            case 7:  sInsert = sStr7; break;
-            case 8:  sInsert = sStr8; break;
-            case 9:  sInsert = sStr9; break;
-            case 10: sInsert = sStr10; break;
-            case 11: sInsert = sStr11; break;
-            case 12: sInsert = sStr12; break;
-            case 13: sInsert = sStr13; break;
-            case 14: sInsert = sStr14; break;
-            case 15: sInsert = sStr15; break;
-            default: sInsert = "*INVALID*"; break;
-        }
-
-        sLeft += GetStringLeft(sRight, nPos) + "'" + SQLEncodeSpecialChars(sInsert) + "'";
-        sRight = GetStringRight(sRight, GetStringLength(sRight) - (nPos + 1));
-    }
-
-    SetLocalString(GetModule(), "NWNX!ODBC!EXEC", sLeft + sRight);
-}
-   --]]
-
 local function get_tag(object, is_global)
    local tag
    if is_global and object:GetLocalInt ("pc_is_pc") then
