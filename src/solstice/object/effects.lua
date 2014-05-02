@@ -191,4 +191,18 @@ function M.Object:RemoveEffectByID(id)
    C.nwn_RemoveEffectById(self.obj.obj, id)
 end
 
+--- Remove effect by type
+-- @param type EFFECT\_TYPE\_*
+function M.Object:RemoveEffectsByType(type)
+   local t = {}
+   for eff in self:EffectsDirect() do
+      if type == eff:GetType() then
+         t[eff:GetId()] = true
+      end
+   end
+   for k, _ in pairs(t) do
+      self:RemoveEffectByID(k)
+   end
+end
+
 jit.off(M.Object.RemoveEffectByID)
