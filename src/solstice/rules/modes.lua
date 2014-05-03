@@ -220,7 +220,7 @@ local function dirty(cre, mode, off)
    if off then return true end
    -- Really is worthless but there you go.  Attack number modifications
    -- are dealth with in Rules.InitializeNumberOfAttacks
-   cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
+   cre.ci.mod_mode.dmg.type = DAMAGE_INDEX_BASE_WEAPON
    cre.ci.mod_mode.dmg.roll.dice = 1
    cre.ci.mod_mode.dmg.roll.sides = 4
 
@@ -297,7 +297,7 @@ RegisterMode(COMBAT_MODE_FLURRY_OF_BLOWS, flurry)
 local function power_attack(cre, mode, off)
    if off then return true end
 
-   cre.ci.mod_mode.dmg.type = DAMAGE_TYPE_BASE_WEAPON
+   cre.ci.mod_mode.dmg.type = DAMAGE_INDEX_BASE_WEAPON
    if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
       cre.ci.mod_mode.ab = -10
       cre.ci.mod_mode.dmg.roll.bonus = 10
