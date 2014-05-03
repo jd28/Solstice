@@ -103,7 +103,6 @@ end
 -- @param cre Creature unarmed.
 local function GetUnarmedDamageBonus(cre)
    local d, s, b = 0, 0, 0
-   local dmgtype = DAMAGE_TYPE_BLUDGEONING
 
    local big = false
    if cre:GetSize() == CREATURE_SIZE_HUGE   or
@@ -437,11 +436,11 @@ local function GetWeaponBaseDamageType(item)
    local type = 0
 
    if t == 1 then
-      type = DAMAGE_TYPE_PIERCING
+      type = DAMAGE_INDEX_PIERCING
    elseif t == 2 then
-      type = DAMAGE_TYPE_BLUDGEONING
+      type = DAMAGE_INDEX_BLUDGEONING
    elseif t == 3 then
-      type = DAMAGE_TYPE_SLASHING
+      type = DAMAGE_INDEX_SLASHING
    else
       error(string.format("Invalid base damage type: %d", t))
    end
