@@ -20,6 +20,8 @@ local DoRoll = Dice.DoRoll
 local RollValid = Dice.IsValid
 local GetIsRangedWeapon = Rules.GetIsRangedWeapon
 
+local Vec = require 'solstice.vector'
+
 --- Adds combat message to an attack.
 local function AddCCMessage(info, type, objs, ints, str)
    C.nwn_AddCombatMessageData(info.attack, type or 0, #objs, objs[1] or 0, objs[2] or 0,
@@ -398,9 +400,9 @@ local function ResolveDeflectArrow(info, attacker, target, hit)
          else
             bow = 1
          end
-         local v = vector_t(target.obj.obj.obj_position.x,
-                            target.obj.obj.obj_position.y,
-                            target.obj.obj.obj_position.z)
+         local v = Vec.vector_t(target.obj.obj.obj_position.x,
+                                target.obj.obj.obj_position.y,
+                                target.obj.obj.obj_position.z)
 
          C.nwn_CalculateProjectileTimeToTarget(attacker.obj, v, bow)
          attacker.obj.cre_combat_round.cr_deflect_arrow = 0
@@ -885,7 +887,7 @@ local function ResolveDeathAttack(info, attacker, target)
       + 10 + attacker:GetAbilityModifier(ABILITY_INTELLIGENCE)
 
    if target:FortitudeSave(dc, SAVING_THROW_VS_DEATH, attacker) == 0 then
-      C.ApplyOnHitDeathAttack(attacker.obj, target.obj.obj, random(6) + attacker:GetHitDice())
+      C.nwn_ApplyOnHitDeathAttack(attacker.obj, target.obj.obj, random(6) + attacker:GetHitDice())
    end
 end
 
