@@ -400,11 +400,6 @@ local function ResolveDeflectArrow(info, attacker, target, hit)
          else
             bow = 1
          end
-         local v = Vec.vector_t(target.obj.obj.obj_position.x,
-                                target.obj.obj.obj_position.y,
-                                target.obj.obj.obj_position.z)
-
-         C.nwn_CalculateProjectileTimeToTarget(attacker.obj, v, bow)
          attacker.obj.cre_combat_round.cr_deflect_arrow = 0
          SetResult(info, 2)
          info.attack.cad_attack_deflected = 1
