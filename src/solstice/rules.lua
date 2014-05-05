@@ -72,6 +72,37 @@ function M.ConvertDamageToItempropConstant(const)
 end
 
 --- Convert damage type constant to item property damage constant.
+function M.ConvertDamageIndexToItempropConstant(const)
+   if const == DAMAGE_INDEX_BLUDGEONING then
+      return IP_CONST_DAMAGE_BLUDGEONING
+   elseif const == DAMAGE_INDEX_PIERCING then
+      return IP_CONST_DAMAGE_PIERCING
+   elseif const == DAMAGE_INDEX_SLASHING then
+      return IP_CONST_DAMAGE_SLASHING
+   elseif const == DAMAGE_INDEX_MAGICAL then
+      return IP_CONST_DAMAGE_MAGICAL
+   elseif const == DAMAGE_INDEX_ACID then
+      return IP_CONST_DAMAGE_ACID
+   elseif const == DAMAGE_INDEX_COLD then
+      return IP_CONST_DAMAGE_COLD
+   elseif const == DAMAGE_INDEX_DIVINE then
+      return IP_CONST_DAMAGE_DIVINE
+   elseif const == DAMAGE_INDEX_ELECTRICAL then
+      return IP_CONST_DAMAGE_ELECTRICAL
+   elseif const == DAMAGE_INDEX_FIRE then
+      return IP_CONST_DAMAGE_FIRE
+   elseif const == DAMAGE_INDEX_NEGATIVE then
+      return IP_CONST_DAMAGE_NEGATIVE
+   elseif const == DAMAGE_INDEX_POSITIVE then
+      return IP_CONST_DAMAGE_POSITIVE
+   elseif const == DAMAGE_INDEX_SONIC then
+      return IP_CONST_DAMAGE_SONIC
+   else
+      error "Unable to convert damage contant to damage IP constant."
+   end
+end
+
+--- Convert damage type constant to item property damage constant.
 function M.ConvertItempropConstantToDamageIndex(const)
    if const == IP_CONST_DAMAGE_BLUDGEONING then
       return DAMAGE_TYPE_BLUDGEONING

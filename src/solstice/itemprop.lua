@@ -235,20 +235,20 @@ function M.ContainerReducedWeight(amount)
 end
 
 --- Creates a damage bonus itemproperty.
--- @param damage_type solstice.damage constant.
--- @param damage solstice.damage.BONUS_*
+-- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage DAMAMGE\_BONUS\_*
 function M.DamageBonus(damage_type, damage)
-   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_BONUS, damage_type, 4, damage)
    return eff
 end
 
 --- Creates a damage immunity itemproperty.
--- @param damage_type DAMAGE\_TYPE\_*
+-- @param damage_type DAMAGE\_INDEX\_*
 -- @param amount IP_CONST_DAMAGEIMMUNITY_*
 function M.DamageImmunity(damage_type, amount)
-   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
    return eff
@@ -272,20 +272,20 @@ function M.DamageReduction(enhancement, soak)
 end
 
 --- Creates damage resistance item property.
--- @param damage_type solstice.damage type constant.
+-- @param damage_type DAMAGE\_INDEX\_*
 -- @param amount IP_CONST_RESIST_*
 function M.DamageResistance(damage_type, amount)
-   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_RESISTANCE, damage_type, 7, amount)
    return eff
 end
 
 --- Creates damage vulnerability item property.
--- @param damage_type solstice.damage type constant.
+-- @param damage_type DAMAGE\_INDEX\_*
 -- @param amount IP_CONST_DAMAGEVULNERABILITY_*
 function M.DamageVulnerability(damage_type, amount)
-   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_VULNERABILITY, damage_type, 22, amount)
    return eff
@@ -313,11 +313,11 @@ function M.EnhancementModifier(amount)
 end
 
 --- Creates an "extra damage type" item property.
--- @param damage_type solstice.damage constant
+-- @param damage_type DAMAGE\_INDEX\_*
 -- @param[opt=false] is_ranged ExtraRangedDamge if true, melee if false.
 function M.ExtraDamageType(damage_type, is_ranged)
    local eff = CreateItempropEffect()
-   damage_type = Rules.ConvertDamageToItempropConstant(damage_type)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
 
    if is_ranged then
       eff:SetValues(ITEM_PROPERTY_EXTRA_RANGED_DAMAGE_TYPE, damage_type, 0)
