@@ -159,7 +159,7 @@ end
 
 --- Create AC item property
 -- @param value Bonus: [1,20] Penaly [-20, -1]
-function M.AC(value)
+function M.ArmorClass(value)
    local eff = CreateItempropEffect()
 
    if value < 0 then

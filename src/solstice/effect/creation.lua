@@ -101,7 +101,7 @@ end
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
 -- @param[opt=AC_DODGE_BONUS] modifier_type AC_*
-function M.AC(amount, modifier_type)
+function M.ArmorClass(amount, modifier_type)
    modifier_type = modifier_type or AC_DODGE_BONUS
    if amount == 0 or modifier_type < 0 then
       return Create()
