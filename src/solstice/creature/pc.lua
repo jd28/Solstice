@@ -80,10 +80,17 @@ function M.Creature:ExploreArea(area, explored)
    ne.ExecuteCommand(403, 3)
 end
 
----
+--- Determine if creature is a PC.
 function M.Creature:GetIsPC()
    if not self:GetIsValid() then return false end
    return not (ffi.C.nwn_GetPlayerByID(self.id) == nil)
+end
+
+--- Determine if creature is an AI
+function M.Creature:GetIsAI()
+   if not self:GetIsValid() then return false end
+   return (not self:GetIsPC() and not self:GetIsPossessedFamiliar() and not self:GetIsDMPossessed())
+      or self:GetMaster():GetIsValid()
 end
 
 --- Removes a journal quest entry from a PCs journal.
