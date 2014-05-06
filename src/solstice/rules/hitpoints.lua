@@ -8,8 +8,11 @@
 --- Determine Maximum Hitpoints.
 -- @param cre Creature
 local function GetMaxHitPoints(cre)
+   if cre:GetLocalBool("TA_CLONE") then
+      return cre.obj.obj.obj_hp_max
+   end
    local res = 0
-   local not_pc = not cre:GetIsPC() or cre:GetIsPossessedFamiliar()
+   local not_pc = cre:GetIsAI()
    local level = cre:GetHitDice()
    if cre:GetHasFeat(FEAT_TOUGHNESS) then
       res = res + level
