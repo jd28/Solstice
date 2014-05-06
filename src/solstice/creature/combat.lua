@@ -541,6 +541,7 @@ local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)
 end
 
 local function UpdateImmunities(self)
+   ffi.fill(self.ci.defense.immunity_misc, 4*IMMUNITY_TYPE_NUM)
    if self.obj.cre_stats.cs_first_imm_eff < 0 then return end
    for i = self.obj.cre_stats.cs_first_imm_eff, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_IMMUNITY then break end
