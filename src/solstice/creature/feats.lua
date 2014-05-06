@@ -34,7 +34,7 @@ function M.Creature:DecrementRemainingFeatUses(feat)
    for i=0, self.obj.cre_stats.cs_featuses.len - 1 do
       if self.obj.cre_stats.cs_featuses.data[i].fu_feat == feat then
          self.obj.cre_stats.cs_featuses.data[i].fu_used =
-            self.obj.cre_stats.cs_featuses.data[i].fu_used - 1
+            self.obj.cre_stats.cs_featuses.data[i].fu_used + 1
       end
    end
 end
@@ -206,7 +206,7 @@ function M.Creature:IncrementRemainingFeatUses(feat)
    for i=0, self.obj.cre_stats.cs_featuses.len - 1 do
       if self.obj.cre_stats.cs_featuses.data[i].fu_feat == feat then
          self.obj.cre_stats.cs_featuses.data[i].fu_used =
-            self.obj.cre_stats.cs_featuses.data[i].fu_used + 1
+            math.max(self.obj.cre_stats.cs_featuses.data[i].fu_used - 1, 0)
       end
    end
 end
