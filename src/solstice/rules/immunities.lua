@@ -12,7 +12,7 @@ local _IMM = {}
 local function GetInnateImmunity(imm, cre)
    local f = _IMM[imm]
    if not f then return 0 end
-   return f()
+   return f(imm, cre)
 end
 
 --- Sets innate immunity override.
@@ -21,7 +21,7 @@ end
 -- @param ... List of IMMUNITY\_TYPE\_* constants.
 local function SetInnateImmunityOverride(func, ...)
    local t = {...}
-   assert(t > 0, "At least one IMMUNITY_TYPE_* constnats must be specified!")
+   assert(#t > 0, "At least one IMMUNITY_TYPE_* constnats must be specified!")
    for _, v in ipairs(t) do
       _IMM[v] = func
    end
