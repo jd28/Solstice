@@ -651,7 +651,7 @@ local function ResolveItemCastSpell(info, attacker, target)
    if target.type ~= OBJECT_TRUETYPE_CREATURE then return end
 
    local weapon = GetCurrentWeapon(info, attacker)
-   if weapon:GetIsValid() then
+   if weapon.type == OBJECT_TRUETYPE_ITEM then
       C.ns_AddOnHitSpells(info.attack, attacker.obj, target.obj.obj,
                           weapon.obj, false)
    end
@@ -659,11 +659,11 @@ local function ResolveItemCastSpell(info, attacker, target)
    local shield = target:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
    local chest = target:GetItemInSlot(INVENTORY_SLOT_CHEST)
 
-   if chest:GetIsValid() then
+   if chest.type == OBJECT_TRUETYPE_ITEM then
       C.ns_AddOnHitSpells(info.attack, attacker.obj, target.obj.obj,
                           chest.obj, true)
    end
-   if shield:GetIsValid() and
+   if shield.type == OBJECT_TRUETYPE_ITEM and
       (shield.obj.it_baseitem == BASE_ITEM_SMALLSHIELD or
        shield.obj.it_baseitem == BASE_ITEM_LARGESHIELD or
        shield.obj.it_baseitem == BASE_ITEM_TOWERSHIELD)
