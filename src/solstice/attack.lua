@@ -439,7 +439,7 @@ local function ResolveParry(info, attacker, target, hit)
       if roll - 10 >= info.attack.cad_attack_roll + info.attack.cad_attack_mod then
          target:AddParryAttack(attacker)
       end
-      SetAttackResult(info, 2)
+      SetResult(info, 2)
       return true
    end
 
@@ -1160,11 +1160,11 @@ local function DoRangedAttack()
             -- If the special attack failed because it wasn't
             -- applicable or the targets skill check (for example)
             -- was success full set the attack result to 5.
-            SetAttackResult(info, 5)
+            SetResult(info, 5)
          end
       else
          -- If the target is not a creature or no damage was dealt set attack result to 6.
-         SetAttackResult(info, 6)
+         SetResult(info, 6)
       end
    end
 end
