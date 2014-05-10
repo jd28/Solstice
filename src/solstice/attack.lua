@@ -1018,7 +1018,7 @@ local function ResolveSituations(info, attacker, target)
    local sneak = RollValid(attacker.ci.mod_situ[SITUATION_SNEAK_ATTACK].dmg.roll)
 
    -- Sneak Attack & Death Attack
-   if sneak or death and
+   if (sneak or death) and
       (band(info.target_state, COMBAT_TARGET_STATE_ATTACKER_UNSEEN) ~= 0 or
        band(info.target_state, COMBAT_TARGET_STATE_FLATFOOTED) ~= 0 or
        band(info.target_state, COMBAT_TARGET_STATE_FLANKED) ~= 0)
