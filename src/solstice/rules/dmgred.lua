@@ -58,7 +58,7 @@ local function GetBaseDamageReduction(cre)
 
    local dd =  cre:GetLevelByClass(CLASS_TYPE_DWARVEN_DEFENDER)
    if dd > 5 then
-      res = res + 3 + (math.floor((dd - 5) / 5) * 3)
+      res = res + 3 + (math.floor((dd - 6) / 4) * 3)
    end
    return res
 end
