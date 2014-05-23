@@ -201,6 +201,8 @@ end
 local function default_wisdom(cre, item)
    if GetIsRangedWeapon(item) and cre:GetHasFeat(FEAT_ZEN_ARCHERY) then
       return cre:GetAbilityModifier(ABILITY_WISDOM)
+   elseif GetIsWeaponSimple(item, cre) and cre:GetHasFeat(TA_FEAT_INTUITIVE_STRIKE) then
+      return cre:GetAbilityModifier(ABILITY_WISDOM)
    end
    return 0
 end
