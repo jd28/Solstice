@@ -85,6 +85,29 @@ function GetIsWeaponLight(item, cre)
    return cre:GetRelativeWeaponSize(item) < 0
 end
 
+--- Determine if weapon is simple
+-- @param item Weapon in question
+-- @param[opt] cre Creature wielding weapon.
+local function GetIsWeaponSimple(item, cre)
+   if GetWeaponType(item) == 8 then return true end
+   local base = item:GetBaseType()
+   return base == BASE_ITEM_CLUB
+      or base == BASE_ITEM_DAGGER
+      or base == BASE_ITEM_DART
+      or base == BASE_ITEM_HEAVYCROSSBOW
+      or base == BASE_ITEM_LIGHTCROSSBOW
+      or base == BASE_ITEM_LANCE
+      or base == BASE_ITEM_LIGHTMACE
+      or base == BASE_ITEM_LIGHT_MACE_2
+      or base == BASE_ITEM_MAGICSTAFF
+      or base == BASE_ITEM_MORNINGSTAR
+      or base == BASE_ITEM_QUARTERSTAFF
+      or base == BASE_ITEM_SICKLE
+      or base == BASE_ITEM_SLING
+      or base == BASE_ITEM_TINY_SPEAR
+      or base == BASE_ITEM_SHORTSPEAR
+end
+
 --- Determine if weapon is finessable.
 -- @param item The weapon in question.
 -- @param cre Creature weilding weapon
@@ -803,6 +826,7 @@ M.GetIsMonkWeapon                 = GetIsMonkWeapon
 M.GetIsRangedWeapon               = GetIsRangedWeapon
 M.GetIsWeaponLight                = GetIsWeaponLight
 M.GetIsWeaponFinessable           = GetIsWeaponFinessable
+M.GetIsWeaponSimple               = GetIsWeaponSimple
 
 M.GetWeaponIteration              = GetWeaponIteration
 M.GetWeaponType                   = GetWeaponType
