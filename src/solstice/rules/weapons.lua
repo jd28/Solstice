@@ -80,7 +80,7 @@ end
 --- Determine if weapon is light.
 -- @param item The weapon in question.
 -- @param cre Creature weilding weapon
-function GetIsWeaponLight(item, cre)
+local function GetIsWeaponLight(item, cre)
    if GetWeaponType(item) == 8 then return true end
    return cre:GetRelativeWeaponSize(item) < 0
 end
@@ -111,7 +111,7 @@ end
 --- Determine if weapon is finessable.
 -- @param item The weapon in question.
 -- @param cre Creature weilding weapon
-function GetIsWeaponFinessable(item, cre)
+local function GetIsWeaponFinessable(item, cre)
    if GetIsWeaponLight(item, cre) then return true end
    local size = cre:GetSize()
    local rel = cre:GetRelativeWeaponSize(item)
