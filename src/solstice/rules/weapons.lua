@@ -424,7 +424,9 @@ local function GetWeaponPower(cre, item)
 
    local eb = 0
    for _it, ip in item:ItemProperties() do
-      if ip:GetPropertyType() == ITEM_PROPERTY_ENHANCEMENT_BONUS then
+      if ip:GetPropertyType() == ITEM_PROPERTY_ENHANCEMENT_BONUS or
+         ip:GetPropertyType() == ITEM_PROPERTY_ATTACK_BONUS
+      then
          eb = math.max(eb, ip:GetCostTableValue())
       end
    end
