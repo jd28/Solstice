@@ -333,7 +333,7 @@ end
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
 function M.Object:DoDamageReduction(amt, eff, power)
-   if amt <= 0 or power <= 0 then return amt, 0 end
+   if amt <= 0 or power < 0 then return amt, 0 end
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.
    local highest_soak = self:GetHardness()

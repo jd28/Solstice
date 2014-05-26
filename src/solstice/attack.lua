@@ -622,23 +622,22 @@ local function ResolveDamageModifications(info, attacker, target)
       end
    end
 
-   if attacker.ci.equips[info.weapon].power > 0 then
-      if target.type == OBJECT_TRUETYPE_CREATURE then
-         start = target.obj.cre_stats.cs_first_dred_eff
-      else
-         start = nil
-      end
+   if target.type == OBJECT_TRUETYPE_CREATURE then
+      start = target.obj.cre_stats.cs_first_dred_eff
+   else
+      start = nil
+   end
 
-      eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
-      local amt, adj, removed = target:DoDamageReduction(info.dmg_result.damages[12],
-                                                         eff,
-                                                         attacker.ci.equips[info.weapon].power)
-      info.dmg_result.damages[12] = amt
-      if adj > 0 then
-         info.dmg_result.reduction = adj
-         if not removed and eff and eff.eff_integers[2] > 0 then
-            info.dmg_result.reduction_remaining = eff.eff_integers[2]
-         end
+   eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
+
+   local amt, adj, removed = target:DoDamageReduction(info.dmg_result.damages[12],
+                                                      eff,
+                                                      attacker.ci.equips[info.weapon].power)
+   info.dmg_result.damages[12] = amt
+   if adj > 0 then
+      info.dmg_result.reduction = adj
+      if not removed and eff and eff.eff_integers[2] > 0 then
+         info.dmg_result.reduction_remaining = eff.eff_integers[2]
       end
    end
 end
