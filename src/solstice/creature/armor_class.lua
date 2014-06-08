@@ -124,7 +124,7 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    end
 
    -- +4 Defensive Training Vs.
-   if self:GetHasDefensiveTrainingVs(vs) then
+   if self:GetHasTrainingVs(vs) then
       ac = ac + 4
    end
 
