@@ -97,6 +97,9 @@ function M.Creature:SetCombatMode(mode, change)
       if off or Rules.ResolveMode(mode, self, off) then
          set_activity()
       end
+      if off then
+         ffi.fill(self.ci.mod_mode, ffi.sizeof("CombatMod"))
+      end
    else
       self.obj.cre_mode_desired = mode
    end
