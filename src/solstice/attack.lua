@@ -740,10 +740,22 @@ local function ResolveDamage(info, attacker, target)
 
    ResolveDamageResult(info, attacker, mult, ki_strike)
    -- Modes
-   for i = 0, COMBAT_MOD_NUM - 1 do
+   for i = 0, COMBAT_MOD_SKILL do
       if RollValid(attacker.ci.mods[i].dmg.roll) then
          AddDamageToResult(info, attacker.ci.mods[i].dmg, mult)
       end
+   end
+
+   if attacker:GetHasTrainingVs(target)
+      and RollValid(attacker.ci.mods[COMBAT_MOD_TRAINING_VS].dmg.roll)
+   then
+      AddDamageToResult(info, attacker.ci.mods[COMBAT_MOD_TRAINING_VS].dmg, mult)
+   end
+
+   if attacker:GetIsFavoredEnemy(target)
+      and RollValid(attacker.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll)
+   then
+      AddDamageToResult(info, attacker.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg, mult)
    end
 
    -- Special attacks

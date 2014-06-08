@@ -318,8 +318,14 @@ function M.Creature:GetFavoredEnemenyMask()
    return res
 end
 
+--- Determine if creature is favored enemy.
+function M.Creature:GetIsFavoredEnemy(vs)
+   if not vs:GetIsValid() then return false end
+   return band(self.ci.fe_mask, lshift(1, vs:GetRacialType())) ~= 0
+end
+
 --- Determine if creature training vs.
-function M.Creature:GetHasDefensiveTrainingVs(vs)
+function M.Creature:GetHasTrainingVs(vs)
    if not vs:GetIsValid() then return false end
    return band(self.ci.training_vs_mask, lshift(1, vs:GetRacialType())) ~= 0
 end
