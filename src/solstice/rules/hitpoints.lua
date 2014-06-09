@@ -20,7 +20,7 @@ local function GetMaxHitPoints(cre)
 
    res = res + math.max(0, cre:GetAbilityModifier(ABILITY_CONSTITUTION) * level)
 
-   local pm = cre:GetLevelByClass(CLASS_TYPE_PALEMASTER)
+   local pm = cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER)
    local pmhp = 0
    if pm >= 5 then
       if pm >= 25 then
