@@ -27,6 +27,54 @@ local function SetInnateImmunityOverride(func, ...)
    end
 end
 
+local function crits(imm, cre)
+   if cre:GetRacialType() == RACIAL_TYPE_UNDEAD
+      or cre:GetRacialType() == RACIAL_TYPE_CONSTRUCT
+   then
+      return 100
+   end
+   if cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER) >= 10 then
+      return 100
+   end
+
+   local mod = 0
+   if OPT.TA then
+      if cre:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) >= 40 then
+         return 100
+      end
+      if cre:GetIsPC() then
+         mod = cre:GetAbilityScore(ABILITY_STRENGTH, true) * 2
+         if cre:GetAbilityScore(ABILITY_DEXTERITY, true) >= 30 then
+            mod = mod + cre:GetAbilityScore(ABILITY_DEXTERITY, true)
+         end
+      end
+   end
+   return mod
+end
+
+local function sneaks(imm, cre)
+   if cre:GetRacialType() == RACIAL_TYPE_UNDEAD
+      or cre:GetRacialType() == RACIAL_TYPE_CONSTRUCT
+   then
+      return 100
+   end
+
+   if cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER) >= 10 then
+      return 100
+   end
+
+   local mod = 0
+   if OPT.TA then
+      if cre:GetIsPC() and cre:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) >= 30 then
+         return 100
+      end
+   end
+   return mod
+end
+
+SetInnateImmunityOverride(crits, IMMUNITY_TYPE_CRITICAL_HIT)
+SetInnateImmunityOverride(sneaks, IMMUNITY_TYPE_SNEAK_ATTACK)
+
 local M = require 'solstice.rules.init'
 M.GetInnateImmunity = GetInnateImmunity
 M.SetInnateImmunityOverride = SetInnateImmunityOverride
