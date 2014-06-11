@@ -1,6 +1,15 @@
+--- Rules
+-- @module rules
+
 local ffi = require 'ffi'
 local C = ffi.C
 
+--- Races
+-- @section rules.races.
+
+--- Determine race's ability bonus.
+-- @param race RACIAL\_TYPE\_*
+-- @param ability ABILITY\_*
 local function GetRaceAbilityBonus(race, ability)
    local r = C.nwn_GetRace(race)
    if r == nil then return 0 end

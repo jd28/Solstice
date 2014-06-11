@@ -145,7 +145,7 @@ end
 
 --- Get remaining feat uses
 -- @param feat FEAT\_*
--- @param[opt=false] If true function assumes that creature
+-- @param[opt=false] has If true function assumes that creature
 -- does have the feat in question.
 function M.Creature:GetRemainingFeatUses(feat, has)
    if not self:GetIsValid() then return 0 end

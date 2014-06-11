@@ -56,6 +56,7 @@ end
 --- Copy damage to NWN Attack Data.
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
+-- @param target Attack target.
 local function CopyDamageToNWNAttackData(info, attacker, target)
    for i = 0, DAMAGE_INDEX_NUM - 1 do
       if i < 13 then
