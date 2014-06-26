@@ -199,12 +199,15 @@ local function default_dexterity(cre, item)
 end
 
 local function default_wisdom(cre, item)
+   local can = false
    if GetIsRangedWeapon(item) and cre:GetHasFeat(FEAT_ZEN_ARCHERY) then
-      return cre:GetAbilityModifier(ABILITY_WISDOM)
+      can = true
    elseif GetIsWeaponSimple(item, cre) and cre:GetHasFeat(TA_FEAT_INTUITIVE_STRIKE) then
-      return cre:GetAbilityModifier(ABILITY_WISDOM)
+      can = true
+   elseif TA and cre:GetIsPolymorphed() then
+      can = true
    end
-   return 0
+   return can and cre:GetAbilityModifier(ABILITY_WISDOM) or 0
 end
 
 local function default_zero(cre, item) return 0 end
