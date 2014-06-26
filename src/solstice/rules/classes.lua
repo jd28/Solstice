@@ -109,11 +109,13 @@ end
 
 local function monk(cre, class)
    local level = cre:GetLevelByClass(class)
+   if level == 0 then return false, 0 end
 
    local can = (cre.obj.cre_stats.cs_ac_armour_base == 0 and
                 cre.obj.cre_stats.cs_ac_shield_base == 0) or
       cre:GetIsPolymorphed()
-   return level > 0 and can, level
+
+   return can, level
 end
 
 SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
