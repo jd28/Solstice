@@ -516,9 +516,9 @@ local function UpdateAttackBonus(self)
 
       if race == 28 and lawchaos == 0 and goodevil == 0 then
          if self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE then
-            bon[atktype] = math.max(bon[atktype], amount)
+            bon[atktype] = bon[atktype] + amount
          elseif self.obj.obj.obj_effects[i].eff_type ==  EFFECT_TYPE_ATTACK_DECREASE then
-            pen[atktype] = math.max(pen[atktype], amount)
+            pen[atktype] = pen[atktype] + amount
          end
       end
    end
