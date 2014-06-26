@@ -18,11 +18,11 @@ local M = require 'solstice.creature.init'
 -- @param target Target object.
 -- @param equip EQUIP\_TYPE\_*
 function M.Creature:GetAttackBonusVs(target, equip)
+   local trans_ab = math.clamp(self.ci.offense.ab_transient + self.ci.equips[equip].transient_ab_mod, -20, 20)
    local ab = self.ci.offense.ab_base
-      + self.ci.offense.ab_transient
       + self.ci.equips[equip].ab_mod
-      + self.ci.equips[equip].transient_ab_mod
       + self.ci.equips[equip].ab_ability
+      + trans_ab
 
    if equip == EQUIP_TYPE_ONHAND then
       ab = ab - self.ci.offense.offhand_penalty_on
