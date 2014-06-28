@@ -654,12 +654,13 @@ local function UpdateDamage(self)
 
       local type      = C.ns_BitScanFFS(self.obj.obj.obj_effects[i].eff_integers[1])
       local race      = self.obj.obj.obj_effects[i].eff_integers[2]
-      local lawchaos  = self.obj.obj.obj_effects[i].eff_integers[3]
-      local goodevil  = self.obj.obj.obj_effects[i].eff_integers[4]
+      local start     = self.obj.obj.obj_effects[i].eff_integers[3]
+      local stop      = self.obj.obj.obj_effects[i].eff_integers[4]
       local att_type  = self.obj.obj.obj_effects[i].eff_integers[5]
       local mask      = self.obj.obj.obj_effects[i].eff_integers[6]
+      local range     = self.obj.obj.obj_effects[i].eff_integers[7] == 1
 
-      if race == 28 and lawchaos == 0 and goodevil == 0 then
+      if race == 28 then
          if att_type == ATTACK_TYPE_MISC then
             local len = self.ci.offense.damage_len
 
@@ -668,14 +669,28 @@ local function UpdateDamage(self)
             else
                self.ci.offense.damage[len].mask = mask
             end
+
             self.ci.offense.damage[len].type = type
-            self.ci.offense.damage[len].roll.dice,
-            self.ci.offense.damage[len].roll.sides,
-            self.ci.offense.damage[len].roll.bonus = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
+
+            if range then
+               self.ci.offense.damage[len].roll.dice,
+               self.ci.offense.damage[len].roll.sides,
+               self.ci.offense.damage[len].roll.bonus = 1, stop - start + 1, start - 1
+            else
+               self.ci.offense.damage[len].roll.dice,
+               self.ci.offense.damage[len].roll.sides,
+               self.ci.offense.damage[len].roll.bonus = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
+            end
             self.ci.offense.damage_len = len + 1
          else
             local e = Rules.AttackTypeToEquipType(att_type)
-            local d, s, b = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
+            local d, s, b = 0, 0, 0
+            if range then
+               d, s, b = 1, stop - start + 1, start - 1
+            else
+               d, s, b = Rules.UnpackItempropDamageRoll(self.obj.obj.obj_effects[i].eff_integers[0])
+            end
+
             AddDamageToEquip(self, e, type, d, s, b,
                              self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_DECREASE and 1 or 0)
          end
