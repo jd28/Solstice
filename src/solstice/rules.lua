@@ -105,29 +105,29 @@ end
 --- Convert damage type constant to item property damage constant.
 function M.ConvertItempropConstantToDamageIndex(const)
    if const == IP_CONST_DAMAGE_BLUDGEONING then
-      return DAMAGE_TYPE_BLUDGEONING
+      return DAMAGE_INDEX_BLUDGEONING
    elseif const == IP_CONST_DAMAGE_PIERCING then
-      return DAMAGE_TYPE_PIERCING
+      return DAMAGE_INDEX_PIERCING
    elseif const == IP_CONST_DAMAGE_SLASHING then
-      return DAMAGE_TYPE_SLASHING
+      return DAMAGE_INDEX_SLASHING
    elseif const == IP_CONST_DAMAGE_MAGICAL then
-      return DAMAGE_TYPE_MAGICAL
+      return DAMAGE_INDEX_MAGICAL
    elseif const == IP_CONST_DAMAGE_ACID then
-      return DAMAGE_TYPE_ACID
+      return DAMAGE_INDEX_ACID
    elseif const == IP_CONST_DAMAGE_COLD then
-      return DAMAGE_TYPE_COLD
+      return DAMAGE_INDEX_COLD
    elseif const == IP_CONST_DAMAGE_DIVINE then
-      return DAMAGE_TYPE_DIVINE
+      return DAMAGE_INDEX_DIVINE
    elseif const == IP_CONST_DAMAGE_ELECTRICAL then
-      return DAMAGE_TYPE_ELECTRICAL
+      return DAMAGE_INDEX_ELECTRICAL
    elseif const == IP_CONST_DAMAGE_FIRE then
-      return DAMAGE_TYPE_FIRE
+      return DAMAGE_INDEX_FIRE
    elseif const == IP_CONST_DAMAGE_NEGATIVE then
-      return DAMAGE_TYPE_NEGATIVE
+      return DAMAGE_INDEX_NEGATIVE
    elseif const == IP_CONST_DAMAGE_POSITIVE then
-      return DAMAGE_TYPE_POSITIVE
+      return DAMAGE_INDEX_POSITIVE
    elseif const == IP_CONST_DAMAGE_SONIC then
-      return DAMAGE_TYPE_SONIC
+      return DAMAGE_INDEX_SONIC
    else
       return 0
    end

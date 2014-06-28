@@ -694,6 +694,40 @@ local function AttackTypeToEquipType(atype)
    return EQUIP_TYPE_ONHAND
 end
 
+local function EquipTypeToAttackType(atype)
+   assert(atype >= 0)
+   if atype == EQUIP_TYPE_OFFHAND then
+      return ATTACK_TYPE_OFFHAND
+   elseif atype == EQUIP_TYPE_CREATURE_1 then
+      return ATTACK_TYPE_CWEAPON1
+   elseif atype == EQUIP_TYPE_CREATURE_2 then
+      return ATTACK_TYPE_CWEAPON2
+   elseif atype == EQUIP_TYPE_CREATURE_3 then
+      return ATTACK_TYPE_CWEAPON3
+   elseif atype == EQUIP_TYPE_UNARMED then
+      return ATTACK_TYPE_UNARMED
+   end
+   return ATTACK_TYPE_ONHAND
+end
+
+local function InventorySlotToAttackType(atype)
+   assert(atype >= 0)
+   if atype == INVENTORY_SLOT_LEFTHAND then
+      return ATTACK_TYPE_OFFHAND
+   elseif atype == INVENTORY_SLOT_CWEAPON_L then
+      return ATTACK_TYPE_CWEAPON1
+   elseif atype == INVENTORY_SLOT_CWEAPON_R then
+      return ATTACK_TYPE_CWEAPON2
+   elseif atype == INVENTORY_SLOT_CWEAPON_B then
+      return ATTACK_TYPE_CWEAPON3
+   elseif atype == INVENTORY_SLOT_ARMS then
+      return ATTACK_TYPE_UNARMED
+   elseif atype == INVENTORY_SLOT_RIGHTHAND then
+      return ATTACK_TYPE_ONHAND
+   else
+      assert(false, "Inventory slot does not have an attack type.")
+   end
+end
 --- Determine number of onhand attacks.
 -- @param cre Creature
 local function GetOnhandAttacks(cre)
@@ -842,6 +876,8 @@ M.GetUnarmedDamageBonus           = GetUnarmedDamageBonus
 
 M.UnpackItempropDamageRoll        = UnpackItempropDamageRoll
 M.AttackTypeToEquipType           = AttackTypeToEquipType
+M.EquipTypeToAttackType           = EquipTypeToAttackType
+M.InventorySlotToAttackType       = InventorySlotToAttackType
 M.GetOnhandAttacks                = GetOnhandAttacks
 M.GetOffhandAttacks               = GetOffhandAttacks
 M.InitializeNumberOfAttacks       = InitializeNumberOfAttacks

@@ -17,15 +17,28 @@ local sm  = string.strip_margin
 -- @param[opt=false] creature If true include creature items.
 function M.Creature:Equips(creature)
    local i, _i = 0
-   local obj, _obj = pc:GetItemInSlot(i)
+   local obj, _obj = self:GetItemInSlot(i)
    local max = creature and INVENTORY_SLOT_NUM or 14
    return function ()
-      while obj and i < max do
+      while i < max do
          _i, i = i, i + 1
-         _obj, obj = obj, pc:GetItemInSlot(i)
+         _obj, obj = obj, self:GetItemInSlot(i)
          return _obj, _i
       end
    end
+end
+
+--- Determine inventory slot from item
+-- @param item Item
+-- @return INVENTORY\_SLOT\_* or -1
+function M.Creature:GetInventorySlotFromItem(item)
+   if not self:GetIsValid() then return -1 end
+   for it, slot in self:Equips(true) do
+      if it.id == item.id then
+         return slot
+      end
+   end
+   return -1
 end
 
 --- Forces creature to equip items
