@@ -256,9 +256,12 @@ function M.DamageRange(damage_type, min, max)
 end
 
 --- Creates a damage immunity itemproperty.
+-- If you are using CEP and CEP is set to true in your global options then you can pass values 1-100,
+-- otherwise you will have to pass the item property constants.
 -- @param damage_type DAMAGE\_INDEX\_*
--- @param amount IP_CONST_DAMAGEIMMUNITY_*
+-- @param amount Amount.
 function M.DamageImmunity(damage_type, amount)
+   if OPT.CEP then amount = amount + 50 end
    damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_IMMUNITY_DAMAGE_TYPE, damage_type, 5, amount)
@@ -293,9 +296,12 @@ function M.DamageResistance(damage_type, amount)
 end
 
 --- Creates damage vulnerability item property.
+-- If you are using CEP and CEP is set to true in your global options then you can pass values 1-100,
+-- otherwise you will have to pass the item property constants.
 -- @param damage_type DAMAGE\_INDEX\_*
--- @param amount IP_CONST_DAMAGEVULNERABILITY_*
+-- @param amount Amount.
 function M.DamageVulnerability(damage_type, amount)
+   if OPT.CEP then amount = amount + 50 end
    damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_VULNERABILITY, damage_type, 22, amount)
