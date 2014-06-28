@@ -1,18 +1,22 @@
 local M = {}
 
+local ffi = require 'ffi'
+local C   = ffi.C
+
 local IP_HANDLERS = {}
 
 function M.GetItempropInfo()
-   local e = C.Local_GetLastNWNXEventItemprop()
+   local e = C.Local_GetLastItemPropEvent()
    if e == nil then return end
 
-   return { type = e.ip.ip_type,
+   return { event  = e,
             object = _SOL_GET_CACHED_OBJECT(e.obj.obj.obj_id),
-            item = _SOL_GET_CACHED_OBJECT(e.item.obj.obj_id),
+            item   = _SOL_GET_CACHED_OBJECT(e.item.obj.obj_id),
+            slot   = C.ns_BitScanFFS(e.slot)
           }
 end
 
---- Register NWNXEvent event handler.
+--- Register item property event handler.
 -- @param ip_type
 -- @param f A function
 function M.RegisterItempropHandler(ip_type, f)
@@ -27,7 +31,7 @@ function NWNXEffects_HandleItemPropEvent(ip_type)
    local f = IP_HANDLERS[ip_type]
    if not f then return 0 end
 
-   local info = solstice.nwnx.GetItemproptInfo()
+   local info = M.GetItempropInfo()
    if not info then return 0 end
 
    f(info)
