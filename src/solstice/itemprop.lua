@@ -244,6 +244,17 @@ function M.DamageBonus(damage_type, damage)
    return eff
 end
 
+--- Creates a damage range itemproperty.
+-- @param damage_type DAMAGE\_INDEX\_*
+-- @param min Minimum damage.
+-- @param max Maximum damage.
+function M.DamageRange(damage_type, min, max)
+   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
+   local eff = CreateItempropEffect()
+   eff:SetValues(ITEM_PROPERTY_DAMAGE_RANGE, damage_type, 33, start, 12, stop)
+   return eff
+end
+
 --- Creates a damage immunity itemproperty.
 -- @param damage_type DAMAGE\_INDEX\_*
 -- @param amount IP_CONST_DAMAGEIMMUNITY_*
