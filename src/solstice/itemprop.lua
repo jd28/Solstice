@@ -304,7 +304,7 @@ end
 -- @param amount Resist value.
 function M.DamageResistance(damage_type, amount)
    if OPT.CEP then
-      assert(amount % 5 == 0, "The soak parameter must be a multiple of 5!")
+      assert(amount % 5 == 0, "The resist parameter must be a multiple of 5!")
       assert(amount >= 5 and amount <= 100)
       -- Convert the value to the constant
       amount = amount / 5
