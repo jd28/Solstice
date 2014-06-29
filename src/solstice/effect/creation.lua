@@ -295,7 +295,8 @@ function M.DamageIncrease(amount, damage_type, critical, unblockable)
 end
 
 --- Effect Damage Increase
--- @param amount DAMAGE\_BONUS\_*
+-- @param start Minimum damage.
+-- @param stop Maximum damage.
 -- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
 -- @bool critical Only applicable on critical hits.
 -- @bool unblockable Not modified by damage protections.
