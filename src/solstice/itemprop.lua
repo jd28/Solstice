@@ -277,18 +277,38 @@ function M.DamagePenalty(amount)
 end
 
 --- Creates a damage reduction itemproperty.
--- @param enhancement IP_CONST_REDUCTION_*
--- @param soak IP_CONST_SOAK_*
+-- If you are using CEP then values can be passed for the soak parameter rather
+-- than IP\_CONST\_SOAK\_*.  The value must be a multiple of 5 and in the range
+-- [5, 100]
+-- @param enhancement [1,20]
+-- @param soak Amount soaked.
 function M.DamageReduction(enhancement, soak)
+   assert(enhancement >= 1 and enhancment <= 20, "Soak enhancement level must be between 1 and 20!")
+   enhancement = enhancement - 1
+   if OPT.CEP then
+      assert(soak % 5 == 0, "The soak parameter must be a multiple of 5!")
+      assert(soak >= 5 and soak <= 100)
+      -- Convert the value to the constant
+      soak = soak / 5
+   end
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_REDUCTION, enhancement, 6, soak)
    return eff
 end
 
 --- Creates damage resistance item property.
+-- If you are using CEP then values can be passed for the amount parameter rather
+-- than IP\_CONST\_RESIST_*.  The value must be a multiple of 5 and in the range
+-- [5, 100]
 -- @param damage_type DAMAGE\_INDEX\_*
--- @param amount IP_CONST_RESIST_*
+-- @param amount Resist value.
 function M.DamageResistance(damage_type, amount)
+   if OPT.CEP then
+      assert(amount % 5 == 0, "The soak parameter must be a multiple of 5!")
+      assert(amount >= 5 and amount <= 100)
+      -- Convert the value to the constant
+      amount = amount / 5
+   end
    damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_DAMAGE_RESISTANCE, damage_type, 7, amount)
