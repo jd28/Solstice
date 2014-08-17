@@ -376,7 +376,7 @@ local function GetWeaponAttackBonus(cre, weap)
        base == BASE_ITEM_MORNINGSTAR           or
        base == BASE_ITEM_SLING)
    then
-      local mx = math.floor((rogue - 20) / 5)
+      local mx = math.min(5, math.floor((rogue - 20) / 5))
       local int = math.floor((cre:GetAbilityScore(ABILITY_INTELLIGENCE) - 10) / 2)
       int = math.clamp(int, 0, mx)
       if int > 0 and rogue >= 30 then
