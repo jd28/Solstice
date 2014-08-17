@@ -39,7 +39,7 @@ local function GetConcealment(cre, vs, is_ranged)
                percent = 15
             end
             percent = max(percent, rogue - 20)
-            total = total + floor((cre:GetSkillRank(SKILL_HIDE) * percent) / 100)
+            total = total + math.min(percent, floor((cre:GetSkillRank(SKILL_HIDE) * percent) / 100))
          end
       end
    end
