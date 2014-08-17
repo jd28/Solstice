@@ -25,9 +25,9 @@ function M.Creature:GetAttackBonusVs(target, equip)
       + trans_ab
 
    if equip == EQUIP_TYPE_ONHAND then
-      ab = ab - self.ci.offense.offhand_penalty_on
+      ab = ab + self.ci.offense.offhand_penalty_on
    elseif equip == EQUIP_TYPE_OFFHAND then
-      ab = ab - self.ci.offense.offhand_penalty_off
+      ab = ab + self.ci.offense.offhand_penalty_off
    end
 
    for i = 0, COMBAT_MOD_SKILL do
