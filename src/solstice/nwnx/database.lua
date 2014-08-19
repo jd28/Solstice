@@ -46,7 +46,7 @@ end
 function M.SQLGetData(column)
    mod = mod or Game.GetModule()
    if not result_set then
-      result_set = string.split(mod:GetLocalString("NWNX_ODBC_CurrentRow"), "¬")
+      result_set = string.split(mod:GetLocalString("NWNX_ODBC_CurrentRow"), "")
    end
    if column > #result_set then
       return ""
@@ -169,10 +169,11 @@ function M.GetVector(object, varname, is_global, table)
    return Vector.FromString(M.GetString(object, varname, is_global, table))
 end
 
-function M.SetObject(owner, varname, object, expires, is_global, table)
+function M.SetObject(object, varname, obj, expires, is_global, table)
    expires = expires or 0
    table = table or DEFAULT_OBJECT_TABLE
 
+   local tag = get_tag(object, is_global)
    tag = M.SQLEncodeSpecialChars(tag)
    varname = M.SQLEncodeSpecialChars(varname)
 
@@ -189,7 +190,7 @@ function M.SetObject(owner, varname, object, expires, is_global, table)
          "('" .. tag .. "','" .. varname .. "',%s," .. expires .. ")"
    end
    mod:SetLocalString("NWNX!ODBC!SETSCORCOSQL", sql);
-   CDB.StoreCampaignObject ("NWNX", "-", object);
+   CDB.StoreCampaignObject ("NWNX", "-", obj);
 end
 
 -- TODO MAY NEED TO FIX THIS!!!!!
@@ -198,8 +199,8 @@ function M.GetObject(object, varname, owner, is_global, table)
    table = table or DEFAULT_OBJECT_TABLE
 
    local tag = get_tag(object, is_global)
-   tag = SQLEncodeSpecialChars(tag)
-   varname = SQLEncodeSpecialChars(varname)
+   tag = M.SQLEncodeSpecialChars(tag)
+   varname = M.SQLEncodeSpecialChars(varname)
 
     local sql = "SELECT val FROM " .. table .. " WHERE tag='" .. tag .. "' AND name='" .. varname .. "'"
     mod:SetLocalString("NWNX!ODBC!SETSCORCOSQL", sql);
@@ -233,7 +234,7 @@ function M.DeleteAllVariables(object, is_global, table)
 end
 
 -- NWNX functions cannot be JITed.
-for name, func in pairs(M) do
+for _, func in pairs(M) do
    if type(func) == "function" then
       jit.off(func)
    end

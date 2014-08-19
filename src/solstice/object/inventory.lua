@@ -42,7 +42,7 @@ function M.Object:GetItemPossessedBy(tag, is_resref)
       NWE.ExecuteCommand(30, 2)
       return NWE.StackPopObject()
    else
-      for item in Object:Items() do
+      for item in self:Items() do
          if tag == item:GetResRef() then
             return item
          end

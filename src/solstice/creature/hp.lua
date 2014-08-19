@@ -10,8 +10,6 @@ local M = require 'solstice.creature.init'
 -- @section hitpoints
 
 require 'solstice.nwn.funcs'
-local ffi = require 'ffi'
-local C = ffi.C
 
 --- Get max hit points by level
 -- @param level The level in question.

@@ -21,11 +21,11 @@ end
 -- @param[opt=1] level Ehancement level that HAK is visible.
 function M.SetHakHidden(hak, level)
    if not mod then mod = Game.GetModule() end
-   nLevel = level or 1
+   level = level or 1
 
    if nLevel <= 0 then return -1 end
 
-   mod:SetLocalString("NWNX!HAKS!SETHAKHIDDEN", hak .. "¬" .. level)
+   mod:SetLocalString("NWNX!HAKS!SETHAKHIDDEN", hak .. "" .. level)
    return mod:tonumber(mod:GetLocalString("NWNX!HAKS!SETHAKHIDDEN"))
 end
 
@@ -38,7 +38,7 @@ function M.SetFallBackTLK(tlk)
 end
 
 -- NWNX functions cannot be JITed.
-for name, func in pairs(M) do
+for _, func in pairs(M) do
    if type(func) == "function" then
       jit.off(func)
    end

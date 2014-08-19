@@ -60,7 +60,7 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
       ac = ac + self.ci.mods[COMBAT_MOD_SKILL].ac
 
       -- Dex Mod.
-      val = self:GetDexMod(not self:GetIsPolymorphed())
+      local val = self:GetDexMod(not self:GetIsPolymorphed())
       ac = ac + val
    else
       -- Dex Modifier

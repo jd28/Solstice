@@ -28,7 +28,6 @@ local function GetAreaCombatModifier(cre)
    if not area:GetIsValid() then return end
 
    local area_type = area.obj.area_type
-   local ab = 0
 
    if bit.band(area_type, 4) and
       not bit.band(area_type, 2) and
@@ -103,7 +102,7 @@ local function GetClassCombatModifier(cre)
          (cre:GetAbilityModifier(ABILITY_STRENGTH) >= 30 or
           style == 1)
       then
-         ab = floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID) / 5)
+         ac = floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID) / 5)
       end
 
       -- Assassin

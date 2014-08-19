@@ -76,7 +76,10 @@ end
 -- @func func (creature) -> int
 -- @param ... DAMAGE\_INDEX\_*
 local function SetBaseDamageResistanceOverride(func, ...)
-   _DMG_RED[dmgidx] = func
+  local t = {...}
+  for _, dmg in ipairs(t) do
+    _DMG_RED[dmg] = func
+  end
 end
 
 local M = require 'solstice.rules.init'

@@ -10,11 +10,6 @@ local TDA = require 'solstice.2da'
 local ffi = require 'ffi'
 local C = ffi.C
 
-local random = math.random
-local floor  = math.floor
-local min    = math.min
-local max    = math.max
-
 local bit    = require 'bit'
 local lshift = bit.lshift
 local bor    = bit.bor
@@ -27,8 +22,6 @@ local Creature = M.Creature
 
 --- Combat
 -- @section
-
-local M = require 'solstice.creature.init'
 
 --- Get creatures total damage immunity.
 -- @param dmgidx DAMAMGE\_INDEX\_*
@@ -141,21 +134,6 @@ function M.Creature:GetGoingToBeAttackedBy()
 
    local obj = self.obj.cre_attacker
    return _SOL_GET_CACHED_OBJECT(obj)
-end
-
---- Determines if creature is immune to critical hits.
--- @param attacker Attacker
-function M.Creature:GetIsImmuneToCriticalHits(attacker)
-   --TODO: FIx or Remove
-   return false
-end
-
---- Determines if creature is immune to sneak/death attacks.
---    Ignores immunity to critical hits.
--- @param attacker Attacker
-function M.Creature:GetIsImmuneToSneakAttack(attacker)
-   --TODO: FIx or Remove
-   return false
 end
 
 --- Determines if creature is in combat.
@@ -749,7 +727,7 @@ function M.Creature:UpdateCombatInfo(all)
          UpdateAmmoDamage(self)
       end
       for i = 0, EQUIP_TYPE_NUM - 1 do
-         weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
+         local weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
          UpdateCriticalDamage(self, i, weap)
       end
    end

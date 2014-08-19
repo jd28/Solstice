@@ -6,7 +6,6 @@
 
 local ffi = require 'ffi'
 local C   = ffi.C
-local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.creature.init'
 
@@ -48,7 +47,7 @@ function M.Creature:GetHasFeat(feat, has_uses, check_successors)
 
    local res = false
    if check_successors then
-      res, feat = GetHighestFeat(feat)
+      res, feat = self:GetHighestFeat(feat)
    end
 
    if not res then
@@ -117,7 +116,7 @@ function M.Creature:GetKnownFeat(index)
       return -1
    end
 
-   return self.obj.cre_stats.cs_feats.data[idx];
+   return self.obj.cre_stats.cs_feats.data[index];
 end
 
 --- Gets known feat by level at index
@@ -173,7 +172,7 @@ end
 -- @param feat FEAT\_*
 function M.Creature:GetTotalFeatUses(feat)
    if not self:GetIsValid() then return -1 end
-   return Rules.GetMaximumFeatUses(feat, cre)
+   return Rules.GetMaximumFeatUses(feat, self)
 end
 
 --- Get total known feats.
@@ -222,12 +221,12 @@ end
 -- @param index Feat index to set
 -- @param feat FEAT\_*
 function M.Creature:SetKnownFeat(index, feat)
-   if not self:GetIsValid() or index < 0 or idx > self.obj.cre_stats.cs_feats.len then
+   if not self:GetIsValid() or index < 0 or index > self.obj.cre_stats.cs_feats.len then
       return -1
    end
 
-   self.obj.cre_stats.cs_feats.data[idx] = feat
-   return self.obj.cre_stats.cs_feats.data[idx];
+   self.obj.cre_stats.cs_feats.data[index] = feat
+   return self.obj.cre_stats.cs_feats.data[index];
 end
 
 --- Set known feat by level

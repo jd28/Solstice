@@ -134,7 +134,7 @@ function M.ShutdownServer (nForce)
 end
 
 -- NWNX functions cannot be JITed.
-for name, func in pairs(M) do
+for _, func in pairs(M) do
    if type(func) == "function" then
       jit.off(func)
    end

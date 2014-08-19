@@ -145,8 +145,8 @@ function M.Object:ActionTakeItem(item, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   NWE.StackPushObject(oTakeFrom)
-   NWE.StackPushObject(oItem)
+   NWE.StackPushObject(target)
+   NWE.StackPushObject(item)
    NWE.ExecuteCommand(136, 2)
 
    NWE.SetCommandObject(temp)

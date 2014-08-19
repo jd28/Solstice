@@ -119,7 +119,7 @@ end
 -- @param faction Faction to check
 function M.Creature:GetStandardFactionReputation(faction)
    NWE.StackPushObject(self)
-   NWE.StackPushInteger(nStandardFaction)
+   NWE.StackPushInteger(faction)
    NWE.ExecuteCommand(524, 2)
    return NWE.StackPopInteger()
 end

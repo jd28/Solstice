@@ -78,7 +78,7 @@ function M.BypassEvent(use_return_val)
    if not use_return_val then
       mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
    else
-      mod:SetLocalString("NWNX!EVENTS!BYPASS", "1¬1")
+      mod:SetLocalString("NWNX!EVENTS!BYPASS", "11")
    end
 end
 
@@ -155,10 +155,10 @@ end
 function M.SetCurrentNodeText(sText, nLangID, nGender)
    if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
-   mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "¬" ..sText)
+   mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "" ..sText)
 end
 
-for name, func in pairs(M) do
+for _, func in pairs(M) do
    if type(func) == "function" then
       -- This must absolutely be set, if the call here is JITed
       -- the plugin will crash constantly.

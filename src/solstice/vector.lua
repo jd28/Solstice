@@ -15,7 +15,7 @@ local vector_mt = {
    __add = function (a, b) return M.vector_t(a.x + b.x,
 					     a.y + b.y,
 					     a.z + a.z) end,
-   __index = Vector,
+   __index = M.Vector,
    __sub = function (a, b) return M.vector_t(a.x - b.x,
 					     a.y - b.y,
 					     a.z - a.z) end
@@ -27,7 +27,7 @@ M.vector_t = ffi.metatype("Vector", vector_mt)
 --- Normalizes vector
 function M.Vector:Normalize()
    local magnitude = self:Magnitude()
-   return vector_t(self.x / magnitude, self.y / magnitude, self.z / magnitude)
+   return M.vector_t(self.x / magnitude, self.y / magnitude, self.z / magnitude)
 end
 
 --- Calculates vector's magnitude
@@ -48,13 +48,13 @@ end
 function M.Vector.FromAngle(angle)
    NWE.StackPushFloat(angle)
    NWE.ExecuteCommand(144, 1)
-   return NWE.StackPopVector(vRetVal)
+   return NWE.StackPopVector()
 end
 
 --- Converts a string to a Vector
 function M.Vector.FromString(str)
    local x, y, z = string.match(str, "([%d%.]+), ([%d%.]+), ([%d%.]+)")
-   return vector_t(x, y, z)
+   return M.vector_t(x, y, z)
 end
 
 --- Converts vector to angle

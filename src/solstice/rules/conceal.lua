@@ -83,7 +83,6 @@ end
 -- @param is_ranged Is ranged attack.
 function GetMissChance(cre, is_ranged)
    local total = 0
-   local eff_type, amount, miss_type
 
    for i = cre.obj.cre_stats.cs_first_misschance_eff, cre.obj.obj.obj_effects_len - 1 do
       local eff_type = cre.obj.obj.obj_effects[i].eff_type

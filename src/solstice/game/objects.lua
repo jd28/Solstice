@@ -95,7 +95,7 @@ function M.GetPCSpeaker()
    return NWE.StackPopObject()
 end
 
-local function GetFirstObjectInShape(shape, size, location, line_of_sight, origin)
+local function GetFirstObjectInShape(shape, size, location, line_of_sight, mask, origin)
    NWE.StackPushVector(origin)
    NWE.StackPushInteger(mask)
    NWE.StackPushBoolean(line_of_sight)

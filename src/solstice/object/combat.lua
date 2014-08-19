@@ -5,15 +5,10 @@ local NWE = require 'solstice.nwn.engine'
 
 local ffi = require 'ffi'
 local C = ffi.C
-local random = math.random
-local floor  = math.floor
 local min    = math.min
 local max    = math.max
 
 local bit    = require 'bit'
-local bor    = bit.bor
-local band   = bit.band
-local lshift = bit.lshift
 
 local M = require 'solstice.object.init'
 
@@ -411,7 +406,7 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amt, dmgidx, no_feedback)
    end
 
    local eff = obj:GetBestDamageResistEffect(dmgidx, start)
-   local new, adj = obj:DoDamageReduction(amt, eff, power)
+   local new, adj = obj:DoDamageResistance(amt, eff, dmgidx)
 
    return new
 end

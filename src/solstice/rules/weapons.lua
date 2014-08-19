@@ -440,8 +440,8 @@ local function GetWeaponPower(cre, item)
    local aa = 0
    -- Enchant Arrow
    if base == BASE_ITEM_LONGBOW or base == BASE_ITEM_SHORTBOW then
-      feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_6,
-                                       FEAT_PRESTIGE_ENCHANT_ARROW_20)
+      local feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_6,
+                                             FEAT_PRESTIGE_ENCHANT_ARROW_20)
       if feat ~= -1 then
          aa = aa + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_6) + 6
       else

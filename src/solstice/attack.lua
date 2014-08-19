@@ -6,7 +6,6 @@ local C = ffi.C
 local random = math.random
 local floor  = math.floor
 local min    = math.min
-local max    = math.max
 
 local bit    = require 'bit'
 local bor    = bit.bor
@@ -19,8 +18,6 @@ local Dice   = require 'solstice.dice'
 local DoRoll = Dice.DoRoll
 local RollValid = Dice.IsValid
 local GetIsRangedWeapon = Rules.GetIsRangedWeapon
-
-local Vec = require 'solstice.vector'
 
 --- Adds combat message to an attack.
 local function AddCCMessage(info, type, objs, ints, str)
@@ -149,7 +146,7 @@ end
 
 --- Determine if current attack is an offhand attack.
 -- @param info AttackInfo
-local function GetIsOffhandAttack(info)
+local function GetIsOffhandAttack(info, attacker)
    local cr = attacker.obj.cre_combat_round
    return attacker.obj.cre_combat_round.cr_current_attack + 1 >
       attacker.obj.cre_combat_round.cr_effect_atks
@@ -205,7 +202,7 @@ local function GetIterationPenalty(info, attacker)
 
    -- Deterimine the iteration penalty for an attack.  Not all attack types are
    -- have it.
-   if att_type == ATTACK_TYPE_OFFHAND then
+   if GetType(info) == ATTACK_TYPE_OFFHAND then
       iter_pen = 5 * attacker.obj.cre_combat_round.cr_offhand_taken
       attacker.obj.cre_combat_round.cr_offhand_taken = attacker.obj.cre_combat_round.cr_offhand_taken + 1
    elseif attacker.obj.cre_combat_round.cr_current_attack > attacker.obj.cre_combat_round.cr_onhand_atks then
@@ -453,8 +450,6 @@ end
 -- @param attacker Attacking creature.
 -- @param target Target object.
 local function ResolveAttackRoll(info, attacker, target)
-   local attack_type = info.attack.cad_attack_type
-
    -- Determine attack modifier
    local ab = ResolveAttackModifier(info, attacker, target) -
       GetIterationPenalty(info, attacker)
@@ -631,9 +626,9 @@ local function ResolveDamageModifications(info, attacker, target)
 
    eff = target:GetBestDamageReductionEffect(attacker.ci.equips[info.weapon].power, start)
 
-   local amt, adj, removed = target:DoDamageReduction(info.dmg_result.damages[12],
-                                                      eff,
-                                                      attacker.ci.equips[info.weapon].power)
+   amt, adj, removed = target:DoDamageReduction(info.dmg_result.damages[12],
+                                                eff,
+                                                attacker.ci.equips[info.weapon].power)
    info.dmg_result.damages[12] = amt
    if adj > 0 then
       info.dmg_result.reduction = adj
@@ -1184,5 +1179,3 @@ end
 function NWNXSolstice_DoRangedAttack()
    DoRangedAttack()
 end
-
-return M

@@ -8,7 +8,6 @@ local M   = require 'solstice.creature.init'
 local ffi = require 'ffi'
 local C   = ffi.C
 local NWE = require 'solstice.nwn.engine'
-local sm  = string.strip_margin
 
 --- Inventory
 -- @section
@@ -126,11 +125,11 @@ function M.Creature:ReequipItemInSlot(slot)
    local item = self:GetItemInSlot(slot)
    if not item then return end
 
-   pc:ClearAllActions(true)
-   pc:ActionUnequipItem(item)
-   pc:ActionEquipItem(item, slot)
-   pc:ActionDoCommand(function (self) self:SetCommandable(true) end)
-   pc:SetCommandable(false)
+   self:ClearAllActions(true)
+   self:ActionUnequipItem(item)
+   self:ActionEquipItem(item, slot)
+   self:ActionDoCommand(function (self) self:SetCommandable(true) end)
+   self:SetCommandable(false)
 end
 
 --- Gives gold to creature

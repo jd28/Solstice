@@ -142,6 +142,7 @@ local function smite_ab(special_attack, info, attacker, target)
 end
 
 local function stunning_fist_dmg(special_attack, info, attacker, target)
+   local roll = damage_roll_t()
    roll.type = DAMAGE_INDEX_BASE_WEAPON
    roll.roll.bonus = 4
    roll.mask = 1
@@ -201,8 +202,6 @@ local function disarm_ab(special_attack, info, attacker, target)
 end
 
 local function called_shot_impact(special_attack, info, attacker, target)
-   local disc = target:GetSkillRank(SKILL_DISCIPLINE)
-
    if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
       target:GetSkillRank(SKILL_DISCIPLINE)
    then

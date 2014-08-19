@@ -26,7 +26,7 @@ end
 -- @bool[opt=false] female If true gets string from 'female'
 -- TLK table, else 'male'.
 function M.GetString(strref, female)
-   NWE.StackPushBoolean(gender)
+   NWE.StackPushBoolean(female)
    NWE.StackPushInteger(strref)
    NWE.ExecuteCommand(239, 2)
    return NWE.StackPopString()

@@ -31,9 +31,8 @@ end
 
 --- Get bonus spell slots
 -- @param sp_class CLASS\_TYPE\_*.
--- @param sp_id SPELL\_*
 -- @param sp_level Spell level.
-function M.Creature:GetBonusSpellSlots(sp_class, sp_id, sp_level)
+function M.Creature:GetBonusSpellSlots(sp_class, sp_level)
    return C.nwn_GetBonusSpellSlots(self.obj, sp_class, sp_level)
 end
 

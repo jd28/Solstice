@@ -153,8 +153,8 @@ function M.Creature:SetWizardSpecialization(specialization)
 
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
       if self.obj.cre_stats.cs_classes[i].cl_class == CLASS_TYPE_WIZARD then
-         self.obj.cre_stats.cs_classes[i].cl_specialist = specilization
-         return specilization
+         self.obj.cre_stats.cs_classes[i].cl_specialist = specialization
+         return specialization
       end
    end
 

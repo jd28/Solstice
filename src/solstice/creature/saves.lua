@@ -11,8 +11,6 @@ local M = require 'solstice.creature.init'
 
 require 'solstice.effect'
 
-local ffi = require 'ffi'
-
 function M.Creature:DebugSaves()
    return ""
 end
@@ -27,9 +25,9 @@ function M.Creature:GetSavingThrowBonus(save)
    if save == SAVING_THROW_FORT then
       bonus = self.obj.cre_stats.cs_save_fort
    elseif save == SAVING_THROW_REFLEX then
-      bonus = stats.cs_save_reflex
+      bonus = self.obj.cre_stats.cs_save_reflex
    elseif save == SAVING_THROW_WILL then
-      bonus = stats.cs_save_will
+      bonus = self.obj.cre_stats.cs_save_will
    end
 
    return bonus
@@ -44,9 +42,9 @@ function M.Creature:SetSavingThrowBonus(save, bonus)
    if save == SAVING_THROW_FORT then
       self.obj.cre_stats.cs_save_fort = bonus
    elseif save == SAVING_THROW_REFLEX then
-      stats.cs_save_reflex = bonus
+      self.obj.cre_stats.cs_save_reflex = bonus
    elseif save == SAVING_THROW_WILL then
-      stats.cs_save_will = bonus
+      self.obj.cre_stats.cs_save_will = bonus
    end
 
    return bonus

@@ -6,7 +6,6 @@
 
 local M = require 'solstice.creature.init'
 
-local NWE = require 'solstice.nwn.engine'
 local ffi = require "ffi"
 local C = ffi.C
 
@@ -128,7 +127,6 @@ function M.Creature:SetAbilityScore(ability, value)
 end
 
 local fmt = string.format
-local sm = string.strip_margin
 local tinsert = table.insert
 
 --- Create Ability debug string.

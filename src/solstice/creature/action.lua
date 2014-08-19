@@ -9,8 +9,6 @@
 
 local M = require 'solstice.creature.init'
 
-local ffi = require 'ffi'
-local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
 
 ---
@@ -77,10 +75,10 @@ function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, p
    NWE.SetCommandObject(self)
 
    metamagic = metamagic or METAMAGIC_ANY
-   projectile_path = projectile_path or PROJECTILE_PATH_TYPE_DEFAULT
+   path_type = path_type or PROJECTILE_PATH_TYPE_DEFAULT
 
    NWE.StackPushBoolean(instant)
-   NWE.StackPushInteger(projectile_path)
+   NWE.StackPushInteger(path_type)
    NWE.StackPushInteger(cheat)
    NWE.StackPushInteger(metamagic)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, target)
@@ -102,10 +100,10 @@ function M.Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, pat
    NWE.SetCommandObject(self)
 
    metamagic = metamagic or METAMAGIC_ANY
-   projectile_path = projectile_path or PROJECTILE_PATH_TYPE_DEFAULT
+   path_type = path_type or PROJECTILE_PATH_TYPE_DEFAULT
 
    NWE.StackPushBoolean(instant)
-   NWE.StackPushBoolean(projectile_path)
+   NWE.StackPushBoolean(path_type)
    NWE.StackPushInteger(cheat)
    NWE.StackPushInteger(metamagic)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_LOCATION, target)

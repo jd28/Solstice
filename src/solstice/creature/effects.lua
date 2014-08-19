@@ -4,7 +4,6 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
-local Obj = require 'solstice.object'
 local M = require 'solstice.creature.init'
 local Creature = M.Creature
 
@@ -18,6 +17,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 
 function Creature:CreateEffectDebugString()
+   local t = {}
    for eff in self:EffectsDirect() do
       table.insert(t, eff:ToString())
    end

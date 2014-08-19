@@ -11,9 +11,9 @@ local NWE = require 'solstice.nwn.engine'
 -- @section nearest
 
 --- Gets nearest creature by criteria types and values
-function M.Object:GetNearestCreature(type1, value2, nth, ...)
+function M.Object:GetNearestCreature(type1, value1, nth, ...)
    nth = nth or 1
-   type2, value2, type3, value3 = ...
+   local type2, value2, type3, value3 = ...
    type2  = type2  or -1
    value2 = value2 or -1
    type3  = type3  or -1
@@ -35,7 +35,7 @@ end
 -- @param[opt=solstice.object.ALL] obj_type solstice.object type constant.
 -- @param[opt=1] nth Which object to return.
 function M.Object:GetNearestObject(obj_type, nth)
-   obj_type = obj_type or solstice.object.ALL
+   obj_type = obj_type or OBJECT_TYPE_ALL
    nth = nth or 1
    
    NWE.StackPushInteger(nth)

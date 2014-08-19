@@ -4,7 +4,6 @@
 local M = {}
 
 local NWE = require 'solstice.nwn.engine'
-local Obj = require 'solstice.object'
 
 --- Campaign Database
 -- @section

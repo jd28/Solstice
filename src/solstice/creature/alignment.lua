@@ -16,7 +16,7 @@ local NWE = require 'solstice.nwn.engine'
 -- @param amount Amount to adjust
 -- @param[opt=false] entire_party If true entire faction's alignment will be adjusted.
 function M.Creature:AdjustAlignment(alignment, amount, entire_party)
-   NWE.StackPushBoolean(entire_faction)
+   NWE.StackPushBoolean(entire_party)
    NWE.StackPushInteger(amount)
    NWE.StackPushInteger(alignment)
    NWE.StackPushObject(self)

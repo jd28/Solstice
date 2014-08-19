@@ -15,10 +15,10 @@ local NWE = safe_require 'solstice.nwn.engine'
 -- No longer really nessary as all actions are explicitly assigned.
 -- @param f A closure
 function M.Object:AssignCommand(f)
-   local temp = NWNE.GetCommandObject()
-   NWNE.SetCommandObject(self)
+   local temp = NWE.GetCommandObject()
+   NWE.SetCommandObject(self)
    f()
-   NWNE.SetCommandObject(temp)
+   NWE.SetCommandObject(temp)
 end
 
 --- Delays a command
@@ -59,15 +59,15 @@ end
 
 --- Get is object commandable
 function M.Object:GetCommandable()
-   NWNE.StackPushObject(self);
-   NWNE.ExecuteCommand(163, 1);
-   return NWNE.StackPopBoolean();
+   NWE.StackPushObject(self);
+   NWE.ExecuteCommand(163, 1);
+   return NWE.StackPopBoolean();
 end
 
 --- Set is object commandable
 -- @param[opt=false] commandable New value.
 function M.Object:SetCommandable(commandable)
-   NWNE.StackPushObject(self);
-   NWNE.StackPushBoolean(commandable);
-   NWNE.ExecuteCommand(162, 2);
+   NWE.StackPushObject(self);
+   NWE.StackPushBoolean(commandable);
+   NWE.ExecuteCommand(162, 2);
 end

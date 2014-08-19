@@ -90,21 +90,21 @@ end
 
 --- LuaFun iterator returning all objects in a specified area.
 function Area:Objects()
-   return iter(area_obj(self.obj.area_objects_len))
+   return iter(area_objs(self.obj.area_objects_len))
 end
 
 --- Changes the ambient soundtracks of an area.
 -- @param day Day track number to change to.  If nil the track is unchanged
 -- @param night Night track number to change to.  If nil the track is unchanged
 function Area:AmbientSoundChange(day, night)
-   if daytrack then
+   if day then
       NWE.StackPushInteger(day)
       NWE.StackPushObject(self)
       NWE.ExecuteCommand(435, 2)
    end
-   if nighttrack then
+   if night then
       NWE.StackPushInteger(night)
-      NWE.StackPushObject(area)
+      NWE.StackPushObject(self)
       NWE.ExecuteCommand(436, 2)
    end
 end
@@ -147,7 +147,7 @@ function Area:MusicBackgroundChange(day, night)
       NWE.ExecuteCommand(428, 2)
    end
    if night then
-      NWE.StackPushInteger(nTrack)
+      NWE.StackPushInteger(night)
       NWE.StackPushObject(self)
       NWE.ExecuteCommand(429, 2)
    end
@@ -227,7 +227,7 @@ end
 -- @param skybox A SKYBOX_* constant (associated with skyboxes.2da)
 function Area:SetSkyBox(skybox)
    NWE.StackPushObject(self)
-   NWE.StackPushInteger(skyBox)
+   NWE.StackPushInteger(skybox)
    NWE.ExecuteCommand(777, 2)
 end
 

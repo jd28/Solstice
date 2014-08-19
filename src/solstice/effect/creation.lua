@@ -629,12 +629,12 @@ function M.Skill(skill, amount)
    local type, amt = determine_type_amount(EFFECT_TYPE_SKILL_INCREASE,
                                            EFFECT_TYPE_SKILL_DECREASE,
                                            amount)
-   return CreateSimple(type, skill, amount, 28)
+   return CreateSimple(type, skill, amt, 28)
 end
 
 --- Creates a sleep effect.
 function M.Sleep()
-   return CreateSimpe(EFFECT_TYPE_SETSTATE, 9)
+   return CreateSimple(EFFECT_TYPE_SETSTATE, 9)
 end
 
 --- Creates a slow effect.

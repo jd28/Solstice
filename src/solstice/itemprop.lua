@@ -251,7 +251,7 @@ end
 function M.DamageRange(damage_type, min, max)
    damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
-   eff:SetValues(ITEM_PROPERTY_DAMAGE_RANGE, damage_type, 33, start, 12, stop)
+   eff:SetValues(ITEM_PROPERTY_DAMAGE_RANGE, damage_type, 33, min, 12, max)
    return eff
 end
 

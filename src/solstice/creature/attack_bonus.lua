@@ -4,9 +4,6 @@
 -- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
-
-local ffi = require 'ffi'
-local NWE = require 'solstice.nwn.engine'
 local USE_VERSUS = OPT.USE_VERSUS
 
 local M = require 'solstice.creature.init'

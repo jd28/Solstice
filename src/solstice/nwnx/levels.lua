@@ -27,11 +27,11 @@ end
 
 function M.LevelUp(oPC)
     oPC:SetLocalString("NWNX!LEVELS!LEVELUP", "  ")
-    return tonumber(GetLocalString(oPC, "NWNX!LEVELS!LEVELUP"))
+    return tonumber(oPC:GetLocalString(oPC, "NWNX!LEVELS!LEVELUP"))
 end
 
 -- NWNX functions cannot be JITed.
-for name, func in pairs(M) do
+for _, func in pairs(M) do
    if type(func) == "function" then
       jit.off(func)
    end

@@ -24,7 +24,7 @@ end
 function M.GetSkillAllCanUse(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return false end
-   return sk_all_can_use ~= 0
+   return sk.sk_all_can_use ~= 0
 end
 
 --- Check if skill has armor check penalty.
