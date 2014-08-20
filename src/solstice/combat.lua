@@ -77,3 +77,11 @@ function NSSavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback,
 
    return cre:SavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat)
 end
+
+function NWNXSolstice_GetArmorClass(cre)
+   cre = Game.GetObjectByID(cre)
+   if not cre:GetIsValid() or cre.type ~= OBJECT_TRUETYPE_CREATURE then
+      return 0
+   end
+   return cre:GetACVersus(OBJECT_INVALID, false)
+end
