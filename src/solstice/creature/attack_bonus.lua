@@ -5,6 +5,7 @@
 -- @module creature
 
 local USE_VERSUS = OPT.USE_VERSUS
+local sm     = string.strip_margin
 
 local M = require 'solstice.creature.init'
 
@@ -69,4 +70,41 @@ function M.Creature:GetRangedAttackMod(target, distance)
    end
 
    return ab
+end
+
+function M.Creature:DebugAttackBonus()
+   local t = {}
+
+   table.insert(t, "Attack Bonus")
+   table.insert(t, string.format("  BAB: %d", self.ci.offense.ab_base))
+   table.insert(t, string.format("  Dual Wield Penalty: On: %d, Off: %d",
+                                 self.ci.offense.offhand_penalty_on,
+                                 self.ci.offense.offhand_penalty_off))
+   table.insert(t, string.format("  Effect AB Bonus: %d", self.ci.offense.ab_transient))
+   table.insert(t, "  Combat Modifiers:")
+   table.insert(t, string.format("    AB Area Modifier: %d", self.ci.mods[COMBAT_MOD_AREA].ab))
+   table.insert(t, string.format("    AB Class Modifier: %d", self.ci.mods[COMBAT_MOD_CLASS].ab))
+   table.insert(t, string.format("    AB Feat Modifier: %d", self.ci.mods[COMBAT_MOD_FEAT].ab))
+   table.insert(t, string.format("    AB Race Modifier: %d", self.ci.mods[COMBAT_MOD_RACE].ab))
+   table.insert(t, string.format("    AB Size Modifier: %d", self.ci.mods[COMBAT_MOD_SIZE].ab))
+   table.insert(t, string.format("    AB Skill Modifier: %d", self.ci.mods[COMBAT_MOD_SKILL].ab))
+   table.insert(t, string.format("    AB Training Vs Modifier: %d", self.ci.mods[COMBAT_MOD_TRAINING_VS].ab))
+   table.insert(t, string.format("    AB Favored Enemy Modifier: %d", self.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab))
+
+   table.insert(t, "  Weapons")
+   local fmt = sm([[    ID: %x:
+                   |    Ability AB: %d,
+                   |    AB Modifier : %d,
+                   |    Effect AB Modifier: %d]])
+
+   for i = 0, 5 do
+      table.insert(t, string.format(fmt,
+                                    self.ci.equips[i].id,
+                                    self.ci.equips[i].ab_ability,
+                                    self.ci.equips[i].ab_mod,
+                                    self.ci.equips[i].transient_ab_mod))
+      table.insert(t, "")
+   end
+
+   return table.concat(t, '\n')
 end

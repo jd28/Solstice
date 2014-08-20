@@ -145,6 +145,60 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    return ac
 end
 
+function M.Creature:DebugArmorClass()
+   local t = {}
+   table.insert(t, "Armor Class:")
+   table.insert(t, string.format("  Total: %d, Touch: %d",
+                                 self:GetACVersus(OBJECT_INVALID, false),
+                                 self:GetACVersus(OBJECT_INVALID, true)))
+   table.insert(t, "  Base: 10")
+   table.insert(t, string.format("  Base Natural AC: %d", self.obj.cre_stats.cs_ac_natural_base))
+   table.insert(t, string.format("  Base Armor AC: %d", self.obj.cre_stats.cs_ac_armour_base))
+   table.insert(t, string.format("  Base Shield AC: %d", self.obj.cre_stats.cs_ac_shield_base))
+
+   table.insert(t, string.format("  Dexterity Modifier: %d", self:GetDexMod(not self:GetIsPolymorphed())))
+
+   table.insert(t, string.format("  Armor AC: %d (%d - %d)",
+                                 self.obj.cre_stats.cs_ac_armour_bonus - self.obj.cre_stats.cs_ac_armour_penalty,
+                                 self.obj.cre_stats.cs_ac_armour_bonus,
+                                 self.obj.cre_stats.cs_ac_armour_penalty))
+
+   table.insert(t, string.format("  Deflect AC: %d (%d - %d)",
+                                 self.obj.cre_stats.cs_ac_deflection_bonus - self.obj.cre_stats.cs_ac_deflection_penalty,
+                                 self.obj.cre_stats.cs_ac_deflection_bonus,
+                                 self.obj.cre_stats.cs_ac_deflection_penalty))
+
+   table.insert(t, string.format("  Sheild AC: %d (%d - %d)",
+                                 self.obj.cre_stats.cs_ac_shield_bonus - self.obj.cre_stats.cs_ac_shield_penalty,
+                                 self.obj.cre_stats.cs_ac_shield_bonus,
+                                 self.obj.cre_stats.cs_ac_shield_penalty))
+
+   table.insert(t, string.format("  Natural AC: %d (%d - %d)",
+                                 self.obj.cre_stats.cs_ac_natural_bonus - self.obj.cre_stats.cs_ac_natural_penalty,
+                                 self.obj.cre_stats.cs_ac_natural_bonus,
+                                 self.obj.cre_stats.cs_ac_natural_penalty))
+
+   table.insert(t, string.format("  Dodge AC: %d (%d - %d)",
+                                 self.obj.cre_stats.cs_ac_dodge_bonus - self.obj.cre_stats.cs_ac_dodge_penalty,
+                                 self.obj.cre_stats.cs_ac_dodge_bonus,
+                                 self.obj.cre_stats.cs_ac_dodge_penalty))
+
+   table.insert(t, string.format("  Mode AC: %d", self.ci.mod_mode.ac))
+
+
+   table.insert(t, "  Combat Modifiers:")
+   table.insert(t, string.format("    AC Area Modifier: %d", self.ci.mods[COMBAT_MOD_AREA].ac))
+   table.insert(t, string.format("    AC Class Modifier: %d", self.ci.mods[COMBAT_MOD_CLASS].ac))
+   table.insert(t, string.format("    AC Feat Modifier: %d", self.ci.mods[COMBAT_MOD_FEAT].ac))
+   table.insert(t, string.format("    AC Race Modifier: %d", self.ci.mods[COMBAT_MOD_RACE].ac))
+   table.insert(t, string.format("    AC Size Modifier: %d", self.ci.mods[COMBAT_MOD_SIZE].ac))
+   table.insert(t, string.format("    AC Skill Modifier: %d", self.ci.mods[COMBAT_MOD_SKILL].ac))
+   table.insert(t, string.format("    AC Training Vs Modifier: %d", self.ci.mods[COMBAT_MOD_TRAINING_VS].ac))
+   table.insert(t, string.format("    AC Favored Enemy Modifier: %d", self.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ac))
+
+   return table.concat(t, "\n")
+end
+
 
 --- Determine maximum armor class modifier
 function M.Creature:GetMaxArmorClassMod()
