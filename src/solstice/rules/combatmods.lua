@@ -99,7 +99,7 @@ local function GetClassCombatModifier(cre)
       -- Fighter Discipline
       if cre:GetIsPC() and
          cre:GetLevelByClass(CLASS_TYPE_FIGHTER) >= 30 and
-         (cre:GetAbilityModifier(ABILITY_STRENGTH) >= 30 or
+         (cre:GetAbilityScore(ABILITY_STRENGTH, true) >= 30 or
           style == 1)
       then
          ac = floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID) / 5)
