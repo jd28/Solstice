@@ -5,6 +5,7 @@ local TA = OPT.TA
 local USE_VERSUS = OPT.USE_VERSUS
 
 local max = math.max
+local min = math.min
 local floor = math.floor
 
 --- Concealment.
@@ -38,12 +39,13 @@ local function GetConcealment(cre, vs, is_ranged)
             else
                percent = 15
             end
-            percent = max(percent, rogue - 20)
-            total = total + math.min(percent, floor((cre:GetSkillRank(SKILL_HIDE) * percent) / 100))
+            percent = min(percent, rogue - 20)
+            total = total + min(percent, floor((cre:GetSkillRank(SKILL_HIDE) * percent) / 100))
          end
       end
    end
 
+   local effbonus = 0
    for i = cre.obj.cre_stats.cs_first_conceal_eff, cre.obj.obj.obj_effects_len - 1 do
       local eff_type = cre.obj.obj.obj_effects[i].eff_type
       if eff_type == EFFECT_TYPE_CONCEALMENT then
@@ -70,12 +72,11 @@ local function GetConcealment(cre, vs, is_ranged)
          end
 
          if valid and amount > total then
-            total = amount
+            effbonus = math.max(amount, effbonus)
          end
       end
    end
-
-   return total
+   return math.max(total, effbonus)
 end
 
 --- Determine Miss Chance.
