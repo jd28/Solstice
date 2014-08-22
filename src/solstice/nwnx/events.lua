@@ -155,7 +155,7 @@ end
 function M.SetCurrentNodeText(sText, nLangID, nGender)
    if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
-   mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "" ..sText)
+   mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "¬" ..sText)
 end
 
 for _, func in pairs(M) do
