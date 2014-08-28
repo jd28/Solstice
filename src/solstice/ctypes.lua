@@ -12,8 +12,6 @@ end
 
 require 'solstice.nwn.ctypes.foundation'
 require 'solstice.nwn.ctypes.2da'
-require 'solstice.nwn.ctypes.vector'
-require 'solstice.nwn.ctypes.location'
 require 'solstice.nwn.ctypes.effect'
 require 'solstice.nwn.ctypes.itemprop'
 require 'solstice.nwn.ctypes.object'
