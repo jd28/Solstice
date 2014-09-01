@@ -13,6 +13,8 @@ local _TIERS = {}
 local _TIER2 = {}
 local _TIER3 = {}
 
+local _FEATS = {}
+
 for i=0, TDA.Get2daRowCount("cls_atk_2") - 1 do
    _TIER2[i] = TDA.Get2daInt("cls_atk_2", "BAB", i)
 end
@@ -32,6 +34,8 @@ for i=0, TDA.Get2daRowCount("classes") - 1 do
    else
       _TIERS[i] = 0
    end
+
+   _FEATS[i] = TDA.Get2daString("classes", "FeatsTable", i):lower()
 end
 
 --- Get base attack bonus
@@ -120,7 +124,23 @@ end
 
 SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
 
+local function GetLevelBonusFeats(cre, class, level)
+   local t = {}
+   local s = _FEATS[class]
+   print(s)
+   if not s or #s == 0 then return t end
+
+   for i = 0, TDA.Get2daRowCount(s) - 1 do
+      if TDA.Get2daInt(s, "GrantedOnLevel", i) == level then
+         table.insert(t, TDA.Get2daInt(s, "FeatIndex", i))
+      end
+   end
+
+   return t
+end
+
 local M = require 'solstice.rules.init'
 M.CanUseClassAbilities            = CanUseClassAbilities
 M.SetCanUseClassAbilitiesOverride = SetCanUseClassAbilitiesOverride
 M.GetBaseAttackBonus              = GetBaseAttackBonus
+M.GetLevelBonusFeats              = GetLevelBonusFeats
