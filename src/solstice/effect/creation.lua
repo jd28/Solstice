@@ -526,7 +526,7 @@ end
 -- @param attacks Maximum is 5, even with the effect stacked
 function M.ModifyAttacks(attacks)
    if attacks < 0 or attacks > 5 then return Create() end
-   return CreateSimple(EFFECT_TYPE_MODIFYNUMATTACKS, attacks)
+   return CreateSimple(EFFECT_TYPE_MODIFY_NUM_ATTACKS, attacks)
 end
 
 --- Create a Movement Speed Increase/Decrease effect to slow target.
