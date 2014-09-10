@@ -70,8 +70,8 @@ local function GetClassCombatModifier(cre)
    end
 
    -- Palemaster
-   if cre:GetHasFeat(FEAT_BONE_SKIN_2) then
-      local pm = cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER)
+   local pm = cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER)
+   if pm > 0 then
       pm = floor(pm / 4)
 
       ac = ac + 2
