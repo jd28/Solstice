@@ -116,7 +116,7 @@ local function GetIsWeaponFinessable(item, cre)
    local size = cre:GetSize()
    local rel = cre:GetRelativeWeaponSize(item)
    local fin = TDA.Get2daInt("wpnprops", "Finesse", BaseitemToWeapon(item))
-   if size >= fin then return true end
+   if fin > 0 and size >= fin then return true end
 
    -- ensure Small beings can finesse Small weapons still
    return size < 3 and rel <= 0
