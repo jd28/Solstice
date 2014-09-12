@@ -161,10 +161,7 @@ local function GetSkillCombatModifier(cre)
    if TA then
       -- TODO modifiy tumble by PM and Rdd...
       ac = ac + math.floor(cre:GetSkillRank(SKILL_CRAFT_ARMOR, OBJECT_INVALID) / 40)
-      local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-      if rh:GetIsValid() then
-         ab = math.floor(cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40)
-      end
+      ab = math.floor(cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40)
    end
    cre.ci.mods[COMBAT_MOD_SKILL].ab = ab
    cre.ci.mods[COMBAT_MOD_SKILL].ac = ac
