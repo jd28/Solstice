@@ -240,12 +240,15 @@ local function default_dmg(cre, item)
    if not item:GetIsValid() then return str end
    local base = item:GetBaseType()
    local mighty = false
+   local mighty_needed = false
 
-   if base ~= BASE_ITEM_DART         and
-      base ~= BASE_ITEM_SHURIKEN     and
-      base ~= BASE_ITEM_THROWING_AXE and
-      GetIsRangedWeapon(item)
+   if base == BASE_ITEM_LONGBOW or
+      base == BASE_ITEM_SHORTBOW or
+      base == BASE_ITEM_SLING or
+      base == BASE_ITEM_HEAVYCROSSBOW or
+      base == BASE_ITEM_LIGHTCROSSBOW
    then
+      mighty_needed = true
       for _it, ip in item:ItemProperties() do
          if ip:GetType() == ITEM_PROPERTY_MIGHTY then
             mighty = ip:GetCostTableValue()
@@ -255,7 +258,7 @@ local function default_dmg(cre, item)
    end
 
    -- TODO: Ensure this is correct...
-   if cre:GetRelativeWeaponSize(item) > 0 then
+   if cre:GetRelativeWeaponSize(item) > 0 and not GetIsRangedWeapon(item) then
       if TA and cre:GetLocalInt('pc_style_fighting') == 4 then
          str = str * 2
       else
@@ -263,7 +266,11 @@ local function default_dmg(cre, item)
       end
    end
 
-   return mighty and math.clamp(str, 0, mighty) or str
+   if mighty_needed then
+      return mighty and math.clamp(str, 0, mighty) or 0
+   end
+
+   return str
 end
 
 local _WEAPON_DMG = {
