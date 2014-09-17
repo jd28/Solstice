@@ -540,6 +540,21 @@ local function GetWeaponBaseDamage(item, cre)
       end
    end
 
+   -- Enchant Arrow
+   local base = item:GetBaseType()
+   if base == BASE_ITEM_LONGBOW or base == BASE_ITEM_SHORTBOW then
+      feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_6,
+                                       FEAT_PRESTIGE_ENCHANT_ARROW_20)
+      if feat ~= -1 then
+         b = b + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_6) + 6
+      else
+         feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_1, FEAT_PRESTIGE_ENCHANT_ARROW_5)
+         if feat ~= -1 then
+            b = b + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_1) + 1
+         end
+      end
+   end
+
    return d, s, b
 end
 
