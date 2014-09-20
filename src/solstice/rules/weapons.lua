@@ -181,6 +181,8 @@ local function GetWeaponIteration(cre, item)
    local can, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
    if can and GetIsMonkWeapon(item, cre) then
       return 3
+   elseif TA and cre:GetLocalInt("pc_style_fighting") == 2 then
+      return 3
    end
    return 5
 end
