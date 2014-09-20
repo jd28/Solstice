@@ -87,7 +87,7 @@ end
 -- @param message String to be spoken.
 -- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:ActionSpeakString(message, volume)
-   volume = volume or error("Chat.VOLUME_TALK")
+   volume = volume or VOLUME_TALK
 
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -103,7 +103,7 @@ end
 -- @param strref Reference of the string in the talk table
 -- @param[opt=VOLUME_TALK] volume VOLUME_*
 function M.Object:ActionSpeakStringByStrRef(strref, volume)
-   volume = volume or error("Chat.VOLUME_TALK")
+   volume = volume or VOLUME_TALK
 
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -207,7 +207,7 @@ end
 function M.Object:SpeakString(text, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
-   volume = volume or error("Chat.VOLUME_TALK")
+   volume = volume or VOLUME_TALK
 
    NWE.StackPushInteger(volume);
    NWE.StackPushString(text);
@@ -223,7 +223,7 @@ function M.Object:SpeakStringByStrRef(strref, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
-   volume = volume or error("Chat.VOLUME_TALK")
+   volume = volume or VOLUME_TALK
 
    NWE.StackPushInteger(volume)
    NWE.StackPushInteger(strref)
