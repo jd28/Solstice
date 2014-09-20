@@ -568,6 +568,17 @@ local function GetWeaponCritRange(cre, item)
    local tda = TDA.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
    local basethreat = TDA.Get2daInt(tda, "CritThreat", BaseitemToWeapon(base))
+   local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
+   if override > 0 then
+      if override == 1 then
+         basethreat = 3
+      elseif override == 2 then
+         basethreat = 2
+      elseif override == 3 then
+         basethreat = 1
+      end
+   end
+
    local threat = basethreat
    local haswoc = false
 
@@ -614,6 +625,16 @@ local function GetWeaponCritMultiplier(cre, item)
    local tda = TDA.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
    local mult = TDA.Get2daInt(tda, "CritMult", BaseitemToWeapon(base))
+   local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
+   if override > 0 then
+      if override == 1 then
+         mult = 2
+      elseif override == 2 then
+         mult = 3
+      elseif override == 3 then
+         mult = 4
+      end
+   end
 
    local wm = cre:GetLevelByClass(CLASS_TYPE_WEAPON_MASTER)
    if wm >= 5 then
