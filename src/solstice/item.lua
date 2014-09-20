@@ -318,4 +318,18 @@ function M.Item:SetWeight(weight)
    self.obj.it_weight = weight
 end
 
+--- Get item's stack size.
+function M.Item:GetStackSize()
+   if not self:GetIsValid() then return 0 end
+   return self.obj.it_stacksize
+end
+
+--- Set item's stack size.
+function M.Item:SetStackSize(value)
+   if not self:GetIsValid() then return end
+   if value <= 0 then return end
+   self.obj.it_stacksize = value
+end
+
+
 return M
