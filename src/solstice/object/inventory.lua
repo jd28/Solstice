@@ -55,7 +55,7 @@ function M.Object:Items()
    local obj = self:GetFirstItemInInventory()
    local prev_obj 
    return function()
-      while obj do
+      while obj:GetIsValid() do
          prev_obj = obj
          obj = self:GetNextItemInInventory()
          return prev_obj
