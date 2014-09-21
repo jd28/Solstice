@@ -53,7 +53,7 @@ end
 --- Iterator over items in an object's inventory
 function M.Object:Items()
    local obj = self:GetFirstItemInInventory()
-   local prev_obj 
+   local prev_obj
    return function()
       while obj:GetIsValid() do
          prev_obj = obj
@@ -76,7 +76,7 @@ end
 -- @param resref The blueprint ResRef string of the item to be created or tag.
 -- @param[opt=1] stack_size The number of items to be created.
 -- @param[opt=""] new_tag If this string is empty (""), it be set to the default tag from the template.
--- @param[opt=false] only_once If true, function will not give item if 
+-- @param[opt=false] only_once If true, function will not give item if
 -- object already possess one.
 -- @return The new item or solstice.object.INVALID on error.
 function M.Object:GiveItem(resref, stack_size, new_tag, only_once)
@@ -101,4 +101,62 @@ function M.Object:OpenInventory(target)
    NWE.StackPushObject(target)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(701, 2)
+end
+
+--- Get number of items that an object carries.
+-- @param id Tag or Resref.
+-- @param[opt=false] Use resref.
+function M.Object:CountItem(id, resref)
+   local count = 0
+   for item in self:Items() do
+      if resref then
+         if id == item:GetResRef() then
+            count = count + item:GetStackSize()
+         end
+      else
+         if id == item:GetTag() then
+            count = count + item:GetStackSize()
+         end
+      end
+   end
+   return count
+end
+
+--- Get number of items that an object carries.
+-- @param id Tag or Resref.
+-- @param[opt=1] How many of the items to take.
+-- @param[opt=false] Use resref.
+function M.Object:TakeItem(id, count, resref)
+   count = count or 1
+   if count > self:CountItem(id, resref) then
+      return 0
+   end
+   local taken = 0
+   for item in self:Items() do
+      if count == 0 then break end
+      local take = false
+      if resref then
+         if id == item:GetResRef() then
+            take = true
+         end
+      else
+         if id == item:GetTag() then
+            take = true
+         end
+      end
+
+      if take then
+         local stacksize = item:GetStackSize()
+         if stacksize > count then
+            taken = taken + count
+            item:SetStackSize(stacksize - count)
+            count = 0
+         else
+            count = count - stacksize
+            taken = taken + stacksize
+            item:Destroy(0.2)
+         end
+      end
+   end
+   return taken
 end
