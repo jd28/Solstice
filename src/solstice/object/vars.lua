@@ -141,7 +141,7 @@ end
 function M.Object:GetLocalInt(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommandUnsafe(51, 2)
+   NWE.ExecuteCommand(51, 2)
    return NWE.StackPopInteger()
 end
 
