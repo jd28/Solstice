@@ -112,13 +112,15 @@ function M.Creature:GetConcealment(vs, is_ranged)
    return Rules.GetConcealment(self, vs, is_ranged)
 end
 
----
-function M.Creature:GetCriticalHitMultiplier(is_offhand, equip)
+--- Get Critical Hit Multiplier
+-- @param equip EQUIP\_TYPE\_*
+function M.Creature:GetCriticalHitMultiplier(equip)
    return self.ci.equips[equip].crit_mult
 end
 
----
-function M.Creature:GetCriticalHitRange(is_offhand, equip)
+--- Get Critical Hit Range
+-- @param equip EQUIP\_TYPE\_*
+function M.Creature:GetCriticalHitRange(equip)
    return self.ci.equips[equip].crit_range
 end
 

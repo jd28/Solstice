@@ -104,7 +104,7 @@ end
 -- @param info AttackInfo.
 -- @param attacker Attacking creature.
 local function GetCriticalHitRoll(info, attacker)
-   return 21 - attacker:GetCriticalHitRange(info.is_offhand, info.weapon)
+   return 21 - attacker:GetCriticalHitRange(info.weapon)
 end
 
 --- Get current weapon.
@@ -731,7 +731,7 @@ local function ResolveDamage(info, attacker, target)
    -- If this is a critical hit determine the multiplier.
    local mult = 1
    if GetIsCriticalHit(info) then
-      mult = attacker:GetCriticalHitMultiplier(info.is_offhand, info.weapon)
+      mult = attacker:GetCriticalHitMultiplier(info.weapon)
    end
 
    ResolveDamageResult(info, attacker, mult, ki_strike)
