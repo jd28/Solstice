@@ -30,6 +30,7 @@ end
 function NWNXSolstice_GetCriticalHitMultiplier(attacker, is_offhand)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
    if not attacker:GetIsValid() then return 0 end
+   attacker:UpdateCombatInfo(true)
    local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
    if equip == EQUIP_TYPE_ONHAND and attacker.ci.equips[equip].id == OBJECT_INVALID.id then
       equip = EQUIP_TYPE_UNARMED
@@ -41,6 +42,7 @@ end
 function NWNXSolstice_GetCriticalHitRoll(attacker, is_offhand)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
    if not attacker:GetIsValid() then return 0 end
+   attacker:UpdateCombatInfo(true)
    local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
    if equip == EQUIP_TYPE_ONHAND and attacker.ci.equips[equip].id == OBJECT_INVALID.id then
       equip = EQUIP_TYPE_UNARMED
