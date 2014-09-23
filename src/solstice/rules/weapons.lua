@@ -457,7 +457,7 @@ local function GetWeaponBaseDamage(item, cre)
       feat = GetWeaponFeat(MASTERWEAPON_FEAT_SPEC_LEG, item)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          found = true
-         b = b + 18
+         b = b + 16
       end
 
       if not found then
