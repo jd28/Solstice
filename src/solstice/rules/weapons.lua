@@ -125,55 +125,6 @@ local function GetIsWeaponFinessable(item, cre)
    return size < 3 and rel <= 0
 end
 
---- Determine unarmed damage bonus.
--- @param cre Creature unarmed.
-local function GetUnarmedDamageBonus(cre)
-   local d, s, b = 0, 0, 0
-
-   local big = false
-   if cre:GetSize() == CREATURE_SIZE_HUGE   or
-      cre:GetSize() == CREATURE_SIZE_LARGE  or
-      cre:GetSize() == CREATURE_SIZE_MEDIUM
-   then
-      big = true
-   end
-
-   local can, monk = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
-   if monk > 0 then
-      d = 1
-      if monk >= 16 then
-         if big then
-            d, s = 1, 20
-         else
-            d, s = 2, 6
-         end
-      elseif monk >= 12 then
-         s = big and 12 or 10
-      elseif monk >= 10 then
-         s = big and 12 or 10
-      elseif monk >= 8 then
-         s = big and 10 or 8
-      elseif monk >= 4 then
-         s = big and 8 or 6
-      else
-         s = big and 6 or 4
-      end
-      if TA then
-         if can and cre:GetLocalInt("pc_style_fighting") == 8 then
-            b = b + math.floor(monk / 6)
-         end
-      end
-   else
-      if big then
-         d, s = 1, 3
-      else
-         d, s = 1, 2
-      end
-   end
-
-   return d, s, b
-end
-
 --- Determine Weapon Iteration.
 -- @param cre Creature weilding weapon
 -- @param item The weapon in question.
@@ -498,7 +449,7 @@ local function GetWeaponBaseDamage(item, cre)
    local d = TDA.Get2daInt(tda, "Dice", BaseitemToWeapon(item))
    local s = TDA.Get2daInt(tda, "Sides", BaseitemToWeapon(item))
    local b = TDA.Get2daInt(tda, "Bonus", BaseitemToWeapon(item))
-
+   local base = type(item) == 'number' and item or item:GetBaseType()
    local found = false
    local feat
 
@@ -543,7 +494,6 @@ local function GetWeaponBaseDamage(item, cre)
    end
 
    -- Enchant Arrow
-   local base = item:GetBaseType()
    if base == BASE_ITEM_LONGBOW or base == BASE_ITEM_SHORTBOW then
       feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_6,
                                        FEAT_PRESTIGE_ENCHANT_ARROW_20)
@@ -554,6 +504,56 @@ local function GetWeaponBaseDamage(item, cre)
          if feat ~= -1 then
             b = b + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_1) + 1
          end
+      end
+   end
+
+   return d, s, b
+end
+
+--- Determine unarmed damage bonus.
+-- @param cre Creature unarmed.
+local function GetUnarmedDamageBonus(cre)
+   local d, s, b = GetWeaponBaseDamage(BASE_ITEM_GLOVES, cre)
+   d, s = 0, 0
+
+   local big = false
+   if cre:GetSize() == CREATURE_SIZE_HUGE   or
+      cre:GetSize() == CREATURE_SIZE_LARGE  or
+      cre:GetSize() == CREATURE_SIZE_MEDIUM
+   then
+      big = true
+   end
+
+   local can, monk = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
+   if monk > 0 then
+      d = 1
+      if monk >= 16 then
+         if big then
+            d, s = 1, 20
+         else
+            d, s = 2, 6
+         end
+      elseif monk >= 12 then
+         s = big and 12 or 10
+      elseif monk >= 10 then
+         s = big and 12 or 10
+      elseif monk >= 8 then
+         s = big and 10 or 8
+      elseif monk >= 4 then
+         s = big and 8 or 6
+      else
+         s = big and 6 or 4
+      end
+      if TA then
+         if can and cre:GetLocalInt("pc_style_fighting") == 8 then
+            b = b + math.floor(monk / 6)
+         end
+      end
+   else
+      if big then
+         d, s = 1, 3
+      else
+         d, s = 1, 2
       end
    end
 
