@@ -478,7 +478,7 @@ local function GetWeaponBaseDamage(item, cre)
    end
 
    if not found then
-      feat = GetWeaponFeat(MASTERWEAPON_FEAT_FOCUS_EPIC, item)
+      feat = GetWeaponFeat(MASTERWEAPON_FEAT_SPEC_EPIC, item)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          found = true
          b = b + 8
