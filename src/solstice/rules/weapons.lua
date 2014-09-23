@@ -203,7 +203,7 @@ local function default_dmg(cre, item)
    then
       mighty_needed = true
       for _it, ip in item:ItemProperties() do
-         if ip:GetType() == ITEM_PROPERTY_MIGHTY then
+         if ip:GetPropertyType() == ITEM_PROPERTY_MIGHTY then
             mighty = ip:GetCostTableValue()
             break
          end
