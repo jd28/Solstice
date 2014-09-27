@@ -39,6 +39,7 @@ end
 
 --- Get local variable count.
 function M.Object:GetLocalVarCount()
+   if not self:GetIsValid() then return 0 end
    local vt = get_var_table(self)
    return vt.vt_len
 end
@@ -46,6 +47,7 @@ end
 --- Get local variable by index.
 -- @param index Postive integer.
 function M.Object:GetLocalVarByIndex(index)
+   if not self:GetIsValid() then return end
    local vt = get_var_table(self)
    if index >= vt.vt_len then return end
    return vt.vt_list[index]
