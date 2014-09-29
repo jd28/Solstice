@@ -726,6 +726,36 @@ local function UnpackItempropDamageRoll(ip)
 
 end
 
+local _MONSTER_ROLLS
+local _MONSTER_ROLLS_LEN = 0
+local function UnpackItempropMonsterRoll(ip)
+   if _MONSTER_ROLLS_LEN == 0 then
+      local tda = TDA.GetCached2da("iprp_monstcost")
+      if tda == nil then error "Unable to locate iprp_monstcost!" end
+
+      _MONSTER_ROLLS_LEN = TDA.Get2daRowCount(tda)
+      _MONSTER_ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
+
+      for i=1, TDA.Get2daRowCount(tda) - 1 do
+
+         local d = TDA.Get2daInt(tda, "NumDice", i)
+         local s = TDA.Get2daInt(tda, "Die", i)
+         if d == 0 then
+            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = 0, 0, s
+         else
+            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = d, s, 0
+         end
+      end
+   end
+
+   if ip < 0 or ip >= _MONSTER_ROLLS_LEN then
+      error(string.format("Invalid IP Const: %d, %s", ip, debug.traceback()))
+   end
+
+   return _MONSTER_ROLLS[ip].dice, _MONSTER_ROLLS[ip].sides, _MONSTER_ROLLS[ip].bonus
+end
+
+
 local function AttackTypeToEquipType(atype)
    assert(atype > 0)
    if atype == ATTACK_TYPE_OFFHAND then
@@ -896,6 +926,16 @@ local function InitializeNumberOfAttacks(cre)
 
 end
 
+local function GetCreatureDamageBonus(cre, item)
+   if not item:GetIsValid() then return 0, 0, 0 end
+   for _it, ip in item:ItemProperties() do
+      if ip:GetPropertyType() == ITEM_PROPERTY_MONSTER_DAMAGE then
+         return UnpackItempropMonsterRoll(ip:GetCostTableValue())
+      end
+   end
+   return 0, 0, 0
+end
+
 -- Exports.
 M.GetWeaponAttackAbility          = GetWeaponAttackAbility
 M.SetWeaponAttackAbilityOverride  = SetWeaponAttackAbilityOverride
@@ -930,3 +970,4 @@ M.GetOnhandAttacks                = GetOnhandAttacks
 M.GetOffhandAttacks               = GetOffhandAttacks
 M.InitializeNumberOfAttacks       = InitializeNumberOfAttacks
 M.BaseitemToWeapon                = BaseitemToWeapon
+M.GetCreatureDamageBonus          = GetCreatureDamageBonus

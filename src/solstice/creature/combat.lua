@@ -579,6 +579,13 @@ local function UpdateCombatWeaponInfo(self)
             self.ci.equips[i].base_dmg_roll.dice,
             self.ci.equips[i].base_dmg_roll.sides,
             self.ci.equips[i].base_dmg_roll.bonus = Rules.GetUnarmedDamageBonus(self)
+         elseif i == EQUIP_TYPE_CREATURE_1
+            or i == EQUIP_TYPE_CREATURE_2
+            or i == EQUIP_TYPE_CREATURE_3
+         then
+            self.ci.equips[i].base_dmg_roll.dice,
+            self.ci.equips[i].base_dmg_roll.sides,
+            self.ci.equips[i].base_dmg_roll.bonus = Rules.GetCreatureDamageBonus(self, weap)
          else
             self.ci.equips[i].base_dmg_roll.dice,
             self.ci.equips[i].base_dmg_roll.sides,
