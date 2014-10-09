@@ -127,7 +127,6 @@ SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
 local function GetLevelBonusFeats(cre, class, level)
    local t = {}
    local s = _FEATS[class]
-   print(s)
    if not s or #s == 0 then return t end
 
    for i = 0, TDA.Get2daRowCount(s) - 1 do
