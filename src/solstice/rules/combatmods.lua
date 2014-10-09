@@ -87,7 +87,7 @@ local function GetClassCombatModifier(cre)
 
    if TA then
       -- Ranger Wisdom
-      local ranger, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_RANGER);
+      local ranger, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_RANGER)
       if not monk and ranger then
          if wis <= 20 then
             ac = ac + math.clamp(wis, 0, floor(lvl / 2))
