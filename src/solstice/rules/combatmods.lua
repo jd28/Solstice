@@ -102,7 +102,7 @@ local function GetClassCombatModifier(cre)
          (cre:GetAbilityScore(ABILITY_STRENGTH, true) >= 30 or
           style == 1)
       then
-         ac = floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID, true) / 5)
+         ac = ac + floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID, true) / 5)
       end
 
       -- Assassin
