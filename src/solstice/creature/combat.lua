@@ -444,8 +444,8 @@ local function UpdateCombatEquips(self)
       elseif base == BASE_ITEM_SHURIKEN then
          rng_type = RANGED_TYPE_SHURIKEN
       end
-      self.ci.offense.ranged_type = rng_type
    end
+   self.ci.offense.ranged_type = rng_type
 
    local is_double = TDA.Get2daInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
 
