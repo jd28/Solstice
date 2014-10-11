@@ -184,6 +184,13 @@ local function GetFavoredEnemyCombatModifier(cre)
    local bonus = 1 + math.floor(r / 5)
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab = bonus
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.bonus = bonus
+
+   if cre:GetHasFeat(FEAT_EPIC_BANE_OF_ENEMIES) then
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab = cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab + 2
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.dice = 2
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.sides = 6
+   end
+
 end
 
 local _COMBAT_MOD = {
