@@ -596,12 +596,21 @@ local function GetWeaponCritRange(cre, item)
       end
    end
 
+   local has_oc = false
    if TA then
       if not haswoc then
          feat = GetWeaponFeat(MASTERWEAPON_FEAT_CRIT_OVERWHELMING, base)
          if feat ~= -1 and cre:GetHasFeat(feat) then
             threat = threat + 1
+            has_oc = true
          end
+      end
+      if not has_oc
+         and cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
+         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 30
+         and GetIsWeaponSimple(item, cre)
+      then
+         threat = threat + 1
       end
    end
 
@@ -649,7 +658,7 @@ local function GetWeaponCritMultiplier(cre, item)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          mult = mult + 1
       elseif cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
-         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 30
+         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 35
          and GetIsWeaponSimple(item, cre)
       then
          mult = mult + 1
