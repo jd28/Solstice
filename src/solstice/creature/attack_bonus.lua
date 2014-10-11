@@ -32,6 +32,14 @@ function M.Creature:GetAttackBonusVs(target, equip)
       ab = ab + self.ci.mods[i].ab
    end
 
+   if self:GetHasTrainingVs(target) then
+      ab = ab + self.ci.mods[COMBAT_MOD_TRAINING_VS].ab
+   end
+
+   if self:GetIsFavoredEnemy(target) then
+      ab = ab + self.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab
+   end
+
    if OPT.TA and not self:GetIsPC() and not self:GetMaster():GetIsValid() then
       ab = ab + self:GetSkillRank(SKILL_RIDE, OBJECT_INVALID, true)
    end
