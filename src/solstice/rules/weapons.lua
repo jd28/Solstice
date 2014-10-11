@@ -648,6 +648,11 @@ local function GetWeaponCritMultiplier(cre, item)
       feat = GetWeaponFeat(MASTERWEAPON_FEAT_CRIT_DEVASTATING, base)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          mult = mult + 1
+      elseif cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
+         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 30
+         and GetIsWeaponSimple(item, cre)
+      then
+         mult = mult + 1
       end
    end
 
