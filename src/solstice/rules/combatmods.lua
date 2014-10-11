@@ -108,6 +108,21 @@ local function GetClassCombatModifier(cre)
       -- Assassin
       if style == 9 and not monk then
          ac = ac + cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+      local rogue = cre:GetLevelByClass(CLASS_TYPE_ROGUE)
+      if rogue >= 25 and cre:GetHasFeat(FEAT_OPPORTUNIST) then
+         local int = cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+         if int > 0 then
+            local cap = 1
+            if rogue >= 40 then
+               cap = 5
+            elseif rogue >= 35 then
+               cap = 4
+            elseif rogue >= 30 then
+               cap = 3
+            end
+
+            cre.ci.mods[COMBAT_MOD_CLASS].ab = math.min(cap, int)
+         end
       end
    end
 
