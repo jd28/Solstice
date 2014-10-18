@@ -605,7 +605,7 @@ local function GetWeaponCritRange(cre, item)
             has_oc = true
          end
       end
-      if not has_oc
+      if not has_oc and not haswoc
          and cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
          and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 30
          and GetIsWeaponSimple(item, cre)
