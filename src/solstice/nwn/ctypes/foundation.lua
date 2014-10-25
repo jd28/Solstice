@@ -39,9 +39,32 @@ typedef struct {
 } CExoLinkedList;
 
 typedef struct {
+    float       x;
+    float       y;
+    float       z;
+} Vector;
+
+typedef struct {
+    float       x;
+    float       y;
+} Vector2;
+
+typedef struct {
+    Vector          position;
+    Vector          orientation;
+    uint32_t        area;
+} CScriptLocation;
+
+typedef struct {
     CExoString          var_name;
     uint32_t            var_type;
-    uint32_t            var_value;
+    union {
+       uint32_t         val_object;
+       int32_t          val_int;
+       float            val_float;
+       CExoString      *val_string;
+       CScriptLocation *val_loc;
+    } var_value;
 } CScriptVariable;
 
 typedef struct {
@@ -71,3 +94,6 @@ make_array_list('uint32_t', 'uint32')
 make_array_list('uint16_t', 'uint16')
 make_array_list('float', 'float')
 make_array_list('CExoString', 'string')
+
+vector3_t = ffi.typeof("Vector")
+vector2_t = ffi.typeof("Vector2")

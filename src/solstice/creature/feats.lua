@@ -19,7 +19,7 @@ function M.Creature:AddKnownFeat(feat, level)
    if not self:GetIsValid() then return -1 end
 
    level = level or 0
-   return C.nwn_AddKnownFeat(self, feat, level)
+   return C.nwn_AddKnownFeat(self.obj, feat, level)
 end
 
 --- Decrement remaining feat uses.

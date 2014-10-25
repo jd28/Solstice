@@ -112,13 +112,15 @@ function M.Creature:GetConcealment(vs, is_ranged)
    return Rules.GetConcealment(self, vs, is_ranged)
 end
 
----
-function M.Creature:GetCriticalHitMultiplier(is_offhand, equip)
+--- Get Critical Hit Multiplier
+-- @param equip EQUIP\_TYPE\_*
+function M.Creature:GetCriticalHitMultiplier(equip)
    return self.ci.equips[equip].crit_mult
 end
 
----
-function M.Creature:GetCriticalHitRange(is_offhand, equip)
+--- Get Critical Hit Range
+-- @param equip EQUIP\_TYPE\_*
+function M.Creature:GetCriticalHitRange(equip)
    return self.ci.equips[equip].crit_range
 end
 
@@ -442,8 +444,8 @@ local function UpdateCombatEquips(self)
       elseif base == BASE_ITEM_SHURIKEN then
          rng_type = RANGED_TYPE_SHURIKEN
       end
-      self.ci.offense.ranged_type = rng_type
    end
+   self.ci.offense.ranged_type = rng_type
 
    local is_double = TDA.Get2daInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
 
@@ -577,6 +579,13 @@ local function UpdateCombatWeaponInfo(self)
             self.ci.equips[i].base_dmg_roll.dice,
             self.ci.equips[i].base_dmg_roll.sides,
             self.ci.equips[i].base_dmg_roll.bonus = Rules.GetUnarmedDamageBonus(self)
+         elseif i == EQUIP_TYPE_CREATURE_1
+            or i == EQUIP_TYPE_CREATURE_2
+            or i == EQUIP_TYPE_CREATURE_3
+         then
+            self.ci.equips[i].base_dmg_roll.dice,
+            self.ci.equips[i].base_dmg_roll.sides,
+            self.ci.equips[i].base_dmg_roll.bonus = Rules.GetCreatureDamageBonus(self, weap)
          else
             self.ci.equips[i].base_dmg_roll.dice,
             self.ci.equips[i].base_dmg_roll.sides,

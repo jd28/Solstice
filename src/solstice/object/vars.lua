@@ -22,6 +22,54 @@ local function get_var_table(obj)
    end
 end
 
+local function get_var_value(var)
+   if var.var_type == VARIABLE_TYPE_OBJECT then
+      return var.var_value.val_object
+   elseif var.var_type == VARIABLE_TYPE_FLOAT then
+      return var.var_value.val_float
+   elseif var.var_type == VARIABLE_TYPE_INT then
+      return var.var_value.val_int
+   elseif var.var_type == VARIABLE_TYPE_STRING then
+      return ffi.string(var.var_value.val_string.text)
+   elseif var.var_type == VARIABLE_TYPE_LOCATION then
+      error "Unsupported"
+   end
+
+end
+
+--- Get local variable count.
+function M.Object:GetLocalVarCount()
+   if not self:GetIsValid() then return 0 end
+   local vt = get_var_table(self)
+   return vt.vt_len
+end
+
+--- Get local variable by index.
+-- @param index Postive integer.
+function M.Object:GetLocalVarByIndex(index)
+   if not self:GetIsValid() then return end
+   local vt = get_var_table(self)
+   if index >= vt.vt_len then return end
+   return vt.vt_list[index]
+end
+
+--- Get all variables.
+-- @param[opt] match A string pattern for testing variable names.  See string.find
+-- @param[opt] type Get variables of a particular type.
+function M.Object:GetAllVars(match, type)
+   local res = {}
+   for i = 0, self:GetLocalVarCount() - 1 do
+      local var = self:GetLocalVarByIndex(i)
+      local name = ffi.string(var.var_name.text)
+      if (not type or var.var_type == type) and
+         (not match or string.find(name, match))
+      then
+         res[name] = get_var_value(var)
+      end
+   end
+   return res
+end
+
 --- Decrements local integer variable
 -- @param name Variable name
 -- @param[opt=1] val Amount to decrement.
@@ -95,7 +143,7 @@ end
 function M.Object:GetLocalInt(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommandUnsafe(51, 2)
+   NWE.ExecuteCommand(51, 2)
    return NWE.StackPopInteger()
 end
 

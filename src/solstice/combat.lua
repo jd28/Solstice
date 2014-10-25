@@ -27,22 +27,28 @@ end
 
 --- Bridge functions.
 
-function NSGetCriticalHitMultiplier(attacker, is_offhand)
+function NWNXSolstice_GetCriticalHitMultiplier(attacker, is_offhand)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
    if not attacker:GetIsValid() then return 0 end
-   return attacker:GetCriticalHitMultiplier(is_offhand == 1)
+   attacker:UpdateCombatInfo(true)
+   local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
+   if equip == EQUIP_TYPE_ONHAND and attacker.ci.equips[equip].id == OBJECT_INVALID.id then
+      equip = EQUIP_TYPE_UNARMED
+   end
+
+   return attacker:GetCriticalHitMultiplier(equip)
 end
 
-function NSGetCriticalHitRange(attacker, is_offhand)
+function NWNXSolstice_GetCriticalHitRoll(attacker, is_offhand)
    attacker = _SOL_GET_CACHED_OBJECT(attacker)
    if not attacker:GetIsValid() then return 0 end
-   return attacker:GetCriticalHitRange(is_offhand == 1)
-end
+   attacker:UpdateCombatInfo(true)
+   local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
+   if equip == EQUIP_TYPE_ONHAND and attacker.ci.equips[equip].id == OBJECT_INVALID.id then
+      equip = EQUIP_TYPE_UNARMED
+   end
 
-function NSGetCriticalHitRoll(attacker, is_offhand)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
-   if not attacker:GetIsValid() then return 0 end
-   return 21 - attacker:GetCriticalHitRange(is_offhand == 1)
+   return 21 - attacker:GetCriticalHitRange(equip)
 end
 
 function NWNXSolstice_InitializeNumberOfAttacks(cre)
@@ -84,4 +90,10 @@ function NWNXSolstice_GetArmorClass(cre)
       return 0
    end
    return cre:GetACVersus(OBJECT_INVALID, false)
+end
+
+function NWNXSolstice_GetWeaponFinesse(cre, item)
+   cre  = Game.GetObjectByID(cre)
+   item = Game.GetObjectByID(item)
+   return Rules.GetIsWeaponFinessable(item, cre)
 end

@@ -116,59 +116,13 @@ local function GetIsWeaponFinessable(item, cre)
    local size = cre:GetSize()
    local rel = cre:GetRelativeWeaponSize(item)
    local fin = TDA.Get2daInt("wpnprops", "Finesse", BaseitemToWeapon(item))
-   if size >= fin then return true end
+   if fin > 0 and size >= fin then return true end
+
+
+   if TA then return rel <= 0 end
 
    -- ensure Small beings can finesse Small weapons still
    return size < 3 and rel <= 0
-end
-
---- Determine unarmed damage bonus.
--- @param cre Creature unarmed.
-local function GetUnarmedDamageBonus(cre)
-   local d, s, b = 0, 0, 0
-
-   local big = false
-   if cre:GetSize() == CREATURE_SIZE_HUGE   or
-      cre:GetSize() == CREATURE_SIZE_LARGE  or
-      cre:GetSize() == CREATURE_SIZE_MEDIUM
-   then
-      big = true
-   end
-
-   local can, monk = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
-   if monk > 0 then
-      d = 1
-      if monk >= 16 then
-         if big then
-            d, s = 1, 20
-         else
-            d, s = 2, 6
-         end
-      elseif monk >= 12 then
-         s = big and 12 or 10
-      elseif monk >= 10 then
-         s = big and 12 or 10
-      elseif monk >= 8 then
-         s = big and 10 or 8
-      elseif monk >= 4 then
-         s = big and 8 or 6
-      else
-         s = big and 6 or 4
-      end
-      if TA then
-         if can and cre:GetLocalInt("pc_style_fighting") == 8 then
-            b = b + math.floor(monk / 6)
-         end
-      end
-   else
-      if big then
-         d, s = 1, 3
-      else
-         d, s = 1, 2
-      end
-   end
-
-   return d, s, b
 end
 
 --- Determine Weapon Iteration.
@@ -177,6 +131,8 @@ end
 local function GetWeaponIteration(cre, item)
    local can, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
    if can and GetIsMonkWeapon(item, cre) then
+      return 3
+   elseif TA and cre:GetLocalInt("pc_style_fighting") == 2 then
       return 3
    end
    return 5
@@ -237,14 +193,17 @@ local function default_dmg(cre, item)
    if not item:GetIsValid() then return str end
    local base = item:GetBaseType()
    local mighty = false
+   local mighty_needed = false
 
-   if base ~= BASE_ITEM_DART         and
-      base ~= BASE_ITEM_SHURIKEN     and
-      base ~= BASE_ITEM_THROWING_AXE and
-      GetIsRangedWeapon(item)
+   if base == BASE_ITEM_LONGBOW or
+      base == BASE_ITEM_SHORTBOW or
+      base == BASE_ITEM_SLING or
+      base == BASE_ITEM_HEAVYCROSSBOW or
+      base == BASE_ITEM_LIGHTCROSSBOW
    then
+      mighty_needed = true
       for _it, ip in item:ItemProperties() do
-         if ip:GetType() == ITEM_PROPERTY_MIGHTY then
+         if ip:GetPropertyType() == ITEM_PROPERTY_MIGHTY then
             mighty = ip:GetCostTableValue()
             break
          end
@@ -252,7 +211,7 @@ local function default_dmg(cre, item)
    end
 
    -- TODO: Ensure this is correct...
-   if cre:GetRelativeWeaponSize(item) > 0 then
+   if cre:GetRelativeWeaponSize(item) > 0 and not GetIsRangedWeapon(item) then
       if TA and cre:GetLocalInt('pc_style_fighting') == 4 then
          str = str * 2
       else
@@ -260,7 +219,11 @@ local function default_dmg(cre, item)
       end
    end
 
-   return mighty and math.clamp(str, 0, mighty) or str
+   if mighty_needed then
+      return mighty and math.clamp(str, 0, mighty) or 0
+   end
+
+   return str
 end
 
 local _WEAPON_DMG = {
@@ -486,7 +449,7 @@ local function GetWeaponBaseDamage(item, cre)
    local d = TDA.Get2daInt(tda, "Dice", BaseitemToWeapon(item))
    local s = TDA.Get2daInt(tda, "Sides", BaseitemToWeapon(item))
    local b = TDA.Get2daInt(tda, "Bonus", BaseitemToWeapon(item))
-
+   local base = type(item) == 'number' and item or item:GetBaseType()
    local found = false
    local feat
 
@@ -494,7 +457,7 @@ local function GetWeaponBaseDamage(item, cre)
       feat = GetWeaponFeat(MASTERWEAPON_FEAT_SPEC_LEG, item)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          found = true
-         b = b + 18
+         b = b + 16
       end
 
       if not found then
@@ -515,7 +478,7 @@ local function GetWeaponBaseDamage(item, cre)
    end
 
    if not found then
-      feat = GetWeaponFeat(MASTERWEAPON_FEAT_FOCUS_EPIC, item)
+      feat = GetWeaponFeat(MASTERWEAPON_FEAT_SPEC_EPIC, item)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          found = true
          b = b + 8
@@ -530,6 +493,70 @@ local function GetWeaponBaseDamage(item, cre)
       end
    end
 
+   -- Enchant Arrow
+   if base == BASE_ITEM_LONGBOW or base == BASE_ITEM_SHORTBOW then
+      feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_6,
+                                       FEAT_PRESTIGE_ENCHANT_ARROW_20)
+      if feat ~= -1 then
+         b = b + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_6) + 6
+      else
+         feat = cre:GetHighestFeatInRange(FEAT_PRESTIGE_ENCHANT_ARROW_1, FEAT_PRESTIGE_ENCHANT_ARROW_5)
+         if feat ~= -1 then
+            b = b + (feat - FEAT_PRESTIGE_ENCHANT_ARROW_1) + 1
+         end
+      end
+   end
+
+   return d, s, b
+end
+
+--- Determine unarmed damage bonus.
+-- @param cre Creature unarmed.
+local function GetUnarmedDamageBonus(cre)
+   local d, s, b = GetWeaponBaseDamage(BASE_ITEM_GLOVES, cre)
+   d, s = 0, 0
+
+   local big = false
+   if cre:GetSize() == CREATURE_SIZE_HUGE   or
+      cre:GetSize() == CREATURE_SIZE_LARGE  or
+      cre:GetSize() == CREATURE_SIZE_MEDIUM
+   then
+      big = true
+   end
+
+   local can, monk = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
+   if monk > 0 then
+      d = 1
+      if monk >= 16 then
+         if big then
+            d, s = 1, 20
+         else
+            d, s = 2, 6
+         end
+      elseif monk >= 12 then
+         s = big and 12 or 10
+      elseif monk >= 10 then
+         s = big and 12 or 10
+      elseif monk >= 8 then
+         s = big and 10 or 8
+      elseif monk >= 4 then
+         s = big and 8 or 6
+      else
+         s = big and 6 or 4
+      end
+      if TA then
+         if can and cre:GetLocalInt("pc_style_fighting") == 8 then
+            b = b + math.floor(monk / 6)
+         end
+      end
+   else
+      if big then
+         d, s = 1, 3
+      else
+         d, s = 1, 2
+      end
+   end
+
    return d, s, b
 end
 
@@ -541,6 +568,17 @@ local function GetWeaponCritRange(cre, item)
    local tda = TDA.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
    local basethreat = TDA.Get2daInt(tda, "CritThreat", BaseitemToWeapon(base))
+   local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
+   if override > 0 then
+      if override == 1 then
+         basethreat = 3
+      elseif override == 2 then
+         basethreat = 2
+      elseif override == 3 then
+         basethreat = 1
+      end
+   end
+
    local threat = basethreat
    local haswoc = false
 
@@ -558,12 +596,21 @@ local function GetWeaponCritRange(cre, item)
       end
    end
 
+   local has_oc = false
    if TA then
       if not haswoc then
          feat = GetWeaponFeat(MASTERWEAPON_FEAT_CRIT_OVERWHELMING, base)
          if feat ~= -1 and cre:GetHasFeat(feat) then
             threat = threat + 1
+            has_oc = true
          end
+      end
+      if not has_oc and not haswoc
+         and cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
+         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 30
+         and GetIsWeaponSimple(item, cre)
+      then
+         threat = threat + 1
       end
    end
 
@@ -587,6 +634,16 @@ local function GetWeaponCritMultiplier(cre, item)
    local tda = TDA.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
    local mult = TDA.Get2daInt(tda, "CritMult", BaseitemToWeapon(base))
+   local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
+   if override > 0 then
+      if override == 1 then
+         mult = 2
+      elseif override == 2 then
+         mult = 3
+      elseif override == 3 then
+         mult = 4
+      end
+   end
 
    local wm = cre:GetLevelByClass(CLASS_TYPE_WEAPON_MASTER)
    if wm >= 5 then
@@ -599,6 +656,11 @@ local function GetWeaponCritMultiplier(cre, item)
    if TA then
       feat = GetWeaponFeat(MASTERWEAPON_FEAT_CRIT_DEVASTATING, base)
       if feat ~= -1 and cre:GetHasFeat(feat) then
+         mult = mult + 1
+      elseif cre:GetHasFeat(FEAT_CRIPPLING_STRIKE)
+         and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 35
+         and GetIsWeaponSimple(item, cre)
+      then
          mult = mult + 1
       end
    end
@@ -677,6 +739,36 @@ local function UnpackItempropDamageRoll(ip)
    return _ROLLS[ip].dice, _ROLLS[ip].sides, _ROLLS[ip].bonus
 
 end
+
+local _MONSTER_ROLLS
+local _MONSTER_ROLLS_LEN = 0
+local function UnpackItempropMonsterRoll(ip)
+   if _MONSTER_ROLLS_LEN == 0 then
+      local tda = TDA.GetCached2da("iprp_monstcost")
+      if tda == nil then error "Unable to locate iprp_monstcost!" end
+
+      _MONSTER_ROLLS_LEN = TDA.Get2daRowCount(tda)
+      _MONSTER_ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
+
+      for i=1, TDA.Get2daRowCount(tda) - 1 do
+
+         local d = TDA.Get2daInt(tda, "NumDice", i)
+         local s = TDA.Get2daInt(tda, "Die", i)
+         if d == 0 then
+            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = 0, 0, s
+         else
+            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = d, s, 0
+         end
+      end
+   end
+
+   if ip < 0 or ip >= _MONSTER_ROLLS_LEN then
+      error(string.format("Invalid IP Const: %d, %s", ip, debug.traceback()))
+   end
+
+   return _MONSTER_ROLLS[ip].dice, _MONSTER_ROLLS[ip].sides, _MONSTER_ROLLS[ip].bonus
+end
+
 
 local function AttackTypeToEquipType(atype)
    assert(atype > 0)
@@ -848,6 +940,18 @@ local function InitializeNumberOfAttacks(cre)
 
 end
 
+local function GetCreatureDamageBonus(cre, item)
+   local d, s, b = GetWeaponBaseDamage(BASE_ITEM_GLOVES, cre)
+   if not item:GetIsValid() then return 0, 0, 0 end
+   for _it, ip in item:ItemProperties() do
+      if ip:GetPropertyType() == ITEM_PROPERTY_MONSTER_DAMAGE then
+         d, s = UnpackItempropMonsterRoll(ip:GetCostTableValue())
+         break
+      end
+   end
+   return d, s, b
+end
+
 -- Exports.
 M.GetWeaponAttackAbility          = GetWeaponAttackAbility
 M.SetWeaponAttackAbilityOverride  = SetWeaponAttackAbilityOverride
@@ -882,3 +986,4 @@ M.GetOnhandAttacks                = GetOnhandAttacks
 M.GetOffhandAttacks               = GetOffhandAttacks
 M.InitializeNumberOfAttacks       = InitializeNumberOfAttacks
 M.BaseitemToWeapon                = BaseitemToWeapon
+M.GetCreatureDamageBonus          = GetCreatureDamageBonus

@@ -44,14 +44,15 @@ local function GetClassCombatModifier(cre)
 
    local style = TA and cre:GetLocalInt("pc_style_fighting") or 0
    local monk, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
+   local monk_ac, ass_ac, ranger_ac = 0, 0, 0
    local wis = cre:GetAbilityModifier(ABILITY_WISDOM)
 
    -- Monk
    if monk then
-      ac = ac + wis
-      ac = ac + floor(lvl / 5)
+      monk_ac = wis
+      monk_ac = monk_ac + floor(lvl / 5)
       if style == 6 then
-         ac = ac + floor(lvl / 6)
+         monk_ac = monk_ac + floor(lvl / 6)
       end
    end
 
@@ -70,8 +71,8 @@ local function GetClassCombatModifier(cre)
    end
 
    -- Palemaster
-   if cre:GetHasFeat(FEAT_BONE_SKIN_2) then
-      local pm = cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER)
+   local pm = cre:GetLevelByClass(CLASS_TYPE_PALE_MASTER)
+   if pm > 0 then
       pm = floor(pm / 4)
 
       ac = ac + 2
@@ -87,12 +88,12 @@ local function GetClassCombatModifier(cre)
 
    if TA then
       -- Ranger Wisdom
-      local ranger, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_RANGER);
+      local ranger, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_RANGER)
       if not monk and ranger then
          if wis <= 20 then
-            ac = ac + math.clamp(wis, 0, floor(lvl / 2))
+            ranger_ac = math.clamp(wis, 0, floor(lvl / 2))
          elseif lvl > 20 then
-            ac = ac + math.min(wis, lvl)
+            ranger_ac = math.min(wis, lvl)
          end
       end
 
@@ -102,15 +103,33 @@ local function GetClassCombatModifier(cre)
          (cre:GetAbilityScore(ABILITY_STRENGTH, true) >= 30 or
           style == 1)
       then
-         ac = floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID) / 5)
+         ac = ac + floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID, true) / 5)
+      end
+      -- Assassin
+      local ass, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_ASSASSIN)
+      if ass and lvl >= 5 then
+         ass_ac = cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
       end
 
-      -- Assassin
-      if style == 9 and not monk then
-         ac = ac + cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+      local rogue = cre:GetLevelByClass(CLASS_TYPE_ROGUE)
+      if rogue >= 25 and cre:GetHasFeat(FEAT_OPPORTUNIST) then
+         local int = cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+         if int > 0 then
+            local cap = 1
+            if rogue >= 40 then
+               cap = 5
+            elseif rogue >= 35 then
+               cap = 4
+            elseif rogue >= 30 then
+               cap = 3
+            end
+
+            cre.ci.mods[COMBAT_MOD_CLASS].ab = math.min(cap, int)
+         end
       end
    end
 
+   ac = ac + math.max(monk_ac, ass_ac, ranger_ac)
    cre.ci.mods[COMBAT_MOD_CLASS].ac = ac
 end
 
@@ -161,10 +180,7 @@ local function GetSkillCombatModifier(cre)
    if TA then
       -- TODO modifiy tumble by PM and Rdd...
       ac = ac + math.floor(cre:GetSkillRank(SKILL_CRAFT_ARMOR, OBJECT_INVALID) / 40)
-      local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-      if rh:GetIsValid() then
-         ab = math.floor(cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40)
-      end
+      ab = math.floor(cre:GetSkillRank(SKILL_CRAFT_WEAPON, OBJECT_INVALID) / 40)
    end
    cre.ci.mods[COMBAT_MOD_SKILL].ab = ab
    cre.ci.mods[COMBAT_MOD_SKILL].ac = ac
@@ -187,6 +203,13 @@ local function GetFavoredEnemyCombatModifier(cre)
    local bonus = 1 + math.floor(r / 5)
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab = bonus
    cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.bonus = bonus
+
+   if cre:GetHasFeat(FEAT_EPIC_BANE_OF_ENEMIES) then
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab = cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].ab + 2
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.dice = 2
+      cre.ci.mods[COMBAT_MOD_FAVORED_ENEMY].dmg.roll.sides = 6
+   end
+
 end
 
 local _COMBAT_MOD = {

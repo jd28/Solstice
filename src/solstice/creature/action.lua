@@ -10,6 +10,7 @@
 local M = require 'solstice.creature.init'
 
 local NWE = require 'solstice.nwn.engine'
+local Eff = require 'solstice.effect'
 
 ---
 -- @param target Target to attack.
@@ -575,6 +576,33 @@ function M.Creature:SpeakOneLinerConversation(resref, target)
    NWE.ExecuteCommand(417, 2)
 
    NWE.SetCommandObject(temp)
+end
+
+function M.Creature:JumpSafeToLocation(loc)
+   self:ApplyEffect(DURATION_TYPE_TEMPORARY,
+                    Eff.CutsceneImmobilize(), 0.1)
+   self:ClearAllActions(true)
+   self:ActionJumpToLocation(loc)
+   self:DoCommand(function (self) self:SetCommandable(true) end)
+   self:SetCommandable(false)
+end
+
+function M.Creature:JumpSafeToObject(obj)
+   self:ApplyEffect(DURATION_TYPE_TEMPORARY,
+                    Eff.CutsceneImmobilize(), 0.1)
+   self:ClearAllActions(true)
+   self:ActionJumpToObject(obj)
+   self:DoCommand(function (self) self:SetCommandable(true) end)
+   self:SetCommandable(false)
+end
+
+function M.Creature:JumpSafeToWaypoint(way)
+   self:ApplyEffect(DURATION_TYPE_TEMPORARY,
+                    Eff.CutsceneImmobilize(), 0.1)
+   self:ClearAllActions(true)
+   self:ActionJumpToObject(Game.GetWaypointByTag(way))
+   self:DoCommand(function (self) self:SetCommandable(true) end)
+   self:SetCommandable(false)
 end
 
 return M

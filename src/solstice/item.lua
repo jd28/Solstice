@@ -214,6 +214,20 @@ function M.Item:SetGoldValue(value)
    return self.obj.it_cost_ided
 end
 
+--- Get item's stack size.
+function M.Item:GetStackSize()
+   if not self:GetIsValid() then return 0 end
+   return self.obj.it_stacksize
+end
+
+--- Set item's stack size.
+-- @param value New stack size.
+function M.Item:SetStackSize(value)
+   if not self:GetIsValid() then return end
+   if value <= 0 then return end
+   self.obj.it_stacksize = value
+end
+
 --- Class Item: Item Properties
 -- @section
 
@@ -274,6 +288,13 @@ function M.Item:GetDroppable()
    return self.obj.it_droppable == 1
 end
 
+--- Set droppable flag.
+-- @bool flag New value.
+function M.Item:SetDroppable(flag)
+   if not self:GetIsValid() then return end
+   self.obj.it_droppable = flag
+end
+
 --- Determines whether an object has been identified.
 function M.Item:GetIdentified()
    if not self:GetIsValid() then return false end
@@ -300,6 +321,19 @@ function M.Item:SetInfiniteFlag(infinite)
    NWE.StackPushBoolean(infinite)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(828, 2)
+end
+
+--- Get item cursed flag.
+function M.Item:GetCursedFlag()
+   if not self:GetIsValid() then return false end
+   return self.obj.it_cursed == 1
+end
+
+--- Set item cursed flag.
+-- @bool flag New flag.
+function M.Item:SetCursedFlag(flag)
+   if not self:GetIsValid() then return end
+   self.obj.it_cursed = flag
 end
 
 --- Class Item: Weight

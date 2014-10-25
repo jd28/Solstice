@@ -150,9 +150,10 @@ end
 -- @param type Appearance type.
 function M.Creature:SetAppearanceType(type)
    if not self:GetIsValid() then return -1 end
-
-   self.obj.cre_stats.cs_appearance = type
-   return self.obj.cre_stats.cs_appearance
+   NWE.StackPushInteger(type)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(765, 2)
+   return type
 end
 
 --- Sets creature's body part
