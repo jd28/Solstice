@@ -941,13 +941,15 @@ local function InitializeNumberOfAttacks(cre)
 end
 
 local function GetCreatureDamageBonus(cre, item)
+   local d, s, b = GetWeaponBaseDamage(BASE_ITEM_GLOVES, cre)
    if not item:GetIsValid() then return 0, 0, 0 end
    for _it, ip in item:ItemProperties() do
       if ip:GetPropertyType() == ITEM_PROPERTY_MONSTER_DAMAGE then
-         return UnpackItempropMonsterRoll(ip:GetCostTableValue())
+         d, s = UnpackItempropMonsterRoll(ip:GetCostTableValue())
+         break
       end
    end
-   return 0, 0, 0
+   return d, s, b
 end
 
 -- Exports.
