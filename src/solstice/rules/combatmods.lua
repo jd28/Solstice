@@ -44,14 +44,15 @@ local function GetClassCombatModifier(cre)
 
    local style = TA and cre:GetLocalInt("pc_style_fighting") or 0
    local monk, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
+   local monk_ac, ass_ac, ranger_ac = 0, 0, 0
    local wis = cre:GetAbilityModifier(ABILITY_WISDOM)
 
    -- Monk
    if monk then
-      ac = ac + wis
-      ac = ac + floor(lvl / 5)
+      monk_ac = wis
+      monk_ac = monk_ac + floor(lvl / 5)
       if style == 6 then
-         ac = ac + floor(lvl / 6)
+         monk_ac = monk_ac + floor(lvl / 6)
       end
    end
 
@@ -90,9 +91,9 @@ local function GetClassCombatModifier(cre)
       local ranger, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_RANGER)
       if not monk and ranger then
          if wis <= 20 then
-            ac = ac + math.clamp(wis, 0, floor(lvl / 2))
+            ranger_ac = math.clamp(wis, 0, floor(lvl / 2))
          elseif lvl > 20 then
-            ac = ac + math.min(wis, lvl)
+            ranger_ac = math.min(wis, lvl)
          end
       end
 
@@ -104,10 +105,12 @@ local function GetClassCombatModifier(cre)
       then
          ac = ac + floor(cre:GetSkillRank(SKILL_DISCIPLINE, OBJECT_INVALID, true) / 5)
       end
-
       -- Assassin
-      if style == 9 and not monk then
-         ac = ac + cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+      local ass, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_ASSASSIN)
+      if ass and lvl >= 5 then
+         ass_ac = cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
+      end
+
       local rogue = cre:GetLevelByClass(CLASS_TYPE_ROGUE)
       if rogue >= 25 and cre:GetHasFeat(FEAT_OPPORTUNIST) then
          local int = cre:GetAbilityModifier(ABILITY_INTELLIGENCE)
@@ -126,6 +129,7 @@ local function GetClassCombatModifier(cre)
       end
    end
 
+   ac = ac + math.max(monk_ac, ass_ac, ranger_ac)
    cre.ci.mods[COMBAT_MOD_CLASS].ac = ac
 end
 
