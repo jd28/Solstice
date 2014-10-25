@@ -122,7 +122,26 @@ local function monk(cre, class)
    return can, level
 end
 
+local function ranger(cre, class)
+   local level = cre:GetLevelByClass(class)
+   if level == 0 then return false, 0 end
+
+   local can = (cre.obj.cre_stats.cs_ac_armour_base >= 1 and
+                cre.obj.cre_stats.cs_ac_armour_base <= 3)
+   return can, level
+end
+
+local function assassin(cre, class)
+   local level = cre:GetLevelByClass(class)
+   if level == 0 then return false, 0 end
+   local can = cre.obj.cre_stats.cs_ac_armour_base == 0
+
+   return can, level
+end
+
 SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
+SetCanUseClassAbilitiesOverride(CLASS_TYPE_ASSASSIN, assassin)
+SetCanUseClassAbilitiesOverride(CLASS_TYPE_RANGER, ranger)
 
 local function GetLevelBonusFeats(cre, class, level)
    local t = {}
