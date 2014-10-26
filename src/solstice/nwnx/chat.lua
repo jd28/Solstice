@@ -22,14 +22,22 @@ function NWNXChat_HandleChatMessage()
    if not CHAT_HANDLER then return false end
 
    local msg = C.Local_GetLastChatMessage()
-   if msg == nil then 
+   if msg == nil then
       error "NWNXChat_HandleChatMessage : NULL msg!"
    end
 
-   msg.suppress = CHAT_HANDLER(msg.channel, 
+   local to = OBJECT_INVALID
+   if msg.to ~= 0xffffffff then
+      local pl = C.nwn_GetPlayerByPlayerID(msg.to)
+      if pl ~= nil then
+         to = _SOL_GET_CACHED_OBJECT(pl.obj_id)
+      end
+   end
+
+   msg.suppress = CHAT_HANDLER(msg.channel,
 			       _SOL_GET_CACHED_OBJECT(msg.from),
-			       ffi.string(msg.msg), 
-			       _SOL_GET_CACHED_OBJECT(msg.to))
+			       ffi.string(msg.msg),
+			       to)
    return msg.suppress
 end
 
@@ -37,12 +45,12 @@ function NWNXChat_HandleCombatMessage()
    if not CC_HANDLER then return false end
 
    local msg = C.Local_GetLastCombatMessage()
-   if msg == nil then 
+   if msg == nil then
       error "NWNXChat_HandleCombatMessage : NULL msg!"
    end
 
    msg.suppress = CC_HANDLER(msg)
-   
+
    return msg.suppress
 end
 
