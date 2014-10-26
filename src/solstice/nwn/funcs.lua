@@ -38,6 +38,12 @@ CExoLocStringElement *nwn_GetCExoLocStringElement(CExoLocString* str, uint32_t l
 const char           *nwn_GetCExoLocStringText(CExoLocString* str, uint32_t locale);
 ]]
 
+-- client.h
+ffi.cdef [[
+CNWSPlayer *nwn_GetPlayerByPlayerID (uint32_t id);
+void        nwn_BootPCWithMessage(nwn_objid_t id, int32_t strref);
+]]
+
 -- rules.h
 ffi.cdef [[
 bool      nwn_GetIsClassBonusFeat(int32_t cls, uint16_t feat);
