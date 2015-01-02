@@ -15,7 +15,7 @@ local color = require 'solstice.color'
 local D     = require 'solstice.dice'
 local Log   = System.GetLogger()
 
---- Determines if a creature can use a skill
+--- [DEPRECATE] Determines if a creature can use a skill
 -- @param skill SKILL\_*.
 function M.Creature:CanUseSkill(skill)
    return ffi.C.nwn_CanUseSkill(self.obj, skill)
