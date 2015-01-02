@@ -106,6 +106,21 @@ function M.Creature:GetClassByPosition(position)
    return cl.cl_class
 end
 
+--- Determins class postion by class type.
+-- @param class CLASS\_TYPE\_*
+-- @return 0, 1, 2, or -1 on error.
+function M.Creature:GetPositionByClass(class)
+   if self:GetClassByPosition(0) == class then
+      return 0
+   elseif self:GetClassByPosition(1) == class then
+      return 1
+   elseif self:GetClassByPosition(2) == class then
+      return 2
+   end
+
+   return -1
+end
+
 --- Gets a creature's wizard specialization.
 function M.Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
@@ -159,4 +174,16 @@ function M.Creature:SetWizardSpecialization(specialization)
    end
 
    return -1
+end
+
+--- Determins creatures highest class level
+-- @return CLASS\_TYPE\_*, level
+function M.Creature:GetHighestLevelClass()
+   local hclass, hlevel = -1, -1
+   for class in self:Classes() do
+      if class.cl_level > hlevel then
+         hclass, hlevel = class.cl_class, class.cl_level
+      end
+   end
+   return hclass, hlevel
 end
