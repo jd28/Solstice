@@ -5,7 +5,7 @@
 -- @section Actions
 
 local M = require 'solstice.creature.init'
-local Creautre = M.Creature
+local Creature = M.Creature
 
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
