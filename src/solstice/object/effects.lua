@@ -11,6 +11,7 @@ local Eff = require 'solstice.effect'
 local ffi = require 'ffi'
 local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
+local Object = M.Object
 
 --- Class Object: Effects
 -- @section effects
@@ -19,7 +20,7 @@ local NWE = require 'solstice.nwn.engine'
 -- @param dur_type DURATION_TYPE_*
 -- @param effect Effect to apply.
 -- @param[opt=0.0] duration Time in seconds for effect to last.
-function M.Object:ApplyEffect(dur_type, effect, duration)
+function Object:ApplyEffect(dur_type, effect, duration)
    duration = duration or 0.0
 
    NWE.StackPushFloat(duration)
@@ -33,7 +34,7 @@ end
 -- @param vfx solstice.vfx constant
 -- @param duration Duration in seconds.  If not passed effect will be of
 -- duration type DURATION_TYPE_INSTANT
-function M.Object:ApplyVisual(vfx, duration)
+function Object:ApplyVisual(vfx, duration)
    local dur_type = duration and DURATION_TYPE_TEMPORARY or DURATION_TYPE_INSTANT
    duration = duration or 0.0
 
@@ -48,7 +49,7 @@ end
 -- @param[opt=solstice.effect.Recurring()] eff_recur The only reason to pass a
 -- different recurring effect here is if you need one that is Supernatural or
 -- Magical.
-function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_recur)
+function Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_recur)
    error "TODO"
    dur_type = duration and DURATION_TYPE_TEMPORARY or DURATION_TYPE_PERMANENT
    duration = duration or 0
@@ -83,7 +84,7 @@ function M.Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff
 end
 
 --- An iterator that iterates directly over applied effects
-function M.Object:Effects()
+function Object:Effects()
    local eff, _eff = self:GetFirstEffect()
    return function()
       while eff:GetIsValid() do
@@ -94,7 +95,7 @@ function M.Object:Effects()
 end
 
 --- An iterator that iterates directly over applied effects
-function M.Object:EffectsDirect()
+function Object:EffectsDirect()
    local obj = self.obj.obj
    local i, _i = 0
    return function()
@@ -107,7 +108,7 @@ function M.Object:EffectsDirect()
    end
 end
 
-function M.Object:GetEffectAtIndex(idx)
+function Object:GetEffectAtIndex(idx)
    local obj = self.obj.obj
    if idx < 0 or idx >= obj.obj_effects_len then
       return
@@ -115,13 +116,13 @@ function M.Object:GetEffectAtIndex(idx)
    return Eff.effect_t(obj.obj_effects[idx], true)
 end
 
-function M.Object:GetEffectCount()
+function Object:GetEffectCount()
    return self.obj.obj.obj_effects_len - 1
 end
 
 --- Get if an object has an effecy by ID
 -- @param id Effect ID.
-function M.Object:GetHasEffectById(id)
+function Object:GetHasEffectById(id)
    for eff in self:EffectsDirect() do
       if eff:GetId() == id then
          return true
@@ -133,7 +134,7 @@ end
 
 --- Get if object has an effect applied by a spell.
 -- @param spell solstice.spell constant that the effect was created by.
-function M.Object:GetHasSpellEffect(spell)
+function Object:GetHasSpellEffect(spell)
    if not self:GetIsValid() then return false end
    for eff in self:EffectsDirect() do
       if eff:GetSpellId() == spell then
@@ -146,7 +147,7 @@ end
 
 --- Gets first effect.
 -- Use the iterator.
-function M.Object:GetFirstEffect()
+function Object:GetFirstEffect()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(85, 1)
 
@@ -155,14 +156,14 @@ end
 
 --- Gets first effect.
 -- Use the iterator.
-function M.Object:GetNextEffect()
+function Object:GetNextEffect()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(86, 1)
    return NWE.StackPopEngineStructure(NWE.STRUCTURE_EFFECT)
 end
 
 --- Logs debug strings for all effects applied to object.
-function M.Object:LogEffects()
+function Object:LogEffects()
    if not self:GetIsValid() then return end
 
    local t = {}
@@ -178,7 +179,7 @@ end
 
 --- Removes an effect from object
 -- @param effect Effec to remove.
-function M.Object:RemoveEffect(effect)
+function Object:RemoveEffect(effect)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_EFFECT, effect)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(87, 2)
@@ -186,14 +187,14 @@ end
 
 --- Removes an effect from object by ID
 -- @param id Effect id to remove.
-function M.Object:RemoveEffectByID(id)
+function Object:RemoveEffectByID(id)
    if not self:GetIsValid() then return end
    C.nwn_RemoveEffectById(self.obj.obj, id)
 end
 
 --- Remove effect by type
 -- @param type EFFECT\_TYPE\_*
-function M.Object:RemoveEffectsByType(type)
+function Object:RemoveEffectsByType(type)
    local t = {}
    for eff in self:EffectsDirect() do
       if type == eff:GetType() then
@@ -205,4 +206,4 @@ function M.Object:RemoveEffectsByType(type)
    end
 end
 
-jit.off(M.Object.RemoveEffectByID)
+jit.off(Object.RemoveEffectByID)

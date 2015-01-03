@@ -11,13 +11,16 @@ local max    = math.max
 local bit    = require 'bit'
 
 local M = require 'solstice.object.init'
+local Object = M.Object
 
 --- Class Object: Combat
 -- @section
 
----
-function M.Object:DoDamage(amount)
-   print("Object:DoDamage")
+--- Do Damage to Object.
+-- NOTE: Untested!!
+-- Directly do damage (with no specified type or feedback) to an object.
+-- @param amount amount of damage to do.
+function Object:DoDamage(amount)
    return C.nwn_DoDamage(self.obj.obj, self.type, amount)
 end
 
@@ -26,19 +29,19 @@ end
 -- placeable AC.
 -- @param attacker Whoever is attacking the object
 -- @param attack Attack instance, just in case.
-function M.Object:GetACVersus(attacker, attack)
+function Object:GetACVersus(attacker, attack)
    return 0
 end
 
 --- Get an objects concealment
 -- This is just a placeholder function, if anyone wants to hook in and give, say, a
 -- placeable concealment.
-function M.Object:GetConcealment()
+function Object:GetConcealment()
    return 0
 end
 
 --- Determine object's 'hardness'
-function M.Object:GetHardness()
+function Object:GetHardness()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(796, 1)
    return NWE.StackPopInteger()
@@ -47,12 +50,12 @@ end
 --- Determines if object is immune to an effect.
 -- @param immunity IMMUNITY\_TYPE\_*
 -- @return Always `false`.
-function M.Object:GetIsImmune(immunity)
+function Object:GetIsImmune(immunity)
    return false
 end
 
 --- Determine who last attacked a creature, door or placeable object.
-function M.Object:GetLastAttacker()
+function Object:GetLastAttacker()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_attacker
 
@@ -60,7 +63,7 @@ function M.Object:GetLastAttacker()
 end
 
 --- Get the object which last damaged a creature or placeable object.
-function M.Object:GetLastDamager()
+function Object:GetLastDamager()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_damager
 
@@ -69,7 +72,7 @@ end
 
 --- Gets the object's killer.
 -- @return Killer or solstice.object.INVALID
-function M.Object:GetKiller()
+function Object:GetKiller()
    if not self:GetIsValid() then return M.INVALID end
 
    local actor = self.obj.obj.obj_killer
@@ -79,7 +82,7 @@ end
 --- Gets the last living, non plot creature that performed a
 -- hostile act against the object.
 -- @return Killer or OBJECT_INVALID
-function M.Object:GetLastHostileActor()
+function Object:GetLastHostileActor()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_hostile_actor
 
@@ -88,7 +91,7 @@ end
 
 --- Set's an object's hardness.q
 -- @param hardness New hardness value.
-function M.Object:SetHardness(hardness)
+function Object:SetHardness(hardness)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(hardness)
    NWE.ExecuteCommand(797, 2)
@@ -96,7 +99,7 @@ end
 
 --- Sets the last hostile actor
 -- Source: nwnx_funcs by Acaos
-function M.Object:SetLastHostileActor(actor)
+function Object:SetLastHostileActor(actor)
    if not self:GetIsValid() or not actor:GetIsValid() then return end
 
    self.obj.obj.obj_last_hostile_actor = actor.id
@@ -105,13 +108,13 @@ end
 --- Get objects damage immunity.
 -- NOTE: Not default behavior
 -- @param dmgidx DAMAGE\_INDEX\_*
-function M.Object:GetDamageImmunity(dmgidx)
+function Object:GetDamageImmunity(dmgidx)
    return 0
 end
 
 
 --- Debug damage immunities.
-function M.Object:DebugDamageImmunities()
+function Object:DebugDamageImmunities()
    local t = {}
    table.insert(t, "Damage Immunity:")
    for i = 0, DAMAGE_INDEX_NUM - 1 do
@@ -124,7 +127,7 @@ function M.Object:DebugDamageImmunities()
 end
 
 --- Debug damage resistance.
-function M.Object:DebugDamageResistance()
+function Object:DebugDamageResistance()
    local t = {}
    local eff
    local start = self.obj.cre_stats.cs_first_dresist_eff
@@ -153,7 +156,7 @@ function M.Object:DebugDamageResistance()
 end
 
 --- Debug damage reduction.
-function M.Object:DebugDamageReduction()
+function Object:DebugDamageReduction()
    local t = {}
    local eff
    local start = self.obj.cre_stats.cs_first_dred_eff
@@ -184,7 +187,7 @@ end
 -- @param dmgidx Damage index DAMAGE\_INDEX\_*
 -- @return Both the adjusted damage amt and the amount resisted will
 -- be returned.
-function M.Object:DoDamageImmunity(amt, dmgidx)
+function Object:DoDamageImmunity(amt, dmgidx)
    -- If the damage index is invalid... skip it.
    if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM or amt <= 0 then
       return amt, 0
@@ -199,7 +202,7 @@ end
 --- Determine best damage reduction effect.
 -- @param dmgidx DAMAGE\_INDEX\_*
 -- @param[opt=0] start Place in object effect array to start looking.
-function M.Object:GetBestDamageResistEffect(dmgidx, start)
+function Object:GetBestDamageResistEffect(dmgidx, start)
    start = start or 0
 
    local cur, camount, climit
@@ -236,7 +239,7 @@ end
 --- Determine best damage reduction effect.
 -- @param power Damage power.
 -- @param[opt=0] start Place in object effect array to start looking.
-function M.Object:GetBestDamageReductionEffect(power, start)
+function Object:GetBestDamageReductionEffect(power, start)
    local cur, camount, climit
    start = start or 0
 
@@ -268,7 +271,7 @@ end
 --- Get objects base damage resistance.
 -- @param dmgidx DAMAGE\_INDEX\_*
 -- @return Always 0
-function M.Object:GetBaseResist(dmgidx)
+function Object:GetBaseResist(dmgidx)
    return 0
 end
 
@@ -278,7 +281,7 @@ end
 -- @param dmgidx DAMAGE\_INDEX\_*
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
-function M.Object:DoDamageResistance(amt, eff, dmgidx)
+function Object:DoDamageResistance(amt, eff, dmgidx)
    if amt <= 0 then return amt, 0 end
 
    local resist = 0
@@ -327,7 +330,7 @@ end
 -- @param power DAMAGE\_POWER\_*
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
-function M.Object:DoDamageReduction(amt, eff, power)
+function Object:DoDamageReduction(amt, eff, power)
    if amt <= 0 or power < 0 then return amt, 0 end
    -- Set highest soak amount to the players innate soak.  E,g their EDR
    -- Dwarven Defender, and/or Barbarian Soak.

@@ -6,13 +6,14 @@
 
 local M = require 'solstice.object.init'
 local NWE = require 'solstice.nwn.engine'
+local Object = M.Object
 
 --- Class Object: Inventory
 -- @section inventory
 
 ---
 -- @return
-function M.Object:GetFirstItemInInventory()
+function Object:GetFirstItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(339, 1)
 
@@ -20,14 +21,14 @@ function M.Object:GetFirstItemInInventory()
 end
 
 --- Determines if object has an inventory.
-function M.Object:GetHasInventory()
+function Object:GetHasInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(570, 1)
    NWE.StackPopBoolean()
 end
 
 --- Determines if an object has an item by tag
-function M.Object:HasItem(tag)
+function Object:HasItem(tag)
    local item = self:GetItemPossessedBy(tag)
    return item:GetIsValid()
 end
@@ -35,7 +36,7 @@ end
 --- Determine if object has an item
 -- @param tag Object tag to search for
 -- @param is_resref If true search by reserf rather than tag.
-function M.Object:GetItemPossessedBy(tag, is_resref)
+function Object:GetItemPossessedBy(tag, is_resref)
    if not is_resref then
       NWE.StackPushString(tag)
       NWE.StackPushObject(self)
@@ -51,7 +52,7 @@ function M.Object:GetItemPossessedBy(tag, is_resref)
 end
 
 --- Iterator over items in an object's inventory
-function M.Object:Items()
+function Object:Items()
    local obj = self:GetFirstItemInInventory()
    local prev_obj
    return function()
@@ -65,7 +66,7 @@ end
 
 ---
 -- @return
-function M.Object:GetNextItemInInventory()
+function Object:GetNextItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(340, 1)
    return NWE.StackPopObject()
@@ -79,7 +80,7 @@ end
 -- @param[opt=false] only_once If true, function will not give item if
 -- object already possess one.
 -- @return The new item or solstice.object.INVALID on error.
-function M.Object:GiveItem(resref, stack_size, new_tag, only_once)
+function Object:GiveItem(resref, stack_size, new_tag, only_once)
    if only_once then
       local item = self:GetItemPossessedBy(resref, true)
       if item then return item end
@@ -97,7 +98,7 @@ end
 
 ---Open Inventory of specified target
 -- @param target Creature to view the inventory of.
-function M.Object:OpenInventory(target)
+function Object:OpenInventory(target)
    NWE.StackPushObject(target)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(701, 2)
@@ -106,7 +107,7 @@ end
 --- Get number of items that an object carries.
 -- @param id Tag or Resref.
 -- @param[opt=false] Use resref.
-function M.Object:CountItem(id, resref)
+function Object:CountItem(id, resref)
    local count = 0
    for item in self:Items() do
       if resref then
@@ -126,7 +127,7 @@ end
 -- @param id Tag or Resref.
 -- @param[opt=1] How many of the items to take.
 -- @param[opt=false] Use resref.
-function M.Object:TakeItem(id, count, resref)
+function Object:TakeItem(id, count, resref)
    count = count or 1
    if count > self:CountItem(id, resref) then
       return 0
