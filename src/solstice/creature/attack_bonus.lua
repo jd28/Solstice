@@ -8,6 +8,7 @@ local USE_VERSUS = OPT.USE_VERSUS
 local sm     = string.strip_margin
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 --- Attack Bonus
 -- @section
@@ -15,7 +16,7 @@ local M = require 'solstice.creature.init'
 --- Get attack bonus vs target.
 -- @param target Target object.
 -- @param equip EQUIP\_TYPE\_*
-function M.Creature:GetAttackBonusVs(target, equip)
+function Creature:GetAttackBonusVs(target, equip)
    local trans_ab = math.clamp(self.ci.offense.ab_transient + self.ci.equips[equip].transient_ab_mod, -20, 20)
    local ab = self.ci.offense.ab_base
       + self.ci.equips[equip].ab_mod
@@ -50,14 +51,14 @@ function M.Creature:GetAttackBonusVs(target, equip)
 end
 
 --- Determine creature's BAB.
-function M.Creature:GetBaseAttackBonus()
+function Creature:GetBaseAttackBonus()
    return Rules.GetBaseAttackBonus(self)
 end
 
 --- Get ranged attack bonus/penalty vs a target.
 -- @param target Creature's target.
 -- @param distance Distance to target.
-function M.Creature:GetRangedAttackMod(target, distance)
+function Creature:GetRangedAttackMod(target, distance)
    local ab = 0
 
    -- Point Blank Shot
@@ -80,7 +81,7 @@ function M.Creature:GetRangedAttackMod(target, distance)
    return ab
 end
 
-function M.Creature:DebugAttackBonus()
+function Creature:DebugAttackBonus()
    local t = {}
 
    table.insert(t, "Attack Bonus")

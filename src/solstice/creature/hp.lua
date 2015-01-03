@@ -5,6 +5,7 @@
 -- @module creature
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 --- Hitpoints
 -- @section hitpoints
@@ -13,7 +14,7 @@ require 'solstice.nwn.funcs'
 
 --- Get max hit points by level
 -- @param level The level in question.
-function M.Creature:GetMaxHitPointsByLevel(level)
+function Creature:GetMaxHitPointsByLevel(level)
    if not self:GetIsValid() then return 0 end
 
    local ls = self:GetLevelStats(level)
@@ -25,7 +26,7 @@ end
 --- Set max hitpoints by level.
 -- @param level The level in question.
 -- @param hp Amount of hitpoints.
-function M.Creature:SetMaxHitPointsByLevel(level, hp)
+function Creature:SetMaxHitPointsByLevel(level, hp)
    if not self:GetIsValid() then return 0 end
 
    local ls = self:GetLevelStats(level)
@@ -37,7 +38,7 @@ function M.Creature:SetMaxHitPointsByLevel(level, hp)
 end
 
 --- Get cretures maximum hit points.
-function M.Creature:GetMaxHitPoints()
+function Creature:GetMaxHitPoints()
    self.ci.defense.hp_max = Rules.GetMaxHitPoints(self)
    return self.ci.defense.hp_max + self.ci.defense.hp_eff
 end

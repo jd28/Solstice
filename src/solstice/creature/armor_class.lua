@@ -1,7 +1,8 @@
---- Armor Class
+----
 -- @module creature
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 local clamp = math.clamp
 local max   = math.max
@@ -10,7 +11,7 @@ local max   = math.max
 -- @section
 
 --- Get Armor Check Penalty.
-function M.Creature:GetArmorCheckPenalty()
+function Creature:GetArmorCheckPenalty()
    if not self:GetIsValid() then return 0 end
    return self.obj.cre_stats.cs_acp_armor + self.obj.cre_stats.cs_acp_shield
 end
@@ -18,11 +19,11 @@ end
 ---- Determines AC vs creature.
 -- The last three parameters should only be used from the combat engine.
 -- @param vs Attacking creature
--- @param touch If true it's a touch attack.
--- @param[opt] is_ranged From ranged attack.
+-- @bool touch If true it's a touch attack.
+-- @bool[opt] is_ranged From ranged attack.
 -- @bool[opt] attack Attack ctype
 -- @param[opt] state Creature state.
-function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
+function Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    vs = vs or OBJECT_INVALID
    -- 10 base AC
    local ac = 10
@@ -145,7 +146,7 @@ function M.Creature:GetACVersus(vs, touch, is_ranged, attack, state)
    return ac
 end
 
-function M.Creature:DebugArmorClass()
+function Creature:DebugArmorClass()
    local t = {}
    table.insert(t, "Armor Class:")
    table.insert(t, string.format("  Total: %d, Touch: %d",
@@ -201,11 +202,11 @@ end
 
 
 --- Determine maximum armor class modifier
-function M.Creature:GetMaxArmorClassMod()
+function Creature:GetMaxArmorClassMod()
    return 20
 end
 
 --- Determine minimum armor class modifier
-function M.Creature:GetMinArmorClassMod()
+function Creature:GetMinArmorClassMod()
    return -20
 end

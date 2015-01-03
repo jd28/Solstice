@@ -9,6 +9,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local ne = require 'solstice.nwn.engine'
 local Color = require 'solstice.color'
+local Creature = M.Creature
 
 --- PC
 -- @section
@@ -20,7 +21,7 @@ local Color = require 'solstice.color'
 -- the start location.
 -- @param[opt=false] seemless If true, the transition will be made 'seamless', and the PC will not
 -- get a dialogue box on transfer.
-function M.Creature:ActivatePortal(ip, password, waypoint, seemless)
+function Creature:ActivatePortal(ip, password, waypoint, seemless)
    ip = ip or ""
    password = password or ""
    waypoint = waypoint or ""
@@ -41,7 +42,7 @@ end
 -- module.
 -- @param[opt=false] allow_override If true, override restriction that nState must be > current
 -- Journal Entry.
-function M.Creature:AddJournalQuestEntry(plot, state, entire_party, all_pc, allow_override)
+function Creature:AddJournalQuestEntry(plot, state, entire_party, all_pc, allow_override)
    if entire_party == nil then entire_party = true end
 
    ne.StackPushBoolean(allow_override)
@@ -54,14 +55,14 @@ function M.Creature:AddJournalQuestEntry(plot, state, entire_party, all_pc, allo
 end
 
 --- Abruptly kicks a player off a multi-player server.
-function M.Creature:BootPC()
+function Creature:BootPC()
    ne.StackPushObject(self)
    ne.ExecuteCommand(565, 1)
 end
 
 --- Changes the current Day/Night cycle for this player to night
 -- @param[opt=0] transition_time Time it takes to become night
-function M.Creature:DayToNight(transition_time)
+function Creature:DayToNight(transition_time)
    ne.StackPushFloat(transition_time or 0)
    ne.StackPushObject(self)
    ne.ExecuteCommand(750, 2)
@@ -71,7 +72,7 @@ end
 -- @param area
 -- @param[opt=true] explored true (explored) or false (hidden). Whether the map should
 -- be completely explored or hidden.
-function M.Creature:ExploreArea(area, explored)
+function Creature:ExploreArea(area, explored)
    if explored == nil then explored = true end
 
    ne.StackPushBoolean(explored)
@@ -81,13 +82,13 @@ function M.Creature:ExploreArea(area, explored)
 end
 
 --- Determine if creature is a PC.
-function M.Creature:GetIsPC()
+function Creature:GetIsPC()
    if not self:GetIsValid() then return false end
    return not (ffi.C.nwn_GetPlayerByID(self.id) == nil)
 end
 
 --- Determine if creature is an AI
-function M.Creature:GetIsAI()
+function Creature:GetIsAI()
    if not self:GetIsValid() then return false end
    return (not self:GetIsPC() and not self:GetIsPossessedFamiliar() and not self:GetIsDMPossessed())
       or self:GetMaster():GetIsValid()
@@ -99,7 +100,7 @@ end
 -- of everyone in the party.
 -- @param[opt=false] all_pc If this is true, the entry will be removed from the journal of
 -- everyone in the world.
-function M.Creature:RemoveJournalQuestEntry(plot, entire_party, all_pc)
+function Creature:RemoveJournalQuestEntry(plot, entire_party, all_pc)
    if entire_party == nil then entire_party = true end
 
    ne.StackPushBoolean(all_pc)
@@ -114,7 +115,7 @@ end
 -- @param[opt=false] single_player If set to true, the player's public CD key
 -- will be returned when the player is playing in single player mode.
 -- Otherwise returns an empty string in single player mode.
-function M.Creature:GetPCPublicCDKey(single_player)
+function Creature:GetPCPublicCDKey(single_player)
    ne.StackPushBoolean(single_player)
    ne.StackPushObject(self)
    ne.ExecuteCommandUnsafe(369, 2)
@@ -123,7 +124,7 @@ function M.Creature:GetPCPublicCDKey(single_player)
 end
 
 --- Retrieves the IP address of a PC.
-function M.Creature:GetPCIPAddress()
+function Creature:GetPCIPAddress()
    ne.StackPushObject(self)
    ne.ExecuteCommandUnsafe(370, 1)
 
@@ -131,7 +132,7 @@ function M.Creature:GetPCIPAddress()
 end
 
 --- Retrieves the login name of the player of a PC.
-function M.Creature:GetPCPlayerName()
+function Creature:GetPCPlayerName()
    ne.StackPushObject(self)
    ne.ExecuteCommandUnsafe(371, 1)
 
@@ -140,7 +141,7 @@ end
 
 --- Changes the current Day/Night cycle for this player to daylight
 -- @param transition_time Time it takes for the daylight to fade in (Default: 0)
-function M.Creature:NightToDay(transition_time)
+function Creature:NightToDay(transition_time)
    transition_time = transition_time or 0
    ne.StackPushFloat(transition_time)
    ne.StackPushObject(self)
@@ -152,7 +153,7 @@ end
 -- @bool[opt=true] wait_enabled If <em>true</em>, the "Wait For Help" button will be enabled
 -- @param[opt=0] help_strref String reference to display for help.
 -- @param[opt=""] help_str String to display for help which appears in the top of the panel.
-function M.Creature:PopUpDeathGUIPanel(respawn_enabled, wait_enabled, help_strref, help_str)
+function Creature:PopUpDeathGUIPanel(respawn_enabled, wait_enabled, help_strref, help_str)
    if respawn_enabled == nil then respawn_enabled = true end
    if wait_enabled == nil then wait_enabled = true end
    help_strref = help_strref or 0
@@ -168,7 +169,7 @@ end
 
 --- Displays a GUI panel to a player.
 -- @param gui_panel solstice.gui.PANEL_*
-function M.Creature:PopUpGUIPanel(gui_panel)
+function Creature:PopUpGUIPanel(gui_panel)
    ne.StackPushInteger(gui_panel)
    ne.StackPushObject(self)
    ne.ExecuteCommand(388, 2)
@@ -176,7 +177,7 @@ end
 
 --- Sends a message to the PC.
 -- @param message Message to be sent to the PC.
-function M.Creature:SendMessage(message)
+function Creature:SendMessage(message)
    ne.StackPushString(message)
    ne.StackPushObject(self)
    ne.ExecuteCommand(374, 2)
@@ -184,7 +185,7 @@ end
 
 --- Sends a message to the PC by StrRef.
 -- @param strref StrRef of the message to send
-function M.Creature:SendMessageByStrRef(strref)
+function Creature:SendMessageByStrRef(strref)
    ne.StackPushInteger(strref)
    ne.StackPushObject(self)
    ne.ExecuteCommand(717, 2)
@@ -192,7 +193,7 @@ end
 
 --- Causes a creature to like a PC.
 -- @param target Target to alter the feelings of.
-function M.Creature:SetPCLike(target)
+function Creature:SetPCLike(target)
    ne.StackPushObject(target)
    ne.StackPushObject(self)
    ne.ExecuteCommand(372, 2)
@@ -200,7 +201,7 @@ end
 
 --- Sets that a player dislikes a creature (or object).
 -- @param target The creature that dislikes the PC (and the PC dislike it).
-function M.Creature:SetPCDislike(target)
+function Creature:SetPCDislike(target)
    ne.StackPushObject(target)
    ne.StackPushObject(self)
    ne.ExecuteCommand(373, 2)
@@ -209,7 +210,7 @@ end
 --- Make a panel button in the player's client start or stop flashing.
 -- button solstice.gui.BUTTON_*
 -- enable_flash true to flash, false to stop flashing
-function M.Creature:SetPanelButtonFlash(button, enable_flash)
+function Creature:SetPanelButtonFlash(button, enable_flash)
    ne.StackPushInteger(enable_flash);
    ne.StackPushInteger(button);
    ne.StackPushObject(self);
@@ -220,26 +221,26 @@ end
 -- @param channel Channel the message to send message on.
 -- @param from Sender.
 -- @param message Text to send.
-function M.Creature:SendChatMessage(channel, from, message)
+function Creature:SendChatMessage(channel, from, message)
    C.nwn_SendMessage(channel, from.id, message, self.id)
 end
 
 --- Simple wrapper around solstice.chat.SendChatMessage
 -- that sends a server message to a player.
 -- @param message Text to send.
-function M.Creature:SendServerMessage(message)
+function Creature:SendServerMessage(message)
    if not self:GetIsValid() then return end
    self:SendChatMessage(5, self, message)
 end
 
 --- Send error message on server channel.
 -- @param message Text to send.
-function M.Creature:ErrorMessage(message)
+function Creature:ErrorMessage(message)
    self:SendServerMessage(Color.RED .. message .. "</c>")
 end
 
 --- Send success message on server channel.
 -- @param message Text to send.
-function M.Creature:SuccessMessage(message)
+function Creature:SuccessMessage(message)
    self:SendServerMessage(Color.GREEN .. message .. "</c>")
 end

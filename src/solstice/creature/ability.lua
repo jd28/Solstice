@@ -1,19 +1,20 @@
---- Creature module
+----
 -- @module creature
 
 --- Abilites
 -- @section abilities
 
-local M = require 'solstice.creature.init'
-
 local ffi = require "ffi"
 local C = ffi.C
+
+local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 require 'solstice.effect'
 
 --- Gets ability score that was raised at a particular level.
 -- @return ABILITY_* or -1 on error.
-function M.Creature:GetAbilityIncreaseByLevel(level)
+function Creature:GetAbilityIncreaseByLevel(level)
    if not self:GetIsValid() then return -1 end
 
    local ls = C.nwn_GetLevelStats(self.obj.cre_stats, level)
@@ -30,7 +31,7 @@ end
 -- items). If nothing entered, defaults to false.
 -- @return Returns the ability score of type `ability`
 -- (otherwise -1).
-function M.Creature:GetAbilityModifier(ability, base)
+function Creature:GetAbilityModifier(ability, base)
     local result = -1
 
     if base then
@@ -63,7 +64,7 @@ end
 -- items). If nothing entered, defaults to false.
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).
-function M.Creature:GetAbilityScore(ability, base)
+function Creature:GetAbilityScore(ability, base)
    local result = -1
 
    if ability == ABILITY_STRENGTH then
@@ -92,7 +93,7 @@ end
 
 --- Gets a creatures dexterity modifier.
 -- @param[opt=false] armor_check If true uses armor check penalty.
-function M.Creature:GetDexMod(armor_check)
+function Creature:GetDexMod(armor_check)
    return C.nwn_GetDexMod(self.obj.cre_stats, armor_check and 1 or 0)
 end
 
@@ -102,14 +103,14 @@ end
 -- @param value Amount to modify ability score
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).
-function M.Creature:ModifyAbilityScore(ability, value)
+function Creature:ModifyAbilityScore(ability, value)
     local abil = self:GetAbilityScore(ability, true) + value
 
     return self:SetAbilityScore(ability, abil)
 end
 
 --- Recalculates a creatures dexterity modifier.
-function M.Creature:RecalculateDexModifier()
+function Creature:RecalculateDexModifier()
    if not self:GetIsValid() then return -1 end
 
    return C.nwn_RecalculateDexModifier(self.obj.cre_stats)
@@ -121,7 +122,7 @@ end
 -- @param value Amount to modify ability score
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).
-function M.Creature:SetAbilityScore(ability, value)
+function Creature:SetAbilityScore(ability, value)
    value = math.clamp(value, 3, 255)
    return C.nwn_SetAbilityScore(self.obj.cre_stats, ability, value)
 end
@@ -130,7 +131,7 @@ local fmt = string.format
 local tinsert = table.insert
 
 --- Create Ability debug string.
-function M.Creature:DebugAbilities()
+function Creature:DebugAbilities()
    local t = {}
    tinsert(t, "Abilities: ")
    for i = 0, ABILITY_NUM - 1 do

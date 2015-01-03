@@ -8,7 +8,7 @@
 -- @section skills
 
 local M = require 'solstice.creature.init'
-
+local Creature = M.Creature
 local ffi   = require 'ffi'
 local NWE   = require 'solstice.nwn.engine'
 local color = require 'solstice.color'
@@ -17,13 +17,13 @@ local Log   = System.GetLogger()
 
 --- [DEPRECATE] Determines if a creature can use a skill
 -- @param skill SKILL\_*.
-function M.Creature:CanUseSkill(skill)
+function Creature:CanUseSkill(skill)
    return ffi.C.nwn_CanUseSkill(self.obj, skill)
 end
 
 --- Determines if a creature has a skill
 -- @param skill SKILL\_*.
-function M.Creature:GetHasSkill(skill)
+function Creature:GetHasSkill(skill)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(skill)
    NWE.ExecuteCommand(286, 2)
@@ -39,7 +39,7 @@ end
 -- @param delay Delay in seconds.
 -- @param take Replaces dice roll.
 -- @param bonus And bonus.
-function M.Creature:GetIsSkillSuccessful(skill, dc, vs, feedback, auto, delay, take, bonus)
+function Creature:GetIsSkillSuccessful(skill, dc, vs, feedback, auto, delay, take, bonus)
    return self:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus) > 0
 end
 
@@ -53,7 +53,7 @@ end
 -- @param delay Delay in seconds.
 -- @param take Replaces dice roll.
 -- @param bonus And bonus.
-function M.Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus)
+function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus)
    vs = vs or OBJECT_INVALID
    if feedback == nil then feedback = true end
    auto = auto or 0
@@ -113,7 +113,7 @@ end
 -- @param level Level to check
 -- @param skill SKILL\_*
 -- @return -1 on error.
-function M.Creature:GetSkillIncreaseByLevel(level, skill)
+function Creature:GetSkillIncreaseByLevel(level, skill)
    if not self:GetIsValid()
       or skill < 0 or skill > SKILL_LAST
    then
@@ -127,7 +127,7 @@ function M.Creature:GetSkillIncreaseByLevel(level, skill)
 end
 
 --- Returns a creatures unused skillpoints.
-function M.Creature:GetSkillPoints()
+function Creature:GetSkillPoints()
    if not self:GetIsValid() then return 0 end
 
    return self.obj.cre_stats.cs_skill_points
@@ -135,7 +135,7 @@ end
 
 -- Gets creature's skill rank.
 -- @param skill SKILL\_*
-function M.Creature:GetSkillRank(skill, vs, base, no_scale)
+function Creature:GetSkillRank(skill, vs, base, no_scale)
    if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
       return 0
    elseif self:GetIsDM() then
@@ -164,7 +164,7 @@ end
 -- @param skill SKILL\_*
 -- @param amount Amount to modify skill rank.
 -- @param level If a level is specified the modification will occur at that level.
-function M.Creature:ModifySkillRank(skill, amount, level)
+function Creature:ModifySkillRank(skill, amount, level)
    if not self:GetIsValid() or
       skill < 0 or skill > SKILL_LAST
    then
@@ -191,7 +191,7 @@ end
 
 --- Sets a creatures skillpoints available.
 -- @param amount New amount
-function M.Creature:SetSkillPoints(amount)
+function Creature:SetSkillPoints(amount)
    if not self:GetIsValid() then return 0 end
 
    self.obj.cre_stats.cs_skill_points = amount
@@ -201,7 +201,7 @@ end
 --- Sets a creatures skill rank
 -- @param skill SKILL\_*
 -- @param amount New skill rank
-function M.Creature:SetSkillRank(skill, amount)
+function Creature:SetSkillRank(skill, amount)
    if not self:GetIsValid() or
       skill < 0 or skill > SKILL_LAST
    then
@@ -217,7 +217,7 @@ function M.Creature:SetSkillRank(skill, amount)
 end
 
 --- Creates debug string for creature's skills.
-function M.Creature:DebugSkills()
+function Creature:DebugSkills()
    local t = {}
    table.insert(t, "Skills: ")
    for i = 0, SKILL_NUM - 1 do

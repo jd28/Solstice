@@ -8,26 +8,26 @@ local M = require 'solstice.creature.init'
 local ffi = require 'ffi'
 local C = ffi.C
 local NWE = require 'solstice.nwn.engine'
+local Creature = M.Creature
 
 --- Info
 -- @section
 
-
 --- Gets creature's age
-function M.Creature:GetAge()
+function Creature:GetAge()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_age
 end
 
 --- Gets creature's appearance type
-function M.Creature:GetAppearanceType()
+function Creature:GetAppearanceType()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_appearance
 end
 
 --- Gets creature's body part
 -- @param part
-function M.Creature:GetBodyPart(part)
+function Creature:GetBodyPart(part)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(part)
    NWE.ExecuteCommand(792, 2)
@@ -35,66 +35,66 @@ function M.Creature:GetBodyPart(part)
 end
 
 --- Gets creature's conversation resref
-function M.Creature:GetConversation()
+function Creature:GetConversation()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.obj.cre_stats.cs_conv)
 end
 
 --- Determine boss creature.
-function M.Creature:GetIsBoss()
+function Creature:GetIsBoss()
    return self:GetLocalInt("Boss") ~= 0
 end
 
 --- Gets creature's size
-function M.Creature:GetSize()
+function Creature:GetSize()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_size
 end
 
 --- Gets creature's deity.
-function M.Creature:GetDeity()
+function Creature:GetDeity()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.obj.cre_stats.cs_deity)
 end
 
 --- Gets creature's deity ID.
-function M.Creature:GetDeityId()
+function Creature:GetDeityId()
    return 0
 end
 
 -- Determines if Creature is a DM
-function M.Creature:GetIsDM()
+function Creature:GetIsDM()
    if not self:GetIsValid() then return false end
 
    return self.obj.cre_stats.cs_is_dm ~= 0
 end
 
 --- Gets if creature is possessed by DM.
-function M.Creature:GetIsDMPossessed()
+function Creature:GetIsDMPossessed()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(723, 1)
    return NWE.StackPopBoolean()
 end
 
 --- Get if creature was spawned by encounter.
-function M.Creature:GetIsEncounterCreature()
+function Creature:GetIsEncounterCreature()
    if not self:GetIsValid() then return false end
    return self.obj.cre_encounter_obj ~= 0x7f000000
 end
 
 --- Get if creature is polymorphed
-function M.Creature:GetIsPolymorphed()
+function Creature:GetIsPolymorphed()
    return self:GetIsValid() and self.obj.cre_is_poly ~= 0
 end
 
 --- Gets creature's gender
-function M.Creature:GetGender()
+function Creature:GetGender()
    if not self:GeIsValid() then return -1 end
    return self.obj.cre_stats.cs_gender
 end
 
 --- Gets PC characters bic file.
-function M.Creature:GetPCFileName()
+function Creature:GetPCFileName()
    if not self:GetIsValid() then return "" end
 
    local pl = C.nwn_GetPlayerByID(self.id)
@@ -102,7 +102,7 @@ function M.Creature:GetPCFileName()
 end
 
 --- Gets creature's race.
-function M.Creature:GetRacialType()
+function Creature:GetRacialType()
    if not self:GetIsValid() then
       return M.RACE_INVALID
    end
@@ -111,36 +111,36 @@ function M.Creature:GetRacialType()
 end
 
 --- Gets creature's starting package.
-function M.Creature:GetStartingPackage()
+function Creature:GetStartingPackage()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_starting_package
 end
 
 --- Gets creature's subrace
-function M.Creature:GetSubrace()
+function Creature:GetSubrace()
    if not self:GetIsValid() then return "" end
    return ffi.string(self.obj.cre_stats.cs_subrace)
 end
 
 --- Gets creature's subrace id.
-function M.Creature:GetSubraceId()
+function Creature:GetSubraceId()
    return 0
 end
 
 --- Gets creature's tail
-function M.Creature:GetTail()
+function Creature:GetTail()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_tail
 end
 
 --- Gets creature's wings
-function M.Creature:GetWings()
+function Creature:GetWings()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_wings
 end
 
 ---
-function M.Creature:SetAge(age)
+function Creature:SetAge(age)
    if not self:GetIsValid() then return -1 end
    self.obj.cre_stats.cs_age = age
    return self.obj.cre_stats.cs_age
@@ -148,7 +148,7 @@ end
 
 --- Sets creature's appearance type
 -- @param type Appearance type.
-function M.Creature:SetAppearanceType(type)
+function Creature:SetAppearanceType(type)
    if not self:GetIsValid() then return -1 end
    NWE.StackPushInteger(type)
    NWE.StackPushObject(self)
@@ -159,7 +159,7 @@ end
 --- Sets creature's body part
 -- @param part
 -- @param model_number
-function M.Creature:SetBodyPart(part, model_number)
+function Creature:SetBodyPart(part, model_number)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(model_number)
    NWE.StackPushInteger(part)
@@ -168,7 +168,7 @@ end
 
 --- Sets creature's deity
 -- @param deity New deity
-function M.Creature:SetDeity(deity)
+function Creature:SetDeity(deity)
    if not self:GetIsValid() then return "" end
 
    if self.obj.cre_stats.cs_deity ~= nil then
@@ -181,7 +181,7 @@ end
 
 --- Sets creature's gender
 -- @param gender New gender
-function M.Creature:SetGender(gender)
+function Creature:SetGender(gender)
    if not self:GetIsValid() then return -1 end
    self.obj.cre_stats.cs_gender = gender
    return self:GetGender()
@@ -189,7 +189,7 @@ end
 
 --- Sets creature lootable
 -- @param lootable New lootable value
-function M.Creature:SetLootable(lootable)
+function Creature:SetLootable(lootable)
    NWE.StackPushBoolean(lootable)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(740, 2)
@@ -197,14 +197,14 @@ end
 
 --- Set creatures movement rate.
 -- @param rate MOVE\_RATE\_*
-function M.Creature:SetMovementRate(rate)
+function Creature:SetMovementRate(rate)
    if not self:GetIsValid() then return end
    C.nwn_SetMovementRate(self.obj, rate)
 end
 
 --- Set creature's subrace
 -- @param subrace New subrace
-function M.Creature:SetSubrace(subrace)
+function Creature:SetSubrace(subrace)
    if not self:GetIsValid() then return "" end
 
    if self.obj.cre_stats.cs_deity ~= nil then

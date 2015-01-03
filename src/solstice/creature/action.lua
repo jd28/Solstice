@@ -1,13 +1,11 @@
---- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+----
 -- @module creature
 
 --- Actions
 -- @section Actions
 
 local M = require 'solstice.creature.init'
+local Creautre = M.Creature
 
 local NWE = require 'solstice.nwn.engine'
 local Eff = require 'solstice.effect'
@@ -15,7 +13,7 @@ local Eff = require 'solstice.effect'
 ---
 -- @param target Target to attack.
 -- @param passive
-function M.Creature:ActionAttack(target, passive)
+function Creature:ActionAttack(target, passive)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -32,7 +30,7 @@ end
 -- @param spell SPELL\_* constant.
 -- @param target Object to cast fake spell at.
 -- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
-function M.Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
+function Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -50,7 +48,7 @@ end
 -- @param spell SPELL\_* constant.
 -- @param target Location to cast spell at.
 -- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
-function M.Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
+function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -71,7 +69,7 @@ end
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
 -- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
 -- @param[opt=false] instant If true spell can instantaneously.
-function M.Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, path_type, instant)
+function Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -96,7 +94,7 @@ end
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
 -- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant
-function M.Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, path_type, instant)
+function Creature:ActionCastSpellAtObject(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -116,7 +114,7 @@ end
 
 ---
 -- @param target
-function M.Creature:ActionCounterSpell(target)
+function Creature:ActionCounterSpell(target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -129,7 +127,7 @@ end
 ---
 -- @param feedback Send feedback.
 -- @param improved Determines if effect is Improved Whirlwind Attack
-function M.Creature:ActionDoWhirlwindAttack(feedback, improved)
+function Creature:ActionDoWhirlwindAttack(feedback, improved)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -145,7 +143,7 @@ end
 ---
 -- @param item
 -- @param slot
-function M.Creature:ActionEquipItem(item, slot)
+function Creature:ActionEquipItem(item, slot)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -159,7 +157,7 @@ end
 ---
 -- @param versus
 -- @param offhand
-function M.Creature:ActionEquipMostDamagingMelee(versus, offhand)
+function Creature:ActionEquipMostDamagingMelee(versus, offhand)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -172,7 +170,7 @@ end
 
 ---
 -- @param versus
-function M.Creature:ActionEquipMostDamagingRanged(versus)
+function Creature:ActionEquipMostDamagingRanged(versus)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -183,7 +181,7 @@ function M.Creature:ActionEquipMostDamagingRanged(versus)
 end
 
 ---
-function M.Creature:ActionEquipMostEffectiveArmor()
+function Creature:ActionEquipMostEffectiveArmor()
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -194,7 +192,7 @@ end
 
 ---
 -- @param target Object to examine.
-function M.Creature:ActionExamine(target)
+function Creature:ActionExamine(target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -207,7 +205,7 @@ end
 ---
 -- @param target
 -- @param[opt=0] distance
-function M.Creature:ActionForceFollowObject(target, distance)
+function Creature:ActionForceFollowObject(target, distance)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -222,7 +220,7 @@ end
 -- @param target
 -- @param run
 -- @param[opt=30] timeout
-function M.Creature:ActionForceMoveToLocation(target, run, timeout)
+function Creature:ActionForceMoveToLocation(target, run, timeout)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -240,7 +238,7 @@ end
 -- @param run
 -- @param range
 -- @param timeout
-function M.Creature:ActionForceMoveToObject(target, run, range, timeout)
+function Creature:ActionForceMoveToObject(target, run, range, timeout)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -255,7 +253,7 @@ end
 
 ---
 -- @param target
-function M.Creature:ActionInteractObject(target)
+function Creature:ActionInteractObject(target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -267,7 +265,7 @@ end
 
 ---
 -- @param loc
-function M.Creature:ActionJumpToLocation(loc)
+function Creature:ActionJumpToLocation(loc)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -281,7 +279,7 @@ end
 -- @param destination
 -- @param[opt=true] straight_line
 -- @return
-function M.Creature:ActionJumpToObject(destination, straight_line)
+function Creature:ActionJumpToObject(destination, straight_line)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -296,7 +294,7 @@ end
 -- @param loc
 -- @param[opt=false] run
 -- @param[opt=40.0] range
-function M.Creature:ActionMoveAwayFromLocation(loc, run, range)
+function Creature:ActionMoveAwayFromLocation(loc, run, range)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -314,7 +312,7 @@ end
 -- @param target
 -- @param run
 -- @param range
-function M.Creature:ActionMoveAwayFromObject(target, run, range)
+function Creature:ActionMoveAwayFromObject(target, run, range)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -329,7 +327,7 @@ end
 ---
 -- @param target
 -- @param run
-function M.Creature:ActionMoveToLocation(target, run)
+function Creature:ActionMoveToLocation(target, run)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -344,7 +342,7 @@ end
 -- @param target
 -- @param run
 -- @param range
-function M.Creature:ActionMoveToObject(target, run, range)
+function Creature:ActionMoveToObject(target, run, range)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -358,7 +356,7 @@ end
 
 ---
 -- @param item
-function M.Creature:ActionPickUpItem(item)
+function Creature:ActionPickUpItem(item)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -372,7 +370,7 @@ end
 -- @param animation
 -- @param speed
 -- @param dur
-function M.Creature:ActionPlayAnimation(animation, speed, dur)
+function Creature:ActionPlayAnimation(animation, speed, dur)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -390,7 +388,7 @@ end
 
 ---
 -- @param item
-function M.Creature:ActionPutDownItem(item)
+function Creature:ActionPutDownItem(item)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -401,7 +399,7 @@ function M.Creature:ActionPutDownItem(item)
 end
 
 ---
-function M.Creature:ActionRandomWalk()
+function Creature:ActionRandomWalk()
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -412,7 +410,7 @@ end
 
 ---
 -- @param check_sight
-function M.Creature:ActionRest(check_sight)
+function Creature:ActionRest(check_sight)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -424,7 +422,7 @@ end
 
 ---
 -- @param chair
-function M.Creature:ActionSit(chair)
+function Creature:ActionSit(chair)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -437,7 +435,7 @@ end
 ---
 -- @param target
 -- @param[opt=true] feedback
-function M.Creature:ActionTouchAttackMelee(target, feedback)
+function Creature:ActionTouchAttackMelee(target, feedback)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -454,7 +452,7 @@ end
 ---
 -- @param target
 -- @param[opt=true] feedback
-function M.Creature:ActionTouchAttackRanged(target, feedback)
+function Creature:ActionTouchAttackRanged(target, feedback)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -470,7 +468,7 @@ end
 ---
 -- @param feat solstice.feat constant.
 -- @param target Target
-function M.Creature:ActionUseFeat(feat, target)
+function Creature:ActionUseFeat(feat, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -482,7 +480,7 @@ function M.Creature:ActionUseFeat(feat, target)
 end
 
 --- TODO Broken
-function M.Creature:ActionUseItem(item, target, area, loc, prop)
+function Creature:ActionUseItem(item, target, area, loc, prop)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -498,7 +496,7 @@ end
 -- @param target
 -- @param subskill
 -- @param item
-function M.Creature:ActionUseSkill(skill, target, subskill, item)
+function Creature:ActionUseSkill(skill, target, subskill, item)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -514,7 +512,7 @@ end
 ---
 -- @param talent
 -- @param loc
-function M.Creature:ActionUseTalentAtLocation(talent, loc)
+function Creature:ActionUseTalentAtLocation(talent, loc)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -528,7 +526,7 @@ end
 ---
 -- @param talent
 -- @param target
-function M.Creature:ActionUseTalentOnObject(talent, target)
+function Creature:ActionUseTalentOnObject(talent, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -541,7 +539,7 @@ end
 
 ---
 -- @param item
-function M.Creature:ActionUnequipItem(item)
+function Creature:ActionUnequipItem(item)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -553,7 +551,7 @@ end
 
 ---
 -- @param id
-function M.Creature:PlayVoiceChat(id)
+function Creature:PlayVoiceChat(id)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -567,7 +565,7 @@ end
 ---
 -- @param resref
 -- @param target
-function M.Creature:SpeakOneLinerConversation(resref, target)
+function Creature:SpeakOneLinerConversation(resref, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
 
@@ -578,7 +576,7 @@ function M.Creature:SpeakOneLinerConversation(resref, target)
    NWE.SetCommandObject(temp)
 end
 
-function M.Creature:JumpSafeToLocation(loc)
+function Creature:JumpSafeToLocation(loc)
    self:ApplyEffect(DURATION_TYPE_TEMPORARY,
                     Eff.CutsceneImmobilize(), 0.1)
    self:ClearAllActions(true)
@@ -587,7 +585,7 @@ function M.Creature:JumpSafeToLocation(loc)
    self:SetCommandable(false)
 end
 
-function M.Creature:JumpSafeToObject(obj)
+function Creature:JumpSafeToObject(obj)
    self:ApplyEffect(DURATION_TYPE_TEMPORARY,
                     Eff.CutsceneImmobilize(), 0.1)
    self:ClearAllActions(true)
@@ -596,7 +594,7 @@ function M.Creature:JumpSafeToObject(obj)
    self:SetCommandable(false)
 end
 
-function M.Creature:JumpSafeToWaypoint(way)
+function Creature:JumpSafeToWaypoint(way)
    self:ApplyEffect(DURATION_TYPE_TEMPORARY,
                     Eff.CutsceneImmobilize(), 0.1)
    self:ClearAllActions(true)

@@ -5,19 +5,20 @@
 -- @module creature
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 --- Saves
 -- @section
 
 require 'solstice.effect'
 
-function M.Creature:DebugSaves()
+function Creature:DebugSaves()
    return ""
 end
 
 --- Gets creatures saving throw bonus
 -- @param save solstice.save constant
-function M.Creature:GetSavingThrowBonus(save)
+function Creature:GetSavingThrowBonus(save)
    if not self:GetIsValid() then return 0 end
 
    local bonus = 0
@@ -36,7 +37,7 @@ end
 --- Sets creatures saving throw bonus
 -- @param save solstice.save type
 -- @param bonus New saving throw bonus
-function M.Creature:SetSavingThrowBonus(save, bonus)
+function Creature:SetSavingThrowBonus(save, bonus)
    if not self:GetIsValid() then return 0 end
 
    if save == SAVING_THROW_FORT then
