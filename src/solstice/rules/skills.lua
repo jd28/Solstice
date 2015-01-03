@@ -192,3 +192,18 @@ function M.GetSkillEffectModifier(cre, skill)
    end
    return eff
 end
+
+--- Determines if a creature can use a skill
+-- @param skill SKILL\_*.
+-- @param cre Creature
+function M.CanUseSkill(skill, cre)
+   if not cre:GetIsValid() then return false end
+   return ffi.C.nwn_CanUseSkill(cre.obj, skill)
+end
+
+--- Determines if a skill is a class skill.
+-- @param skill SKILL\_*.
+-- @param class CLASS\_TYPE\_*
+function M.GetIsClassSkill(skill, class)
+   return ffi.C.nwn_GetIsClassSkill(class, skill)
+end

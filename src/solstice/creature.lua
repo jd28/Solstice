@@ -1,4 +1,5 @@
---- Creature module
+----
+-- Module containing the `Creature` class.
 -- @module creature
 
 local ffi = require 'ffi'

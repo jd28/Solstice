@@ -30,6 +30,11 @@ function M.LevelUp(oPC)
     return tonumber(oPC:GetLocalString(oPC, "NWNX!LEVELS!LEVELUP"))
 end
 
+function M.GetMeetsLevelUpFeatRequirements (cre, feat)
+   cre:SetLocalString("NWNX!LEVELS!GETMEETSFEATREQUIREMENTS", ">" .. tostring(feat))
+	return tonumber(cre:GetLocalString("NWNX!LEVELS!GETMEETSFEATREQUIREMENTS")) == 1
+end
+
 -- NWNX functions cannot be JITed.
 for _, func in pairs(M) do
    if type(func) == "function" then

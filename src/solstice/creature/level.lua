@@ -1,12 +1,10 @@
---- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+----
 -- @module creature
 
 local M = require 'solstice.creature.init'
 local ffi = require 'ffi'
 local C = ffi.C
+local Creature = M.Creature
 
 --- Level
 -- @section level
@@ -14,7 +12,7 @@ local C = ffi.C
 --- Calculate a creature's hit dice.
 -- @param[opt=false] use_neg_levels If true negative levels factored in to
 -- total hit dice.
-function M.Creature:GetHitDice(use_neg_levels)
+function Creature:GetHitDice(use_neg_levels)
    local total = 0
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
       -- Class level can never be negative.
@@ -29,12 +27,12 @@ function M.Creature:GetHitDice(use_neg_levels)
 end
 
 --- Gets a creatures effective level.
-function M.Creature:GetEffectiveLevel()
+function Creature:GetEffectiveLevel()
    error "???"
 end
 
 --- Gets difference between hitdice and effective level.
-function M.Creature:GetEffectiveLevelDifference()
+function Creature:GetEffectiveLevelDifference()
    error "???"
    local hd = self:GetHitDice()
    if self.effective_level > hd then
@@ -45,14 +43,14 @@ function M.Creature:GetEffectiveLevelDifference()
 end
 
 --- Gets total negative levels
-function M.Creature:GetTotalNegativeLevels()
+function Creature:GetTotalNegativeLevels()
    if not self:GetIsValid() then return 0 end
    return C.nwn_GetTotalNegativeLevels(self.obj.cre_stats)
 end
 
 --- Sets a creatures effective level.
 -- @param level New effective level.
-function M.Creature:SetEffectiveLevel(level)
+function Creature:SetEffectiveLevel(level)
    error "???"
    self.effective_level = level
 end

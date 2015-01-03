@@ -1,7 +1,4 @@
---- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+----
 -- @module creature
 
 local ffi = require 'ffi'
@@ -10,11 +7,12 @@ local jit = require 'jit'
 
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
+local Creature = M.Creature
 
 --- Modes
 -- @section level
 
-function M.Creature:GetDetectMode()
+function Creature:GetDetectMode()
    NWE.StackPushObject(self);
    NWE.ExecuteCommand(575, 1);
    return NWE.StackPopInteger();
@@ -22,23 +20,23 @@ end
 
 --- Notifies creature's associats of combat mode change
 -- @param mode solstice.modes type constant.
-function M.Creature:NotifyAssociateActionToggle(mode)
+function Creature:NotifyAssociateActionToggle(mode)
    C.nwn_NotifyAssociateActionToggle(self.obj, mode)
 end
 
 --- Sets a creature's activity
 -- @param act
 -- @param on
-function M.Creature:SetActivity(act, on)
+function Creature:SetActivity(act, on)
    C.nwn_SetActivity(self.obj, act, on)
 end
 
-jit.off(M.Creature.SetActivity)
+jit.off(Creature.SetActivity)
 
 --- Sets creature's combat mode
 -- @param mode solstice.modes type constant.
 -- @param change If false the combat mode is already active.
-function M.Creature:SetCombatMode(mode, change)
+function Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
    local off = mode == COMBAT_MODE_INVALID
    if change and self.obj.cre_mode_combat > 11 then
@@ -105,7 +103,7 @@ function M.Creature:SetCombatMode(mode, change)
    end
 end
 
-jit.off(M.Creature.SetCombatMode)
+jit.off(Creature.SetCombatMode)
 
 --- Sets creature's combat mode
 -- @param cre Creature in question.

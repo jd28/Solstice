@@ -134,7 +134,6 @@ function M.Object:ActionStartConversation(target, dialog, private, hello)
    NWE.StackPushObject(target)
    NWE.ExecuteCommand(204, 4)
 
-   print(self, temp)
    NWE.SetCommandObject(temp)
 end
 

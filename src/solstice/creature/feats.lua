@@ -1,13 +1,11 @@
---- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+----
 -- @module creature
 
 local ffi = require 'ffi'
 local C   = ffi.C
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 --- Feats
 -- @section
@@ -15,7 +13,7 @@ local M = require 'solstice.creature.init'
 --- Add known feat to creature
 -- @param feat FEAT\_*
 -- @param level If level is specified feat will be add at that level. (Default: 0)
-function M.Creature:AddKnownFeat(feat, level)
+function Creature:AddKnownFeat(feat, level)
    if not self:GetIsValid() then return -1 end
 
    level = level or 0
@@ -24,7 +22,7 @@ end
 
 --- Decrement remaining feat uses.
 -- @param feat FEAT\_*
-function M.Creature:DecrementRemainingFeatUses(feat)
+function Creature:DecrementRemainingFeatUses(feat)
    local has, feat = self:GetHighestFeat(feat)
    if not has or self:GetRemainingFeatUses(feat, has) == 0 then
       return
@@ -42,7 +40,7 @@ end
 -- @param feat FEAT\_*
 -- @param[opt=false] has_uses Check the feat is useable.
 -- @param[opt=false] check_successors Check feat successors.
-function M.Creature:GetHasFeat(feat, has_uses, check_successors)
+function Creature:GetHasFeat(feat, has_uses, check_successors)
    if not self:GetIsValid() then return false end
 
    local res = false
@@ -80,7 +78,7 @@ end
 -- @param feat FEAT\_*
 -- @return true if a creature has a feat.
 -- @return if creature has the feat, the highest feat is returned.
-function M.Creature:GetHighestFeat(feat)
+function Creature:GetHighestFeat(feat)
    local feats = Rules.GetFeatSuccessors(feat)
 
    if #feats > 0 then
@@ -98,7 +96,7 @@ end
 -- @param low_feat FEAT\_*
 -- @param high_feat FEAT\_*
 -- @return FEAT\_* or -1 on error.
-function M.Creature:GetHighestFeatInRange(low_feat, high_feat)
+function Creature:GetHighestFeatInRange(low_feat, high_feat)
    while high_feat >= low_feat do
       if self:GetHasFeat(high_feat) then
          return high_feat
@@ -111,7 +109,7 @@ end
 
 --- Gets known feat at index
 -- @param index Index of feat
-function M.Creature:GetKnownFeat(index)
+function Creature:GetKnownFeat(index)
    if not self:GetIsValid() or index < 0 or index > self.obj.cre_stats.cs_feats.len then
       return -1
    end
@@ -122,7 +120,7 @@ end
 --- Gets known feat by level at index
 -- @param level Level in question
 -- @param idx Index of feat
-function M.Creature:GetKnownFeatByLevel(level, idx)
+function Creature:GetKnownFeatByLevel(level, idx)
    if not self:GetIsValid() then return -1 end
 
    local ls = C.nwn_GetLevelStats(self.obj.cre_stats, level)
@@ -136,7 +134,7 @@ end
 --- Determines if a creature knows a feat.
 -- Feats acquired from gear do not count.
 -- @param feat FEAT\_*
-function M.Creature:GetKnowsFeat(feat)
+function Creature:GetKnowsFeat(feat)
    if not self:GetIsValid() then return false end
 
    return C.nwn_GetKnowsFeat(self.obj.cre_stats, feat)
@@ -146,7 +144,7 @@ end
 -- @param feat FEAT\_*
 -- @param[opt=false] has If true function assumes that creature
 -- does have the feat in question.
-function M.Creature:GetRemainingFeatUses(feat, has)
+function Creature:GetRemainingFeatUses(feat, has)
    if not self:GetIsValid() then return 0 end
    if not has then
       has, feat = self:GetHighestFeat(feat)
@@ -170,14 +168,14 @@ end
 
 --- Get total feat uses.
 -- @param feat FEAT\_*
-function M.Creature:GetTotalFeatUses(feat)
+function Creature:GetTotalFeatUses(feat)
    if not self:GetIsValid() then return -1 end
    return Rules.GetMaximumFeatUses(feat, self)
 end
 
 --- Get total known feats.
 -- @return -1 on error.
-function M.Creature:GetTotalKnownFeats()
+function Creature:GetTotalKnownFeats()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_feats.len
 end
@@ -185,7 +183,7 @@ end
 --- Get total known feats by level.
 -- @param level The level to check.
 -- @return -1 on error.
-function M.Creature:GetTotalKnownFeatsByLevel(level)
+function Creature:GetTotalKnownFeatsByLevel(level)
    if not self:GetIsValid() then return -1 end
 
    local ls = C.nwn_GetLevelStats(self.obj.cre_stats, level)
@@ -196,7 +194,7 @@ end
 
 --- Increment remaining feat uses.
 -- @param feat FEAT\_*
-function M.Creature:IncrementRemainingFeatUses(feat)
+function Creature:IncrementRemainingFeatUses(feat)
    local has, feat = self:GetHighestFeat(feat)
    if not has or self:GetRemainingFeatUses(feat, has) == 0 then
       return
@@ -212,7 +210,7 @@ end
 
 --- Remove feat from creature.
 -- @param feat FEAT\_*
-function M.Creature:RemoveKnownFeat(feat)
+function Creature:RemoveKnownFeat(feat)
    if not self:GetIsValid() then return end
    C.nwn_RemoveKnownFeat(self.obj.cre_stats, feat)
 end
@@ -220,7 +218,7 @@ end
 --- Set known feat on creature
 -- @param index Feat index to set
 -- @param feat FEAT\_*
-function M.Creature:SetKnownFeat(index, feat)
+function Creature:SetKnownFeat(index, feat)
    if not self:GetIsValid() or index < 0 or index > self.obj.cre_stats.cs_feats.len then
       return -1
    end
@@ -233,7 +231,7 @@ end
 -- @param level Level to set the feat on.
 -- @param index Feat index
 -- @param feat FEAT\_*
-function M.Creature:SetKnownFeatByLevel(level, index, feat)
+function Creature:SetKnownFeatByLevel(level, index, feat)
    if not self:GetIsValid() then return -1 end
 
    local ls = C.nwn_GetLevelStats(self.obj.cre_stats, level)

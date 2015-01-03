@@ -6,7 +6,7 @@
 -- @section class
 
 local TDA = require 'solstice.2da'
-
+local TLK = require 'solstice.tlk'
 local _CLASS = {}
 local _TIERS = {}
 
@@ -143,6 +143,11 @@ SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
 SetCanUseClassAbilitiesOverride(CLASS_TYPE_ASSASSIN, assassin)
 SetCanUseClassAbilitiesOverride(CLASS_TYPE_RANGER, ranger)
 
+--- Get bonus feats for level.
+-- @param cre Creature
+-- @param class CLASS\_TYPE\_*
+-- @param level Character level.
+-- @return List of feats.
 local function GetLevelBonusFeats(cre, class, level)
    local t = {}
    local s = _FEATS[class]
@@ -157,8 +162,26 @@ local function GetLevelBonusFeats(cre, class, level)
    return t
 end
 
+--- Get class name.
+-- @param class CLASS\_TYPE\_*
+local function GetClassName(class)
+   local strref = TDA.Get2daInt('classes', 'Name', class)
+   if strref == 0 then
+      error("Unknown class: " .. tostring(class))
+   end
+   return TLK.GetString(strref)
+end
+
+--- Get number of skillpoints class gains on level up.
+-- @param class CLASS\_TYPE\_*
+local function GetSkillPointsGainedOnLevelUp(class)
+   return TDA.Get2daInt('classes', 'SkillPointBase', class)
+end
+
 local M = require 'solstice.rules.init'
 M.CanUseClassAbilities            = CanUseClassAbilities
 M.SetCanUseClassAbilitiesOverride = SetCanUseClassAbilitiesOverride
 M.GetBaseAttackBonus              = GetBaseAttackBonus
 M.GetLevelBonusFeats              = GetLevelBonusFeats
+M.GetClassName                    = GetClassName
+M.GetSkillPointsGainedOnLevelUp   = GetSkillPointsGainedOnLevelUp

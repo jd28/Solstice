@@ -10,53 +10,7 @@ local C = require('ffi').C
 local TDA = require 'solstice.2da'
 local TLK = require 'solstice.tlk'
 
-local _FEAT_TABLE
 local FEAT_USES = {}
-
-function M.GetFeatTable()
-   if not _FEAT_TABLE then
-      _FEAT_TABLE = {}
-      _FEAT_TABLE.master = {}
-
-      local twoda = TDA.GetCached2da("feat")
-      local size = TDA.Get2daRowCount(twoda) - 1
-      for i = 0, size do
-         local const = TDA.Get2daString(twoda, "FEAT", i)
-         local master = TDA.Get2daString(twoda, "MASTERFEAT", i)
-
-         if #const > 0 and const ~= "****" then
-            local str = TLK.GetString(tonumber(const))
-            local insert
-
-            if #master > 0 and master ~= "****" then
-               local m = tonumber(master)
-               if not _FEAT_TABLE.master[m] then
-                  _FEAT_TABLE.master[m] = {}
-                  -- Only insert the master feat into the feat table once.
-                  insert = { TLK.GetString(m).."...", m, master = true }
-               end
-               table.insert(_FEAT_TABLE.master[m], { str, i })
-            else
-               insert = { str, i }
-            end
-
-            if insert then table.insert(_FEAT_TABLE, insert) end
-         end
-      end
-
-      -- Sort everything alphabetically.
-      table.sort(_FEAT_TABLE, function(a, b) return a[1] < b[1] end)
-      for _, v in pairs(_FEAT_TABLE.master) do
-         table.sort(v, function(a, b) return a[1] < b[1] end)
-      end
-   end
-
-   return iter(_FEAT_TABLE)
-end
-
-function M.GetMasterFeatTable(master)
-   return iter(_FEAT_TABLE.master[master])
-end
 
 --- Determines a creatures maximum feat uses.
 -- @param feat
@@ -99,4 +53,40 @@ end
 function NWNXSolstice_GetMaximumFeatUses(feat, cre)
    cre = _SOL_GET_CACHED_OBJECT(cre)
    return M.GetMaximumFeatUses(feat, cre)
+end
+
+--- Determine is first level feat only.
+-- @param feat FEAT\_*
+function M.GetFeatIsFirstLevelOnly(feat)
+   local f = C.nwn_GetFeat(feat)
+   if f == nil then return false end
+   return f.feat_max_level == 1
+end
+
+--- Get feat name.
+-- @param feat FEAT\_*
+function M.GetFeatName(feat)
+   local f = C.nwn_GetFeat(feat)
+   if f == nil then return "" end
+   return TLK.GetString(f.feat_name_strref)
+end
+
+--- Determine if feat is class general feat.
+-- @param feat FEAT\_*
+-- @param class CLASS\_TYPE\_*
+function M.GetIsClassGeneralFeat(feat, class)
+   return C.nwn_GetIsClassGeneralFeat(class, feat)
+end
+--- Determine if feat is class bonus feat.
+-- @param feat FEAT\_*
+-- @param class CLASS\_TYPE\_*
+function M.GetIsClassBonusFeat(feat, class)
+   return C.nwn_GetIsClassBonusFeat(class, feat)
+end
+
+--- Determine if feat is class granted feat.
+-- @param feat FEAT\_*
+-- @param class CLASS\_TYPE\_*
+function M.GetIsClassGrantedFeat(feat, class)
+   return C.nwn_GetIsClassGrantedFeat(class, feat)
 end

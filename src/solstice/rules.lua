@@ -25,6 +25,7 @@ safe_require 'solstice.rules.situations'
 safe_require 'solstice.rules.specattack'
 safe_require 'solstice.rules.skills'
 safe_require 'solstice.rules.weapons'
+safe_require 'solstice.rules.levels'
 
 local TDA = require 'solstice.2da'
 

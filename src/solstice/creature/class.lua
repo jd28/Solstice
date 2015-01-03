@@ -2,12 +2,13 @@
 -- @module creature
 
 local M = require 'solstice.creature.init'
+local Creature = M.Creature
 
 --- Class
 -- @section class
 
 --- Iterator over creature's classes
-function M.Creature:Classes()
+function Creature:Classes()
    if not self:GetIsValid() then return end
    local i, count, _i = 0, self.obj.cre_stats.cs_classes_len
    return function ()
@@ -21,7 +22,7 @@ end
 --- Determines class that was chosen at a particular level.
 -- @param level Level to get class at.
 -- @return CLASS\_TYPE\_* constant or -1 on error.
-function M.Creature:GetClassByLevel(level)
+function Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
    local ls = self:GetLevelStats(level)
@@ -32,7 +33,7 @@ end
 
 --- Determines a cleric's domain.
 -- @param domain Cleric's first or second domain
-function M.Creature:GetClericDomain(domain)
+function Creature:GetClericDomain(domain)
    if not self:GetIsValid() then return -1 end
    if domain ~= 1 and domain ~= 2 then
       error "Invalid domain."
@@ -59,7 +60,7 @@ end
 
 --- Get number of levels a creature by class
 -- @param class CLASS\_TYPE\_* type constant.
-function M.Creature:GetLevelByClass(class)
+function Creature:GetLevelByClass(class)
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
       if self.obj.cre_stats.cs_classes[i].cl_class == class then
          return self.obj.cre_stats.cs_classes[i].cl_level
@@ -70,7 +71,7 @@ end
 
 --- Get number of levels a creature by position
 -- @param position Valid values: 0, 1, or 2
-function M.Creature:GetLevelByPosition(position)
+function Creature:GetLevelByPosition(position)
    if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
    end
@@ -83,7 +84,7 @@ function M.Creature:GetLevelByPosition(position)
    return cl.cl_level
 end
 
-function M.Creature:GetLevelStats(level)
+function Creature:GetLevelStats(level)
    if level < 1 or level > self.obj.cre_stats.cs_levelstat_len then
       return
    end
@@ -93,21 +94,37 @@ end
 
 --- Get class type by position
 -- @param position Valid values: 0, 1, or 2
-function M.Creature:GetClassByPosition(position)
+-- @return -1 on error.
+function Creature:GetClassByPosition(position)
    if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
    end
 
-   if not self:GetIsValid() then return 0 end
+   if not self:GetIsValid() then return -1 end
 
    local cl = self.obj.cre_stats.cs_classes[position]
-   if cl == nil then return 0 end
+   if cl == nil then return -1 end
 
    return cl.cl_class
 end
 
+--- Determins class postion by class type.
+-- @param class CLASS\_TYPE\_*
+-- @return 0, 1, 2, or -1 on error.
+function Creature:GetPositionByClass(class)
+   if self:GetClassByPosition(0) == class then
+      return 0
+   elseif self:GetClassByPosition(1) == class then
+      return 1
+   elseif self:GetClassByPosition(2) == class then
+      return 2
+   end
+
+   return -1
+end
+
 --- Gets a creature's wizard specialization.
-function M.Creature:GetWizardSpecialization()
+function Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
 
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
@@ -121,7 +138,7 @@ end
 --- Sets a cleric's domain.
 -- @param domain Cleric's first or second domain
 -- @param newdomain See domains.2da
-function M.Creature:SetClericDomain(domain, newdomain)
+function Creature:SetClericDomain(domain, newdomain)
    if not self:GetIsValid() then return -1 end
 
    domain = domain or 1
@@ -148,7 +165,7 @@ end
 
 --- Set a wizard's specialization.
 -- @param specialization see schools.2da
-function M.Creature:SetWizardSpecialization(specialization)
+function Creature:SetWizardSpecialization(specialization)
    if not self:GetIsValid() then return -1 end
 
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
@@ -159,4 +176,16 @@ function M.Creature:SetWizardSpecialization(specialization)
    end
 
    return -1
+end
+
+--- Determins creatures highest class level
+-- @return CLASS\_TYPE\_*, level
+function Creature:GetHighestLevelClass()
+   local hclass, hlevel = -1, -1
+   for class in self:Classes() do
+      if class.cl_level > hlevel then
+         hclass, hlevel = class.cl_class, class.cl_level
+      end
+   end
+   return hclass, hlevel
 end
