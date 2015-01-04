@@ -101,6 +101,13 @@ function Creature:GetPCFileName()
    return ffi.string(pl.pl_bicfile)
 end
 
+--- Get creatures's phenotype
+function Creature:GetPhenoType()
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(778, 1)
+   return NWE.StackPopInteger()
+end
+
 --- Gets creature's race.
 function Creature:GetRacialType()
    if not self:GetIsValid() then
@@ -200,6 +207,14 @@ end
 function Creature:SetMovementRate(rate)
    if not self:GetIsValid() then return end
    C.nwn_SetMovementRate(self.obj, rate)
+end
+
+--- Set creatures's phenotype
+-- @param phenotype Phenotype constant.
+function Creature:SetPhenoType(phenotype)
+   NWE.StackPushObject(self)
+   NWE.StackPushInteger(phenotype)
+   NWE.ExecuteCommand(779, 2)
 end
 
 --- Set creature's subrace
