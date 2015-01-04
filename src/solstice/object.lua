@@ -34,6 +34,7 @@ safe_require "solstice.object.nearest"
 safe_require "solstice.object.saves"
 safe_require "solstice.object.spells"
 safe_require "solstice.object.vars"
+safe_require 'solstice.object.properties'
 
 --- Class Object
 -- @section class_object
