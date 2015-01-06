@@ -174,8 +174,15 @@ end
 
 --- Get number of skillpoints class gains on level up.
 -- @param class CLASS\_TYPE\_*
-local function GetSkillPointsGainedOnLevelUp(class)
-   return TDA.Get2daInt('classes', 'SkillPointBase', class)
+-- @param pc PC
+local function GetSkillPointsGainedOnLevelUp(class, pc)
+   local sps = TDA.Get2daInt('classes', 'SkillPointBase', class)
+   if pc:GetRacialType(pc) == RACIAL_TYPE_HUMAN then
+      sps = sps + 1
+   end
+   sps = sps + pc:GetAbilityModifier(ABILITY_INTELLIGENCE, true)
+   return sps > 0 and sps or 1
+end
 end
 
 local M = require 'solstice.rules.init'
