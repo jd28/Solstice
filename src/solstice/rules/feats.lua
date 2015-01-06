@@ -90,3 +90,9 @@ end
 function M.GetIsClassGrantedFeat(feat, class)
    return C.nwn_GetIsClassGrantedFeat(class, feat)
 end
+
+--- Get Master Feat Name
+-- @param feat master feat
+function M.GetMasterFeatName(master)
+   return TLK.GetString(TDA.Get2daInt('masterfeats', 'STRREF', master))
+end
