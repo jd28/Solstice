@@ -183,6 +183,22 @@ local function GetSkillPointsGainedOnLevelUp(class, pc)
    sps = sps + pc:GetAbilityModifier(ABILITY_INTELLIGENCE, true)
    return sps > 0 and sps or 1
 end
+
+--- Get number of hitpoints class gains on level up.
+-- @param class CLASS\_TYPE\_*
+-- @param pc PC
+local function GetHitPointsGainedOnLevelUp(class, pc)
+   local hp = TDA.Get2daInt('classes', 'HitDie', class)
+   if class == CLASS_TYPE_DRAGON_DISCIPLE then
+      local level = pc:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) + 1
+      if level >= 6 then
+         return 10
+      elseif level >= 4 then
+         return 8
+      end
+   end
+
+   return hp
 end
 
 local M = require 'solstice.rules.init'
@@ -192,3 +208,4 @@ M.GetBaseAttackBonus              = GetBaseAttackBonus
 M.GetLevelBonusFeats              = GetLevelBonusFeats
 M.GetClassName                    = GetClassName
 M.GetSkillPointsGainedOnLevelUp   = GetSkillPointsGainedOnLevelUp
+M.GetHitPointsGainedOnLevelUp     = GetHitPointsGainedOnLevelUp
