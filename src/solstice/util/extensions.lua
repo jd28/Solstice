@@ -3,6 +3,7 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
+local Color = require 'solstice.color'
 
 function string:index(n)
    return string.sub(self, n, n)
@@ -131,4 +132,16 @@ function string.levenshtein(str1, str2)
 
         -- return the last value - this is the Levenshtein distance
 	return matrix[len1][len2]
+end
+
+--- Color a string.
+-- @param color See solstice.color
+function string:color(color)
+   return color..self..Color.END
+end
+
+--- Sort table on a key.
+-- @param key Key to sort on.
+function table:ksort(key)
+   table.sort(self, function (a, b) return a[key] < b[key] end)
 end
