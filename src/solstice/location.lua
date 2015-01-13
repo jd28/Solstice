@@ -69,7 +69,7 @@ end
 --- Applies a visual effect to a location
 -- @param vfx VFX_*
 -- @param[opt] duration Duration in seconds.  If not passed the visual
--- will be applied as DURATION\_TYPE\_INSTANT.
+-- will be applied as DURATION_TYPE_INSTANT.
 function Location:ApplyVisual(vfx, duration)
    local durtype = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_INSTANT
    duration = duration or 0

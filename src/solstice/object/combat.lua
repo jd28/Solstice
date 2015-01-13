@@ -48,7 +48,7 @@ function Object:GetHardness()
 end
 
 --- Determines if object is immune to an effect.
--- @param immunity IMMUNITY\_TYPE\_*
+-- @param immunity IMMUNITY_TYPE_*
 -- @return Always `false`.
 function Object:GetIsImmune(immunity)
    return false
@@ -107,7 +107,7 @@ end
 
 --- Get objects damage immunity.
 -- NOTE: Not default behavior
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 function Object:GetDamageImmunity(dmgidx)
    return 0
 end
@@ -184,7 +184,7 @@ end
 
 --- Determines damage immunity adjustment.
 -- @param amt Damage amount.
--- @param dmgidx Damage index DAMAGE\_INDEX\_*
+-- @param dmgidx Damage index DAMAGE_INDEX_*
 -- @return Both the adjusted damage amt and the amount resisted will
 -- be returned.
 function Object:DoDamageImmunity(amt, dmgidx)
@@ -200,7 +200,7 @@ function Object:DoDamageImmunity(amt, dmgidx)
 end
 
 --- Determine best damage reduction effect.
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 -- @param[opt=0] start Place in object effect array to start looking.
 function Object:GetBestDamageResistEffect(dmgidx, start)
    start = start or 0
@@ -269,7 +269,7 @@ function Object:GetBestDamageReductionEffect(power, start)
 end
 
 --- Get objects base damage resistance.
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 -- @return Always 0
 function Object:GetBaseResist(dmgidx)
    return 0
@@ -278,7 +278,7 @@ end
 --- Resolves damage resistance.
 -- @param amt Damage amount.
 -- @param eff Damage Resistance effect if any.
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
 function Object:DoDamageResistance(amt, eff, dmgidx)
@@ -327,7 +327,7 @@ end
 --- Resolves damage reduction.
 -- @param amt Damage amount.
 -- @param eff Damage reduction effect if any.
--- @param power DAMAGE\_POWER\_*
+-- @param power DAMAGE_POWER_*
 -- @return Adjusted damage amount.
 -- @return Adjustment amount.
 function Object:DoDamageReduction(amt, eff, power)

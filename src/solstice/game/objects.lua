@@ -10,7 +10,7 @@ local M = require 'solstice.game.init'
 
 --- Create an object of a specified type at a given location
 -- NWScript: CreateObject
--- @param object_type OBJECT\_TYPE\_*
+-- @param object_type OBJECT_TYPE_*
 -- @param template The resref of the object to create from the pallet.
 -- @param loc The location to create the object at.
 -- @param[opt=false] appear If `true`, the object will play its spawn in animation.
@@ -122,8 +122,8 @@ local function GetNextObjectInShape(shape, size, location, line_of_sight, mask, 
 end
 
 --- Iterator over objects in a shape.
--- @param shape SHAPE\_*
--- @param size The size of the shape. Dependent on shape or RADIUS\_SIZE\_*.
+-- @param shape SHAPE_*
+-- @param size The size of the shape. Dependent on shape or RADIUS_SIZE_*.
 -- @param location Shapes location
 -- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
 -- @param[opt=OBJECT_TYPE_CREATURE] mask Object type mask.

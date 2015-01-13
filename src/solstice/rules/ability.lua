@@ -13,7 +13,7 @@ end
 
 --- Get the limits of ability effects
 -- @param cre Creature object.
--- @param ability ABILITY\_*
+-- @param ability ABILITY_*
 -- @return Minimum Default: -12
 -- @return Maximum Default: 12
 local function GetAbilityEffectLimits(cre, ability)
@@ -22,7 +22,7 @@ end
 
 --- Get ability modification from effects.
 -- @param cre Creature object.
--- @param ability ABILITY\_*
+-- @param ability ABILITY_*
 -- @return Total amount, uncapped
 local function GetAbilityEffectModifier(cre, ability)
    local eff = 0

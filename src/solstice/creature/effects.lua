@@ -1,4 +1,4 @@
---
+---
 -- @module creature
 
 local M = require 'solstice.creature.init'
@@ -46,7 +46,7 @@ function Creature:GetEffectImmunity(imm_type, vs)
 end
 
 --- Determins if creature has a feat effect.
--- @param feat FEAT\_*
+-- @param feat FEAT_*
 function Creature:GetHasFeatEffect(feat)
    local f = C.nwn_GetFeat(feat)
    if f == nil then return false end

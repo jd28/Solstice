@@ -1,7 +1,4 @@
 --- Object
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module object
 
 local M = require 'solstice.object.init'
@@ -193,7 +190,7 @@ function Object:RemoveEffectByID(id)
 end
 
 --- Remove effect by type
--- @param type EFFECT\_TYPE\_*
+-- @param type EFFECT_TYPE_*
 function Object:RemoveEffectsByType(type)
    local t = {}
    for eff in self:EffectsDirect() do

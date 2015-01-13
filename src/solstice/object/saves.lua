@@ -10,7 +10,7 @@ local Object = M.Object
 
 --- Do fortitude save
 -- @param dc Difficult class
--- @param save_type solstice.save.VS_*
+-- @param save_type
 -- @param vs Save versus object
 function Object:FortitudeSave(dc, save_type, vs)
    NWE.StackPushObject(vs)

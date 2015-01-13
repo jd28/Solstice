@@ -25,7 +25,7 @@ end
 
 --- Get the ability score of a specific type for a creature.
 -- NWScript: GetAbilityModifier
--- @param ability ABILITY\_*.
+-- @param ability ABILITY_*.
 -- @param[opt=false] base If true will return the base ability score
 -- without bonuses (e.g. ability bonuses granted from equipped
 -- items). If nothing entered, defaults to false.
@@ -58,7 +58,7 @@ end
 
 --- Get the ability score of a specific type for a creature.
 -- NWScript: GetAbilityScore
--- @param ability ABILITY\_*.
+-- @param ability ABILITY_*.
 -- @param[opt=false] base If `true` will return the base ability score
 -- without bonuses (e.g. ability bonuses granted from equipped
 -- items). If nothing entered, defaults to false.
@@ -99,7 +99,7 @@ end
 
 --- Modifies the ability score of a specific type for a creature.
 -- NWScript: nwnx_funcs by Acaos.
--- @param ability ABILITY\_*.
+-- @param ability ABILITY_*.
 -- @param value Amount to modify ability score
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).
@@ -118,7 +118,7 @@ end
 
 --- Sets the ability score of a specific type for a creature.
 -- NWScript: nwnx_funcs by Acaos.
--- @param ability ABILITY\_*.
+-- @param ability ABILITY_*.
 -- @param value Amount to modify ability score
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).

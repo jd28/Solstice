@@ -7,7 +7,7 @@
 local _IMM = {}
 
 --- Get innate immunity.
--- @param imm IMMUNITY\_TYPE\_* constant.
+-- @param imm IMMUNITY_TYPE_* constant.
 -- @param cre Creature object.
 local function GetInnateImmunity(imm, cre)
    local f = _IMM[imm]
@@ -18,7 +18,7 @@ end
 --- Sets innate immunity override.
 -- @param func Function taking a creature parameter and
 -- returning a percent immunity.
--- @param ... List of IMMUNITY\_TYPE\_* constants.
+-- @param ... List of IMMUNITY_TYPE_* constants.
 local function SetInnateImmunityOverride(func, ...)
    local t = {...}
    assert(#t > 0, "At least one IMMUNITY_TYPE_* constnats must be specified!")

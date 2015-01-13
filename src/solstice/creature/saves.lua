@@ -1,7 +1,4 @@
 --- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
 local M = require 'solstice.creature.init'
@@ -17,7 +14,7 @@ function Creature:DebugSaves()
 end
 
 --- Gets creatures saving throw bonus
--- @param save solstice.save constant
+-- @param save SAVING_THROW_*
 function Creature:GetSavingThrowBonus(save)
    if not self:GetIsValid() then return 0 end
 

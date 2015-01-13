@@ -39,7 +39,7 @@ end
 --- Adds an onhit visual effect to an attack.
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
--- @param vfx VFX\_*
+-- @param vfx VFX_*
 local function AddVFX(info, attacker, vfx)
    AddEffect(info, attacker, Eff.VisualEffect(vfx))
 end

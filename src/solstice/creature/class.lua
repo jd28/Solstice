@@ -21,7 +21,7 @@ end
 
 --- Determines class that was chosen at a particular level.
 -- @param level Level to get class at.
--- @return CLASS\_TYPE\_* constant or -1 on error.
+-- @return CLASS_TYPE_* constant or -1 on error.
 function Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
@@ -59,7 +59,7 @@ function Creature:GetClericDomain(domain)
 end
 
 --- Get number of levels a creature by class
--- @param class CLASS\_TYPE\_* type constant.
+-- @param class CLASS_TYPE_* type constant.
 function Creature:GetLevelByClass(class)
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
       if self.obj.cre_stats.cs_classes[i].cl_class == class then
@@ -109,7 +109,7 @@ function Creature:GetClassByPosition(position)
 end
 
 --- Determins class postion by class type.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @return 0, 1, 2, or -1 on error.
 function Creature:GetPositionByClass(class)
    if self:GetClassByPosition(0) == class then
@@ -179,7 +179,7 @@ function Creature:SetWizardSpecialization(specialization)
 end
 
 --- Determins creatures highest class level
--- @return CLASS\_TYPE\_*, level
+-- @return CLASS_TYPE_*, level
 function Creature:GetHighestLevelClass()
    local hclass, hlevel = -1, -1
    for class in self:Classes() do

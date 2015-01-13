@@ -17,7 +17,7 @@ M.aoe_t = ffi.metatype("AoE", { __index = AoE })
 
 --- Gets the first object in an AoE.
 -- Perfer the AoE:ObjectsInEffect iterator.
--- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT_TYPE_* mask.
 -- @return Next object in AoE and finally OBJECT_INVALID
 function AoE:GetFirstInPersistentObject(object_mask)
    object_mask = object_mask or OBJECT_TYPE_CREATURE
@@ -31,7 +31,7 @@ end
 
 --- Gets the next object in an AoE.
 -- Perfer the AoE:ObjectsInEffect iterator.
--- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT_TYPE_* mask.
 -- @return Next object in AoE and finally OBJECT_INVALID
 function AoE:GetNextInPersistentObject(object_mask)
    object_mask = object_mask or OBJECT_TYPE_CREATURE
@@ -44,7 +44,7 @@ function AoE:GetNextInPersistentObject(object_mask)
 end
 
 --- An iterator over all objects in an AoE
--- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT\_TYPE\_* mask.
+-- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT_TYPE_* mask.
 -- @return Iterator of objects satisfying the object mask.
 function AoE:ObjectsInEffect(object_mask)
    object_mask = object_mask or OBJECT_TYPE_CREATURE

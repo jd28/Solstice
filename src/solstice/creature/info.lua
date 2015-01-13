@@ -1,7 +1,4 @@
 --- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
 local M = require 'solstice.creature.init'
@@ -203,7 +200,7 @@ function Creature:SetLootable(lootable)
 end
 
 --- Set creatures movement rate.
--- @param rate MOVE\_RATE\_*
+-- @param rate MOVE_RATE_*
 function Creature:SetMovementRate(rate)
    if not self:GetIsValid() then return end
    C.nwn_SetMovementRate(self.obj, rate)

@@ -1,7 +1,4 @@
 --- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
 --- Skills
@@ -16,13 +13,13 @@ local D     = require 'solstice.dice'
 local Log   = System.GetLogger()
 
 --- [DEPRECATE] Determines if a creature can use a skill
--- @param skill SKILL\_*.
+-- @param skill SKILL_*.
 function Creature:CanUseSkill(skill)
    return ffi.C.nwn_CanUseSkill(self.obj, skill)
 end
 
 --- Determines if a creature has a skill
--- @param skill SKILL\_*.
+-- @param skill SKILL_*.
 function Creature:GetHasSkill(skill)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(skill)
@@ -31,7 +28,7 @@ function Creature:GetHasSkill(skill)
 end
 
 --- Determines if skill check is successful
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @param dc Difficulty Class
 -- @param vs Versus a target
 -- @param feedback If true sends feedback to participants.
@@ -45,7 +42,7 @@ end
 
 --- Determine's a skill check.
 -- Source: FunkySwerve on NWN bioboards
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @param dc Difficulty Class
 -- @param vs Versus a target
 -- @param feedback If true sends feedback to participants.
@@ -111,7 +108,7 @@ end
 
 --- Gets the amount a skill was increased at a level.
 -- @param level Level to check
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @return -1 on error.
 function Creature:GetSkillIncreaseByLevel(level, skill)
    if not self:GetIsValid()
@@ -134,7 +131,7 @@ function Creature:GetSkillPoints()
 end
 
 -- Gets creature's skill rank.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 function Creature:GetSkillRank(skill, vs, base, no_scale)
    if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
       return 0
@@ -161,7 +158,7 @@ function Creature:GetSkillRank(skill, vs, base, no_scale)
 end
 
 --- Modifies skill rank.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @param amount Amount to modify skill rank.
 -- @param level If a level is specified the modification will occur at that level.
 function Creature:ModifySkillRank(skill, amount, level)
@@ -199,7 +196,7 @@ function Creature:SetSkillPoints(amount)
 end
 
 --- Sets a creatures skill rank
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @param amount New skill rank
 function Creature:SetSkillRank(skill, amount)
    if not self:GetIsValid() or

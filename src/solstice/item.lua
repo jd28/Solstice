@@ -129,8 +129,8 @@ function Item:GetEntireAppearance()
 end
 
 --- Returns the appearance of an item
--- @param appearance_type ITEM\_APPR\_TYPE\_*
--- @param index ITEM\_APPR\_WEAPON\_* or ITEM\_APPR\_ARMOR\_*
+-- @param appearance_type ITEM_APPR_TYPE_*
+-- @param index ITEM_APPR_WEAPON_* or ITEM_APPR_ARMOR_*
 function Item:GetItemAppearance(appearance_type, index)
    NWE.StackPushInteger(index)
    NWE.StackPushInteger(appearance_type)
@@ -246,7 +246,7 @@ function Item:AddItemProperty(dur_type, ip, duration)
 end
 
 --- Check whether an item has a given property.
--- @param ip_type ITEM\_PROPERTY\_*
+-- @param ip_type ITEM_PROPERTY_*
 function Item:GetHasItemProperty(ip_type)
    return C.nwn_HasPropertyType(self.obj, ip_type) ~= 0
 end

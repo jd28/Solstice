@@ -27,7 +27,7 @@ function Creature:ActionAttack(target, passive)
 end
 
 ---
--- @param spell SPELL\_* constant.
+-- @param spell SPELL_* constant.
 -- @param target Object to cast fake spell at.
 -- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 function Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
@@ -45,9 +45,9 @@ function Creature:ActionCastFakeSpellAtObject(spell, target, path_type)
 end
 
 ---
--- @param spell SPELL\_* constant.
+-- @param spell SPELL_* constant.
 -- @param target Location to cast spell at.
--- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -63,11 +63,11 @@ function Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
 end
 
 ---
--- @param spell SPELL\_* constant.
+-- @param spell SPELL_* constant.
 -- @param target Location to cast spell at.
--- @param[opt=METAMAGIC\_ANY] metamagic METAMAGIC\_*.
+-- @param[opt=METAMAGIC_ANY] metamagic METAMAGIC_*.
 -- @param[opt=false] cheat If true cast spell even if target does not have the ability.
--- @param[opt=PROJECTILE\_PATH\_TYPE\_DEFAULT] path_type PROJECTILE\_PATH\_TYPE\_*.
+-- @param[opt=PROJECTILE_PATH_TYPE_DEFAULT] path_type PROJECTILE_PATH_TYPE_*.
 -- @param[opt=false] instant If true spell can instantaneously.
 function Creature:ActionCastSpellAtLocation(spell, target, metamagic, cheat, path_type, instant)
    local temp = NWE.GetCommandObject()

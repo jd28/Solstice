@@ -1,8 +1,8 @@
 ﻿--- Colors
--- @module color
-
 -- NOTE: Colors MUST be encoded with rgb values, string constants
--- copied from NWScript will NOT work in most cases.
+-- copied from NWScript will NOT work in most cases due to encoding
+-- issues.
+-- @module color
 
 local M = {}
 

@@ -90,7 +90,7 @@ merge=true
 sort=true
 no_summary = true
 wrap = true
-
+plain=true
 file={
 	'../src/solstice',
 }

@@ -36,7 +36,7 @@ end
 
 --- Creature spell cast at event.
 -- @param caster Spell caster.
--- @param spell SPELL\_*
+-- @param spell SPELL_*
 -- @bool is_harmful Is spell harmful to target.
 function M.EventSpellCastAt(caster, spell, is_harmful)
    NWE.StackPushBoolean(is_harmful)
@@ -147,14 +147,14 @@ end
 
 --- Get the current UserDefined Item Event Number
 -- @param obj Item object
--- @return ITEM\_EVENT\_* (see itemevents.2da)
+-- @return ITEM_EVENT_* (see itemevents.2da)
 function M.GetUserDefinedItemEventNumber(obj)
     return obj:GetLocalInt("X2_L_LAST_ITEM_EVENT")
 end
 
 --- Set the current UserDefined Item Event Number
 -- @param obj Item object
--- @param event ITEM\_EVENT\_* (see itemevents.2da)
+-- @param event ITEM_EVENT_* (see itemevents.2da)
 function M.SetUserDefinedItemEventNumber(obj, event)
     obj:SetLocalInt("X2_L_LAST_ITEM_EVENT", event)
 end

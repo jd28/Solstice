@@ -87,7 +87,7 @@ end
 
 --- Determine if creature can use class abilites.
 -- @param cre Creature object.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @return boolean, class level
 local function CanUseClassAbilities(cre, class)
    if not cre:GetIsValid() then return false, 0 end
@@ -100,9 +100,9 @@ local function CanUseClassAbilities(cre, class)
 end
 
 --- Registers a class ability handler.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @func func A function that takes a creature and
--- optionally a CLASS\_TYPE\_* argument and returns
+-- optionally a CLASS_TYPE_* argument and returns
 -- a boolean indicating whether the creature can use
 -- the abilities for the class and the creatures class
 -- level.  NOTE: you must return both or an assertion
@@ -145,7 +145,7 @@ SetCanUseClassAbilitiesOverride(CLASS_TYPE_RANGER, ranger)
 
 --- Get bonus feats for level.
 -- @param cre Creature
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @param level Character level.
 -- @return List of feats.
 local function GetLevelBonusFeats(cre, class, level)
@@ -163,7 +163,7 @@ local function GetLevelBonusFeats(cre, class, level)
 end
 
 --- Get class name.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 local function GetClassName(class)
    local strref = TDA.Get2daInt('classes', 'Name', class)
    if strref == 0 then
@@ -173,7 +173,7 @@ local function GetClassName(class)
 end
 
 --- Get number of skillpoints class gains on level up.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @param pc PC
 local function GetSkillPointsGainedOnLevelUp(class, pc)
    local sps = TDA.Get2daInt('classes', 'SkillPointBase', class)
@@ -185,7 +185,7 @@ local function GetSkillPointsGainedOnLevelUp(class, pc)
 end
 
 --- Get number of hitpoints class gains on level up.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @param pc PC
 local function GetHitPointsGainedOnLevelUp(class, pc)
    local hp = TDA.Get2daInt('classes', 'HitDie', class)

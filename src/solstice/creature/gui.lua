@@ -1,4 +1,4 @@
---- GUI
+-- GUI
 -- @module gui
 
 local M = {}

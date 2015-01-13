@@ -9,7 +9,7 @@ local _DMG_RED = {}
 
 --- Get base damage immunity.
 -- @param cre Creature object.
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 local function GetBaseDamageImmunity(cre, dmgidx)
    local f = _DMG_IMM[dmgidx]
    if not f then return 0 end
@@ -18,7 +18,7 @@ end
 
 --- Sets a damage immunity override function.
 -- @func func (creature) -> int
--- @param ... DAMAGE\_INDEX\_*
+-- @param ... DAMAGE_INDEX_*
 local function SetBaseDamageImmunityOverride(func, ...)
    local t = {...}
    assert(#t > 0, "At least one DAMAGE_INDEX_* constant must be specified!")
@@ -65,7 +65,7 @@ end
 
 --- Get base damage reduction.
 -- @param cre Creature object.
--- @param dmgidx DAMAGE\_INDEX\_*
+-- @param dmgidx DAMAGE_INDEX_*
 local function GetBaseDamageResistance(cre, dmgidx)
    local f = _DMG_RED[dmgidx]
    if not f then return 0 end
@@ -74,7 +74,7 @@ end
 
 --- Sets a damage resistance override function.
 -- @func func (creature) -> int
--- @param ... DAMAGE\_INDEX\_*
+-- @param ... DAMAGE_INDEX_*
 local function SetBaseDamageResistanceOverride(func, ...)
   local t = {...}
   for _, dmg in ipairs(t) do

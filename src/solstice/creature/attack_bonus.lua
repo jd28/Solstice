@@ -15,7 +15,7 @@ local Creature = M.Creature
 
 --- Get attack bonus vs target.
 -- @param target Target object.
--- @param equip EQUIP\_TYPE\_*
+-- @param equip EQUIP_TYPE_*
 function Creature:GetAttackBonusVs(target, equip)
    local trans_ab = math.clamp(self.ci.offense.ab_transient + self.ci.equips[equip].transient_ab_mod, -20, 20)
    local ab = self.ci.offense.ab_base

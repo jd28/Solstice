@@ -1,7 +1,4 @@
 --- Object
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module object
 
 local M = safe_require 'solstice.object.init'

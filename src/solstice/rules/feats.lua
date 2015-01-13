@@ -27,8 +27,8 @@ end
 
 --- Register a function to determine maximum feat uses.
 -- @param func A function taking two argument, a Creature instance and
--- and a FEAT\_* constant.
--- @param ... Vararg list FEAT\_* constants.
+-- and a FEAT_* constant.
+-- @param ... Vararg list FEAT_* constants.
 function M.RegisterFeatUses(func, ...)
    local t = {...}
    assert(#t > 0)
@@ -38,7 +38,7 @@ function M.RegisterFeatUses(func, ...)
 end
 
 --- Get array of feats successors.
--- @param feat FEAT\_*
+-- @param feat FEAT_*
 -- @return empty array if no successors.
 function M.GetFeatSuccessors(feat)
    local res = {}
@@ -56,7 +56,7 @@ function NWNXSolstice_GetMaximumFeatUses(feat, cre)
 end
 
 --- Determine is first level feat only.
--- @param feat FEAT\_*
+-- @param feat FEAT_*
 function M.GetFeatIsFirstLevelOnly(feat)
    local f = C.nwn_GetFeat(feat)
    if f == nil then return false end
@@ -64,7 +64,7 @@ function M.GetFeatIsFirstLevelOnly(feat)
 end
 
 --- Get feat name.
--- @param feat FEAT\_*
+-- @param feat FEAT_*
 function M.GetFeatName(feat)
    local f = C.nwn_GetFeat(feat)
    if f == nil then return "" end
@@ -72,21 +72,21 @@ function M.GetFeatName(feat)
 end
 
 --- Determine if feat is class general feat.
--- @param feat FEAT\_*
--- @param class CLASS\_TYPE\_*
+-- @param feat FEAT_*
+-- @param class CLASS_TYPE_*
 function M.GetIsClassGeneralFeat(feat, class)
    return C.nwn_GetIsClassGeneralFeat(class, feat)
 end
 --- Determine if feat is class bonus feat.
--- @param feat FEAT\_*
--- @param class CLASS\_TYPE\_*
+-- @param feat FEAT_*
+-- @param class CLASS_TYPE_*
 function M.GetIsClassBonusFeat(feat, class)
    return C.nwn_GetIsClassBonusFeat(class, feat)
 end
 
 --- Determine if feat is class granted feat.
--- @param feat FEAT\_*
--- @param class CLASS\_TYPE\_*
+-- @param feat FEAT_*
+-- @param class CLASS_TYPE_*
 function M.GetIsClassGrantedFeat(feat, class)
    return C.nwn_GetIsClassGrantedFeat(class, feat)
 end

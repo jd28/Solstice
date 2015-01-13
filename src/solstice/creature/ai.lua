@@ -17,7 +17,7 @@ function Creature:GetAILevel()
 end
 
 --- Sets creature's AI level.
--- @param ai_level solstice.ai.LEVEL_*
+-- @param ai_level
 function Creature:SetAILevel(ai_level)
    NWE.StackPushInteger(ai_level);
    NWE.StackPushObject(self);

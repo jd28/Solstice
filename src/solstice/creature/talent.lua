@@ -1,5 +1,4 @@
 --- Talent
--- @license GPL v2
 -- @module creature
 
 local M   = require 'solstice.creature.init'
@@ -19,7 +18,7 @@ function Creature:GetHasTalent(talent)
 end
 
 --- Determines the best talent of a creature from a group of talents.
--- @param category TALENT\_CATEGORY\_*
+-- @param category TALENT_CATEGORY_*
 -- @param cr_max The maximum Challenge Rating of the talent.
 function Creature:GetTalentBest(category, cr_max)
    NWE.StackPushObject(self)
@@ -30,7 +29,7 @@ function Creature:GetTalentBest(category, cr_max)
 end
 
 --- Retrieves a random talent from a group of talents that a creature possesses.
--- @param category TALENT\_CATEGORY\_*
+-- @param category TALENT_CATEGORY_*
 function Creature:GetTalentRandom(category)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(category)
