@@ -17,7 +17,8 @@ end
 
 --- Modifies a creatures XP.
 -- @param amount Amount of XP to give or take.
--- @bool[opt=false] direct If true the xp amount is set directly.
+-- @bool[opt=false] direct If true the xp amount is set directly with
+-- no feedback to player.
 function Creature:ModifyXP(amount, direct)
    local cmd = 393
    if amount < 0 then
@@ -37,7 +38,8 @@ end
 
 --- Sets a creatures XP
 -- @param amount Amount to set XP to
--- @bool[opt=false] direct If true the xp amount is set directly.
+-- @bool[opt=false] direct If true the xp amount is set directly with
+-- no feedback to player.
 function Creature:SetXP(amount, direct)
    if direct then
       if not self:GetIsValid() then return end

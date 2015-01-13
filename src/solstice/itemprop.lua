@@ -120,7 +120,7 @@ local function CreateItempropInternal(type, subtype, cost, cost_val,
    return ip
 end
 
---- Item Property creation functions.
+--- Creation Functions.
 -- @section ip_create
 
 local function CreateItemPropery(command, args)

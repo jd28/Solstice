@@ -12,9 +12,12 @@ local C = ffi.C
 local Object = {}
 M.Object = Object
 
---- Internal Object ctype.
+-- Internal Object ctype.
 -- See sol/ctypes.lua for definition.
 M.object_t = ffi.metatype("Object", { __index = M.Object })
+
+--- Constants
+-- @section class_object
 
 --- Invalid Object.
 -- Create invalid object so don't have to test nullity and validity.
@@ -125,7 +128,8 @@ end
 
 --- Causes object to play a sound
 -- @param strref Sound to play
--- @param[opt=true] as_action Determines if this is an action that can be stacked on the action queue.
+-- @param[opt=true] as_action Determines if this is an action that
+-- can be stacked on the action queue.
 function Object:PlaySoundByStrRef(strref, as_action)
    if as_action == nil then as_action = true end
    NWE.StackPushInteger(as_action)
@@ -170,6 +174,8 @@ function Object:GetTransitionTarget()
    return NWE.StackPopObject()
 end
 
+--- Get an object's type.
+-- @return OBJECT\_TYPE\_* or OBJECT_TYPE_NONE on error.
 function Object:GetType()
    if not self:GetIsValid() then return OBJECT_TYPE_NONE end
    if self.type == OBJECT_TRUETYPE_CREATURE then
