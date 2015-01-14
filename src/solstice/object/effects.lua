@@ -80,31 +80,38 @@ function Object:ApplyRecurringEffect(effect, duration, dur_type, interval, eff_r
 
 end
 
---- An iterator that iterates directly over applied effects
-function Object:Effects()
-   local eff, _eff = self:GetFirstEffect()
-   return function()
-      while eff:GetIsValid() do
-         _eff, eff = eff, self:GetNextEffect()
-         return _eff
+--- An iterator that iterates over applied effects.
+-- Note: if direct is true, the actual effect will be returned.  Modyfying
+-- it will modify the applied effect.  If direct is false, a copy of the
+-- effect will be returned.
+function Object:Effects(direct)
+   if not direct then
+      local eff, _eff = self:GetFirstEffect()
+      return function()
+         while eff:GetIsValid() do
+            _eff, eff = eff, self:GetNextEffect()
+            return _eff
+         end
+      end
+   else
+      local obj = self.obj.obj
+      local i, _i = 0
+      return function()
+         while i < obj.obj_effects_len do
+            _i, i = i, i + 1
+            if obj.obj_effects[_i] == nil then return end
+
+            return Eff.effect_t(obj.obj_effects[_i], true)
+         end
       end
    end
 end
 
---- An iterator that iterates directly over applied effects
-function Object:EffectsDirect()
-   local obj = self.obj.obj
-   local i, _i = 0
-   return function()
-      while i < obj.obj_effects_len do
-         _i, i = i, i + 1
-         if obj.obj_effects[_i] == nil then return end
-
-         return Eff.effect_t(obj.obj_effects[_i], true)
-      end
-   end
-end
-
+--- Get an effect.
+-- Note: This returns effects directly.  Modifying them will
+-- modify the applied effect.
+-- @param idx Index is zero based.
+-- @return Effect or nil.
 function Object:GetEffectAtIndex(idx)
    local obj = self.obj.obj
    if idx < 0 or idx >= obj.obj_effects_len then
@@ -113,8 +120,9 @@ function Object:GetEffectAtIndex(idx)
    return Eff.effect_t(obj.obj_effects[idx], true)
 end
 
+--- Get the number effects applied to an object;
 function Object:GetEffectCount()
-   return self.obj.obj.obj_effects_len - 1
+   return self.obj.obj.obj_effects_len
 end
 
 --- Get if an object has an effecy by ID
