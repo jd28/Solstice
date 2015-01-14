@@ -70,11 +70,13 @@
 # if ldoc.body then -- verbatim HTML as contents; 'non-code' entries
     $(ldoc.body)
 # elseif module then -- module documentation
-<h1>$(ldoc.module_typename(module)) <code>$(module.name)</code></h1>
-<p>$(M(module.summary,module))</p>
-<p>$(M(module.description,module))</p>
+<div id="module_info">
+    <h2></h2>
+    <h1>$(ldoc.module_typename(module)) <code>$(module.name)</code></h1>
+    <p>$(M(module.summary,module))</p>
+    <p>$(M(module.description,module))</p>
 #   if module.tags.include then
-        $(M(ldoc.include_file(module.tags.include)))
+    $(M(ldoc.include_file(module.tags.include)))
 #   end
 
 #   if module.usage then
@@ -93,6 +95,7 @@
         <li><strong>$(tag)</strong>: $(M(value,module))</li>
 #     end
     </ul>
+</div>
 #   end -- if module.info
 
 # if ldoc.no_summary and module and not ldoc.one then -- bang out the functions on the side
@@ -103,20 +106,21 @@
 #   i = i + 1
 #  end
 # if #t > 0 then
+    <hr>
 # ldoc.sort(t)
-    <h2>Sections</h2>
-<table class="sections_list">
-    <tbody>
+   <table class="sections_list">
         <tr>
-            <td valign="top">
+            <td>
+                <div id="mycontainer">
 #    for i=1, #t do
-                <a href="#$(no_spaces(t[i]))">$(t[i])</a>
+                    <div><a href="#$(no_spaces(t[i]))">$(t[i])</a></div>
 #    end
+                </div>
             </td>
         </tr>
-    </tbody>
-</table>
+    </table>
 # end
+    <hr>
 # end
 
 # if not ldoc.no_summary then

@@ -25,28 +25,35 @@ strong { font-weight: bold;}
 em { font-style: italic;}
 
 h1 {
-    font-size: 1.5em;
+    font-size:2em;
     margin: 0 0 20px 0;
+    color: #006699;
 }
 h2, h3, h4 {
     margin: 15px 0 10px 0;
 }
 h2 { font-size: 1.25em;
-    border-bottom: 1px solid #DDDDDD;
-    padding-bottom: 0.5em;
+    padding-top: 0.5em;
+    color: #006699;
 }
 h3 { font-size: 1.15em; }
 h4 { font-size: 1.06em; }
 
-a:link { font-weight: bold; color: #004080; text-decoration: none; }
+a:link { font-weight: bold; color: #006699; text-decoration: none; }
 a:visited { font-weight: bold; color: #006699; text-decoration: none; }
 a:link:hover { text-decoration: underline; }
 
 hr {
-    color:#cccccc;
-    background: #00007f;
+    border: 0;
     height: 1px;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(192,192,192,0.75), rgba(0,0,0,0));
+    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(192,192,192,0.75), rgba(0,0,0,0));
+    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(192,192,192,0.75), rgba(0,0,0,0));
+    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(192,192,192,0.75), rgba(0,0,0,0));
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
+
 
 blockquote { margin-left: 3em; }
 
@@ -78,6 +85,36 @@ table.index td { text-align: left; vertical-align: top; }
     margin-right: 1em;
 }
 
+#mycontainer {
+    margin-left: 2em;
+    margin-right: 2em;
+    text-align: center;
+}
+
+#mycontainer div {
+    float: none;
+    display:inline-block;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    border-color:transparent;
+}
+
+#module_info {
+    padding-bottom: 0.5em;
+}
+
+#mycontainer div a {
+    text-decoration:none;
+    color:#004080;
+}
+
+#mycontainer div:hover {
+    background-color: #e7e7e7;
+}
+
 #product {
     text-align: center;
     border-bottom: 1px solid #cccccc;
@@ -99,6 +136,7 @@ table.index td { text-align: left; vertical-align: top; }
     overflow: visible;
     border-left: 2px solid #cccccc;
     border-right: 2px solid #cccccc;
+    border-bottom: 2px solid #cccccc;
 }
 
 #navigation h1 {
@@ -110,7 +148,7 @@ table.index td { text-align: left; vertical-align: top; }
 
 #navigation h2 {
     font-size:1.5em;
-    color: #004080;
+    color: #006699;
     text-align: center;
     padding:0.2em;
     border-bottom:1px solid #dddddd;
@@ -147,10 +185,7 @@ table.index td { text-align: left; vertical-align: top; }
 
 #navigation li a:hover {
     background-color: #e7e7e7;
-}
-
-#navigation li a:hover {
-    background-color: #e7e7e7;
+    border-radius: 3px
 }
 
 #navigation li li a {
@@ -259,16 +294,19 @@ ul.nowrap {
 }
 
 dl.table dt, dl.function dt {
+    margin-left: 1em;
     padding: 0.5em;
     background-color: #e7e7e7;
-    border-top: solid;
-    border-top-color: black;
-    border-top-width: 1px;
+    border-radius: 3px;
+    border-style:solid;
+    border-color:transparent;
     font-family:monospace;
     font-size: 1.1em;
+    padding-left: 1.5em;
 }
 dl.table dd, dl.function dd {
     padding-bottom: 1em; margin: 10px 0 0 20px;
+    padding-left: 1.5em;
 }
 dl.table h3, dl.function h3 {
     font-size: .95em;
