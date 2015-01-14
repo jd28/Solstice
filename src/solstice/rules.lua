@@ -30,8 +30,8 @@ safe_require 'solstice.rules.levels'
 local TDA = require 'solstice.2da'
 
 local DMG_VFX = {}
-for i = 0, TDA.Get2daRowCount("damagehitvisual") - 1 do
-   DMG_VFX[i] = TDA.Get2daInt("damagehitvisual", "VisualEffectID", i)
+for i = 0, TDA.GetRowCount("damagehitvisual") - 1 do
+   DMG_VFX[i] = TDA.GetInt("damagehitvisual", "VisualEffectID", i)
 end
 
 --- Get damage impact visual.

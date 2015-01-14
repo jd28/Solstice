@@ -30,7 +30,7 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
    local poly_2da = C.Local_GetPoly2da()
    local poly_eff = C.Local_GetPolyEffect()
 
-   local appear = TDA.Get2daInt(poly_2da, "AppearanceType", polyid)
+   local appear = TDA.GetInt(poly_2da, "AppearanceType", polyid)
    if appear == 0 then return 0 end
 
    cre.obj.cre_poly_appearance = cre.obj.cre_stats.cs_appearance;
@@ -53,16 +53,16 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
    cre.obj.cre_stats.cs_appearance = appear
    cre.obj.cre_appearance_info.cai_appearance = appear
 
-   local race = TDA.Get2daInt(poly_2da, "RacialType", polyid)
+   local race = TDA.GetInt(poly_2da, "RacialType", polyid)
    if race > 0 then
       cre.obj.cre_stats.cs_race = race
    end
 
-   local port_id = TDA.Get2daInt(poly_2da, "PortraitId", polyid)
+   local port_id = TDA.GetInt(poly_2da, "PortraitId", polyid)
    if port_id > 0 and port_id ~= 65535 then
       cre.obj.obj.obj_portrait_id = port_id
    else
-      local port = TDA.Get2daString(poly_2da, "Portrait", polyid)
+      local port = TDA.GetString(poly_2da, "Portrait", polyid)
       if #port > 0 then
          ffi.copy(cre.obj.cre_stats.cs_portrait,
                   port,
@@ -70,9 +70,9 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
       end
    end
 
-   local str = TDA.Get2daInt(poly_2da, "STR", polyid)
-   local dex = TDA.Get2daInt(poly_2da, "DEX", polyid)
-   local con = TDA.Get2daInt(poly_2da, "CON", polyid)
+   local str = TDA.GetInt(poly_2da, "STR", polyid)
+   local dex = TDA.GetInt(poly_2da, "DEX", polyid)
+   local con = TDA.GetInt(poly_2da, "CON", polyid)
 
    if str > 0 then
       cre:SetAbilityScore(ABILITY_STRENGTH, str)
@@ -96,13 +96,13 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
    end
 
    local eff_bonus_ac
-   local ac = TDA.Get2daInt(poly_2da, "NATURALACBONUS", polyid)
+   local ac = TDA.GetInt(poly_2da, "NATURALACBONUS", polyid)
    if ac > 0 then
       eff_bonus_ac = Eff.AC(ac, AC_DODGE_BONUS)
    end
 
    local eff_bonus_hp
-   local hp = TDA.Get2daInt(poly_2da, "HPBONUS", polyid)
+   local hp = TDA.GetInt(poly_2da, "HPBONUS", polyid)
    if hp > 0 then
       eff_bonus_hp = Eff.TemporaryHitpoints(hp)
    end
@@ -131,7 +131,7 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
    cre.obj.cre_poly_hpbonus = eff:GetId()
    eff:SetSpellId(-1)
    cre:ApplyEffect(4, eff)
-   local mask = TDA.Get2daInt(poly_2da, "UnequipMask", polyid)
+   local mask = TDA.GetInt(poly_2da, "UnequipMask", polyid)
    for i=0, 17 do
       if bit.band(mask, bit.lshift(1, i)) ~= 0 then
          local it = cre:GetItemInSlot(i)
@@ -143,40 +143,40 @@ function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
    end
 
    local creweap = true
-   local t = TDA.Get2daString(poly_2da, "Equipped", polyid)
+   local t = TDA.GetString(poly_2da, "Equipped", polyid)
    if #t > 0 then
       CreateItemAndEquip(cre, t, INVENTORY_SLOT_RIGHTHAND)
       creweap = false
    end
 
    if creweap then
-      t = TDA.Get2daString(poly_2da, "CreatureWeapon1", polyid)
+      t = TDA.GetString(poly_2da, "CreatureWeapon1", polyid)
       if #t > 0 then
          CreateItemAndEquip(cre, t, INVENTORY_SLOT_CWEAPON_L)
       end
 
-      t = TDA.Get2daString(poly_2da, "CreatureWeapon2", polyid)
+      t = TDA.GetString(poly_2da, "CreatureWeapon2", polyid)
       if #t > 0 then
          CreateItemAndEquip(cre, t, INVENTORY_SLOT_CWEAPON_R)
       end
 
-      t = TDA.Get2daString(poly_2da, "CreatureWeapon3", polyid)
+      t = TDA.GetString(poly_2da, "CreatureWeapon3", polyid)
       if #t > 0 then
          CreateItemAndEquip(cre, t, INVENTORY_SLOT_CWEAPON_B)
       end
    end
 
-   local sp1 = TDA.Get2daInt(poly_2da, "Spell1", polyid)
+   local sp1 = TDA.GetInt(poly_2da, "Spell1", polyid)
    if sp1 > 0 then
       cre.obj.cre_poly_spellid_1 = sp1
    end
 
-   local sp2 = TDA.Get2daInt(poly_2da, "Spell2", polyid)
+   local sp2 = TDA.GetInt(poly_2da, "Spell2", polyid)
    if sp2 > 0 then
       cre.obj.cre_poly_spellid_2 = sp2
    end
 
-   local sp3 = TDA.Get2daInt(poly_2da, "Spell3", polyid)
+   local sp3 = TDA.GetInt(poly_2da, "Spell3", polyid)
    if sp3 > 0 then
       cre.obj.cre_poly_spellid_3 = sp3
    end

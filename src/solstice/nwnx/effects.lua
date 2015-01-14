@@ -25,14 +25,8 @@ local M = {}
 
 local EFF_HANDLERS = {}
 
-function M.SendEffects(obj)
-   obj:SetLocalString("NWNX!EFFECTS!SENDEFFECTS", " ")
-end
-
-function M.Log(obj)
-   obj:SetLocalString("NWNX!EFFECTS!LOGEFFECTS", " ")
-end
-
+--- Checks if a handler is present..
+-- @param eff_type custom effect constants.
 function M.GetIsEffectHandlerRegistered(eff_type)
    local h = EFF_HANDLERS[eff_type]
    if not h then
@@ -42,7 +36,7 @@ function M.GetIsEffectHandlerRegistered(eff_type)
 end
 
 --- Register an effect handler.
--- @function handler Function to call on object when effect is applied or removed.
+-- @param handler Function to call on object when effect is applied or removed.
 -- @param ... List of custom effect constants.
 function M.RegisterEffectHandler(handler, ...)
    local types = {...}

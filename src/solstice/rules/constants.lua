@@ -15,9 +15,9 @@ local function load(into, lookup)
    end
 
    local twoda = TDA.GetCached2da(lookup.tda)
-   local size = TDA.Get2daRowCount(twoda) - 1
+   local size = TDA.GetRowCount(twoda) - 1
    for i = 0, size do
-      local const = TDA.Get2daString(twoda, lookup.column_label, i)
+      local const = TDA.GetString(twoda, lookup.column_label, i)
       if #const > 0 and const ~= "****" then
          if lookup.extract then
             const = string.match(const, lookup.extract)
@@ -26,11 +26,11 @@ local function load(into, lookup)
             if lookup.value_label then
                local val
                if lookup.value_type == "string" then
-                  val = TDA.Get2daString(twoda, lookup.value_label, i)
+                  val = TDA.GetString(twoda, lookup.value_label, i)
                elseif lookup.value_type == "float" then
-                  val = TDA.Get2daFloat(twoda, lookup.value_label, i)
+                  val = TDA.GetFloat(twoda, lookup.value_label, i)
                elseif lookup.value_type == "int" then
-                  val = TDA.Get2daInt(twoda, lookup.value_label, i)
+                  val = TDA.GetInt(twoda, lookup.value_label, i)
                else
                   error(string.format("solstice.constant.Load: Invalid value type %s!",
                                       lookup.value_type))

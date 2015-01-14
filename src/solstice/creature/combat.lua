@@ -444,7 +444,7 @@ local function UpdateCombatEquips(self)
    end
    self.ci.offense.ranged_type = rng_type
 
-   local is_double = TDA.Get2daInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
+   local is_double = TDA.GetInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
 
    self.ci.equips[0].id = rh.id
    if is_double then

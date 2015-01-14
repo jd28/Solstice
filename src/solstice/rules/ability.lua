@@ -8,7 +8,7 @@ local TDA = require 'solstice.2da'
 -- @section ability
 
 local function GetAbilityName(ability)
-   return TLK.GetString(TDA.Get2daInt("abilities", "Name", ability))
+   return TLK.GetString(TDA.GetInt("abilities", "Name", ability))
 end
 
 --- Get the limits of ability effects

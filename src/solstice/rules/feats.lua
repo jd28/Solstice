@@ -20,7 +20,7 @@ function M.GetMaximumFeatUses(feat, cre)
    local res = f and f(feat, cre)
    if res then return res end
 
-   local tda = TDA.Get2daString("feat", "USESPERDAY", feat)
+   local tda = TDA.GetString("feat", "USESPERDAY", feat)
    if #tda == 0 then return 100 end
    return tonumber(tda) or 100
 end
@@ -94,5 +94,5 @@ end
 --- Get Master Feat Name
 -- @param feat master feat
 function M.GetMasterFeatName(master)
-   return TLK.GetString(TDA.Get2daInt('masterfeats', 'STRREF', master))
+   return TLK.GetString(TDA.GetInt('masterfeats', 'STRREF', master))
 end
