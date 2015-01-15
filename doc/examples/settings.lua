@@ -9,8 +9,8 @@
 -- wish and have it available via the global table OPT.
 --
 -- Note: These needn't be set manually.  You can use
--- [`os.getenv`](http://www.lua.org/manual/5.1/manual.html#pdf-os.getenv)
--- and read environment variables.  E,g. `LOG_FILE = os.getenv('MYSERVER_LOG_FILE')
+-- os.getenv() and read environment variables.  E,g.
+-- `LOG_FILE = os.getenv('MYSERVER_LOG_FILE').
 -- If you do set them manually, make sure not to check this file into
 -- your version control.
 

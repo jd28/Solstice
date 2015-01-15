@@ -15,7 +15,7 @@ function M.Encode(r, g, b)
 end
 
 --- Encodes hex color strings.
--- @param hex Same for max as HTML.  "#000000"
+-- @param hex Same format as HTML: "#000000"
 function M.EncodeHex(hex)
     return M.Encode(hex:sub(2,3), 16), tonumber(hex:sub(4,5), 16), tonumber(hex:sub(6,7), 16)
 end

@@ -123,7 +123,7 @@ This has a some side effects:
   inconsistent.  This does require some 2da merging or a lot of data entry.
 
 ## The not-all-roses side
-* Learning Lua is task.  It's a dynamically typed language, so many
+* Learning Lua is a task.  It's a dynamically typed language, so many
   errors that would have been caught at compile time will only be found
   at runtime.  If you make a typo or a syntax error restarting the server
   might be necessary.  Currently there is no built in way to reload scripts.
