@@ -32,12 +32,11 @@ require 'solstice.util.fn'
 require 'solstice.ctypes'
 
 -- Global modules
-
+System   = require 'solstice.system'
 Effect   = require 'solstice.effect'
 ItemProp = require 'solstice.itemprop'
 Game     = require 'solstice.game'
 Rules    = require 'solstice.rules'
-System   = require 'solstice.system'
 
 local Obj       = require 'solstice.object'
 Rules.RegisterConstant("OBJECT_INVALID", Obj.INVALID)
