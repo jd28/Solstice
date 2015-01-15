@@ -5,7 +5,7 @@ Solstice is a scripting library and combat engine replacement for
 was to expand NWN from a platform for building adventures to also allow building
 new/different rulesets.  The
 project also aims at a tight level of integration: where you could create a server with
-no NWN scripts is possible, but also where you could add/replace a script or two
+no NWN scripts is possible, but also where you could add/replace a script
 without having to change a single line of NWN script.
 
 This project is open source and licensed under the MIT License (any mentions
@@ -60,6 +60,7 @@ Solstice is a more object oriented framework.  e.g. rather than
 Examples:
 
 A normal 'script':
+
 ```lua
 function hello_world(obj)
     obj:SendMessage('Hello, world!')
@@ -67,6 +68,7 @@ end
 ```
 
 A 'script' that can be used in a conversation conditional:
+
 ```lua
 function is_epic_char(obj)
     return obj:GetHitDice() >= 20
@@ -112,9 +114,9 @@ This has a some side effects:
   data through LocalStrings.
 * Access to more data structures: arrays, tables, and the ability to implement
   your own.
-* Constants are not predefined but loaded from modified 2DAs, ensuring
-  that they're never out of date or inconsistent.  This does require some
-  2da merging or a lot of data entry.
+* Constants don't need to be predefined but can be loaded from
+  modified 2DAs, ensuring that they're never out of date or
+  inconsistent.  This does require some 2da merging or a lot of data entry.
 
 ## The not-all-roses side
 * Learning Lua is task.  It's a dynamically typed language, so many

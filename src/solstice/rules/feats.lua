@@ -92,7 +92,7 @@ function M.GetIsClassGrantedFeat(feat, class)
 end
 
 --- Get Master Feat Name
--- @param feat master feat
+-- @param master master feat
 function M.GetMasterFeatName(master)
    return TLK.GetString(TDA.GetInt('masterfeats', 'STRREF', master))
 end

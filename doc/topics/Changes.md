@@ -24,15 +24,15 @@
 
 ### Modified effects:
 
-  * Immunity - An additional parameter indicating percent immmunity to
-    an immunity type.
-  * AC - Removed versus damage type parameter.
-  * Expaned DamageIncrease/Decrease to be able to specificaly create
-    bonuses/penalties that are only applied on critical hits and/or
-    are unblockable.  NOTE: This will require updating some NWN scripts
-    as they will become blockable.  (This feature is dependent on using
-    the new combat engine.)
+* Immunity - An additional parameter indicating percent immmunity to
+  an immunity type.
+* AC - Removed versus damage type parameter.
+* Expaned DamageIncrease/Decrease to be able to specificaly create
+  bonuses/penalties that are only applied on critical hits and/or
+  are unblockable.  NOTE: This will require updating some NWN scripts
+  as they will become blockable.  (This feature is dependent on using
+  the new combat engine.)
 
 ### Additional effect types:
-  * Recurring - A placeholder effect for creating recurring effects a
-    la wounding/regeneration.
+* Recurring - A placeholder effect for creating recurring effects a
+  la wounding/regeneration.
