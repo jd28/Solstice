@@ -1,6 +1,6 @@
 ---
 -- Functions for getting values from cached 2da files.  Note: this does no
--- parsing and useable on a running server.
+-- parsing and is only useable on a running server.
 --
 -- @module 2da
 -- @alias M

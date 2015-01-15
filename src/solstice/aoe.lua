@@ -1,4 +1,4 @@
---- Area of Effects
+----
 -- This module defines the AoE area of effect class.
 -- @module aoe
 

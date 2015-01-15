@@ -70,32 +70,31 @@
 # if ldoc.body then -- verbatim HTML as contents; 'non-code' entries
     $(ldoc.body)
 # elseif module then -- module documentation
-<div id="module_info">
-    <h2></h2>
-    <h1>$(ldoc.module_typename(module)) <code>$(module.name)</code></h1>
-    <p>$(M(module.summary,module))</p>
-    <p>$(M(module.description,module))</p>
+    <div id="module_info">
+        <h2></h2>
+        <h1>$(ldoc.module_typename(module)) <code>$(module.name)</code></h1>
+        <p>$(M(module.summary,module))</p>
+        <p>$(M(module.description,module))</p>
 #   if module.tags.include then
     $(M(ldoc.include_file(module.tags.include)))
 #   end
-
+    </div>
 #   if module.usage then
 #     local li,il = use_li(module.usage)
-    <h3>Usage:</h3>
-    <ul>
+        <h3>Usage:</h3>
+        <ul>
 #     for usage in iter(module.usage) do
         $(li)<pre class="example">$(ldoc.escape(usage))</pre>$(il)
 #     end -- for
-    </ul>
+        </ul>
 #   end -- if usage
 #   if module.info then
-    <h3>Info:</h3>
-    <ul>
+        <h3>Info:</h3>
+        <ul>
 #     for tag, value in module.info:iter() do
-        <li><strong>$(tag)</strong>: $(M(value,module))</li>
+            <li><strong>$(tag)</strong>: $(M(value,module))</li>
 #     end
-    </ul>
-</div>
+        </ul>
 #   end -- if module.info
 
 # if ldoc.no_summary and module and not ldoc.one then -- bang out the functions on the side
