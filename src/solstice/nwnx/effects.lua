@@ -20,6 +20,7 @@
 require 'solstice.nwn.ctypes.effect'
 local ffi = require 'ffi'
 local C = ffi.C
+local Eff = require 'solstice.effect'
 
 local M = {}
 

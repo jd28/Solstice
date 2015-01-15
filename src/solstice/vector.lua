@@ -9,9 +9,6 @@ local M = {}
 local Vector = {}
 M.Vector = Vector
 
--- Internal ctype.
-M.vector_t = ffi.metatype("Vector", vector_mt)
-
 local vector_mt = {
    __add = function (a, b) return M.vector_t(a.x + b.x,
 					     a.y + b.y,
@@ -21,6 +18,9 @@ local vector_mt = {
 					     a.y - b.y,
 					     a.z - a.z) end
 }
+
+-- Internal ctype.
+M.vector_t = ffi.metatype("Vector", vector_mt)
 
 --- Normalizes vector
 function Vector:Normalize()
