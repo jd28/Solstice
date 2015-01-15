@@ -18,18 +18,22 @@ end
 -- @return nil if object is invalid, else all properties as a mutable lua table.
 local function GetAllProperties(obj)
    if not obj:GetIsValid() then return end
+   _PROPERTIES[obj.id] = _PROPERTIES[obj.id] or {}
    return _PROPERTIES[obj.id]
 end
 
 --- Get an object's properties.
 -- @param obj Object.
+-- @param prop Property name.
 local function GetProperty(obj, prop)
    assert(type(prop) == 'string', 'Property name must be a string!')
    if not obj:GetIsValid() then return end
+   _PROPERTIES[obj.id] = _PROPERTIES[obj.id] or {}
    return _PROPERTIES[obj.id][prop]
 end
 
 --- Set a property on an object.
+-- @param obj Object.
 -- @string prop Property name.
 -- @param value The value can be anything you choose number, string, location,
 -- lua table, etc, etc.

@@ -145,7 +145,8 @@ local function GetIsHit(info)
 end
 
 --- Determine if current attack is an offhand attack.
--- @param info AttackInfo
+-- @param info AttackInfo.
+-- @param attacker Attacker.
 local function GetIsOffhandAttack(info, attacker)
    local cr = attacker.obj.cre_combat_round
    return attacker.obj.cre_combat_round.cr_current_attack + 1 >

@@ -54,8 +54,10 @@ M.FileLog = file(OPT.LOG_FILE, OPT.LOG_DATE_PATTERN)
 
 local _LOGGER = M.FileLog
 
---- Sets the system logging function.
--- This defaults to printing to the nwnx_solstice.txt log file.
+--- Logging
+-- @section logging
+
+--- Sets the default logging function.
 -- @param logger See LuaLogging.
 function M.SetLogger(logger)
    _LOGGER = logger

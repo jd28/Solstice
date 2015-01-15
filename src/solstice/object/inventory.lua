@@ -8,8 +8,9 @@ local Object = M.Object
 --- Class Object: Inventory
 -- @section inventory
 
----
--- @return
+--- Get first item in object's inventory.
+-- I suggest using the Object:Items() iterator instead.
+-- @return object or nil
 function Object:GetFirstItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(339, 1)
@@ -61,8 +62,9 @@ function Object:Items()
    end
 end
 
----
--- @return
+--- Get first item in object's inventory.
+-- I suggest using the Object:Items() iterator instead.
+-- @return object or nil
 function Object:GetNextItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(340, 1)
@@ -103,7 +105,7 @@ end
 
 --- Get number of items that an object carries.
 -- @param id Tag or Resref.
--- @param[opt=false] Use resref.
+-- @param[opt=false] resref Use resref.
 function Object:CountItem(id, resref)
    local count = 0
    for item in self:Items() do
@@ -120,10 +122,13 @@ function Object:CountItem(id, resref)
    return count
 end
 
---- Get number of items that an object carries.
+--- Take an item from an object.
+-- This function handles stack size reduction.  It also checks if the
+-- object posses enough of them before taking any.
 -- @param id Tag or Resref.
--- @param[opt=1] How many of the items to take.
--- @param[opt=false] Use resref.
+-- @param[opt=1] count How many of the items to take.
+-- @param[opt=false] resref Use resref.
+-- @return The amount taken.
 function Object:TakeItem(id, count, resref)
    count = count or 1
    if count > self:CountItem(id, resref) then

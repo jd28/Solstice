@@ -1,3 +1,5 @@
+# Differences
+
 ## Combat Engine Differences
 * Weapons with multiple damage types are treated as being one or the other.
 * Little to no support for effects versus targets.  This does not

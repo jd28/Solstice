@@ -24,7 +24,10 @@ geared towards it.  You can get a sense of what I've done
 The code there is likewise MIT Licensed.
 
 If you're curious how everything comes together take a look at the Rules module,
-which is the core of the system.
+which is the core of the system.  If you want to see the details of
+the combat engine replacement see `src/solstice/attack.lua`, just be
+aware that that code is atypical in that it's written for the highest
+performance possible.
 
 There are also other projects similar to this: nwnx\_jvm, nwnx\_ruby, nwnx\_lua.  So
 if you like the idea but not Lua or the implementation, there are other
@@ -56,7 +59,8 @@ options.
 NWN scripts are mapped to functions in the global Lua namespace.
 There is no concept of `void main() {...}` or `int StartingConditional() {...}`.
 In the former case, in Lua it's merely a function that returns no value;
-in the latter a function that returns a boolean.
+in the latter a function that returns a boolean.  There is no concept
+of `OBJECT_SELF`, the object is passed explicitly.
 
 Solstice is a more object oriented framework.  e.g. rather than
 `SendMessageToPC(pc, "Hello")` in Solstice it would be
@@ -82,13 +86,14 @@ A 'script' that can be used in a conversation conditional:
 
 
 This has a some side effects:
+
 * Lua functions that you're using as 'scripts' are limited to 16
   characters, like script file names.
 * Script editing needs to be done in external editor.
 * Scripts placed into events, like in the dialog editor, will not display
   their contents.
-* Many scripts can be placed into a single file.
-* None of these external Lua scripts count towards resource counts and
+* Many Lua functions can be placed into a single file.
+* None of these external Lua scripts count towards resource limits and
   if you build your module they will be considered 'missing'.
 
 ## The plus side.
@@ -97,8 +102,7 @@ This has a some side effects:
   Dark Souls, even in the Baldur's Gate series, and [many others](http://en.wikipedia.org/wiki/Category:Lua-scripted_video_games).
   So someone looking to develop skills for a career in gamedev will
   be able to learn a directly applicable programming language, while
-  availing themselves with the accessibility of the NWN Toolset for module
-  creation.
+  availing themselves of the accessibility of the NWN Toolset.
 * Due to the dynamic nature of Lua, everything can be replaced.  If you
   don't like the way some library function works: replace it.  There is
   the caveat that some functions forward to NWScript built-in functions.
@@ -136,16 +140,17 @@ This has a some side effects:
 * Lua indexes arrays starting at 1.  Some functions that communicate
   with C(++) have indexes starting at 0.  This is sometimes confusing.
   Also, the C(++) underbelly is still rather visible in places.
-
+* The probability of this being ported to the client or Windows is 0%.
 ]]
 
 format = 'discount'
-topics = 'topics'
+topics = {'topics'}
 examples = {'examples'}
 merge=true
 sort=true
 no_summary = true
 wrap = true
+use_markdown_titles=true
 file={
 	'../src/solstice',
 }

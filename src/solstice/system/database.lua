@@ -1,3 +1,7 @@
+--- System
+-- @module system
+-- @alias M
+
 local M = require 'solstice.system.init'
 local Log = M.GetLogger()
 
