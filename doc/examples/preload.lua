@@ -15,7 +15,7 @@ local script_dir = 'lua'
 package.path = package.path .. ";./"..script_dir.."/?.lua;"
 
 -- Required: loads Lua extensions require for loading Solstice.
-require "solstice.util.lua_preload"
+require "solstice.util"
 
 -- Required: Load your settings into global table `OPT`.
 OPT = runfile(fmt('./%s/settings.lua', script_dir))

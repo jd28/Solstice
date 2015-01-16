@@ -4,27 +4,8 @@
 -- is no need to require in user scripts.
 -- @module global
 
---- Inheritance function.
--- This VERY crude.  For some reason I'm not altogther sure why,
--- luajit trace will abort with a bad argument error if there are
--- nested metatables???  So this simply copies all function values.
--- Thus: It should be used before any other functions are added to
--- the class.
--- @param class New class type.
--- @param base Base class type.
-function inheritsFrom( class, base )
-   for k, v in pairs(base) do
-      if type(v) == "function" then
-         class[k] = v
-      end
-   end
-   return class
-end
-
 local tremove = table.remove
 local tinsert = table.insert
-
-require 'solstice.util.fn'
 
 --- Types
 -- @section types
