@@ -215,7 +215,7 @@ function Area:MusicBattleStop()
 end
 
 --- Sets the graphic shown when a PC moves between two different areas in a module.
--- @param predef A predifined AREA_TRANSITION\_* constant.
+-- @param predef A predifined AREA_TRANSITION_* constant.
 -- @param[opt=""] custom File name of an area transition bitmap.
 function Area:SetAreaTransitionBMP(predef, custom)
    NWE.StackPushString(custom or "")
@@ -232,7 +232,7 @@ function Area:SetSkyBox(skybox)
 end
 
 --- Sets the weather in the specified area.
--- @param weather AREA\_WEATHER\_*
+-- @param weather AREA_WEATHER_*
 function Area:SetWeather(weather)
    NWE.StackPushInteger(weather)
    NWE.StackPushObject(self)

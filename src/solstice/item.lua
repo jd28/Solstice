@@ -1,8 +1,5 @@
 -----------------------------------------------
--- Item
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+-- Defines the Item class.
 -- @module item
 -- @alias M
 
@@ -13,16 +10,17 @@ local Eff = require 'solstice.effect'
 local IP  = require 'solstice.itemprop'
 
 local M = {}
-M.Item = inheritsFrom({}, Obj.Object)
+local Item = inheritsFrom({}, Obj.Object)
+M.Item = Item
 
---- Internal ctype.
+-- Internal ctype.
 M.item_t = ffi.metatype("Item", { __index = M.Item })
 
---- Class Item: Armor Class
+--- Armor Class
 -- @section
 
 --- Get the armor classof an item.
-function M.Item:GetACValue()
+function Item:GetACValue()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(401, 1)
 
@@ -30,8 +28,9 @@ function M.Item:GetACValue()
 end
 
 --- Gets Armor's Base AC bonus.
+-- Note this is currently hardcoded to the typical vanilla NWN values.
 -- @return -1 if item is not armor.
-function M.Item:GetBaseArmorACBonus()
+function Item:GetBaseArmorACBonus()
    if not self:GetIsValid()
       or self:GetBaseType() ~= BASE_ITEM_ARMOR
    then
@@ -57,14 +56,14 @@ function M.Item:GetBaseArmorACBonus()
    return -1
 end
 
---- Class Item: Copying
+--- Copying
 -- @section item
 
 --- Duplicates an item.
 -- @param[opt=OBJECT_INVALID] target Create the item within this object's
 -- inventory
 -- @param[opt=false] copy_vars If true, local variables on item are copied.
-function M.Item:Copy(target, copy_vars)
+function Item:Copy(target, copy_vars)
    NWE.StackPushBoolean(copy_vars)
    NWE.StackPushObject(target or OBJECT_INVALID)
    NWE.StackPushObject(self)
@@ -78,7 +77,7 @@ end
 -- @param index Index of the modification to make.
 -- @param value New value of the modified index
 -- @param[opt=false] copy_vars If true, local variables on item are copied.
-function M.Item:CopyAndModify(modtype, index, value, copy_vars)
+function Item:CopyAndModify(modtype, index, value, copy_vars)
    NWE.StackPushBoolean(copy_vars)
    NWE.StackPushInteger(value)
    NWE.StackPushInteger(index)
@@ -89,30 +88,30 @@ function M.Item:CopyAndModify(modtype, index, value, copy_vars)
    return NWE.StackPopObject()
 end
 
---- Class Item: Type
+--- Type
 -- @section
 
 --- Get the base item type.
 -- @return BASE_ITEM_INVALID if invalid item.
-function M.Item:GetBaseType()
+function Item:GetBaseType()
    if not self:GetIsValid() then return BASE_ITEM_INVALID end
    return self.obj.it_baseitem
 end
 
 --- Sets an items base type
 -- Source: nwnx_funcs by Acaos
-function M.Item:SetBaseType(value)
+function Item:SetBaseType(value)
    if not self:GetIsValid() then return -1 end
    self.obj.it_baseitem = value
 end
 
---- Class Item: Appearance
+--- Appearance
 -- @section
 
 --- Encodes an items appearance
 -- Source: nwnx_funcs by Acaos
 -- @return A string encoding the appearance
-function M.Item:GetEntireAppearance()
+function Item:GetEntireAppearance()
    if not self:GetIsValid() then return "" end
    local app = {}
    for i = 0, 5 do
@@ -127,9 +126,9 @@ function M.Item:GetEntireAppearance()
 end
 
 --- Returns the appearance of an item
--- @param appearance_type ITEM\_APPR\_TYPE\_*
--- @param index ITEM\_APPR\_WEAPON\_* or ITEM\_APPR\_ARMOR\_*
-function M.Item:GetItemAppearance(appearance_type, index)
+-- @param appearance_type ITEM_APPR_TYPE_*
+-- @param index ITEM_APPR_WEAPON_* or ITEM_APPR_ARMOR_*
+function Item:GetItemAppearance(appearance_type, index)
    NWE.StackPushInteger(index)
    NWE.StackPushInteger(appearance_type)
    NWE.StackPushObject(self)
@@ -140,7 +139,7 @@ end
 
 --- Restores an items appearance.
 -- @param appearance An encoding from Item:GetEntireAppearance
-function M.Item:RestoreAppearance(appearance)
+function Item:RestoreAppearance(appearance)
    local app = {}
    string.gsub(appearance, "(%w%w)",
                function (x)
@@ -160,7 +159,7 @@ function M.Item:RestoreAppearance(appearance)
 end
 
 --- Set item
-function M.Item:SetAppearance(index, value)
+function Item:SetAppearance(index, value)
    if not self:GetIsValid()
       or index < ITME_APPR_COLOR_LEATHER_1
       or index > ITME_APPR_ARMOR_MODEL_ROBE
@@ -181,7 +180,7 @@ end
 --- Set item color
 -- @param index
 -- @param value
-function M.Item:SetColor(index, value)
+function Item:SetColor(index, value)
    if not self:GetIsValid() or index < 0 or index > 5
       or value < 0 or value > 255
    then
@@ -192,11 +191,11 @@ function M.Item:SetColor(index, value)
    return self.obj.it_color[index]
 end
 
---- Class Item: Value
+--- Value
 -- @section
 
 --- Determines the value of an item in gold pieces.
-function M.Item:GetGoldValue()
+function Item:GetGoldValue()
    if not self:GetIsValid() then return -1 end
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(311, 1)
@@ -207,7 +206,7 @@ end
 --- Sets an items gold piece value when IDed
 -- Source: nwnx_funcs by Acaos
 -- @param value New gold value.
-function M.Item:SetGoldValue(value)
+function Item:SetGoldValue(value)
    if not self:GetIsValid() then return -1 end
 
    self.obj.it_cost_ided = value
@@ -215,27 +214,27 @@ function M.Item:SetGoldValue(value)
 end
 
 --- Get item's stack size.
-function M.Item:GetStackSize()
+function Item:GetStackSize()
    if not self:GetIsValid() then return 0 end
    return self.obj.it_stacksize
 end
 
 --- Set item's stack size.
 -- @param value New stack size.
-function M.Item:SetStackSize(value)
+function Item:SetStackSize(value)
    if not self:GetIsValid() then return end
    if value <= 0 then return end
    self.obj.it_stacksize = value
 end
 
---- Class Item: Item Properties
+--- Properties
 -- @section
 
 --- Add an itemproperty to an item
 -- @param dur_type DURATION_TYPE_*
 -- @param ip Itemproperty to add.
 -- @param[opt=0.0] duration Duration Duration in seconds in added temporarily.
-function M.Item:AddItemProperty(dur_type, ip, duration)
+function Item:AddItemProperty(dur_type, ip, duration)
    NWE.StackPushFloat(duration or 0.0)
    NWE.StackPushObject(self)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_ITEMPROPERTY, ip)
@@ -244,8 +243,8 @@ function M.Item:AddItemProperty(dur_type, ip, duration)
 end
 
 --- Check whether an item has a given property.
--- @param ip_type ITEM\_PROPERTY\_*
-function M.Item:GetHasItemProperty(ip_type)
+-- @param ip_type ITEM_PROPERTY_*
+function Item:GetHasItemProperty(ip_type)
    return C.nwn_HasPropertyType(self.obj, ip_type) ~= 0
 end
 
@@ -266,43 +265,43 @@ local function get_next(self)
 end
 
 --- Iterates over an items properties
-function M.Item:ItemProperties()
+function Item:ItemProperties()
    self.obj.obj.obj_effect_index = 0
    return filter(ignore_ip, take_while(not_nil, map(get_next, duplicate(self))))
 end
 
 --- Removes an item property
 -- @param ip Item property to remove.
-function M.Item:RemoveItemProperty(ip)
+function Item:RemoveItemProperty(ip)
    NWE.StackPushEngineStructure(NWE.STRUCTURE_ITEMPROPERTY, ip)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(610, 2)
 end
 
---- Class Item: Flags
+--- Flags
 -- @section
 
 --- Determines if an item can be dropped.
-function M.Item:GetDroppable()
+function Item:GetDroppable()
    if not self:GetIsValid() then return -1 end
    return self.obj.it_droppable == 1
 end
 
 --- Set droppable flag.
 -- @bool flag New value.
-function M.Item:SetDroppable(flag)
+function Item:SetDroppable(flag)
    if not self:GetIsValid() then return end
    self.obj.it_droppable = flag
 end
 
 --- Determines whether an object has been identified.
-function M.Item:GetIdentified()
+function Item:GetIdentified()
    if not self:GetIsValid() then return false end
    return self.obj.it_identified == 1
 end
 
 --- Gets if there is an infinite quantity of any item in a store.
-function M.Item:GetInfiniteFlag()
+function Item:GetInfiniteFlag()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(827, 1)
    return NWE.StackPopBoolean
@@ -310,44 +309,44 @@ end
 
 --- Sets an item identified
 -- @param[opt=false] is_ided true or false.
-function M.Item:SetIdentified(is_ided)
+function Item:SetIdentified(is_ided)
    if not self:GetIsValid() then return end
    self.obj.it_identified = is_ided and 1 or 0
 end
 
 --- Sets and items infinite quantity flag.
 -- @param[opt=false] infinite true or false
-function M.Item:SetInfiniteFlag(infinite)
+function Item:SetInfiniteFlag(infinite)
    NWE.StackPushBoolean(infinite)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(828, 2)
 end
 
 --- Get item cursed flag.
-function M.Item:GetCursedFlag()
+function Item:GetCursedFlag()
    if not self:GetIsValid() then return false end
    return self.obj.it_cursed == 1
 end
 
 --- Set item cursed flag.
 -- @bool flag New flag.
-function M.Item:SetCursedFlag(flag)
+function Item:SetCursedFlag(flag)
    if not self:GetIsValid() then return end
    self.obj.it_cursed = flag
 end
 
---- Class Item: Weight
+--- Weight
 -- @section
 
 --- Gets item weight.
-function M.Item:GetWeight()
+function Item:GetWeight()
    if not self:GetIsValid() then return 0 end
    return self.obj.it_weight
 end
 
 --- Sets item's weight.
 -- @param weight New weight.
-function M.Item:SetWeight(weight)
+function Item:SetWeight(weight)
    if not self:GetIsValid() then return end
    self.obj.it_weight = weight
 end

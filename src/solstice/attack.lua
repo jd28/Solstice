@@ -39,7 +39,7 @@ end
 --- Adds an onhit visual effect to an attack.
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
--- @param vfx VFX\_*
+-- @param vfx VFX_*
 local function AddVFX(info, attacker, vfx)
    AddEffect(info, attacker, Eff.VisualEffect(vfx))
 end
@@ -145,7 +145,8 @@ local function GetIsHit(info)
 end
 
 --- Determine if current attack is an offhand attack.
--- @param info AttackInfo
+-- @param info AttackInfo.
+-- @param attacker Attacker.
 local function GetIsOffhandAttack(info, attacker)
    local cr = attacker.obj.cre_combat_round
    return attacker.obj.cre_combat_round.cr_current_attack + 1 >

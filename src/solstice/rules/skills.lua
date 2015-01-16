@@ -10,8 +10,8 @@ local TLK   = require 'solstice.tlk'
 local M = require 'solstice.rules.init'
 
 --- Get skill's associated ability.
--- @param skill SKILL\_*
--- @return ABILIIY\_*
+-- @param skill SKILL_*
+-- @return ABILIIY_*
 function M.GetSkillAbility(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return -1 end
@@ -20,7 +20,7 @@ function M.GetSkillAbility(skill)
 end
 
 --- Check if skill requires training.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 function M.GetSkillAllCanUse(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return false end
@@ -28,7 +28,7 @@ function M.GetSkillAllCanUse(skill)
 end
 
 --- Check if skill has armor check penalty.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 function M.GetSkillHasArmorCheckPenalty(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return false end
@@ -37,7 +37,7 @@ function M.GetSkillHasArmorCheckPenalty(skill)
 end
 
 --- Check if skill requires training.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 function M.GetSkillIsUntrained(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return false end
@@ -45,7 +45,7 @@ function M.GetSkillIsUntrained(skill)
 end
 
 --- Get Skill name.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 function M.GetSkillName(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return "" end
@@ -161,7 +161,7 @@ end
 
 --- Get the limits of skill effects
 -- @param cre Creature object.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @return Minimum Default: -50
 -- @return Maximum Default: 50
 function M.GetSkillEffectLimits(cre, skill)
@@ -170,7 +170,7 @@ end
 
 --- Get skill modification from effects.
 -- @param cre Creature object.
--- @param skill SKILL\_*
+-- @param skill SKILL_*
 -- @return Total amount, uncapped
 function M.GetSkillEffectModifier(cre, skill)
    local eff = 0
@@ -194,7 +194,7 @@ function M.GetSkillEffectModifier(cre, skill)
 end
 
 --- Determines if a creature can use a skill
--- @param skill SKILL\_*.
+-- @param skill SKILL_*.
 -- @param cre Creature
 function M.CanUseSkill(skill, cre)
    if not cre:GetIsValid() then return false end
@@ -202,8 +202,8 @@ function M.CanUseSkill(skill, cre)
 end
 
 --- Determines if a skill is a class skill.
--- @param skill SKILL\_*.
--- @param class CLASS\_TYPE\_*
+-- @param skill SKILL_*.
+-- @param class CLASS_TYPE_*
 function M.GetIsClassSkill(skill, class)
    return ffi.C.nwn_GetIsClassSkill(class, skill)
 end

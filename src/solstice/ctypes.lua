@@ -1,4 +1,4 @@
---- solstice.ctypes defines the internal proxy ctypes used by
+-- solstice.ctypes defines the internal proxy ctypes used by
 -- the Solstice library.  It never needs to be explicitly
 -- required.
 -- @module ctypes

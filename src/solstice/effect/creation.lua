@@ -31,7 +31,7 @@ end
 --- Creates simple effect.
 -- NOTE: This is for simple effects, that have less than
 -- 10 integers and always generate a new ID.
--- @param type EFFECT\_TYPE\_*
+-- @param type EFFECT_TYPE_*
 -- @param ... Ints to set on the effect.
 local function CreateSimple(type, ...)
    local eff = Create()
@@ -49,7 +49,7 @@ end
 -- NOTE: This is for simple custom effects, that have less than
 -- 8 integers and always generate a new ID.
 -- @see nwnx.effects
--- @param type CUSTOM\_EFFECT\_TYPE\_*
+-- @param type CUSTOM_EFFECT_TYPE_*
 -- @param ... Ints to set on the effect.
 local function CreateSimpleCustom(type, ...)
    local eff = Create()
@@ -141,7 +141,7 @@ end
 --- Create an Attack increase/decrease effect.
 -- @param amount If < 0 effect will cause a decrease by amount, it will be
 -- and increase if > 0
--- @param[opt=ATTACK_TYPE_MISC] modifier_type ATTACK\_TYPE\_*
+-- @param[opt=ATTACK_TYPE_MISC] modifier_type ATTACK_TYPE_*
 function M.AttackBonus(amount, modifier_type)
    local type, amt = determine_type_amount(EFFECT_TYPE_ATTACK_INCREASE,
                                            EFFECT_TYPE_ATTACK_DECREASE,
@@ -150,7 +150,7 @@ function M.AttackBonus(amount, modifier_type)
 end
 
 --- Create a Beam effect.
--- @param beam VFX\_BEAM\_* Constant defining the visual type of beam to use.
+-- @param beam VFX_BEAM_* Constant defining the visual type of beam to use.
 -- @param creator The beam is emitted from this creature
 -- @param bodypart BODY_NODE_* Constant defining where on the creature the beam originates from.
 -- @param[opt=false] miss_effect If true, the beam will fire to a random vector near or past the target.
@@ -179,7 +179,7 @@ end
 
 --- Creates a concealment effect.
 -- @param percent [1,100]
--- @param[opt=MISS\_CHANCE\_TYPE\_NORMAL] miss_type MISS\_CHANCE\_TYPE\_*
+-- @param[opt=MISS_CHANCE_TYPE_NORMAL] miss_type MISS_CHANCE_TYPE_*
 function M.Concealment(percent, miss_type)
    percent = math.clamp(percent, 1, 100)
    miss_type = miss_type or MISS_CHANCE_TYPE_NORMAL
@@ -230,8 +230,8 @@ end
 
 --- Creates Damage effect.
 -- @param amount amount of damage to be dealt.
--- @param damage_type DAMAGE\_INDEX\_*
--- @param[opt=DAMAGE\_POWER\_NORMAL] power DAMAGE\_POWER\_*
+-- @param damage_type DAMAGE_INDEX_*
+-- @param[opt=DAMAGE_POWER_NORMAL] power DAMAGE_POWER_*
 function M.Damage(amount, damage_type, power)
    damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
@@ -252,8 +252,8 @@ function M.Damage(amount, damage_type, power)
 end
 
 --- Effect Damage Decrease
--- @param amount DAMAGE\_BONUS\_*
--- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+-- @param amount DAMAGE_BONUS_*
+-- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE_INDEX_*
 -- @bool critical Only applicable on critical hits.
 -- @bool unblockable Not modified by damage protections.
 function M.DamageDecrease(amount, damage_type, critical, unblockable)
@@ -273,8 +273,8 @@ function M.DamageDecrease(amount, damage_type, critical, unblockable)
 end
 
 --- Effect Damage Increase
--- @param amount DAMAGE\_BONUS\_*
--- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+-- @param amount DAMAGE_BONUS_*
+-- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE_INDEX_*
 -- @bool critical Only applicable on critical hits.
 -- @bool unblockable Not modified by damage protections.
 function M.DamageIncrease(amount, damage_type, critical, unblockable)
@@ -297,7 +297,7 @@ end
 --- Effect Damage Increase
 -- @param start Minimum damage.
 -- @param stop Maximum damage.
--- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE\_INDEX\_*
+-- @param[opt=DAMAGE_INDEX_MAGICAL] damage_type DAMAGE_INDEX_*
 -- @bool critical Only applicable on critical hits.
 -- @bool unblockable Not modified by damage protections.
 function M.DamageRange(start, stop, damage_type, critical, unblockable)
@@ -320,7 +320,7 @@ end
 
 
 --- Damage immunity effect.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param amount [-100, -1] or [1,100]
 function M.DamageImmunity(damage_type, amount)
    local type, amt = determine_type_amount(EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE,
@@ -341,7 +341,7 @@ function M.DamageReduction(amount, power, limit)
 end
 
 --- Damage resistance effect.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param amount Amount
 -- @param[opt=0] limit Limit
 function M.DamageResistance(damage_type, amount, limit)
@@ -353,7 +353,7 @@ end
 --- Damage Shield effect.
 -- @param amount
 -- @param random
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 function M.DamageShield(amount, random, damage_type)
    local damage_flag = bit.lshift(1, damage_type)
    return CreateSimple(EFFECT_TYPE_DAMAGE_SHIELD, amount, random, damage_flag)
@@ -413,7 +413,7 @@ function M.Disarm()
 end
 
 --- Create a Disease effect.
--- @param disease DISEASE\_*
+-- @param disease DISEASE_*
 function M.Disease(disease)
    return CreateSimple(EFFECT_TYPE_DISEASE, disease)
 end
@@ -482,7 +482,7 @@ function M.Icon(icon)
 end
 
 --- Create an Immunity effect.
--- @param immunity One of the IMMUNITY\_TYPE\_* constants.
+-- @param immunity One of the IMMUNITY_TYPE_* constants.
 -- @param amount Percent immunity.
 function M.Immunity(immunity, amount)
    local type, amt = determine_type_amount(EFFECT_TYPE_IMMUNITY,
@@ -493,7 +493,7 @@ function M.Immunity(immunity, amount)
 end
 
 --- Create an Invisibility effect.
--- @param invisibilty_type One of the INVISIBILITY\_TYPE\_*
+-- @param invisibilty_type One of the INVISIBILITY_TYPE_*
 -- constants defining the type of invisibility to use.
 function M.Invisibility(invisibilty_type)
    return CreateSimple(EFFECT_TYPE_INVISIBILITY, invisibilty_type)
@@ -516,7 +516,7 @@ end
 
 --- Creates a miss chance effect.
 -- @param percent [1,100].
--- @param[opt=MISS_CHANCE_TYPE_NORMAL] misstype MISS\_CHANCE\_TYPE\_*
+-- @param[opt=MISS_CHANCE_TYPE_NORMAL] misstype MISS_CHANCE_TYPE_*
 function M.MissChance(percent, misstype)
    misstype = misstype or MISS_CHANCE_TYPE_NORMAL
    return CreateSimple(EFFECT_TYPE_MISS_CHANCE, percent, misstype)
@@ -557,7 +557,7 @@ function M.Petrify()
 end
 
 --- Create a Poison effect.
--- @param poison The type of poison to use, as defined in the POISON\_* constant group.
+-- @param poison The type of poison to use, as defined in the POISON_* constant group.
 function M.Poison(poison)
    return CreateSimple(EFFECT_TYPE_POISON, poison)
 end
@@ -598,7 +598,7 @@ end
 -- @param save The Saving Throw to affect, as defined by the SAVING_THROW_* constants group.
 -- @param amount The amount to modify the saving throws by.  If > 0 an increase, if < 0 a decrease.
 -- @param[opt=SAVING_THROW_TYPE_ALL] save_type The type of resistance this effect applies to as
--- defined by the SAVING\_THROW\_VS\_* constants group.
+-- defined by the SAVING_THROW_VS_* constants group.
 function M.SavingThrow(save, amount, save_type)
    local type, amt = determine_type_amount(EFFECT_TYPE_SAVING_THROW_INCREASE,
                                            EFFECT_TYPE_SAVING_THROW_DECREASE,
@@ -644,7 +644,7 @@ end
 
 --- Creates an effect that inhibits spells.
 -- @param[opt=100] percent Percent chance of spell failing (1 to 100).
--- @param[opt=SPELL_SCHOOL_GENERAL] spell_school SPELL\_SCHOOL\_*
+-- @param[opt=SPELL_SCHOOL_GENERAL] spell_school SPELL_SCHOOL_*
 function M.SpellFailure(percent, spell_school)
    percent = percent or 100
    spell_school = spell_school or SPELL_SCHOOL_GENERAL
@@ -685,7 +685,7 @@ end
 
 --- Summon Creature Effect
 -- @param resref Identifies the creature to be summoned by resref name.
--- @param[opt=VFX_NONE] vfx VFX\_*.
+-- @param[opt=VFX_NONE] vfx VFX_*.
 -- @param[opt=0.0] delay There can be delay between the visual effect being played,
 -- and the creature being added to the area.
 -- @param[opt=false] appear

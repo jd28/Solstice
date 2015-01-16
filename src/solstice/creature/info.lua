@@ -1,7 +1,4 @@
 --- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module creature
 
 local M = require 'solstice.creature.init'
@@ -101,6 +98,13 @@ function Creature:GetPCFileName()
    return ffi.string(pl.pl_bicfile)
 end
 
+--- Get creatures's phenotype
+function Creature:GetPhenoType()
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(778, 1)
+   return NWE.StackPopInteger()
+end
+
 --- Gets creature's race.
 function Creature:GetRacialType()
    if not self:GetIsValid() then
@@ -196,10 +200,18 @@ function Creature:SetLootable(lootable)
 end
 
 --- Set creatures movement rate.
--- @param rate MOVE\_RATE\_*
+-- @param rate MOVE_RATE_*
 function Creature:SetMovementRate(rate)
    if not self:GetIsValid() then return end
    C.nwn_SetMovementRate(self.obj, rate)
+end
+
+--- Set creatures's phenotype
+-- @param phenotype Phenotype constant.
+function Creature:SetPhenoType(phenotype)
+   NWE.StackPushObject(self)
+   NWE.StackPushInteger(phenotype)
+   NWE.ExecuteCommand(779, 2)
 end
 
 --- Set creature's subrace

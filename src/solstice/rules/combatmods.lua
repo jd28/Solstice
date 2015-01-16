@@ -11,7 +11,7 @@ local M = require 'solstice.rules.init'
 
 --- Zeros combat modifier.
 -- @param cre Creature.
--- @param mod COMBAT\_MOD\_*
+-- @param mod COMBAT_MOD_*
 local function ZeroCombatModifier(cre, mod)
    cre.ci.mods[mod].ab = 0
    cre.ci.mods[mod].ac = 0
@@ -224,7 +224,7 @@ local _COMBAT_MOD = {
 }
 
 --- Resolves combat modifier.
--- @param type COMBAT\_MOD\_*
+-- @param type COMBAT_MOD_*
 -- @param cre Creature object.
 local function ResolveCombatModifier(type, cre)
    local f = _COMBAT_MOD[type]
@@ -232,7 +232,7 @@ local function ResolveCombatModifier(type, cre)
 end
 
 --- Sets combat modifier override.
--- @param type COMBAT\_MOD\_*
+-- @param type COMBAT_MOD_*
 -- @param func (creature) -> nil
 local function SetCombatModifierOverride(type, func)
    _COMBAT_MOD[type] = func

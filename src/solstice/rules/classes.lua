@@ -15,16 +15,16 @@ local _TIER3 = {}
 
 local _FEATS = {}
 
-for i=0, TDA.Get2daRowCount("cls_atk_2") - 1 do
-   _TIER2[i] = TDA.Get2daInt("cls_atk_2", "BAB", i)
+for i=0, TDA.GetRowCount("cls_atk_2") - 1 do
+   _TIER2[i] = TDA.GetInt("cls_atk_2", "BAB", i)
 end
 
-for i=0, TDA.Get2daRowCount("cls_atk_3") - 1 do
-   _TIER3[i] = TDA.Get2daInt("cls_atk_3", "BAB", i)
+for i=0, TDA.GetRowCount("cls_atk_3") - 1 do
+   _TIER3[i] = TDA.GetInt("cls_atk_3", "BAB", i)
 end
 
-for i=0, TDA.Get2daRowCount("classes") - 1 do
-   local atk = TDA.Get2daString("classes", "AttackBonusTable", i)
+for i=0, TDA.GetRowCount("classes") - 1 do
+   local atk = TDA.GetString("classes", "AttackBonusTable", i)
    if atk == 'CLS_ATK_1' then
       _TIERS[i] = 1
    elseif atk == 'CLS_ATK_2' then
@@ -35,7 +35,7 @@ for i=0, TDA.Get2daRowCount("classes") - 1 do
       _TIERS[i] = 0
    end
 
-   _FEATS[i] = TDA.Get2daString("classes", "FeatsTable", i):lower()
+   _FEATS[i] = TDA.GetString("classes", "FeatsTable", i):lower()
 end
 
 --- Get base attack bonus
@@ -87,7 +87,7 @@ end
 
 --- Determine if creature can use class abilites.
 -- @param cre Creature object.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @return boolean, class level
 local function CanUseClassAbilities(cre, class)
    if not cre:GetIsValid() then return false, 0 end
@@ -100,9 +100,9 @@ local function CanUseClassAbilities(cre, class)
 end
 
 --- Registers a class ability handler.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @func func A function that takes a creature and
--- optionally a CLASS\_TYPE\_* argument and returns
+-- optionally a CLASS_TYPE_* argument and returns
 -- a boolean indicating whether the creature can use
 -- the abilities for the class and the creatures class
 -- level.  NOTE: you must return both or an assertion
@@ -145,7 +145,7 @@ SetCanUseClassAbilitiesOverride(CLASS_TYPE_RANGER, ranger)
 
 --- Get bonus feats for level.
 -- @param cre Creature
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 -- @param level Character level.
 -- @return List of feats.
 local function GetLevelBonusFeats(cre, class, level)
@@ -153,9 +153,9 @@ local function GetLevelBonusFeats(cre, class, level)
    local s = _FEATS[class]
    if not s or #s == 0 then return t end
 
-   for i = 0, TDA.Get2daRowCount(s) - 1 do
-      if TDA.Get2daInt(s, "GrantedOnLevel", i) == level then
-         table.insert(t, TDA.Get2daInt(s, "FeatIndex", i))
+   for i = 0, TDA.GetRowCount(s) - 1 do
+      if TDA.GetInt(s, "GrantedOnLevel", i) == level then
+         table.insert(t, TDA.GetInt(s, "FeatIndex", i))
       end
    end
 
@@ -163,9 +163,9 @@ local function GetLevelBonusFeats(cre, class, level)
 end
 
 --- Get class name.
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 local function GetClassName(class)
-   local strref = TDA.Get2daInt('classes', 'Name', class)
+   local strref = TDA.GetInt('classes', 'Name', class)
    if strref == 0 then
       error("Unknown class: " .. tostring(class))
    end
@@ -173,9 +173,32 @@ local function GetClassName(class)
 end
 
 --- Get number of skillpoints class gains on level up.
--- @param class CLASS\_TYPE\_*
-local function GetSkillPointsGainedOnLevelUp(class)
-   return TDA.Get2daInt('classes', 'SkillPointBase', class)
+-- @param class CLASS_TYPE_*
+-- @param pc PC
+local function GetSkillPointsGainedOnLevelUp(class, pc)
+   local sps = TDA.GetInt('classes', 'SkillPointBase', class)
+   if pc:GetRacialType(pc) == RACIAL_TYPE_HUMAN then
+      sps = sps + 1
+   end
+   sps = sps + pc:GetAbilityModifier(ABILITY_INTELLIGENCE, true)
+   return sps > 0 and sps or 1
+end
+
+--- Get number of hitpoints class gains on level up.
+-- @param class CLASS_TYPE_*
+-- @param pc PC
+local function GetHitPointsGainedOnLevelUp(class, pc)
+   local hp = TDA.GetInt('classes', 'HitDie', class)
+   if class == CLASS_TYPE_DRAGON_DISCIPLE then
+      local level = pc:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) + 1
+      if level >= 6 then
+         return 10
+      elseif level >= 4 then
+         return 8
+      end
+   end
+
+   return hp
 end
 
 local M = require 'solstice.rules.init'
@@ -185,3 +208,4 @@ M.GetBaseAttackBonus              = GetBaseAttackBonus
 M.GetLevelBonusFeats              = GetLevelBonusFeats
 M.GetClassName                    = GetClassName
 M.GetSkillPointsGainedOnLevelUp   = GetSkillPointsGainedOnLevelUp
+M.GetHitPointsGainedOnLevelUp     = GetHitPointsGainedOnLevelUp

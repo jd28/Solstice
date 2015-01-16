@@ -8,8 +8,8 @@ local C = ffi.C
 -- @section rules.races.
 
 --- Determine race's ability bonus.
--- @param race RACIAL\_TYPE\_*
--- @param ability ABILITY\_*
+-- @param race RACIAL_TYPE_*
+-- @param ability ABILITY_*
 local function GetRaceAbilityBonus(race, ability)
    local r = C.nwn_GetRace(race)
    if r == nil then return 0 end

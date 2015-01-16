@@ -22,6 +22,9 @@ M.INVALID = M.location_t(Vec.vector_t(0,0,0),
                          Vec.vector_t(0,0,0),
                          Obj.INVALID.id)
 
+--- Creation Functions
+-- @section
+
 --- Create a new location
 -- @param position Location's position
 -- @param orientation Location's orientation
@@ -32,6 +35,18 @@ function M.Create(position, orientation, area)
    NWE.StackPushObject(area)
    NWE.ExecuteCommandUnsafe(215, 3)
    return NWE.StackPopEngineStructure(NWE.STRUCTURE_LOCATION)
+end
+
+--- Convert string to location.
+-- Format: "<area_tag> (<x>, <y>, <z>) <orientation>"
+-- @string str String
+-- @return Location instance.
+function M.FromString(str)
+   local area, x, y, z, orient = string.match(str, "([%w_]+) %(([%d%.]+), ([%d%.]+), ([%d%.]+)%) ([%d%.]+)")
+   area = Obj.GetByTag(area)
+   local pos = vector_t(x, y, z)
+
+   return M.Create(pos, orient, area)
 end
 
 --- Class Location
@@ -54,7 +69,7 @@ end
 --- Applies a visual effect to a location
 -- @param vfx VFX_*
 -- @param[opt] duration Duration in seconds.  If not passed the visual
--- will be applied as DURATION\_TYPE\_INSTANT.
+-- will be applied as DURATION_TYPE_INSTANT.
 function Location:ApplyVisual(vfx, duration)
    local durtype = duration and Eff.DURATION_TYPE_TEMPORARY or Eff.DURATION_TYPE_INSTANT
    duration = duration or 0
@@ -218,16 +233,6 @@ function Location:GetPosition()
    NWE.ExecuteCommand(223, 1)
 
    return NWE.StackPopVector()
-end
-
---- Convert string to location.
--- @string str String
-function M.FromString(str)
-   local area, x, y, z, orient = string.match(str, "([%w_]+) %(([%d%.]+), ([%d%.]+), ([%d%.]+)%) ([%d%.]+)")
-   area = Obj.GetByTag(area)
-   local pos = vector_t(x, y, z)
-
-   return M.Create(pos, orient, area)
 end
 
 return M

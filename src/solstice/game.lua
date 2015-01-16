@@ -1,12 +1,15 @@
 --- Game module.
+-- This module deals predominatedly with game related things that exist only during a single
+-- server reset.
 -- @module game
 
 local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.game.init'
-require 'solstice.game.objects'
-require 'solstice.game.events'
-require 'solstice.game.script'
+safe_require 'solstice.game.objects'
+safe_require 'solstice.game.events'
+safe_require 'solstice.game.script'
+safe_require 'solstice.game.properties'
 
 --- Export all characters.
 function M.ExportAllCharacters()

@@ -11,7 +11,7 @@ local M = require 'solstice.rules.init'
 
 -- Internal toggle mode function
 -- @param cre Creature to toggle mode on
--- @param mode ACTION\_MODE\_*
+-- @param mode ACTION_MODE_*
 function NSToggleMode(cre, mode)
    cre = _SOL_GET_CACHED_OBJECT(cre)
    if not cre:GetIsValid() then return false end
@@ -159,7 +159,7 @@ local function RegisterMode(mode, f)
 end
 
 --- Updates combat modifer when mode changes.
--- @param mode COMBAT\_MODE\_*.
+-- @param mode COMBAT_MODE_*.
 -- @param cre Creature object
 -- @bool[opt=false] off True if the mode is being turned off.
 function M.ResolveMode(mode, cre, off)
@@ -169,8 +169,8 @@ function M.ResolveMode(mode, cre, off)
    return f(cre, mode, off)
 end
 
---- Convert COMBAT\_MODE\_\* to ACTION\_MODE\_\*.
--- @param mode COMBAT\_MODE\_\*.
+--- Convert COMBAT_MODE_\* to ACTION_MODE_\*.
+-- @param mode COMBAT_MODE_\*.
 -- @return -1 on error.
 function M.ToAction(mode)
    if mode == COMBAT_MODE_PARRY then

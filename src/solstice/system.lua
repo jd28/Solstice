@@ -3,6 +3,7 @@
 
 local M = require 'solstice.system.init'
 require 'solstice.system.logging'
+require 'solstice.system.database'
 
 --- Run Lua garbage collector.
 -- @return The amount in KB freed.

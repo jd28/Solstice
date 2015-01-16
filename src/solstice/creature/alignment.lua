@@ -1,7 +1,4 @@
---- Creature module
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+---
 -- @module creature
 
 local M = require 'solstice.creature.init'
@@ -13,7 +10,7 @@ local NWE = require 'solstice.nwn.engine'
 -- @section
 
 --- Adjust creature's alignment.
--- @param alignment ALIGNMENT\_* constant.
+-- @param alignment ALIGNMENT_* constant.
 -- @param amount Amount to adjust
 -- @param[opt=false] entire_party If true entire faction's alignment will be adjusted.
 function Creature:AdjustAlignment(alignment, amount, entire_party)
@@ -25,7 +22,7 @@ function Creature:AdjustAlignment(alignment, amount, entire_party)
 end
 
 --- Determines the disposition of a creature.
--- @return ALIGNMENT\_* constant.
+-- @return ALIGNMENT_* constant.
 function Creature:GetAlignmentLawChaos()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(126, 1)
@@ -33,7 +30,7 @@ function Creature:GetAlignmentLawChaos()
 end
 
 --- Determines the disposition of a creature.
--- @return ALIGNMENT\_* constant.
+-- @return ALIGNMENT_* constant.
 function Creature:GetAlignmentGoodEvil()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(127, 1)

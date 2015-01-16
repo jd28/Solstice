@@ -12,7 +12,7 @@ local _SPEC_EFF = {}
 -- @section
 
 --- Determine special attack damage.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @param info Attack ctype from combat engine.
 -- @param attacker Attacking creature.
 -- @param target Attacked creature.
@@ -25,7 +25,7 @@ end
 --- Determine special attack effect.
 -- This determines both the effect to apply if any and whether the special
 -- attack was resisted.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @param info Attack ctype from combat engine.
 -- @param attacker Attacking creature.
 -- @param target Attacked creature.
@@ -37,7 +37,7 @@ local function GetSpecialAttackEffect(special_attack, info, attacker, target)
 end
 
 --- Determine special attack bonus modifier.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @param info Attack ctype from combat engine.
 -- @param attacker Attacking creature.
 -- @param target Attacked creature.
@@ -48,7 +48,7 @@ local function GetSpecialAttackModifier(special_attack, info, attacker, target)
 end
 
 --- Register special attack handlers.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @func damage See Rules.GetSpecialAttackDamage
 -- @func effect See Rules.GetSpecialAttackEffect
 -- @func attack See Rules.GetSpecialAttackModifier
@@ -59,21 +59,21 @@ local function RegisterSpecialAttack(special_attack, damage, effect, attack)
 end
 
 --- Register special attack handlers.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @func attack See Rules.GetSpecialAttackModifier
 local function RegisterSpecialAttackModifier(special_attack, attack)
    _SPEC_AB[special_attack]  = attack
 end
 
 --- Register special attack handlers.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @func damage See Rules.GetSpecialAttackDamage
 local function RegisterSpecialDamageModifier(special_attack, damage)
    _SPEC_DMG[special_attack] = damage
 end
 
 --- Register special attack handlers.
--- @param special_attack SPECIAL\_ATTACK\_*
+-- @param special_attack SPECIAL_ATTACK_*
 -- @func effect See Rules.GetSpecialAttackEffect
 local function RegisterSpecialImpact(special_attack, effect)
    _SPEC_EFF[special_attack] = effect

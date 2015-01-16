@@ -10,13 +10,13 @@ local C = require ('ffi').C
 -- @section damages
 
 local function GetDamageName(index)
-   return TLK.GetString(TDA.Get2daInt('damages', 'Name', index))
+   return TLK.GetString(TDA.GetInt('damages', 'Name', index))
 end
 
 local function GetDamageColor(index)
-   return Color.Encode(TDA.Get2daInt('damages', 'R', index),
-                       TDA.Get2daInt('damages', 'G', index),
-                       TDA.Get2daInt('damages', 'B', index))
+   return Color.Encode(TDA.GetInt('damages', 'R', index),
+                       TDA.GetInt('damages', 'G', index),
+                       TDA.GetInt('damages', 'B', index))
 end
 
 for i=0, DAMAGE_INDEX_NUM - 1 do

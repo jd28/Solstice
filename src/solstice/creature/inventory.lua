@@ -30,7 +30,7 @@ end
 
 --- Determine inventory slot from item
 -- @param item Item
--- @return INVENTORY\_SLOT\_* or -1
+-- @return INVENTORY_SLOT_* or -1
 function Creature:GetInventorySlotFromItem(item)
    if not self:GetIsValid() then return -1 end
    for it, slot in self:Equips(true) do

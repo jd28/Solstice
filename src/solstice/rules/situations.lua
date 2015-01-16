@@ -123,7 +123,7 @@ local _SITU_MOD = {
 -- @section
 
 --- Override Situation Modifier.
--- @param situation SITUATION\_* see situations.2da
+-- @param situation SITUATION_* see situations.2da
 -- @param func A function taking a creature paramater
 -- that calculates the combat modifier for a situation
 -- at a given index.
@@ -135,7 +135,7 @@ local function SetSituationModiferOverride(situation, func)
 end
 
 --- Resolves situation modifier.
--- @param type SITUATION\_* see situations.2da
+-- @param type SITUATION_* see situations.2da
 -- @param cre Creature object.
 local function ResolveSituationModifier(type, cre)
    local f = _SITU_MOD[type]

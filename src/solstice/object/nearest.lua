@@ -1,17 +1,15 @@
---- Object
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
+----
 -- @module object
 
 local M = require 'solstice.object.init'
 local NWE = require 'solstice.nwn.engine'
+local Object = M.Object
 
 --- Class Object: Nearest Objects
 -- @section nearest
 
 --- Gets nearest creature by criteria types and values
-function M.Object:GetNearestCreature(type1, value1, nth, ...)
+function Object:GetNearestCreature(type1, value1, nth, ...)
    nth = nth or 1
    local type2, value2, type3, value3 = ...
    type2  = type2  or -1
@@ -34,10 +32,10 @@ end
 --- Get nearest object
 -- @param[opt=solstice.object.ALL] obj_type solstice.object type constant.
 -- @param[opt=1] nth Which object to return.
-function M.Object:GetNearestObject(obj_type, nth)
+function Object:GetNearestObject(obj_type, nth)
    obj_type = obj_type or OBJECT_TYPE_ALL
    nth = nth or 1
-   
+
    NWE.StackPushInteger(nth)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(obj_type)
@@ -48,7 +46,7 @@ end
 --- Get nearest object by tag.
 -- @param tag Tag of object
 -- @param[opt=1] nth Which object to return
-function M.Object:GetNearestObjectByTag(tag, nth)
+function Object:GetNearestObjectByTag(tag, nth)
    nth = nth or 1
 
    NWE.StackPushInteger(nth)
@@ -60,10 +58,9 @@ end
 
 --- Get nearest trap.
 -- @param[opt=false] is_detected If true return only detected traps.
-function M.Object:GetNearestTrap(is_detected)
+function Object:GetNearestTrap(is_detected)
    NWE.StackPushBoolean(is_detected)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(488, 2)
    return NWE.StackPopObject()
 end
-

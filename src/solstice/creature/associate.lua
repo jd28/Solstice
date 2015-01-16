@@ -102,10 +102,10 @@ function Creature:GetLastAssociateCommand()
 end
 
 --- Levels up a creature using the default settings.
--- @param[opt=CLASS_TYPE_INVALID] class CLASS\_TYPE\_*
+-- @param[opt=CLASS_TYPE_INVALID] class CLASS_TYPE_*
 -- @param[opt=false] ready_spells Determines if all memorizable spell slots will be
 -- filled without requiring rest.
--- @param[opt=PACKAGE_INVALID] package PACKAGE\_*
+-- @param[opt=PACKAGE_INVALID] package PACKAGE_*
 function Creature:LevelUpHenchman(class, ready_spells, package)
    class = class or CLASS_TYPE_INVALID
    package = package or PACKAGE_INVALID

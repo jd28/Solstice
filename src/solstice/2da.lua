@@ -1,7 +1,7 @@
 ---
--- This module is for working with cached 2da files.
--- Note that it depends on nwserver to do any parsing,
--- it is not useable outside of the that currently.
+-- Functions for getting values from cached 2da files.  Note: this does no
+-- parsing and is only useable on a running server.
+--
 -- @module 2da
 -- @alias M
 
@@ -11,8 +11,9 @@ require 'solstice.nwn.ctypes.2da'
 
 local M = {}
 
--- Get a cached 2da file.
+--- Get a cached 2da file.
 -- @param twoda 2da name (minus .2da extention)
+-- @return A cached 2da or nil.
 function M.GetCached2da(twoda)
    if type(twoda) ~= "string" then
       error "solstice.2da.GetCached2da: parameter is not a string type!"
@@ -28,26 +29,26 @@ end
 
 --- Get number of columns in 2da.
 -- @param twoda 2da file.
-function M.Get2daColumnCount(twoda)
+function M.GetColumnCount(twoda)
    if type(twoda) == "string" then
       twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
-      error "solstice.2da.Get2daColumnCount: Invalid TwoDA"
+      error "solstice.2da.GetColumnCount: Invalid TwoDA"
    end
    return C.nwn_Get2daColumnCount(twoda);
 end
 
 --- Get number of rows in 2da.
 -- @param twoda 2da file.
-function M.Get2daRowCount(twoda)
+function M.GetRowCount(twoda)
    if type(twoda) == "string" then
       twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
-      error "solstice.2da.Get2daRowCount: Invalid TwoDA"
+      error "solstice.2da.GetRowCount: Invalid TwoDA"
    end
    return C.nwn_Get2daRowCount(twoda);
 end
@@ -56,13 +57,13 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.Get2daFloat(twoda, col, row)
+function M.GetFloat(twoda, col, row)
    if type(twoda) == "string" then
       twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
-      error "solstice.2da.Get2daFloat: Invalid TwoDA"
+      error "solstice.2da.GetFloat: Invalid TwoDA"
    end
 
    if type(col) == "string" then
@@ -70,7 +71,7 @@ function M.Get2daFloat(twoda, col, row)
    elseif type(col) == "number" then
       return C.nwn_Get2daFloatIdx(twoda, col, row)
    else
-      error "solstice.2da.Get2daFloat: Invalid column type"
+      error "solstice.2da.GetFloat: Invalid column type"
    end
 end
 
@@ -78,13 +79,13 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.Get2daInt(twoda, col, row)
+function M.GetInt(twoda, col, row)
    if type(twoda) == "string" then
       twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
-      error "solstice.2da.Get2daInt: Invalid TwoDA"
+      error "solstice.2da.GetInt: Invalid TwoDA"
    end
 
    if type(col) == "string" then
@@ -92,7 +93,7 @@ function M.Get2daInt(twoda, col, row)
    elseif type(col) == "number" then
       return C.nwn_Get2daIntIdx(twoda, col, row)
    else
-      error "solstice.2da.Get2daInt: Invalid column type"
+      error "solstice.2da.GetInt: Invalid column type"
    end
 
 end
@@ -101,13 +102,13 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.Get2daString(twoda, col, row)
+function M.GetString(twoda, col, row)
    if type(twoda) == "string" then
       twoda = M.GetCached2da(twoda)
    end
 
    if twoda == nil then
-      error "solstice.2da.Get2daString: Invalid TwoDA"
+      error "solstice.2da.GetString: Invalid TwoDA"
    end
 
    if type(col) == "string" then
@@ -115,7 +116,7 @@ function M.Get2daString(twoda, col, row)
    elseif type(col) == "number" then
       return ffi.string(C.nwn_Get2daStringIdx(twoda, col, row))
    else
-      error "solstice.2da.Get2daString: Invalid column type"
+      error "solstice.2da.GetString: Invalid column type"
    end
 end
 

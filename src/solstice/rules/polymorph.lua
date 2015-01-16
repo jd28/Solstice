@@ -6,7 +6,7 @@ end
 
 local DEFAULT_UNEQUIP_MASK = 64520
 local function GetPolymorphUnequipMask(polyid)
-   local res = TDA.Get2daInt("polymorph", "UnequipMask", polyid)
+   local res = TDA.GetInt("polymorph", "UnequipMask", polyid)
    if res == 0 then
       return DEFAULT_UNEQUIP_MASK
    end

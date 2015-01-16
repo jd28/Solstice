@@ -8,12 +8,12 @@ local TDA = require 'solstice.2da'
 -- @section ability
 
 local function GetAbilityName(ability)
-   return TLK.GetString(TDA.Get2daInt("abilities", "Name", ability))
+   return TLK.GetString(TDA.GetInt("abilities", "Name", ability))
 end
 
 --- Get the limits of ability effects
 -- @param cre Creature object.
--- @param ability ABILITY\_*
+-- @param ability ABILITY_*
 -- @return Minimum Default: -12
 -- @return Maximum Default: 12
 local function GetAbilityEffectLimits(cre, ability)
@@ -22,7 +22,7 @@ end
 
 --- Get ability modification from effects.
 -- @param cre Creature object.
--- @param ability ABILITY\_*
+-- @param ability ABILITY_*
 -- @return Total amount, uncapped
 local function GetAbilityEffectModifier(cre, ability)
    local eff = 0

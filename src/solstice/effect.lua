@@ -225,7 +225,7 @@ function Effect:SetString(index, str)
 end
 
 --- Set the subtype of the effect.
--- @param value solstice.SUBTYPE_*
+-- @param value SUBTYPE_*
 function Effect:SetSubType(value)
    self.eff.eff_dursubtype = bit.bor(value, self:GetDurationType())
    return self.eff.eff_dursubtype

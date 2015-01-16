@@ -11,7 +11,7 @@ local NWE = require 'solstice.nwn.engine'
 -- rather than ExecuteScript.
 -- @param script Script to call.
 -- @param target Object to run the script on.
--- @return SCRIPT\_RETURN\_*
+-- @return SCRIPT_RETURN_*
 local function ExecuteScript(script, target)
    if target:GetIsValid() then
       target:DeleteLocalInt("X2_L_LAST_RETVAR")
@@ -65,14 +65,14 @@ end
 
 --- Get last item event type.
 -- @param obj Object
--- @return ITEM\_EVENT\_* See itemevents.2da
+-- @return ITEM_EVENT_* See itemevents.2da
 local function GetItemEventType(obj)
    return obj:GetLocalInt("X2_L_LAST_ITEM_EVENT")
 end
 
 --- Sets item event type on object.
 -- @param obj Object
--- @param event ITEM\_EVENT\_* See itemevents.2da
+-- @param event ITEM_EVENT_* See itemevents.2da
 local function SetItemEventType(obj, event)
    obj:SetLocalInt("X2_L_LAST_ITEM_EVENT", event)
 end
@@ -81,8 +81,8 @@ end
 -- NOTE: This will only fire if module supports tag based scripting.
 -- @param obj Object
 -- @param item Item
--- @param event ITEM\_EVENT\_* See itemevents.2da
--- @return SCRIPT\_RETURN\_*
+-- @param event ITEM_EVENT_* See itemevents.2da
+-- @return SCRIPT_RETURN_*
 local function ExecuteItemEvent(obj, item, event)
    if Game.GetModule():GetLocalBool("X2_SWITCH_ENABLE_TAGBASED_SCRIPTS") then
       SetItemEventNumber(obj, event)

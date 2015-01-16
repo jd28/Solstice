@@ -1,7 +1,4 @@
 ----------------------------------------------------------
--- @license GPL v2
--- @copyright 2011-2013
--- @author jmd ( jmd2028 at gmail dot com )
 -- @module itemprop
 -- @alias M
 
@@ -120,7 +117,7 @@ local function CreateItempropInternal(type, subtype, cost, cost_val,
    return ip
 end
 
---- Item Property creation functions.
+--- Creation Functions.
 -- @section ip_create
 
 local function CreateItemPropery(command, args)
@@ -235,8 +232,8 @@ function M.ContainerReducedWeight(amount)
 end
 
 --- Creates a damage bonus itemproperty.
--- @param damage_type DAMAGE\_INDEX\_*
--- @param damage DAMAMGE\_BONUS\_*
+-- @param damage_type DAMAGE_INDEX_*
+-- @param damage DAMAMGE_BONUS_*
 function M.DamageBonus(damage_type, damage)
    damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
    local eff = CreateItempropEffect()
@@ -245,7 +242,7 @@ function M.DamageBonus(damage_type, damage)
 end
 
 --- Creates a damage range itemproperty.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param min Minimum damage.
 -- @param max Maximum damage.
 function M.DamageRange(damage_type, min, max)
@@ -258,7 +255,7 @@ end
 --- Creates a damage immunity itemproperty.
 -- If you are using CEP and CEP is set to true in your global options then you can pass values 1-100,
 -- otherwise you will have to pass the item property constants.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param amount Amount.
 function M.DamageImmunity(damage_type, amount)
    if OPT.CEP then amount = amount + 50 end
@@ -278,7 +275,7 @@ end
 
 --- Creates a damage reduction itemproperty.
 -- If you are using CEP then values can be passed for the soak parameter rather
--- than IP\_CONST\_SOAK\_*.  The value must be a multiple of 5 and in the range
+-- than IP_CONST_SOAK_*.  The value must be a multiple of 5 and in the range
 -- [5, 100]
 -- @param enhancement [1,20]
 -- @param soak Amount soaked.
@@ -298,9 +295,9 @@ end
 
 --- Creates damage resistance item property.
 -- If you are using CEP then values can be passed for the amount parameter rather
--- than IP\_CONST\_RESIST_*.  The value must be a multiple of 5 and in the range
+-- than IP_CONST_RESIST_*.  The value must be a multiple of 5 and in the range
 -- [5, 100]
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param amount Resist value.
 function M.DamageResistance(damage_type, amount)
    if OPT.CEP then
@@ -318,7 +315,7 @@ end
 --- Creates damage vulnerability item property.
 -- If you are using CEP and CEP is set to true in your global options then you can pass values 1-100,
 -- otherwise you will have to pass the item property constants.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param amount Amount.
 function M.DamageVulnerability(damage_type, amount)
    if OPT.CEP then amount = amount + 50 end
@@ -350,7 +347,7 @@ function M.EnhancementModifier(amount)
 end
 
 --- Creates an "extra damage type" item property.
--- @param damage_type DAMAGE\_INDEX\_*
+-- @param damage_type DAMAGE_INDEX_*
 -- @param[opt=false] is_ranged ExtraRangedDamge if true, melee if false.
 function M.ExtraDamageType(damage_type, is_ranged)
    local eff = CreateItempropEffect()
@@ -392,7 +389,7 @@ function M.HolyAvenger()
 end
 
 --- Creates immunity item property
--- @param immumity_type IMMUNITY\_TYPE\_*
+-- @param immumity_type IMMUNITY_TYPE_*
 function M.ImmunityMisc(immumity_type)
    local eff = CreateItempropEffect()
    immumity_type = Rules.ConvertImmunityToIPConstant(immumity_type)
@@ -424,7 +421,7 @@ function M.Light(brightness, color)
 end
 
 --- Creates a class use limitation item property
--- @param class CLASS\_TYPE\_*
+-- @param class CLASS_TYPE_*
 function M.LimitUseByClass(class)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_USE_LIMITATION_CLASS, class, 0)
@@ -440,7 +437,7 @@ function M.LimitUseByRace(race)
 end
 
 --- Creates a massive criticals item property.
--- @param damage DAMAGE\_BONUS\_*
+-- @param damage DAMAGE_BONUS_*
 function M.MassiveCritical(damage)
    local eff = CreateItempropEffect()
    eff:SetValues(ITEM_PROPERTY_MASSIVE_CRITICALS, nil, 4, damage)

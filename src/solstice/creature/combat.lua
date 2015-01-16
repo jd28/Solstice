@@ -21,7 +21,7 @@ local Creature = M.Creature
 -- @section
 
 --- Get creatures total damage immunity.
--- @param dmgidx DAMAMGE\_INDEX\_*
+-- @param dmgidx DAMAMGE_INDEX_*
 function Creature:GetDamageImmunity(dmgidx)
    -- If the damage index is invalid... skip it.
    if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM then
@@ -110,13 +110,13 @@ function Creature:GetConcealment(vs, is_ranged)
 end
 
 --- Get Critical Hit Multiplier
--- @param equip EQUIP\_TYPE\_*
+-- @param equip EQUIP_TYPE_*
 function Creature:GetCriticalHitMultiplier(equip)
    return self.ci.equips[equip].crit_mult
 end
 
 --- Get Critical Hit Range
--- @param equip EQUIP\_TYPE\_*
+-- @param equip EQUIP_TYPE_*
 function Creature:GetCriticalHitRange(equip)
    return self.ci.equips[equip].crit_range
 end
@@ -444,7 +444,7 @@ local function UpdateCombatEquips(self)
    end
    self.ci.offense.ranged_type = rng_type
 
-   local is_double = TDA.Get2daInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
+   local is_double = TDA.GetInt("wpnprops", "Type", Rules.BaseitemToWeapon(rh)) == 7
 
    self.ci.equips[0].id = rh.id
    if is_double then

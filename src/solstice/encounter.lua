@@ -23,7 +23,7 @@ function Encounter:GetActive()
 end
 
 --- Get the difficulty level of the encounter.
--- @return ENCOUNTER\_DIFFICULTY\_*
+-- @return ENCOUNTER_DIFFICULTY_*
 function Encounter:GetDifficulty()
    if self:GetIsValid() then return -1 end
    return self.obj.enc_difficulty
@@ -74,7 +74,7 @@ function Encounter:SetActive(value)
 end
 
 --- Sets the difficulty level of an encounter.
--- @param value ENCOUNTER\_DIFFICULTY\_*
+-- @param value ENCOUNTER_DIFFICULTY_*
 function Encounter:SetDifficulty(value)
    if not self:GetIsValid() then return end
    self.obj.enc_difficulty = value
