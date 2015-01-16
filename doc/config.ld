@@ -8,9 +8,9 @@ description = [[
 Solstice is a scripting library and combat engine replacement for
 [Neverwinter Nights](http://neverwinternights.info/) (NWN).  My main goal
 was to expand NWN from a platform for building adventures to also allow building
-new/different rulesets.  The
-project also aims at a tight level of integration: where you could create a server with
-no NWN scripts is possible, but also where you could add/replace a script
+new/different rulesets.  The project also aims at a tight level of
+integration: where you could create a server with
+no NWN scripts, but also where you could add/replace a script
 without having to change a single line of NWN script.
 
 This project is open source and licensed under the MIT License (any mentions
@@ -141,6 +141,9 @@ This has a some side effects:
   with C(++) have indexes starting at 0.  This is sometimes confusing.
   Also, the C(++) underbelly is still rather visible in places.
 * The probability of this being ported to the client or Windows is 0%.
+* You need to be aware of the global exports from `solstice.util` and
+  LuaFun because you can clobber these with your own scripts, which
+  will introduce varying levels of breakage.
 ]]
 
 format = 'discount'

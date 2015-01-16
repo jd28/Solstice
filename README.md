@@ -135,3 +135,6 @@ This has a some side effects:
   with C(++) have indexes starting at 0.  This is sometimes confusing.
   Also, the C(++) underbelly is still rather visible in places.
 * The probability of this being ported to the client or Windows is 0%.
+* You need to be aware of the global exports from `solstice.util` and
+  LuaFun because you can clobber these with your own scripts, which
+  will introduce varying levels of breakage.
