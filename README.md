@@ -3,9 +3,9 @@
 Solstice is a scripting library and combat engine replacement for
 [Neverwinter Nights](http://neverwinternights.info/) (NWN).  My main goal
 was to expand NWN from a platform for building adventures to also allow building
-new/different rulesets.  The
-project also aims at a tight level of integration: where you could create a server with
-no NWN scripts is possible, but also where you could add/replace a script
+new/different rulesets.  The project also aims at a tight level of
+integration: where you could create a server with
+no NWN scripts, but also where you could add/replace a script
 without having to change a single line of NWN script.
 
 This project is open source and licensed under the MIT License (any mentions

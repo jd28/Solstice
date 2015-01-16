@@ -14,7 +14,8 @@ local script_dir = 'lua'
 -- Required: package path so Lua can find your scripts and libraries.
 package.path = package.path .. ";./"..script_dir.."/?.lua;"
 
--- Required: loads Lua extensions require for loading Solstice.
+-- Required: loads Lua extensions and utility functions required for
+-- loading Solstice.
 require "solstice.util"
 
 -- Required: Load your settings into global table `OPT`.

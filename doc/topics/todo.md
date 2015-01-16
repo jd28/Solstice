@@ -8,3 +8,4 @@
   functional programming library.
 * Deal with the Faction and Lock modules.
 * Add more examples.
+* Make the combat engine override optional.
