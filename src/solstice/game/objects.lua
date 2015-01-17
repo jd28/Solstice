@@ -91,7 +91,7 @@ end
 
 --- Iterator over all PCs
 function M.PCs()
-   return make_iter_valid(M.GetFirstPC, M.GetNextPC)
+   return make_iter_valid(GetFirstPC, GetNextPC)
 end
 
 --- Gets the PC speaker.
