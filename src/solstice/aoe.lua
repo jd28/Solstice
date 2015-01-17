@@ -80,4 +80,16 @@ function AoE:SetSpellLevel(level)
    return self.obj.aoe_spell_level
 end
 
+--- Get Spell DC.
+function AoE:GetSpellDC()
+   if not self:GetIsValid() then return -1 end
+   return self.obj.aoe_spell_dc
+end
+
+--- Gets AoEs spell level.
+function AoE:GetSpellLevel(level)
+   if not self:GetIsValid() then return -1 end
+   return self.obj.aoe_spell_level
+end
+
 return M
