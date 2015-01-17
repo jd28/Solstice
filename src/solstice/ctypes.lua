@@ -1,6 +1,15 @@
--- solstice.ctypes defines the internal proxy ctypes used by
--- the Solstice library.  It never needs to be explicitly
--- required.
+---
+-- This module defines some C structs for use by Solstice.  The constructors
+-- all take parameters for their respective fields.  These are generated
+-- dynamically by LuaJIT and so are dependent on some constants being
+-- defined.
+--
+-- If you have any desire to change these... note which ones need to
+-- be synced with nwnx_solstice.
+--
+-- Note about documentation.  If a field is an array is it will be
+-- specified `field:` \[length\]
+--
 -- @module ctypes
 
 local ffi = require 'ffi'
@@ -34,6 +43,131 @@ require 'solstice.nwn.ctypes.store'
 require 'solstice.nwn.ctypes.trigger'
 require 'solstice.nwn.ctypes.waypoint'
 
+--- Types
+-- @section types
+
+--- Constructor: dice_roll_t
+-- @table DiceRoll
+-- @field dice Number of dice.
+-- @field sides Number of sides.
+-- @field bonus Bonus
+
+--- Constructor: damage_roll_t
+--
+-- The mask is defined:
+--
+-- * 0x1 = Damage roll is a penalty
+-- * 0x2 = Damage roll is applicable only to criticals.
+-- * 0x4 = Damage roll is unblockable by resistances.
+-- @table DamageRoll
+-- @field type DAMAGE_INDEX_*
+-- @field roll DiceRoll
+-- @field mask Critical/Unblockable bitmask.
+
+--- Constructor combat_mod_t
+-- @table CombatMod
+-- @field ab Attack bonus/penalty.
+-- @field ac AC bonus/penalty.
+-- @field dmd DamageRoll bonus/penalty.
+-- @field hp Hitpoint bonus/penalty.
+
+--- Constructor damage_result_t
+-- This struct is used by the combat engine to when determining a damage
+-- roll.  The length of the arrays is determined by the global DAMAGE_INDEX_NUM
+-- constant.
+-- @table DamageResult
+-- @field damages [DAMAGE_INDEX_NUM] damages.
+-- @field damages_unblocked [DAMAGE_INDEX_NUM] unblockable damages.
+-- @field immunity [DAMAGE_INDEX_NUM] damage immunity adjustments.
+-- @field resist [DAMAGE_INDEX_NUM] damage resistance adjustments.
+-- @field resist_remaining [DAMAGE_INDEX_NUM] damage resistance remaining.
+-- This is to provide feedback for DamageResistance effects with limits.
+-- @field reduction Damage reduction adjustment.
+-- @field reduction_remaining Damage reduction remaining.
+-- This is to provide feedback for DamageReduction effects with limits.
+-- @field parry Parry adjustment for servers using the Critical Hit Parry
+-- reduction designed by Higher Ground.
+
+--- Caches some offensive information.
+-- @table Offense
+-- @field ab_base BAB
+-- @field ab_transient Attack bonus effects applied directly to player.
+-- @field attacks_on Number of onhand attacks.
+-- @field attacks_off Number of offhand attacks.
+-- @field offhand_penalty_on Dualwield AB penalty for offhand attack.
+-- @field offhand_penalty_off Dualwield AB penalty for offhand attack.
+-- @field ranged_type Ranged type. See rangedwpns.2da
+-- @field weapon_type Weapon type. See 'Type' column in wpnprops.2da
+-- @field damage [20] DamageRoll.  Damage bonus/penalties applied
+-- directly to player.
+-- @field damage_len Number of DamageRolls in the damage array.
+
+--- Caches some defensive information.
+-- @table Defense
+-- @field concealment Concealment
+-- @field hp_eff Hitpoints from effects.
+-- @field hp_max Maximum hitpoints.
+-- @field soak Innate soak.
+-- @field soak_stack [DAMAGE_POWER_NUM] Stacking soak effects.
+-- @field immunity [DAMAGE_INDEX_NUM] Damage immunity.
+-- @field immunity_base [DAMAGE_INDEX_NUM] Innate immunity. E,g RDD.
+-- @field immunity_misc [IMMUNITY_TYPE_NUM] % Immunity to IMMMUNITY_TYPE_*
+-- @field resist [DAMAGE_INDEX_NUM] Innate resistance.
+-- @field resist_stack [DAMAGE_INDEX_NUM] Stacking damage resistance.
+
+--- Weapon properties.
+-- @table CombatWeapon
+-- @field id Item's object id.
+-- @field iter Iteration penalty.
+-- @field ab_ability AB from ability scores.
+-- @field dmg_ability Damage from ability scores.
+-- @field ab_mod AB modifier. Eg. from WM.
+-- @field transient_ab_mod AB modifer from AttackBonus effects.
+-- @field crit_range Critical hit range.  More technically, the threat.
+-- @field crit_mult Critical hit multiplier
+-- @field power Damage power
+-- @field base_dmg_flags Base weapon damage flags.
+-- @field base_dmg_roll Base weapon damage roll.
+-- @field damage [50] From effects, weapons, etc. [TODO] Reconsider the size.
+-- @field damage_len Number of damages used in the above array.
+-- @field has_dev_crit
+
+--- Caches combat related information.
+-- @table CombatInfo
+-- @field offense Offense ctype.
+-- @field defense Deffense type
+-- @field equips [EQUIP_TYPE_NUM] CombatWeapon ctypes.
+-- @field mods [COMBAT_MOD_NUM] CombatMod ctypes.
+-- @field mod_situ[SITUATION_NUM] CombatMod ctypes.
+-- @field mod_mode CombatMod for mode effects.
+-- @field effective_level OBSOLETE
+-- @field first_custom_eff OBSOLETE
+-- @field fe_mask Favored enemy bitmask.
+-- @field training_vs_mask Training Vs bitmask.
+-- @field skill_eff [SKILL_NUM] Skill bonuses from effects.
+-- @field ability_eff [ABILITY_NUM] Ability bonuses from effects.
+-- @field update_flags OBSOLETE
+
+--- Information for an attack.
+-- @table Attack
+-- @field attacker_nwn Internal attacker object.
+-- @field target_nwn Internal target object.
+-- @field attacker_ci Attacker CombatInfo ctype.
+-- @field target_ci Target CombatInfo ctype.
+-- @field attack Internal NWN attack data.
+-- @field weapon EQUIP_TYPE_* of current weapon.
+-- @field target_state Target state bitmask.
+-- @field situational_flags Situational bitmask.
+-- @field target_distance Distance to target.
+-- @field is_offhand Is offhand attack.
+-- @field is_sneak Is sneak attack.
+-- @field is_death Is death attack.
+-- @field is_killing Is killing blow.
+-- @field damage_total Total damage done.
+-- @field dmg_result DamageResult ctype.
+
+effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
+effects_to_remove_len;
 ffi.cdef(interp([[
 typedef struct {
    int32_t      dice;
