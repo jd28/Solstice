@@ -2,9 +2,6 @@
 -- @module object
 
 local M = safe_require 'solstice.object.init'
-M.const = safe_require 'solstice.object.constant'
-setmetatable(M, { __index = M.const })
-
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local C = ffi.C
