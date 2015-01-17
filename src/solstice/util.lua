@@ -2,7 +2,7 @@
 -- This module defines some extensions to Lua builtins and some utility
 -- functions into the global namespace.  It only ever needs to be
 -- required in your `preload.lua`.  This module will also load the
--- LuaFun library into the global namespace, allowing it's use without
+-- LuaFun library into the global namespace, allowing its use without
 -- explicitly requiring it.
 -- @module util
 
