@@ -5,7 +5,7 @@
 -- @section
 
 local NWE = require 'solstice.nwn.engine'
-
+local C = require('ffi').C
 local M = require 'solstice.game.init'
 
 --- Create an object of a specified type at a given location
@@ -46,6 +46,13 @@ function M.GetObjectByID(id)
    return _SOL_GET_CACHED_OBJECT(id)
 end
 
+--- Remove object from Solstice object cache.
+-- @param obj Any object.
+function M.RemoveObject(obj)
+   _SOL_REMOVE_CACHED_OBJECT(obj.id)
+   C.Local_DeleteCreature(obj.id)
+end
+
 --- Gets an object by tag
 -- @param tag Tag of object
 -- @param[opt=1] nth Nth object.
@@ -68,18 +75,16 @@ function M.ObjectsByTag(tag)
    return take_while(function (x) return x ~= OBJECT_INVALID end, tabulate(f))
 end
 
---- Gets first PC.
---     This function should probably be passed over in favor
---     of the M.PCs iterator.
+-- Gets first PC.
 -- @return OBJECT_INVALID if no PCs are logged into the server.
-function M.GetFirstPC()
+local function GetFirstPC()
    NWE.ExecuteCommand(548, 0)
    return NWE.StackPopObject()
 end
 
---- Get next PC.
+-- Get next PC.
 -- @return OBJECT_INVALID if there are no furter PCs.
-function M.GetNextPC()
+local function GetNextPC()
    NWE.ExecuteCommand(549, 0)
    return NWE.StackPopObject()
 end
