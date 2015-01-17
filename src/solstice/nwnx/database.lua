@@ -15,11 +15,13 @@ local mod
 
 -- Functions for initializing APS and working with result sets
 
+--- TODO
 function M.SQLInit()
    mod = mod or Game.GetModule()
    mod:SetLocalString("NWNX!ODBC!SPACER", string.rep('.', 8*128))
 end
 
+--- TODO
 function M.SQLExecDirect(sql)
    mod = mod or Game.GetModule()
    mod:SetLocalString("NWNX!ODBC!EXEC", sql)
@@ -27,6 +29,7 @@ end
 
 local result_set
 
+--- TODO
 function M.SQLFetch()
    mod = mod or Game.GetModule()
    -- Reset the result set.
@@ -43,6 +46,7 @@ function M.SQLFetch()
    end
 end
 
+--- TODO
 function M.SQLGetData(column)
    mod = mod or Game.GetModule()
    if not result_set then
@@ -55,12 +59,14 @@ function M.SQLGetData(column)
    return result_set[column]
 end
 
+--- TODO
 -- Problems can arise with SQL commands if variables or values have single quotes
 -- in their names. These functions are a replace these quote with the tilde character
 function M.SQLEncodeSpecialChars(text)
    return string.gsub(text, "'", "~")
 end
 
+--- TODO
 function M.SQLDecodeSpecialChars(text)
    return string.gsub(text, "~", "'")
 end
@@ -75,6 +81,7 @@ local function get_tag(object, is_global)
    return tag
 end
 
+--- TODO
 function M.GetString(object, varname, is_global, table)
    local tag = get_tag(object, is_global)
    table = table or DEFAULT_TABLE
@@ -92,6 +99,7 @@ function M.GetString(object, varname, is_global, table)
    return ""
 end
 
+--- TODO
 function M.SetString(object, varname, value, expires, is_global, table)
    local tag = get_tag(object, is_global)
    table = table or DEFAULT_TABLE
@@ -117,10 +125,12 @@ function M.SetString(object, varname, value, expires, is_global, table)
    M.SQLExecDirect(sql)
 end
 
+--- TODO
 function M.SetInt(object, varname, value, expires, is_global, table)
    M.SetString(object, varname, tostring(value), expires, is_global, table)
 end
 
+--- TODO
 function M.GetInt(object, varname, is_global, table)
    table = table or DEFAULT_TABLE
    local tag = get_tag(object, is_global)
@@ -135,10 +145,12 @@ function M.GetInt(object, varname, is_global, table)
    return tonumber(mod:GetLocalString("NWNX!ODBC!FETCH")) or 0
 end
 
+--- TODO
 function M.SetFloat(object, varname, value, expires, is_global, table)
    M.SetString(object, varname, tostring(value), expires, is_global, table)
 end
 
+--- TODO
 function M.GetFloat(object, varname, is_global, table)
    table = table or DEFAULT_TABLE
    local tag = get_tag(object, is_global)
@@ -153,22 +165,27 @@ function M.GetFloat(object, varname, is_global, table)
    return tonumber(mod:GetLocalString("NWNX!ODBC!FETCH")) or 0
 end
 
+--- TODO
 function M.SetLocation(object, varname, value, expires, is_global, table)
    M.SetString(object, varname, value:ToString(), expires, is_global, table)
 end
 
+--- TODO
 function M.GetLocation(object, varname, is_global, table)
    return Location.FromString(M.GetString(object, varname, is_global, table))
 end
 
+--- TODO
 function M.SetVector(object, varname, value, expires, is_global, table)
    M.SetString(object, varname, value:ToString(), expires, is_global, table)
 end
 
+--- TODO
 function M.GetVector(object, varname, is_global, table)
    return Vector.FromString(M.GetString(object, varname, is_global, table))
 end
 
+--- TODO
 function M.SetObject(object, varname, obj, expires, is_global, table)
    expires = expires or 0
    table = table or DEFAULT_OBJECT_TABLE
@@ -193,7 +210,7 @@ function M.SetObject(object, varname, obj, expires, is_global, table)
    CDB.StoreCampaignObject ("NWNX", "-", obj);
 end
 
--- TODO MAY NEED TO FIX THIS!!!!!
+--- TODO
 function M.GetObject(object, varname, owner, is_global, table)
    owner = owner or object
    table = table or DEFAULT_OBJECT_TABLE
@@ -212,6 +229,7 @@ function M.GetObject(object, varname, owner, is_global, table)
     return CDB.RetrieveCampaignObject ("NWNX", "-", owner:GetLocation(), owner)
 end
 
+--- TODO
 function M.DeleteVariable(object, varname, is_global, table)
    table = table or DEFAULT_TABLE
    local tag = get_tag(object, is_global)
@@ -223,6 +241,7 @@ function M.DeleteVariable(object, varname, is_global, table)
    M.SQLExecDirect(sql)
 end
 
+--- TODO
 function M.DeleteAllVariables(object, is_global, table)
    table = table or DEFAULT_TABLE
    local tag = get_tag(object, is_global)

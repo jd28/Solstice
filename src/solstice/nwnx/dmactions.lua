@@ -24,35 +24,42 @@ local function get_int(dm, str, spacer)
    return tonumber(ret)
 end
 
+--- TODO
 function M.SetScript(nAction, sScript)
    local mod = Game.GetModule()
    mod:SetLocalString("NWNX!DMACTIONS!SET_ACTION_SCRIPT", nAction .. ":" .. sScript)
    mod:DeleteLocalString("NWNX!DMACTIONS!SET_ACTION_SCRIPT")
 end
 
+--- TODO
 function M.GetID(dm)
    return get_int(dm, "NWNX!DMACTIONS!GETACTIONID", "                ")
 end
 
+--- TODO
 function M.Prevent(dm)
    dm:SetLocalString("NWNX!DMACTIONS!PREVENT", "1")
    dm:DeleteLocalString("NWNX!DMACTIONS!PREVENT")
 end
 
+--- TODO
 function M.nGetDMAction_Param(dm, second)
    local nth = second and "2" or "1"
    return get_int(dm, "NWNX!DMACTIONS!GETPARAM_" .. nth, "                ")
 end
 
+--- TODO
 function M.GetDMAction_Param(dm)
    return get_int(dm, "NWNX!DMACTIONS!GETSTRPARAM1", "                                ")
 end
 
+--- TODO
 function M.GetTarget(dm, second)
    local nth = second and "2" or "1"
    return dm:GetLocalObject("NWNX!DMACTIONS!TARGET_" .. nth)
 end
 
+--- TODO
 function M.GetPosition(dm)
    dm:SetLocalString("NWNX!DMACTIONS!GETPOS", "                                              ")
    local vector = dm:GetLocalString("NWNX!DMACTIONS!GETPOS")
@@ -62,10 +69,12 @@ function M.GetPosition(dm)
    return vector_t(x, y, z)
 end
 
+--- TODO
 function M.GetTargetsCount(dm)
    return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCOUNT", "                ")
 end
 
+--- TODO
 function M.GetTargetsCurrent(dm)
    return get_int(dm, "NWNX!DMACTIONS!GETTARGETSCURRENT", "                ")
 end

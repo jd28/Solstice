@@ -9,11 +9,12 @@ local CC_HANDLER
 
 local M = {}
 
----
+--- TODO
 function M.SetChatHandler(func)
    CHAT_HANDLER = func
 end
 
+--- TODO
 function M.SetCombatMessageHandler(func)
    CC_HANDLER = func
 end
