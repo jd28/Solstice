@@ -495,7 +495,7 @@ const char* ns_GetCombatDamageString(
 
 ChatMessage   *Local_GetLastChatMessage();
 CombatMessage *Local_GetLastCombatMessage();
-EquipEvent    *Local_GetLastEquipEvent();
+ItemEvent    *Local_GetLastItemEvent();
 EventEffect   *Local_GetLastEffectEvent();
 EventItemprop *Local_GetLastItemPropEvent();
 CGameEffect   *Local_GetLastDamageEffect();

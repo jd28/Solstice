@@ -43,7 +43,7 @@ typedef struct {
     uint32_t item;
     bool     use_result;
     int32_t  result;
-} EquipEvent;
+} ItemEvent;
 
 typedef struct {
     CNWSObject  *obj;
