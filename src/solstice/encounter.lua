@@ -55,7 +55,7 @@ end
 
 --- Gets a spawn point location.
 -- @param idx Index in the spawn poing list.
--- @return solstice.location.Location instance
+-- @return Location instance
 function Encounter:GetSpawnPointByIndex(idx)
    if not self:GetIsValid() then return end
    if idx < 0 or idx >= self.obj.enc_spawn_points_len then return end

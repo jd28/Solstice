@@ -105,7 +105,7 @@ end
 
 jit.off(Creature.SetCombatMode)
 
---- Sets creature's combat mode
+-- Sets creature's combat mode
 -- @param cre Creature in question.
 -- @param mode solstice.modes type constant.
 -- @param change If false the combat mode is already active.

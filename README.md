@@ -81,7 +81,7 @@ end
 
 This has a some side effects:
 
-* Lua functions that you're using as 'scripts' are limited to 16
+* Lua function names that you're using as 'scripts' are limited to 16
   characters, like script file names.
 * Script editing needs to be done in external editor.
 * Scripts placed into events, like in the dialog editor, will not display

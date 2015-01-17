@@ -1,5 +1,5 @@
 -- The following defines all your constants.  You can set them
--- manually or read them 2DA files.  This particular file is
+-- manually or read them from 2DA files.  This particular file is
 -- what I've made for my PW and I've added and extended a number of
 -- 2DAs to make constant loading as painless as possible.  These
 -- will all be made available in the 2da folder that's distributed

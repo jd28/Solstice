@@ -11,7 +11,9 @@ require 'solstice.nwn.ctypes.2da'
 
 local M = {}
 
---- Get a cached 2da file.
+-- Get a cached 2da file.
+-- Note: You do not want to store the return of this variable
+-- as it can be deleted from the NWN 2da cache.
 -- @param twoda 2da name (minus .2da extention)
 -- @return A cached 2da or nil.
 function M.GetCached2da(twoda)

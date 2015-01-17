@@ -12,7 +12,7 @@ local Creature = M.Creature
 -- @section
 
 --- Check if a creature is using a given action mode
--- @param mode solstice.nwn.ACTION_MODE_*
+-- @param mode ACTION_MODE_*
 function Creature:GetActionMode(mode)
    NWE.StackPushInteger(mode)
    NWE.StackPushObject(self)
@@ -37,10 +37,10 @@ function Creature:GetIsBlind()
 end
 
 --- Determines if a creature is flanked.
--- @param target Attacker
-function Creature:GetIsFlanked(target)
+-- @param vs Attacker
+function Creature:GetIsFlanked(vs)
    if not target:GetIsValid() then return false end
-   return C.nwn_GetFlanked(self.obj, target.obj)
+   return C.nwn_GetFlanked(self.obj, vs.obj)
 end
 
 --- Determines if a creature is flatfooted
@@ -72,7 +72,7 @@ function Creature:GetIsResting()
 end
 
 --- Sets the status of an action mode on a creature
--- @param mode solstice.nwn.ACTION_MODE_*
+-- @param mode ACTION_MODE_*
 -- @bool status New value.
 function Creature:SetActionMode(mode, status)
    NWE.StackPushBoolean(status)

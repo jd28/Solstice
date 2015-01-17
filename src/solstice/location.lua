@@ -5,7 +5,6 @@
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Vec = require 'solstice.vector'
-local Obj = require 'solstice.object'
 local Eff = require 'solstice.effect'
 
 local M = {}
@@ -20,9 +19,9 @@ M.location_t = ffi.metatype("CScriptLocation",
 -- Aliased globally as LOCATION_INVALID.
 M.INVALID = M.location_t(Vec.vector_t(0,0,0),
                          Vec.vector_t(0,0,0),
-                         Obj.INVALID.id)
+                         OBJECT_INVALID.id)
 
---- Creation Functions
+--- Functions
 -- @section
 
 --- Create a new location
@@ -38,13 +37,13 @@ function M.Create(position, orientation, area)
 end
 
 --- Convert string to location.
--- Format: "<area_tag> (<x>, <y>, <z>) <orientation>"
+-- Format: "area_tag (x, y, z) orientation"
 -- @string str String
 -- @return Location instance.
 function M.FromString(str)
    local area, x, y, z, orient = string.match(str, "([%w_]+) %(([%d%.]+), ([%d%.]+), ([%d%.]+)%) ([%d%.]+)")
-   area = Obj.GetByTag(area)
-   local pos = vector_t(x, y, z)
+   area = Game.GetObjectByTag(area)
+   local pos = Vec.vector_t(x, y, z)
 
    return M.Create(pos, orient, area)
 end

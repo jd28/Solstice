@@ -1,5 +1,6 @@
 --- NWNX Events
 -- @module nwnx.events
+-- @alias M
 
 local Vec = require 'solstice.vector'
 local Log = System.GetLogger()
@@ -44,11 +45,11 @@ M.LANGUAGE_CHINESE_SIMPLIFIED  = 130
 M.LANGUAGE_JAPANESE            = 131
 
 --- Event Info Table
--- @class table NWNXEventInfo
+-- @table NWNXEventInfo
 -- @field type Event type
--- @field type Event subtype
--- @field type Event target or solstice.object.INVALID
--- @field item Event item or solstice.object.INVALID
+-- @field subtype Event subtype
+-- @field target Event target or OBJECT_INVALID
+-- @field item Event item or OBJECT_INVALID
 -- @field pos Event location vector
 
 --- Gets information about the current event.
@@ -70,22 +71,22 @@ function M.GetEventInfo()
 end
 
 --- Bypass current event.
--- @param use_return_val If true this tells the plugin to use a value
---    passed via M.SetEventReturnValue. (Default: false)
+-- @param[opt=false] use_return_val If true this tells the plugin to use a value
+-- passed via M.SetEventReturnValue.
 function M.BypassEvent(use_return_val)
    if not mod then mod = Game.GetModule() end
 
    if not use_return_val then
       mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
    else
-      mod:SetLocalString("NWNX!EVENTS!BYPASS", "11")
+      mod:SetLocalString("NWNX!EVENTS!BYPASS", "1~1")
    end
 end
 
 --- Register NWNXEvent event handler.
 -- @param event_type M.EVENT_TYPE_*
 -- @param f A function to handle the event.  When the event fires the function will
---    be called with one paramenter a NWNXEventInfo table.
+-- be called with one paramenter a NWNXEventInfo table.
 function M.RegisterEventHandler(event_type, f)
    EVENT_HANDLERS[event_type] = f
 end
@@ -94,8 +95,8 @@ end
 -- TODO FIX THIS
 -- @param obj_type
 -- @param f A function to handle the event.  When the event fires the function will
---    be called with two parameters the object and a boolean indicating whether the object
---    is identified or not..
+-- be called with two parameters the object and a boolean indicating whether the object
+-- is identified or not..
 function M.RegisterExamineEventHandler(obj_type, f)
    EXAMINE_HANDLERS[obj_type] = f
 end
@@ -108,36 +109,42 @@ function M.SetEventReturnValue(val)
    mod:SetLocalString("NWNX!EVENTS!RETURN", tostring(val));
 end
 
+--- Get current conversation node type.
 function M.GetCurrentNodeType()
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_TYPE", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_TYPE"))
 end
 
+--- TODO
 function M.GetCurrentNodeID()
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_ID"))
 end
 
+--- TODO
 function M.GetCurrentAbsoluteNodeID()
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID"))
 end
 
+--- TODO
 function M.GetSelectedNodeID()
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID"))
 end
 
+--- TODO
 function M.GetSelectedAbsoluteNodeID()
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID", "      ")
    return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID"))
 end
 
+--- TODO
 function M.GetSelectedNodeText(nLangID, nGender)
    if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
@@ -145,6 +152,7 @@ function M.GetSelectedNodeText(nLangID, nGender)
    return mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT")
 end
 
+--- TODO
 function M.GetCurrentNodeText(nLangID, nGender)
    if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
@@ -152,6 +160,7 @@ function M.GetCurrentNodeText(nLangID, nGender)
    return mod:GetLocalString("NWNX!EVENTS!GET_NODE_TEXT")
 end
 
+--- TODO
 function M.SetCurrentNodeText(sText, nLangID, nGender)
    if not mod then mod = Game.GetModule() end
    if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
