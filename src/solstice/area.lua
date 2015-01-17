@@ -78,19 +78,16 @@ function Area:GetObjectAtIndex(idx)
    return OBJECT_INVALID
 end
 
-
-local function area_objs_gen(max, state)
-   if state >= max then return nil end
-   return state + 1, _SOL_GET_CACHED_OBJECT(self.obj.area_objects[state])
-end
-
-local function area_objs(max)
-   return area_objs_gen, max, 0
-end
-
---- LuaFun iterator returning all objects in a specified area.
+--- Iterator returning all objects in a specified area.
 function Area:Objects()
-   return iter(area_objs(self.obj.area_objects_len))
+   local i = 0
+   return function()
+      local obj = self:GetObjectIndex(i)
+      if obj:GetIsValid() then
+         i = i + 1
+         return obj
+      end
+   end
 end
 
 --- Changes the ambient soundtracks of an area.
