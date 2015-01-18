@@ -12,7 +12,7 @@ local lshift = bit.lshift
 local bor    = bit.bor
 local band   = bit.band
 local sm     = string.strip_margin
-
+local GetObjectByID = Game.GetObjectByID
 local NWE = require 'solstice.nwn.engine'
 
 local Creature = M.Creature
@@ -73,7 +73,7 @@ end
 function Creature:GetAttackTarget()
    if not self:GetIsValid() then return OBJECT_INVALID end
    local obj = self.obj.cre_attack_target
-   return _SOL_GET_CACHED_OBJECT(obj)
+   return GetObjectByID(obj)
 end
 
 --- Get creature's attempted attack target
@@ -132,7 +132,7 @@ function Creature:GetGoingToBeAttackedBy()
    if not self:GetIsValid() then return OBJECT_INVALID end
 
    local obj = self.obj.cre_attacker
-   return _SOL_GET_CACHED_OBJECT(obj)
+   return GetObjectByID(obj)
 end
 
 --- Determines if creature is in combat.
@@ -157,14 +157,14 @@ end
 function Creature:GetLastTrapDetected()
    if not self:GetIsValid() then return OBJECT_INVALID end
    local obj = self.obj.cre_last_trap_detected
-   return _SOL_GET_CACHED_OBJECT(obj)
+   return GetObjectByID(obj)
 end
 
 --- Get's last weapon used by creature.
 function Creature:GetLastWeaponUsed()
    if not self:GetIsValid() then return OBJECT_INVALID end
    local obj = self.obj.obj.obj_last_attack_weapon
-   return _SOL_GET_CACHED_OBJECT(obj)
+   return GetObjectByID(obj)
 end
 
 --- Determines creatures maximum attack range.
@@ -563,7 +563,7 @@ end
 local function UpdateCombatWeaponInfo(self)
    local weap
    for i = 0, EQUIP_TYPE_NUM - 1 do
-      weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
+      weap = GetObjectByID(self.ci.equips[i].id)
       if weap:GetIsValid() or i == EQUIP_TYPE_UNARMED then
 
          self.ci.equips[i].ab_mod         = Rules.GetWeaponAttackBonus(self, weap)
@@ -741,7 +741,7 @@ function Creature:UpdateCombatInfo(all)
          UpdateAmmoDamage(self)
       end
       for i = 0, EQUIP_TYPE_NUM - 1 do
-         local weap = _SOL_GET_CACHED_OBJECT(self.ci.equips[i].id)
+         local weap = GetObjectByID(self.ci.equips[i].id)
          UpdateCriticalDamage(self, i, weap)
       end
    end

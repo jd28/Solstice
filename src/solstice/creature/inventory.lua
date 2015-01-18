@@ -9,6 +9,7 @@ local ffi = require 'ffi'
 local C   = ffi.C
 local NWE = require 'solstice.nwn.engine'
 local Creature = M.Creature
+local GetObjectByID = Game.GetObjectByID
 
 --- Inventory
 -- @section
@@ -82,7 +83,7 @@ function Creature:GetItemInSlot(slot)
       return OBJECT_INVALID
    end
 
-   return _SOL_GET_CACHED_OBJECT(self.obj.cre_equipment.equips[slot])
+   return GetObjectByID(self.obj.cre_equipment.equips[slot])
 end
 
 --- Determines a weapons weapon size relative to a creature.

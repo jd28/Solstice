@@ -6,6 +6,7 @@ local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Vec = require 'solstice.vector'
 local Object = M.Object
+local GetObjectByID = Game.GetObjectByID
 
 -- TODO: Move this...
 ffi.cdef [[
@@ -27,7 +28,7 @@ end
 function Object:GetSpellCastAtCaster()
    if not self:GetIsValid() then return M.INVALID end
    local o = self.obj.obj.obj_last_spell_castat_caster
-   return _SOL_GET_CACHED_OBJECT(o)
+   return GetObjectByID(o)
 end
 
 --- Determine if the last spell cast at object is harmful
@@ -69,7 +70,7 @@ function Object:GetSpellCastItem()
       return M.INVALID
    end
    local o = self.obj.cre_item_spell_item
-   return _SOL_GET_CACHED_OBJECT(o)
+   return GetObjectByID(o)
 end
 
 --- Get spell resitance.
@@ -107,5 +108,5 @@ end
 function Object:GetSpellTargetObject()
    if not self:GetIsValid() then return M.INVALID end
    local o = self.obj.obj.obj_last_spell_target
-   return _SOL_GET_CACHED_OBJECT(o)
+   return GetObjectByID(o)
 end

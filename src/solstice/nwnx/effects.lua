@@ -21,6 +21,7 @@ require 'solstice.nwn.ctypes.effect'
 local ffi = require 'ffi'
 local C = ffi.C
 local Eff = require 'solstice.effect'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 
@@ -53,7 +54,7 @@ function NWNXEffects_HandleEffectEvent()
    local ev = C.Local_GetLastEffectEvent()
    if ev == nil then return 0 end
 
-   local obj = _SOL_GET_CACHED_OBJECT(ev.obj.obj_id)
+   local obj = GetObjectByID(ev.obj.obj_id)
 
    local h = EFF_HANDLERS[ev.eff.eff_integers[0]]
    if not h then return 0 end

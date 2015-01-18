@@ -4,11 +4,11 @@
 --- Class Area
 -- @section area
 
-
 local NWE = require 'solstice.nwn.engine'
 local ffi = require 'ffi'
 local C = ffi.C
 local Obj = require 'solstice.object'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 local Area = inheritsFrom({}, Obj.Object)
@@ -73,7 +73,7 @@ end
 function Area:GetObjectAtIndex(idx)
    if not self:GetIsValid() then return OBJECT_INVALID end
    if idx >= 0 and idx < self.obj.area_objects_len then
-      return _SOL_GET_CACHED_OBJECT(self.obj.area_objects[idx])
+      return GetObjectByID(self.obj.area_objects[idx])
    end
    return OBJECT_INVALID
 end

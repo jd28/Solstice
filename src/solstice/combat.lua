@@ -3,6 +3,7 @@ local C = ffi.C
 local bit = require 'bit'
 local fmt = string.format
 local sm = string.strip_margin
+local GetObjectByID = Game.GetObjectByID
 
 local Attack = safe_require 'solstice.attack'
 ---
@@ -28,7 +29,7 @@ end
 --- Bridge functions.
 
 function NWNXSolstice_GetCriticalHitMultiplier(attacker, is_offhand)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
+   attacker = GetObjectByID(attacker)
    if not attacker:GetIsValid() then return 0 end
    attacker:UpdateCombatInfo(true)
    local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
@@ -40,7 +41,7 @@ function NWNXSolstice_GetCriticalHitMultiplier(attacker, is_offhand)
 end
 
 function NWNXSolstice_GetCriticalHitRoll(attacker, is_offhand)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
+   attacker = GetObjectByID(attacker)
    if not attacker:GetIsValid() then return 0 end
    attacker:UpdateCombatInfo(true)
    local equip = is_offhand and EQUIP_TYPE_OFFHAND or EQUIP_TYPE_ONHAND
@@ -52,20 +53,20 @@ function NWNXSolstice_GetCriticalHitRoll(attacker, is_offhand)
 end
 
 function NWNXSolstice_InitializeNumberOfAttacks(cre)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    if not cre:GetIsValid() then return end
    Rules.InitializeNumberOfAttacks(cre)
 end
 
 function NWNXSolstice_UpdateCombatInfo(attacker)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
+   attacker = GetObjectByID(attacker)
    attacker:UpdateCombatInfo(true)
 end
 
 -- This function is called by others get worst faction AC...
 function NSGetArmorClassVersus(target, attacker, touch)
-   attacker = _SOL_GET_CACHED_OBJECT(attacker)
-   target = _SOL_GET_CACHED_OBJECT(target)
+   attacker = GetObjectByID(attacker)
+   target = GetObjectByID(target)
    return target:GetACVersus(attacker, touch)
 end
 
@@ -78,8 +79,8 @@ function NSGetAttackModifierVersus(attacker, target, attack_info, attack_type)
 end
 
 function NSSavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
-   vs = _SOL_GET_CACHED_OBJECT(vs)
+   cre = GetObjectByID(cre)
+   vs = GetObjectByID(vs)
 
    return cre:SavingThrowRoll(cre, save_type, dc, immunity_type, vs, send_feedback, feat, from_combat)
 end

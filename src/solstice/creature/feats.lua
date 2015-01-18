@@ -6,6 +6,7 @@ local C   = ffi.C
 
 local M = require 'solstice.creature.init'
 local Creature = M.Creature
+local GetObjectByID = Game.GetObjectByID
 
 --- Feats
 -- @section
@@ -245,6 +246,6 @@ function Creature:SetKnownFeatByLevel(level, index, feat)
 end
 
 function NWNXSolstice_GetRemainingFeatUses(feat, cre)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    return cre:GetRemainingFeatUses(feat)
 end

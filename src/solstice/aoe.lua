@@ -5,6 +5,7 @@
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 
@@ -62,7 +63,7 @@ end
 -- @return The creator or OBJECT_INVALID.
 function AoE:GetCreator()
    if not self:GetIsValid() then return OBJECT_INVALID end
-   return _SOL_GET_CACHED_OBJECT(self.obj.aoe_creator)
+   return GetObjectByID(self.obj.aoe_creator)
 end
 
 --- Sets AoEs spell DC.

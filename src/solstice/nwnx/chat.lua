@@ -31,12 +31,12 @@ function NWNXChat_HandleChatMessage()
    if msg.to ~= 0xffffffff then
       local pl = C.nwn_GetPlayerByPlayerID(msg.to)
       if pl ~= nil then
-         to = _SOL_GET_CACHED_OBJECT(pl.obj_id)
+         to = Game.GetObjectByID(pl.obj_id)
       end
    end
 
    msg.suppress = CHAT_HANDLER(msg.channel,
-			       _SOL_GET_CACHED_OBJECT(msg.from),
+			       Game.GetObjectByID(msg.from),
 			       ffi.string(msg.msg),
 			       to)
    return msg.suppress

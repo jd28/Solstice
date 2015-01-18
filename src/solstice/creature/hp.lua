@@ -3,6 +3,7 @@
 
 local M = require 'solstice.creature.init'
 local Creature = M.Creature
+GetObjectByID = Game.GetObjectByID
 
 --- Hitpoints
 -- @section hitpoints
@@ -41,7 +42,7 @@ function Creature:GetMaxHitPoints()
 end
 
 function NWNXSolstice_GetMaxHitpoints(id)
-   local cre = _SOL_GET_CACHED_OBJECT(id)
+   local cre = GetObjectByID(id)
    if not cre:GetIsValid() then return 0 end
    return cre:GetMaxHitPoints()
 end

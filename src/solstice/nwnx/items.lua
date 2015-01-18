@@ -18,6 +18,7 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 local EVENT_HANDLERS = {}
@@ -109,7 +110,7 @@ end
 -- @param result Integer value dependent on the event firing.
 function M.SetResult(result)
    current_event.use_result = true
-   current_event.result = result
+   current_event.result = result and 1 or 0
 end
 
 function NWNXItems_HandleItemEvent()
@@ -123,8 +124,8 @@ function NWNXItems_HandleItemEvent()
    if not f then return false end
 
    current_event = ev
-   local cre  = _SOL_GET_CACHED_OBJECT(ev.object)
-   local item = _SOL_GET_CACHED_OBJECT(ev.item)
+   local cre  = GetObjectByID(ev.object)
+   local item = GetObjectByID(ev.item)
 
    f(item, cre, ev.type)
 
@@ -143,8 +144,8 @@ function NWNXItems_HandleItemPropEvent()
    if not f then return false end
 
    current_event = ev
-   local cre  = _SOL_GET_CACHED_OBJECT(ev.obj)
-   local item = _SOL_GET_CACHED_OBJECT(ev.item)
+   local cre  = GetObjectByID(ev.obj)
+   local item = GetObjectByID(ev.item)
    f(item, cre, ev.ip, ev.slot)
 
    current_event = nil

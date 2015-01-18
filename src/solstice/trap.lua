@@ -7,6 +7,7 @@
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 
@@ -16,7 +17,7 @@ M.Trap = {}
 M.trap_t = ffi.metatype("Trap", { __index = M.Trap })
 
 local function trap_get_obj(trap)
-   local ob = _SOL_GET_CACHED_OBJECT(trap.id)
+   local ob = GetObjectByID(trap.id)
    if not anyinstance(trap, Door, Placeable, Trigger) then
       error "Invalid type!"
    end

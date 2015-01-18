@@ -6,6 +6,7 @@ local C = ffi.C
 local random = math.random
 local floor  = math.floor
 local min    = math.min
+local GetObjectByID = Game.GetObjectByID
 
 local bit    = require 'bit'
 local bor    = bit.bor
@@ -114,7 +115,7 @@ local function GetCurrentWeapon(info, attacker)
    local n = info.weapon
    if n >= 0 and n <= 5 then
       local id = attacker.ci.equips[n].id
-      return _SOL_GET_CACHED_OBJECT(id)
+      return GetObjectByID(id)
    end
    return OBJECT_INVALID
 end
@@ -1051,8 +1052,8 @@ local info, attacker, target
 
 function NWNXSolstice_ResolvePreAttack(attacker_, target_)
    info     = C.Local_GetAttack();
-   attacker = _SOL_GET_CACHED_OBJECT(attacker_)
-   target   = _SOL_GET_CACHED_OBJECT(target_)
+   attacker = GetObjectByID(attacker_)
+   target   = GetObjectByID(target_)
 
    info.attacker_ci = attacker.ci
 

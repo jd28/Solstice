@@ -8,6 +8,7 @@ local jit = require 'jit'
 local M = require 'solstice.creature.init'
 local NWE = require 'solstice.nwn.engine'
 local Creature = M.Creature
+local GetObjectByID = Game.GetObjectByID
 
 --- Modes
 -- @section level
@@ -110,6 +111,6 @@ jit.off(Creature.SetCombatMode)
 -- @param mode solstice.modes type constant.
 -- @param change If false the combat mode is already active.
 function NSSetCombatMode(cre, mode, change)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    cre:SetCombatMode(mode, change)
 end

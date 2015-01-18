@@ -5,6 +5,7 @@
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 local Obj = require 'solstice.object'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 
@@ -23,7 +24,7 @@ function Module:Areas()
    return function ()
       while i < self.obj.mod_areas_len do
          _i, i = i, i + 1
-         return _SOL_GET_CACHED_OBJECT(self.obj.mod_areas[_i])
+         return GetObjectByID(self.obj.mod_areas[_i])
       end
    end
 end

@@ -8,12 +8,13 @@ local ffi = require 'ffi'
 local jit = require 'jit'
 local MODES = {}
 local M = require 'solstice.rules.init'
+GetObjectByID = Game.GetObjectByID
 
 -- Internal toggle mode function
 -- @param cre Creature to toggle mode on
 -- @param mode ACTION_MODE_*
 function NSToggleMode(cre, mode)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    if not cre:GetIsValid() then return false end
 
    local bypass = true

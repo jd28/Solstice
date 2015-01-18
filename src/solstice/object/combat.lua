@@ -7,6 +7,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local min    = math.min
 local max    = math.max
+local GetObjectByID = Game.GetObjectByID
 
 local bit    = require 'bit'
 
@@ -59,7 +60,7 @@ function Object:GetLastAttacker()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_attacker
 
-   return _SOL_GET_CACHED_OBJECT(actor)
+   return GetObjectByID(actor)
 end
 
 --- Get the object which last damaged a creature or placeable object.
@@ -67,7 +68,7 @@ function Object:GetLastDamager()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_damager
 
-   return _SOL_GET_CACHED_OBJECT(actor)
+   return GetObjectByID(actor)
 end
 
 --- Gets the object's killer.
@@ -76,7 +77,7 @@ function Object:GetKiller()
    if not self:GetIsValid() then return M.INVALID end
 
    local actor = self.obj.obj.obj_killer
-   return _SOL_GET_CACHED_OBJECT(actor)
+   return GetObjectByID(actor)
 end
 
 --- Gets the last living, non plot creature that performed a
@@ -86,7 +87,7 @@ function Object:GetLastHostileActor()
    if not self:GetIsValid() then return M.INVALID end
    local actor = self.obj.obj.obj_last_hostile_actor
 
-   return _SOL_GET_CACHED_OBJECT(actor)
+   return GetObjectByID(actor)
 end
 
 --- Set's an object's hardness.q
@@ -372,16 +373,16 @@ end
 -- Bridge functions.
 
 function NWNXSolstice_DoDamageImmunity(obj, vs, amt, dmgidx, no_feedback)
-   obj = _SOL_GET_CACHED_OBJECT(obj)
-   vs = _SOL_GET_CACHED_OBJECT(vs)
+   obj = GetObjectByID(obj)
+   vs = GetObjectByID(vs)
    local new, adj = obj:DoDamageImmunity(amt, dmgidx)
 
    return new
 end
 
 function NWNXSolstice_DoDamageReduction(obj, vs, amt, power, no_feedback)
-   obj = _SOL_GET_CACHED_OBJECT(obj)
-   vs = _SOL_GET_CACHED_OBJECT(vs)
+   obj = GetObjectByID(obj)
+   vs = GetObjectByID(vs)
 
    local start = 0
    if obj.type == OBJECT_TRUETYPE_CREATURE
@@ -398,8 +399,8 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amt, power, no_feedback)
 end
 
 function NWNXSolstice_DoDamageResistance(obj, vs, amt, dmgidx, no_feedback)
-   obj = _SOL_GET_CACHED_OBJECT(obj)
-   vs = _SOL_GET_CACHED_OBJECT(vs)
+   obj = GetObjectByID(obj)
+   vs = GetObjectByID(vs)
 
    local start = 0
    if obj.type == OBJECT_TRUETYPE_CREATURE

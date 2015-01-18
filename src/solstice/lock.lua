@@ -5,6 +5,7 @@
 
 local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 M.Lock = {}
@@ -13,7 +14,7 @@ M.Lock = {}
 M.lock_t = ffi.metatype("Lock", { __index = M.Lock })
 
 local function lock_get_obj(lock)
-   local obj = _SOL_GET_CACHED_OBJECT(lock.id)
+   local obj = GetObjectByID(lock.id)
    if not anyinstance(obj, Door, Placeable) then
       error "Invalid type"
    end

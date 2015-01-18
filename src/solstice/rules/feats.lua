@@ -6,6 +6,7 @@
 
 local M = require 'solstice.rules.init'
 local C = require('ffi').C
+local GetObjectByID = Game.GetObjectByID
 
 local TDA = require 'solstice.2da'
 local TLK = require 'solstice.tlk'
@@ -51,7 +52,7 @@ function M.GetFeatSuccessors(feat)
 end
 
 function NWNXSolstice_GetMaximumFeatUses(feat, cre)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    return M.GetMaximumFeatUses(feat, cre)
 end
 

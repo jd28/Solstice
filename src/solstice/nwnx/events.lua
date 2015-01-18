@@ -4,6 +4,7 @@
 
 local Vec = require 'solstice.vector'
 local Log = System.GetLogger()
+local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 
@@ -63,9 +64,9 @@ function M.GetEventInfo()
 
    return { type = e.type,
             subtype = e.subtype,
-            object = _SOL_GET_CACHED_OBJECT(e.object),
-            target = _SOL_GET_CACHED_OBJECT(e.target),
-            item = _SOL_GET_CACHED_OBJECT(e.item),
+            object = GetObjectByID(e.object),
+            target = GetObjectByID(e.target),
+            item = GetObjectByID(e.item),
             pos = Vec.vector_t(e.loc.x, e.loc.y, e.loc.z)
           }
 end
@@ -186,7 +187,7 @@ function NWNXEvents_HandleEvent(event_type)
 end
 
 function NWNXEvents_HandleExamineEvent(obj, identified)
-   obj = _SOL_GET_CACHED_OBJECT(obj)
+   obj = GetObjectByID(obj)
    identified = identified or true
 
    if not obj:GetIsValid() then return "" end

@@ -1,6 +1,7 @@
 local TDA = require 'solstice.2da'
 local ffi = require 'ffi'
 local C   = ffi.C
+local GetObjectByID = Game.GetObjectByID
 
 local Eff = require 'solstice.effect'
 
@@ -26,7 +27,7 @@ jit.off(postpoly)
 jit.off(CreateItemAndEquip)
 
 function NWNXSolstice_Polymorph(cre, polyid, ignore_pos)
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    local poly_2da = C.Local_GetPoly2da()
    local poly_eff = C.Local_GetPolyEffect()
 
@@ -202,7 +203,7 @@ end
 
 function NWNXSolstice_Unpolymorph(cre)
    print("NWNXSolstice_Unpolymorph")
-   cre = _SOL_GET_CACHED_OBJECT(cre)
+   cre = GetObjectByID(cre)
    local poly_eff = C.Local_GetPolyEffect()
 
    if cre.obj.cre_is_poly == 0 then return end
@@ -249,7 +250,7 @@ function NWNXSolstice_Unpolymorph(cre)
 
    for i=0, 17 do
       if cre.obj.cre_poly_item_id[i] ~= OBJECT_INVALID.id then
-         local it = _SOL_GET_CACHED_OBJECT(cre.obj.cre_poly_item_id[i])
+         local it = GetObjectByID(cre.obj.cre_poly_item_id[i])
          equip(cre, it, i)
          cre.obj.cre_poly_item_id[i] = OBJECT_INVALID.id
       end

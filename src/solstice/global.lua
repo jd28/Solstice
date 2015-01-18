@@ -14,9 +14,9 @@ require 'solstice.ctypes'
 
 -- Global modules
 System   = require 'solstice.system'
+Game     = require 'solstice.game'
 Effect   = require 'solstice.effect'
 ItemProp = require 'solstice.itemprop'
-Game     = require 'solstice.game'
 Rules    = require 'solstice.rules'
 
 local Obj       = require 'solstice.object'
