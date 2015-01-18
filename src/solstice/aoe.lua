@@ -15,7 +15,7 @@ M.aoe_t = ffi.metatype("AoE", { __index = AoE })
 --- Class AoE
 -- @section
 
---- Gets the first object in an AoE.
+-- Gets the first object in an AoE.
 -- Perfer the AoE:ObjectsInEffect iterator.
 -- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT_TYPE_* mask.
 -- @return Next object in AoE and finally OBJECT_INVALID
@@ -29,7 +29,7 @@ function AoE:GetFirstInPersistentObject(object_mask)
    return NWE.StackPopObject()
 end
 
---- Gets the next object in an AoE.
+-- Gets the next object in an AoE.
 -- Perfer the AoE:ObjectsInEffect iterator.
 -- @param[opt=OBJECT_TYPE_CREATURE] object_mask OBJECT_TYPE_* mask.
 -- @return Next object in AoE and finally OBJECT_INVALID
@@ -66,6 +66,7 @@ function AoE:GetCreator()
 end
 
 --- Sets AoEs spell DC.
+-- @param dc Sets spell DC
 function AoE:SetSpellDC(dc)
    if not self:GetIsValid() then return -1 end
    self.obj.aoe_spell_dc = dc
@@ -73,9 +74,9 @@ function AoE:SetSpellDC(dc)
 end
 
 --- Sets AoEs spell level.
+-- @param level Spell level.
 function AoE:SetSpellLevel(level)
    if not self:GetIsValid() then return -1 end
-
    self.obj.aoe_spell_level = level
    return self.obj.aoe_spell_level
 end

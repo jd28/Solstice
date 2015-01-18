@@ -15,7 +15,7 @@
 -- * 'LL_SPGN[Spell Level]\_[Nth spell]': Spells removed at each spell level.
 -- Value: SPELL_* + 1
 -- * 'LL_SPRM[Spell Level]\_USED': Number of spells removes at spell
--- * 'LL_SPRM1[Spell Level]\_[Nth spell]': Spells removed at each spell level.
+-- * 'LL_SPRM[Spell Level]\_[Nth spell]': Spells removed at each spell level.
 -- Value: SPELL_* + 1
 --
 -- Notes:
