@@ -1,0 +1,16 @@
+2DA V2.0
+
+      ID                                   
+0     ACTION_MODE_DETECT                   
+1     ACTION_MODE_STEALTH                  
+2     ACTION_MODE_PARRY                    
+3     ACTION_MODE_POWER_ATTACK             
+4     ACTION_MODE_IMPROVED_POWER_ATTACK    
+5     ACTION_MODE_COUNTERSPELL             
+6     ACTION_MODE_FLURRY_OF_BLOWS          
+7     ACTION_MODE_RAPID_SHOT               
+8     ACTION_MODE_EXPERTISE                
+9     ACTION_MODE_IMPROVED_EXPERTISE       
+10    ACTION_MODE_DEFENSIVE_CAST           
+11    ACTION_MODE_DIRTY_FIGHTING           
+12    ACTION_MODE_DEFENSIVE_STANCE         

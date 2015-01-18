@@ -1,0 +1,16 @@
+2DA V2.0
+
+      ID                         Mask    ID_INDEX                    Name        R      G      B      
+0     DAMAGE_TYPE_BLUDGEONING    1       DAMAGE_INDEX_BLUDGEONING    16877374    254    102    32     
+1     DAMAGE_TYPE_PIERCING       2       DAMAGE_INDEX_PIERCING       16877375    254    102    32     
+2     DAMAGE_TYPE_SLASHING       4       DAMAGE_INDEX_SLASHING       16877376    254    102    32     
+3     DAMAGE_TYPE_MAGICAL        8       DAMAGE_INDEX_MAGICAL        16877377    204    119    254    
+4     DAMAGE_TYPE_ACID           16      DAMAGE_INDEX_ACID           16877378    32     254    32     
+5     DAMAGE_TYPE_COLD           32      DAMAGE_INDEX_COLD           16877379    153    254    254    
+6     DAMAGE_TYPE_DIVINE         64      DAMAGE_INDEX_DIVINE         16877380    254    254    32     
+7     DAMAGE_TYPE_ELECTRICAL     128     DAMAGE_INDEX_ELECTRICAL     16877381    32     102    254    
+8     DAMAGE_TYPE_FIRE           256     DAMAGE_INDEX_FIRE           16877382    254    32     32     
+9     DAMAGE_TYPE_NEGATIVE       512     DAMAGE_INDEX_NEGATIVE       16877383    153    153    153    
+10    DAMAGE_TYPE_POSITIVE       1024    DAMAGE_INDEX_POSITIVE       16877384    254    254    254    
+11    DAMAGE_TYPE_SONIC          2048    DAMAGE_INDEX_SONIC          16877385    254    153    32     
+12    DAMAGE_TYPE_BASE_WEAPON    4096    DAMAGE_INDEX_BASE_WEAPON    16877386    254    102    32     

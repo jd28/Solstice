@@ -1,0 +1,7 @@
+2DA V2.0
+
+     ID                        Flag                           Value    
+0    SITUATION_COUPDEGRACE     SITUATION_FLAG_COUPDEGRACE     1        
+1    SITUATION_SNEAK_ATTACK    SITUATION_FLAG_SNEAK_ATTACK    2        
+2    SITUATION_DEATH_ATTACK    SITUATION_FLAG_DEATH_ATTACK    4        
+3    SITUATION_NUM             ****                           ****     

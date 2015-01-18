@@ -1,0 +1,14 @@
+2DA V2.0
+
+      ID                                     Value    
+0     COMBAT_TARGET_STATE_BLIND              1        
+1     COMBAT_TARGET_STATE_ATTACKER_INVIS     2        
+2     COMBAT_TARGET_STATE_UNSEEN             4        
+3     COMBAT_TARGET_STATE_MOVING             8        
+4     COMBAT_TARGET_STATE_PRONE              16       
+5     COMBAT_TARGET_STATE_STUNNED            32       
+6     COMBAT_TARGET_STATE_FLANKED            64       
+7     COMBAT_TARGET_STATE_FLATFOOTED         128      
+8     COMBAT_TARGET_STATE_ASLEEP             256      
+9     COMBAT_TARGET_STATE_ATTACKER_UNSEEN    512      
+10    COMBAT_TARGET_STATE_INVIS              1024     

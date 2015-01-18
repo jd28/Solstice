@@ -1,0 +1,11 @@
+2DA V2.0
+
+     ID                      
+0    RANGED_TYPE_INVALID     
+1    RANGED_TYPE_BOW         
+2    RANGED_TYPE_CROSSBOW    
+3    RANGED_TYPE_THROWAXE    
+4    RANGED_TYPE_SLING       
+5    RANGED_TYPE_DART        
+6    RANGED_TYPE_SHURIKEN    
+7    RANGED_TYPE_NUM         
