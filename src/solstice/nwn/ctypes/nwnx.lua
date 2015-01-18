@@ -42,7 +42,7 @@ typedef struct {
     uint32_t object;
     uint32_t item;
     bool     use_result;
-    int32_t  result;
+    uint32_t  result;
 } ItemEvent;
 
 typedef struct {
