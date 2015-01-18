@@ -47,8 +47,41 @@ function Object:GetName(original)
 end
 
 --- Get object's type
+-- @return OBJECT_TYPE_* or OBJECT_TYPE_NONE
 function Object:GetType()
-   return self.type
+   local ret = OBJECT_TYPE_NONE
+   if self.type == OBJECT_TRUETYPE_CREATURE then
+      ret = OBJECT_TYPE_CREATURE
+   elseif self.type == OBJECT_TRUETYPE_ITEM then
+      ret = OBJECT_TYPE_ITEM
+   elseif self.type == OBJECT_TRUETYPE_TRIGGER then
+      ret = OBJECT_TYPE_TRIGGER
+   elseif self.type == OBJECT_TRUETYPE_PLACEABLE then
+      ret = OBJECT_TYPE_PLACEABLE
+   elseif self.type == OBJECT_TRUETYPE_DOOR then
+      ret = OBJECT_TYPE_DOOR
+   elseif self.type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
+      ret = OBJECT_TYPE_AREA_OF_EFFECT
+   elseif self.type == OBJECT_TRUETYPE_WAYPOINT then
+      ret = OBJECT_TYPE_WAYPOINT
+   elseif self.type == OBJECT_TRUETYPE_ENCOUNTER then
+      ret = OBJECT_TYPE_ENCOUNTER
+   elseif self.type == OBJECT_TRUETYPE_STORE then
+      ret = OBJECT_TYPE_STORE
+   end
+   return ret
+end
+
+--- Checks object type.
+-- @param ... Any number of OBJECT_TYPE_* constants
+function Object:CheckType(...)
+   local t = self:GetType()
+   for _, v in ipairs({...}) do
+      if t == v then
+         return true
+      end
+   end
+   return false
 end
 
 --- Get plot flag
