@@ -68,11 +68,14 @@ end
 --- Iterator over objects by tag
 -- @param tag Tag of object
 function M.ObjectsByTag(tag)
-   local function f(n)
-      return M.GetObjectByTag(tag, n+1)
+   local i = 1
+   return function()
+      local obj = M.GetObjectByTag(tag, i)
+      if obj:GetIsValid() then
+         i = i + 1
+         return obj
+      end
    end
-
-   return take_while(function (x) return x ~= OBJECT_INVALID end, tabulate(f))
 end
 
 -- Gets first PC.

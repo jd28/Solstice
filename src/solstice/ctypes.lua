@@ -165,9 +165,9 @@ require 'solstice.nwn.ctypes.waypoint'
 -- @field is_killing Is killing blow.
 -- @field damage_total Total damage done.
 -- @field dmg_result DamageResult ctype.
+-- @field effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
+-- @field effects_to_remove_len;
 
-effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
-effects_to_remove_len;
 ffi.cdef(interp([[
 typedef struct {
    int32_t      dice;

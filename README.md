@@ -43,7 +43,6 @@ options.
 * nwnx_solstice
 * nwnx_nsevents (Temporary?)
 * nwnx_nschat (Temporary?)
-* [LuaFun](https://github.com/rtsisyk/luafun) (Consider removing?)
 
 ## git
 * `develop` is the branch with ongoing development.
@@ -109,7 +108,7 @@ This has a some side effects:
   since you don't have to rely on resref tags.
 * Solstice uses Luajit and its Foreign Function Interface (FFI) library.
   Therefore all game objects, data, etc are accessible and any C
-  library is easily to imported and used.  Some care does have to be
+  library is easily imported and used.  Some care does have to be
   taken since Luajit's FFI does not protect you, if you pass bad data
   into C your server _will_ segfault.
 * Access to a number of [Lua libraries](https://rocks.moonscript.org/).
@@ -135,6 +134,5 @@ This has a some side effects:
   with C(++) have indexes starting at 0.  This is sometimes confusing.
   Also, the C(++) underbelly is still rather visible in places.
 * The probability of this being ported to the client or Windows is 0%.
-* You need to be aware of the global exports from `solstice.util` and
-  LuaFun because you can clobber these with your own scripts, which
+* You need to be aware of the global exports from `solstice.util` because you can clobber these with your own scripts, which
   will introduce varying levels of breakage.

@@ -622,7 +622,7 @@ local function UpdateAmmoDamage(self)
 
    if not obj:GetIsValid() then return end
 
-   for _it, ip in obj:ItemProperties() do
+   for ip in obj:ItemProperties() do
       if ip:GetPropertyType() == ITEM_PROPERTY_DAMAGE_BONUS then
          local type = ip:GetPropertySubType()
          if type > 2 then type = type - 2 end
@@ -692,7 +692,7 @@ end
 
 local function UpdateCriticalDamage(self, equip_num, item)
    if item:GetIsValid() then
-      for _it, ip in item:ItemProperties() do
+      for ip in item:ItemProperties() do
          if ip:GetPropertyType() == ITEM_PROPERTY_MASSIVE_CRITICALS then
             local d, s, b = Rules.UnpackItempropDamageRoll(ip:GetCostTableValue())
             AddDamageToEquip(self, equip_num,

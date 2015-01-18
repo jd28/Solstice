@@ -1,9 +1,7 @@
 ----
 -- This module defines some extensions to Lua builtins and some utility
 -- functions into the global namespace.  It only ever needs to be
--- required in your `preload.lua`.  This module will also load the
--- LuaFun library into the global namespace, allowing its use without
--- explicitly requiring it.
+-- required in your `preload.lua`.
 -- @module util
 
 local ffi = require 'ffi'
@@ -13,22 +11,18 @@ local Color = require 'solstice.color'
 --- Utility Funcions
 -- @section util
 
-require 'fun' ()
-
---- An iterator over an integer range.
--- @param start Starting number.
--- @param[opt=1] step Amount to step each iteration.
-function irange(start, step)
-   step = step or 1
-   return tabulate(function(n) return start + step * n end)
-end
-
 function make_iter_valid(f1, f2)
-   local function it(n)
-      return n == 0 and f1() or f2()
+   local i = 0
+
+   local function it()
+      local obj = i == 0 and f1() or f2()
+      if obj:GetIsValid() then
+         i = i + 1
+         return obj
+      end
    end
 
-   return take_while(function (x) return x ~= OBJECT_INVALID end, tabulate(it))
+   return it
 end
 
 --- Creates a function with the first parameter bound.

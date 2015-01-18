@@ -202,7 +202,7 @@ local function default_dmg(cre, item)
       base == BASE_ITEM_LIGHTCROSSBOW
    then
       mighty_needed = true
-      for _it, ip in item:ItemProperties() do
+      for ip in item:ItemProperties() do
          if ip:GetPropertyType() == ITEM_PROPERTY_MIGHTY then
             mighty = ip:GetCostTableValue()
             break
@@ -389,7 +389,7 @@ local function GetWeaponPower(cre, item)
    if not item:GetIsValid() then return power end
 
    local eb = 0
-   for _it, ip in item:ItemProperties() do
+   for ip in item:ItemProperties() do
       if ip:GetPropertyType() == ITEM_PROPERTY_ENHANCEMENT_BONUS or
          ip:GetPropertyType() == ITEM_PROPERTY_ATTACK_BONUS
       then
@@ -615,7 +615,7 @@ local function GetWeaponCritRange(cre, item)
    end
 
    if item:GetIsValid() then
-      for _it, ip in item:ItemProperties() do
+      for ip in item:ItemProperties() do
          if ip:GetPropertyType() == ITEM_PROPERTY_KEEN then
             threat = threat + basethreat
             break
@@ -943,7 +943,7 @@ end
 local function GetCreatureDamageBonus(cre, item)
    local d, s, b = GetWeaponBaseDamage(BASE_ITEM_GLOVES, cre)
    if not item:GetIsValid() then return 0, 0, 0 end
-   for _it, ip in item:ItemProperties() do
+   for ip in item:ItemProperties() do
       if ip:GetPropertyType() == ITEM_PROPERTY_MONSTER_DAMAGE then
          d, s = UnpackItempropMonsterRoll(ip:GetCostTableValue())
          break

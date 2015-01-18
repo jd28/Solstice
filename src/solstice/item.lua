@@ -249,25 +249,32 @@ function Item:GetHasItemProperty(ip_type)
 end
 
 local function ignore_ip(ip)
-   return not (ip.eff.eff_is_exposed == 0 or
-               ip.eff.eff_type == EFFECT_TYPE_ICON or
-               (bit.band(ip.eff.eff_dursubtype, 0x7) ~= 1 and
-                bit.band(ip.eff.eff_dursubtype, 0x7) ~= 2))
+   return (ip.eff_is_exposed == 0 or
+           ip.eff_type == EFFECT_TYPE_ICON or
+           (bit.band(ip.eff_dursubtype, 0x7) ~= 1 and
+            bit.band(ip.eff_dursubtype, 0x7) ~= 2))
 end
-
-local function not_nil(x) return x ~= nil end
 
 local function get_next(self)
    local n = self.obj.obj.obj_effect_index
-   if n >= self.obj.obj.obj_effects_len then return end
-   self.obj.obj.obj_effect_index = n + 1
-   return IP.itemprop_t(self.obj.obj.obj_effects[n], true)
+   while n < self.obj.obj.obj_effects_len do
+      if not ignore_ip(self.obj.obj.obj_effects[n]) then
+         local ip = IP.itemprop_t(self.obj.obj.obj_effects[n], true)
+         n = n + 1
+         self.obj.obj.obj_effect_index = n
+         return ip
+      end
+      n = n + 1
+      self.obj.obj.obj_effect_index = n
+   end
 end
 
 --- Iterates over an items properties
 function Item:ItemProperties()
    self.obj.obj.obj_effect_index = 0
-   return filter(ignore_ip, take_while(not_nil, map(get_next, duplicate(self))))
+   return function()
+      return get_next(self)
+   end
 end
 
 --- Removes an item property
