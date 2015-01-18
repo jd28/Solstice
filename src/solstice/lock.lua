@@ -15,7 +15,7 @@ M.lock_t = ffi.metatype("Lock", { __index = M.Lock })
 
 local function lock_get_obj(lock)
    local obj = GetObjectByID(lock.id)
-   if not anyinstance(obj, Door, Placeable) then
+   if not obj:CheckType(OBJECT_TYPE_DOOR, OBJECT_TYPE_PLACEABLE) then
       error "Invalid type"
    end
    return obj

@@ -18,7 +18,9 @@ M.trap_t = ffi.metatype("Trap", { __index = M.Trap })
 
 local function trap_get_obj(trap)
    local ob = GetObjectByID(trap.id)
-   if not anyinstance(trap, Door, Placeable, Trigger) then
+   if not ob:CheckType(OBJECT_TYPE_DOOR, OBJECT_TYPE_PLACEABLE,
+                       OBJECT_TYPE_TRIGGER)
+   then
       error "Invalid type!"
    end
    return ob

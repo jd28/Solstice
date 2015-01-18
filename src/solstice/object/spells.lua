@@ -48,7 +48,7 @@ function Object:GetSpellCastClass()
    if not self:GetIsValid() then return -1 end
 
    local pos = self.obj.obj.obj_last_spell_multiclass
-   if isinstance(self, Creature)
+   if self:GetType() == OBJECT_TYPE_CREATURE
       and self.obj.cre_stats.cs_class_len > pos
    then
       return self.obj.cre_stats.cs_classes[pos].cl_class
@@ -66,7 +66,7 @@ end
 --- Get item of that last spell cast
 function Object:GetSpellCastItem()
    if not self:GetIsValid() then return nil end
-   if not isinstance(self, Creature) then
+   if not self:GetType() == OBJECT_TYPE_CREATURE then
       return M.INVALID
    end
    local o = self.obj.cre_item_spell_item
@@ -85,9 +85,9 @@ function Object:GetSpellSaveDC(spell)
 
    if not self:GetIsValid() then return dc end
 
-   if isinstance(self, Creature) then
+   if self:GetType() == OBJECT_TYPE_CREATURE then
       dc = ffi.C.nl_CalculateSpellDC(self, spell)
-   elseif isinstance(self, AoE) then
+   elseif self:GetType() == OBJECT_TYPE_AREA_OF_EFFECT then
       dc = self:GetSpellDC()
    end
 
