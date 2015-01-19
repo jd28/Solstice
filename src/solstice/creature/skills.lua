@@ -133,7 +133,7 @@ end
 --- Gets creature's skill rank.
 -- @param skill SKILL_*
 -- @param[opt] vs Versus
--- @bool base If true returns base skill rank.
+-- @bool[opt=false] base If true returns base skill rank.
 function Creature:GetSkillRank(skill, vs, base)
    if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
       return 0
