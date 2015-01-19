@@ -130,9 +130,11 @@ function Creature:GetSkillPoints()
    return self.obj.cre_stats.cs_skill_points
 end
 
--- Gets creature's skill rank.
+--- Gets creature's skill rank.
 -- @param skill SKILL_*
-function Creature:GetSkillRank(skill, vs, base, no_scale)
+-- @param[opt] vs Versus
+-- @bool base If true returns base skill rank.
+function Creature:GetSkillRank(skill, vs, base)
    if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
       return 0
    elseif self:GetIsDM() then
