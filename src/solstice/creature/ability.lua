@@ -9,6 +9,7 @@ local C = ffi.C
 
 local M = require 'solstice.creature.init'
 local Creature = M.Creature
+local floor = math.floor
 
 require 'solstice.effect'
 
@@ -35,7 +36,7 @@ function Creature:GetAbilityModifier(ability, base)
     local result = -1
 
     if base then
-        result = (self:GetAbilityScore(ability, base) - 10) / 2
+       result = floor((self:GetAbilityScore(ability, base) - 10) / 2)
     else
        if ability == ABILITY_STRENGTH then
           result = self.obj.cre_stats.cs_str_mod
@@ -80,7 +81,6 @@ function Creature:GetAbilityScore(ability, base)
    elseif ability == ABILITY_CHARISMA then
       result = self.obj.cre_stats.cs_cha
    end
-
    result = result + Rules.GetRaceAbilityBonus(self:GetRacialType(), ability)
 
    if not base then
