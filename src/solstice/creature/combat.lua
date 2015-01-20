@@ -540,6 +540,16 @@ local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)
    self.ci.equips[equip_num].damage_len = len + 1
 end
 
+--- Clear the effect cache.
+-- This function must be run on client leave, since effects
+-- are re-applied on enter.
+function Creature:ClearEffectCache()
+   ffi.fill(self.ci.defense.immunity_misc, 4 * IMMUNITY_TYPE_NUM)
+   ffi.fill(self.ci.defense.immunity, 4 * DAMAGE_INDEX_NUM)
+   self.ci.defense.hp_eff = 0
+   self:SetLocalInt("gsp_mod_dc", 0)
+end
+
 local function UpdateImmunities(self)
    ffi.fill(self.ci.defense.immunity_misc, 4*IMMUNITY_TYPE_NUM)
    if self.obj.cre_stats.cs_first_imm_eff < 0 then return end
@@ -714,6 +724,8 @@ local function UpdateCriticalDamage(self, equip_num, item)
                        2)
    end
 end
+
+
 
 --- Updates a creature's combat modifiers.
 -- See ConbatMod ctype.
