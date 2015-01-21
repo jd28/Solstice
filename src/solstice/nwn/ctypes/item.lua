@@ -126,7 +126,7 @@ typedef struct {
     uint32_t                    field_238;              /* 0238 */
     uint32_t                    field_23C;              /* 023C */
     uint32_t                    field_240;              /* 0240 */
-    uint32_t                    field_244;              /* 0244 */
+    uint32_t                    it_possessor;           /* 0244 */
     uint32_t                    field_248;              /* 0248 */
     uint32_t                    field_24C;              /* 024C */
     CExoLocString               it_desc_id;             /* 0250 */

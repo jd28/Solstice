@@ -227,6 +227,12 @@ function Item:SetStackSize(value)
    self.obj.it_stacksize = value
 end
 
+--- Get item possessor.
+function Item:GetPossesor()
+   if not self:GetIsValid() then return OBJECT_INVALID end
+   return Game.GetObjectByID(self.obj.it_possessor)
+end
+
 --- Properties
 -- @section
 
