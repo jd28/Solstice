@@ -54,12 +54,11 @@ end
 local function CreateSimpleCustom(type, ...)
    local eff = Create()
    eff:SetType(EFFECT_TYPE_MODIFY_NUM_ATTACKS)
-   eff:SetInt(1, type)
+   eff:SetInt(0, type)
    local t = {...}
-   if #t > 0 then
-      for i=2, #t - 1 do
-         eff:SetInt(i, t[i+1])
-      end
+
+   for i, v in ipairs(t) do
+      eff:SetInt(i, v)
    end
    return eff
 end
