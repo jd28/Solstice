@@ -139,6 +139,8 @@ local function CreateItempropEffect(show_icon)
    return eff
 end
 
+M.CreateItempropEffect = CreateItempropEffect
+
 --- Create Ability bonus/penalty item property.
 -- @param ability ABILITY_*
 -- @param mod Bonus: [1, 12], Penalty [-12, -1]
@@ -155,7 +157,7 @@ function M.AbilityScore(ability, mod)
 end
 
 --- Create AC item property
--- @param value Bonus: [1,20] Penaly [-20, -1]
+-- @param value Bonus: [1,20] Penalty: [-20, -1]
 function M.ArmorClass(value)
    local eff = CreateItempropEffect()
 
@@ -190,7 +192,7 @@ function M.AttackModifier(value)
    local eff = CreateItempropEffect()
 
    if value < 0 then
-      eff:SetValues(ITEM_PROPERTY_DECREASED_ATTACK_MODIFIER, nil, 25, math.clamp(value, 1, 5))
+      eff:SetValues(ITEM_PROPERTY_DECREASED_ATTACK_MODIFIER, nil, 25, math.clamp(-value, 1, 5))
    else
       eff:SetValues(ITEM_PROPERTY_ATTACK_BONUS, nil, 20, math.clamp(value, 1, 20))
    end
