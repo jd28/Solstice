@@ -128,7 +128,7 @@ end
 --- Get if an object has an effecy by ID
 -- @param id Effect ID.
 function Object:GetHasEffectById(id)
-   for eff in self:EffectsDirect() do
+   for eff in self:Effects(true) do
       if eff:GetId() == id then
          return true
       end
@@ -141,7 +141,7 @@ end
 -- @param spell solstice.spell constant that the effect was created by.
 function Object:GetHasSpellEffect(spell)
    if not self:GetIsValid() then return false end
-   for eff in self:EffectsDirect() do
+   for eff in self:Effects(true) do
       if eff:GetSpellId() == spell then
          return true
       end
@@ -175,7 +175,7 @@ function Object:LogEffects()
 
    table.insert(t, string.format("Effects - %s", self:GetName()))
 
-   for eff in self:EffectsDirect() do
+   for eff in self:Effects(true) do
       table.insert(t, eff:ToString())
    end
 
@@ -201,7 +201,7 @@ end
 -- @param type EFFECT_TYPE_*
 function Object:RemoveEffectsByType(type)
    local t = {}
-   for eff in self:EffectsDirect() do
+   for eff in self:Effects(true) do
       if type == eff:GetType() then
          t[eff:GetId()] = true
       end

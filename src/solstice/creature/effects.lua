@@ -15,7 +15,7 @@ local C = ffi.C
 
 function Creature:CreateEffectDebugString()
    local t = {}
-   for eff in self:EffectsDirect() do
+   for eff in self:Effects(true) do
       table.insert(t, eff:ToString())
    end
 
