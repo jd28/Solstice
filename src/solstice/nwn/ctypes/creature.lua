@@ -182,31 +182,33 @@ typedef struct {
 
     void                       *cs_specabil;            /* 043C */
 
-    uint16_t                    field_440;
+    uint16_t                    cs_first_temphp_eff;
     uint16_t                    cs_first_ac_eff;
-    uint16_t                    cs_first_ab_eff;
-    uint16_t                    cs_first_dred_eff;
-    uint16_t                    cs_first_dresist_eff;
-    uint16_t                    cs_first_dmg_eff;
+    uint16_t                    cs_first_ab_effect;
+    uint16_t                    cs_first_dmgred_eff;
+    uint16_t                    cs_first_dmgresist_eff;
+    uint16_t                    cs_first_damage_eff;
     uint16_t                    cs_first_aistate_eff;
     uint16_t                    cs_first_icon_eff;
-    uint16_t                    field_450;
-    uint16_t                    cs_first_conceal_eff;
-    uint16_t                    field_454;
+    uint16_t                    cs_first_sanctuary_eff;
+    uint16_t                    cs_first_invis_eff;
+    uint16_t                    cs_first_spellresist_eff;
     uint16_t                    cs_first_ability_eff;
-    uint16_t                    field_458;
-    uint16_t                    field_45A;
+    uint16_t                    cs_first_seeinvis_eff;
+    uint16_t                    cs_first_ultravision_eff;
     uint16_t                    cs_first_misschance_eff;
-    uint16_t                    field_45E;
-    uint32_t                    field_460;
-    uint32_t                    field_464;
-    uint16_t                    field_468;
+    uint16_t                    cs_first_conceal_eff;
+    uint16_t                    cs_first_blindess_eff;
+    uint16_t                    cs_first_walkanim_eff;
+    uint16_t                    cs_first_spellabsorb_eff;
+    uint16_t                    cs_first_spellimm_eff;
+    uint16_t                    cs_first_dmgshield_eff;
     uint16_t                    cs_first_skill_eff;
     uint16_t                    cs_first_save_eff;
-    uint16_t                    field_46E;
+    uint16_t                    cs_first_haste_eff;
     uint16_t                    cs_first_imm_eff;
-    uint16_t                    field_472;
-    uint16_t                    field_474;
+    uint16_t                    cs_first_limitspeed_eff;
+    uint16_t                    cs_first_speeddec_eff;
 
     uint16_t                    cs_skill_points;        /* 0476 */
     uint8_t                    *cs_skills;              /* 0478 */
