@@ -274,3 +274,9 @@ end
 function table:ksort(key)
    table.sort(self, function (a, b) return a[key] < b[key] end)
 end
+
+--- Packs a vararg into a table.
+-- @param ... args.
+function table.pack(...)
+  return { n = select("#", ...), ... }
+end
