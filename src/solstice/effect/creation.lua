@@ -485,10 +485,16 @@ end
 -- @param immunity One of the IMMUNITY_TYPE_* constants.
 -- @param amount Percent immunity.
 function M.Immunity(immunity, amount)
-   local type, amt = determine_type_amount(EFFECT_TYPE_IMMUNITY,
-                                           EFFECT_TYPE_IMMUNITY_DECREASE,
-                                           amount)
+   local type, amt = EFFECT_TYPE_IMMUNITY, amount
+   if amount < 0 then
+      type, amt = CUSTOM_EFFECT_TYPE_IMMUNITY_MISC_PENALTY, -amount
+   end
    amt = math.clamp(amt, 1, 100)
+
+   if amount < 0 then
+      return CreateSimpleCustom(type, immunity, amt)
+   end
+
    return CreateSimple(type, immunity, amt)
 end
 
