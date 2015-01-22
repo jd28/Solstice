@@ -39,7 +39,7 @@ end
 --- Determines if a creature is flanked.
 -- @param vs Attacker
 function Creature:GetIsFlanked(vs)
-   if not target:GetIsValid() then return false end
+   if not vs:GetIsValid() then return false end
    return C.nwn_GetFlanked(self.obj, vs.obj)
 end
 

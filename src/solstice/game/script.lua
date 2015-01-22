@@ -22,7 +22,7 @@ local function ExecuteScript(script, target)
    NWE.ExecuteCommand(8, 2)
 
    if target:GetIsValid() then
-      return object:GetLocalInt("X2_L_LAST_RETVAR")
+      return target:GetLocalInt("X2_L_LAST_RETVAR")
    end
 end
 
