@@ -77,15 +77,18 @@ function M.RegisterItemEventHandler(ev_type, f)
 end
 
 --- Register an item propert handler.
--- @param ipconst An item property constant.
 -- @param f A function taking up to four parameters: An item, the object
 -- equipping the item, the item property, the slot the item is being
 -- equipped to, and a boolean indicating whether the item property is being removed.
 -- The item property is a C struct `CNWItemProperty` as
 -- defined in solstice/nwn/ctypes/itemprop.lua, it is not an ItemProp
 -- class instance.
-function M.RegisterItempropHandler(ipconst, f)
-   IP_HANDLERS[ipconst] = f
+-- @param ... An item property constant.
+function M.RegisterItempropHandler(f, ...)
+   local t = table.pack(...)
+   for i=1, t.n do
+      IP_HANDLERS[t[i]] = f
+   end
 end
 
 --- Gets the default ILR for an item.
@@ -147,7 +150,7 @@ function NWNXItems_HandleItemPropEvent()
    current_event = ev
    local cre  = GetObjectByID(ev.obj.obj.obj_id)
    local item = GetObjectByID(ev.item.obj.obj_id)
-   f(item, cre, ev.ip, ev.slot, ev.remove)
+   f(item, cre, ev.ip, ffi.C.ns_BitScanFFS(ev.slot), ev.remove)
 
    current_event = nil
    return true
