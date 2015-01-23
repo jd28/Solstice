@@ -490,11 +490,15 @@ function M.Immunity(immunity, amount)
    end
    amt = math.clamp(amt, 1, 100)
 
+   local e
    if amount < 0 then
-      return CreateSimpleCustom(type, immunity, amt)
+      e = CreateSimpleCustom(type, immunity)
+   else
+      e = CreateSimple(type, immunity)
    end
+   e:SetInt(4, amt)
 
-   return CreateSimple(type, immunity, amt)
+   return e
 end
 
 --- Create an Invisibility effect.

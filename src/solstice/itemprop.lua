@@ -96,7 +96,7 @@ end
 -------------------------------------------------------------------------------
 
 local function CreateItempropInternal(type, subtype, cost, cost_val,
-                                  param1, param1_val, chance)
+                                      param1, param1_val, chance)
    subtype = subtype or -1
    cost = cost or -1
    cost_val = cost_val or -1

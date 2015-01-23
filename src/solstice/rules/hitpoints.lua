@@ -50,7 +50,7 @@ local function GetMaxHitPoints(cre)
          base = base + cre:GetMaxHitPointsByLevel(i)
       end
       res = res + base
-      cre.obj.obj.obj_hp_max = math.max(res, cre.obj.obj.obj_hp_max)
+      cre.obj.obj.obj_hp_max = res
    end
 
    if res <= 0 then res = 1 end

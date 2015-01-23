@@ -647,7 +647,7 @@ end
 local function UpdateDamage(self)
    self.ci.offense.damage_len = 0
 
-   for i = self.obj.cre_stats.cs_first_dmg_eff, self.obj.obj.obj_effects_len - 1 do
+   for i = self.obj.cre_stats.cs_first_damage_eff, self.obj.obj.obj_effects_len - 1 do
       if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_DECREASE and
          self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_INCREASE
       then

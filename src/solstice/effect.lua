@@ -245,13 +245,13 @@ end
 --- Set exposed.
 -- @bool val Value
 function Effect:SetExposed(val)
-   e.eff.eff_is_exposed = val and 1 or 0
+   self.eff.eff_is_exposed = val and 1 or 0
 end
 
 --- Set icon shown.
 -- @bool val Value
 function Effect:SetIconShown(val)
-   e.eff.eff_is_iconshown = val and 1 or 0
+   self.eff.eff_is_iconshown = val and 1 or 0
 end
 
 return M

@@ -184,7 +184,7 @@ typedef struct {
 
     uint16_t                    cs_first_temphp_eff;
     uint16_t                    cs_first_ac_eff;
-    uint16_t                    cs_first_ab_effect;
+    uint16_t                    cs_first_ab_eff;
     uint16_t                    cs_first_dmgred_eff;
     uint16_t                    cs_first_dmgresist_eff;
     uint16_t                    cs_first_damage_eff;

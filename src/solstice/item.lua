@@ -158,7 +158,9 @@ function Item:RestoreAppearance(appearance)
    end
 end
 
---- Set item
+--- Set item appearance
+-- @param index
+-- @param value
 function Item:SetAppearance(index, value)
    if not self:GetIsValid()
       or index < ITME_APPR_COLOR_LEATHER_1
@@ -191,7 +193,7 @@ function Item:SetColor(index, value)
    return self.obj.it_color[index]
 end
 
---- Value
+--- Info
 -- @section
 
 --- Determines the value of an item in gold pieces.
@@ -275,7 +277,7 @@ local function get_next(self)
    end
 end
 
---- Iterates over an items properties
+--- Iterates over items properties
 function Item:ItemProperties()
    self.obj.obj.obj_effect_index = 0
    return function()
