@@ -126,6 +126,8 @@ This has a some side effects:
 * Constants don't need to be predefined but can be loaded from
   modified 2DAs, ensuring that they're never out of date or
   inconsistent.  This does require some 2da merging or a lot of data entry.
+* Advanced NWNX users can directly hook nwserver functions with Lua
+  functions.
 
 ## The not-all-roses side
 * Learning Lua is task.  It's a dynamically typed language, so many
