@@ -577,7 +577,7 @@ local function ResolveDamageModifications(info, attacker, target)
    local start
 
    if target.type == OBJECT_TRUETYPE_CREATURE then
-      start = target.obj.cre_stats.cs_first_dresist_eff
+      start = target.obj.cre_stats.cs_first_dmgresist_eff
    end
 
    eff, start = target:GetBestDamageResistEffect(attacker.ci.equips[info.weapon].base_dmg_flags, start)
@@ -621,7 +621,7 @@ local function ResolveDamageModifications(info, attacker, target)
    end
 
    if target.type == OBJECT_TRUETYPE_CREATURE then
-      start = target.obj.cre_stats.cs_first_dred_eff
+      start = target.obj.cre_stats.cs_first_dmgred_eff
    else
       start = nil
    end

@@ -131,7 +131,7 @@ end
 function Object:DebugDamageResistance()
    local t = {}
    local eff
-   local start = self.obj.cre_stats.cs_first_dresist_eff
+   local start = self.obj.cre_stats.cs_first_dmgresist_eff
    if start <= 0 then start = 0 end
 
    table.insert(t, "Damage Resist:")
@@ -160,7 +160,7 @@ end
 function Object:DebugDamageReduction()
    local t = {}
    local eff
-   local start = self.obj.cre_stats.cs_first_dred_eff
+   local start = self.obj.cre_stats.cs_first_dmgred_eff
    if start <= 0 then start = 0 end
 
    table.insert(t, "Damage Reduction:")
@@ -386,9 +386,9 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amt, power, no_feedback)
 
    local start = 0
    if obj.type == OBJECT_TRUETYPE_CREATURE
-      and obj.obj.cre_stats.cs_first_dred_eff > 0
+      and obj.obj.cre_stats.cs_first_dmgred_eff > 0
    then
-      start = obj.obj.cre_stats.cs_first_dred_eff
+      start = obj.obj.cre_stats.cs_first_dmgred_eff
    end
 
    local eff = obj:GetBestDamageReductionEffect(power, start)
@@ -404,9 +404,9 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amt, dmgidx, no_feedback)
 
    local start = 0
    if obj.type == OBJECT_TRUETYPE_CREATURE
-      and obj.obj.cre_stats.cs_first_dresist_eff > 0
+      and obj.obj.cre_stats.cs_first_dmgresist_eff > 0
    then
-      start = obj.obj.cre_stats.cs_first_dresist_eff
+      start = obj.obj.cre_stats.cs_first_dmgresist_eff
    end
 
    local eff = obj:GetBestDamageResistEffect(dmgidx, start)
