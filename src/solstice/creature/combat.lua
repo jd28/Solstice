@@ -544,7 +544,6 @@ end
 -- This function must be run on client leave, since effects
 -- are re-applied on enter.
 function Creature:ClearEffectCache()
-   ffi.fill(self.ci.defense.immunity_misc, 4 * IMMUNITY_TYPE_NUM)
    ffi.fill(self.ci.defense.immunity, 4 * DAMAGE_INDEX_NUM)
    self.ci.defense.hp_eff = 0
    self:SetLocalInt("gsp_mod_dc", 0)
