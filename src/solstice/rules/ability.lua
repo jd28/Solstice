@@ -25,6 +25,10 @@ end
 -- @param ability ABILITY_*
 -- @return Total amount, uncapped
 local function GetAbilityEffectModifier(cre, ability)
+   if OPT.TA then
+      return cre.ci.ability_eff[ability]
+   end
+
    local eff = 0
    if cre.obj.cre_stats.cs_first_ability_eff > 0 then
       for i = cre.obj.cre_stats.cs_first_ability_eff, cre.obj.obj.obj_effects_len - 1 do
