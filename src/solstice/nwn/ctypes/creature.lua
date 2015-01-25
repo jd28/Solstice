@@ -81,12 +81,14 @@ typedef struct {
     uint8_t          unknown_2[4];
 } CNWSCreatureClass;
 
+struct CNWSCreature_s;
+
 typedef struct {
     ArrayList_uint16             cs_feats;               /* 0000 */
     ArrayList_FeatUses           cs_featuses;            /* 000C */         /* CNWSStats_FeatUses * */
     ArrayList_uint16             cs_feats_bonus;
 
-    void                        *cs_original;            /* 0024 */
+    struct CNWSCreature_s       *cs_original;            /* 0024 */
 
     CNWSStats_Level           **cs_levelstat;           /* 0028 */         /* CNWSStats_Level * */
     uint32_t                    cs_levelstat_len;
@@ -286,7 +288,7 @@ typedef struct CNWSInventory {
     uint32_t                        equips[18];
 } CNWSInventory;
 
-typedef struct {
+typedef struct CNWSCreature_s {
     CNWSObject                  obj;
 
     uint32_t                    cre_ponyride;           /* 01C4 */
