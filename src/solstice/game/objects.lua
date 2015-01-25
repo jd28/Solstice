@@ -50,7 +50,9 @@ end
 -- @param obj Any object.
 function M.RemoveObject(obj)
    _SOL_REMOVE_CACHED_OBJECT(obj.id)
-   C.Local_DeleteCreature(obj.id)
+   if obj:GetType() == OBJECT_TYPE_CREATURE and not obj:GetIsPC() then
+      C.Local_DeleteCreature(obj.id)
+   end
 end
 
 --- Gets an object by tag

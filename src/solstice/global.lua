@@ -52,6 +52,7 @@ local C = ffi.C
 -- No script would even need use these.
 
 local _OBJECTS = {}
+local _PCS = {}
 
 -- Get cached Solstice object.
 -- This should, generaly, be considered a private function and used
@@ -118,8 +119,19 @@ function _SOL_GET_CACHED_OBJECT(id)
 
    -- Always refresh the cached objects NWN server object.
    if type == OBJECT_TRUETYPE_CREATURE then
+      object.id   = id
       object.obj  = C.nwn_GetCreatureByID(id)
-      object.ci   = C.Local_GetCombatInfo(id)
+      local skip_cre = false
+      if object:GetIsPC() then
+         local name = object:GetPCPlayerName()..object:GetName()
+         if not _PCS[name] then
+            _PCS[name] = object.id
+         else
+            id = _PCS[name]
+            skip_cre = true
+         end
+      end
+      object.ci   = C.Local_GetCombatInfo(id, skip_cre)
       assert(object.ci ~= nil, "CombatInfo cannot be nil...")
    elseif type == OBJECT_TRUETYPE_MODULE then
       object.obj = C.nwn_GetModule()
