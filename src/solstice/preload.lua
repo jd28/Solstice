@@ -24,6 +24,88 @@ typedef struct {
 } CNWSEffectListHandler;
 ]]
 
+local Orig_OnApplyDamageImmunityIncrease
+local function Hook_OnApplyDamageImmunityIncrease(handler, obj, eff, force)
+   local res = Orig_OnApplyDamageImmunityIncrease(handler, obj, eff, force)
+   local cre = Game.GetObjectByID(obj.obj_id)
+   if res == 0 and cre:GetType() == OBJECT_TYPE_CREATURE then
+      local idx = C.ns_BitScanFFS(eff.eff_integers[0])
+      local amt = eff.eff_integers[1]
+      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] + amt
+   end
+   return res
+end
+
+Orig_OnApplyDamageImmunityIncrease = Hook.hook {
+   func = Hook_OnApplyDamageImmunityIncrease,
+   length = 5,
+   address = 0x081712A8,
+   type = 'int32_t (*)(CNWSEffectListHandler *, CNWSObject *, CGameEffect *, int32_t)',
+   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
+}
+
+local Orig_OnRemoveDamageImmunityIncrease
+local function Hook_OnRemoveDamageImmunityIncrease(handler, obj, eff)
+   local res = Orig_OnRemoveDamageImmunityIncrease(handler, obj, eff)
+   local cre = Game.GetObjectByID(obj.obj_id)
+   if cre:GetType() == OBJECT_TYPE_CREATURE then
+      local idx = C.ns_BitScanFFS(eff.eff_integers[0])
+      local amt = eff.eff_integers[1]
+      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] - amt
+   end
+   return res
+end
+
+Orig_OnRemoveDamageImmunityIncrease = Hook.hook {
+   func = Hook_OnRemoveDamageImmunityIncrease,
+   length = 5,
+   address = 0x08171454,
+   type = 'int32_t (*)(CNWSEffectListHandler *, CNWSObject *, CGameEffect *)',
+   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
+}
+
+local Orig_OnApplyDamageImmunityDecrease
+local function Hook_OnApplyDamageImmunityDecrease(handler, obj, eff, force)
+   local res = Orig_OnApplyDamageImmunityDecrease(handler, obj, eff, force)
+   local cre = Game.GetObjectByID(obj.obj_id)
+
+   if res == 0 and cre:GetType() == OBJECT_TYPE_CREATURE then
+      local idx = C.ns_BitScanFFS(eff.eff_integers[0])
+      local amt = eff.eff_integers[1]
+      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] - amt
+   end
+   return res
+end
+
+Orig_OnApplyDamageImmunityDecrease = Hook.hook {
+   func = Hook_OnApplyDamageImmunityDecrease,
+   length = 5,
+   address = 0x0817153C,
+   type = 'int32_t (*)(CNWSEffectListHandler *, CNWSObject *, CGameEffect *, int32_t)',
+   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
+
+}
+
+local Orig_OnRemoveDamageImmunityDecrease
+local function Hook_OnRemoveDamageImmunityDecrease(handler, obj, eff)
+   local res = Orig_OnRemoveDamageImmunityDecrease(handler, obj, eff)
+   local cre = Game.GetObjectByID(obj.obj_id)
+   if cre:GetType() == OBJECT_TYPE_CREATURE then
+      local idx = C.ns_BitScanFFS(eff.eff_integers[0])
+      local amt = eff.eff_integers[1]
+      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] + amt
+   end
+   return res
+end
+
+Orig_OnRemoveDamageImmunityDecrease = Hook.hook {
+   func = Hook_OnRemoveDamageImmunityDecrease,
+   length = 5,
+   address = 0x08171734,
+   type = 'int32_t (*)(CNWSEffectListHandler *, CNWSObject *, CGameEffect *)',
+   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
+}
+
 -- CNWSEffectListHandler::OnApplyEffectImmunity(CNWSObject *,CGameEffect *,int) 0x08178470
 local Orig_OnApplyEffectImmunity
 local function Hook_OnApplyEffectImmunity(handler, obj, eff, force)
