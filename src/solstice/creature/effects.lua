@@ -26,23 +26,7 @@ end
 -- @param imm_type IMMUNITY_TYPE_*
 -- @param[opt] vs Creature's attacker.
 function Creature:GetEffectImmunity(imm_type, vs)
-   if imm_type == nil then
-      error(debug.traceback())
-   end
-   if not self:GetIsValid() or
-      imm_type < 0 or imm_type >= IMMUNITY_TYPE_NUM
-   then
-      return 0
-   end
-
-   if USE_VERSUS then
-      error "Net yet implimented"
-   end
-
-   local innate = Rules.GetInnateImmunity(imm_type, self)
-
-   return math.max(self.ci.defense.immunity_misc[imm_type] + innate,
-                   innate)
+   return Rules.GetEffectImmunity(self, imm_type, vs)
 end
 
 --- Determins if creature has a feat effect.
@@ -67,6 +51,7 @@ end
 -- @param immunity IMMUNITY_TYPE_*
 -- @param[opt] versus Versus object.
 function Creature:GetIsImmune(immunity, versus)
+   if self:GetIsInvulnerable() then return true end
    local imm = self:GetEffectImmunity(immunity, versus)
    if imm <= 0 then return false
    elseif imm >= 100 then return true

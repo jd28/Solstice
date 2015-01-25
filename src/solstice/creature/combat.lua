@@ -545,27 +545,10 @@ end
 -- are re-applied on enter.
 function Creature:ClearEffectCache()
    ffi.fill(self.ci.defense.immunity, 4 * DAMAGE_INDEX_NUM)
+   ffi.fill(self.ci.defense.immunity_misc, 4 * IMMUNITY_TYPE_NUM)
+   ffi.fill(self.ci.ability_eff, 4 * ABILITY_TYPE_NUM)
    self.ci.defense.hp_eff = 0
    self:SetLocalInt("gsp_mod_dc", 0)
-end
-
-local function UpdateImmunities(self)
-   ffi.fill(self.ci.defense.immunity_misc, 4*IMMUNITY_TYPE_NUM)
-   if self.obj.cre_stats.cs_first_imm_eff < 0 then return end
-   for i = self.obj.cre_stats.cs_first_imm_eff, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_IMMUNITY then break end
-
-      if self.obj.obj.obj_effects[i].eff_integers[1] == 28
-         and self.obj.obj.obj_effects[i].eff_integers[2] == 0
-         and self.obj.obj.obj_effects[i].eff_integers[3] == 0
-      then
-         local amt = self.obj.obj.obj_effects[i].eff_integers[4]
-         amt = amt == 0 and 100 or amt
-
-         self.ci.defense.immunity_misc[self.obj.obj.obj_effects[i].eff_integers[0]] =
-            self.ci.defense.immunity_misc[self.obj.obj.obj_effects[i].eff_integers[0]] + amt
-      end
-   end
 end
 
 -- Determines creature's weapon combat info.
@@ -769,7 +752,5 @@ function Creature:UpdateCombatInfo(all)
       UpdateDamageResistance(self)
    end
    UpdateDamageImmunity(self)
-   UpdateImmunities(self)
-
    self.ci.update_flags = 0
 end

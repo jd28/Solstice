@@ -72,9 +72,33 @@ local function sneaks(imm, cre)
    return mod
 end
 
+--- Determine if creature has an immunity.
+-- @param cre Creature
+-- @param imm_type IMMUNITY_TYPE_*
+-- @param[opt] vs Creature's attacker.
+local function GetEffectImmunity(cre, imm_type, vs)
+   if imm_type == nil then
+      error(debug.traceback())
+   end
+   if not cre:GetIsValid() or
+      imm_type < 0 or imm_type >= IMMUNITY_TYPE_NUM
+   then
+      return 0
+   end
+
+   if OPT.USE_VERSUS then
+      error "Net yet implimented"
+   end
+
+   local innate = GetInnateImmunity(imm_type, self)
+   return math.max(self.ci.defense.immunity_misc[imm_type] + innate,
+                   innate)
+end
+
 SetInnateImmunityOverride(crits, IMMUNITY_TYPE_CRITICAL_HIT)
 SetInnateImmunityOverride(sneaks, IMMUNITY_TYPE_SNEAK_ATTACK)
 
 local M = require 'solstice.rules.init'
 M.GetInnateImmunity = GetInnateImmunity
 M.SetInnateImmunityOverride = SetInnateImmunityOverride
+M.GetEffectImmunity = GetEffectImmunity

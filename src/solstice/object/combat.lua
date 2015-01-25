@@ -370,6 +370,14 @@ function Object:DoDamageReduction(amt, eff, power)
    return amt - highest_soak, highest_soak, remove_effect
 end
 
+--- Determine if object is invulnerable
+function Object:GetIsInvulnerable()
+   if not self:GetIsValid() then
+      return false
+   end
+   return self.obj.obj.obj_is_invulnerable == 1
+end
+
 -- Bridge functions.
 
 function NWNXSolstice_DoDamageImmunity(obj, vs, amt, dmgidx, no_feedback)

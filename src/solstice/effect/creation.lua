@@ -486,7 +486,7 @@ end
 function M.Immunity(immunity, amount)
    local type, amt = EFFECT_TYPE_IMMUNITY, amount
    if amount < 0 then
-      type, amt = CUSTOM_EFFECT_TYPE_IMMUNITY_MISC_PENALTY, -amount
+      type, amt = CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE, -amount
    end
    amt = math.clamp(amt, 1, 100)
 
