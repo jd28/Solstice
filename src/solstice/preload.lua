@@ -173,6 +173,62 @@ Hook.hook {
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
 }
 
+local GetTotalEffectBonus_orig
+local function Hook_GetTotalEffectBonus(cre, eff_switch , versus, elemental,
+                                        is_crit, save, save_vs, skill,
+                                        ability, is_offhand)
+   local obj = Game.GetObjectByID(cre.obj.obj_id)
+   if obj:GetType() == OBJECT_TYPE_CREATURE then
+      if eff_switch == 3 then
+         local min, max = Rules.GetSaveEffectLimits(obj, save, save_vs)
+         local eff = Rules.GetSaveEffectBonus(obj, save, save_vs)
+         return  math.clamp(eff, min, max)
+      elseif eff_switch == 4 then
+         local min, max = Rules.GetAbilityEffectLimits(obj, ability)
+         local eff = Rules.GetAbilityEffectModifier(obj, ability)
+         eff = math.clamp(eff, min, max)
+
+         -- Just to make sure...that the modifiers are updated.
+         -- Depending on how abilities are implemented it can be
+         -- an issue.
+         local base = obj:GetAbilityScore(ability, true) + eff
+         local mod  = math.floor((base - 10) / 2)
+         if ability == ABILITY_STRENGTH then
+            obj.obj.cre_stats.cs_str_mod = mod
+         elseif ability == ABILITY_DEXTERITY then
+            obj.obj.cre_stats.cs_dex_mod = mod
+         elseif ability == ABILITY_CONSTITUTION then
+            obj.obj.cre_stats.cs_con_mod = mod
+         elseif ability == ABILITY_INTELLIGENCE then
+            obj.obj.cre_stats.cs_int_mod = mod
+         elseif ability == ABILITY_WISDOM then
+            obj.obj.cre_stats.cs_wis_mod = mod
+         elseif ability == ABILITY_CHARISMA then
+            obj.obj.cre_stats.cs_cha_mod = mod
+         end
+         return eff
+      elseif eff_switch == 5 then
+         local min, max = Rules.GetSkillEffectLimits(obj, skill)
+         local eff = Rules.GetSkillEffectModifier(obj, skill)
+         return math.clamp(eff, min, max)
+      end
+   end
+
+   return GetTotalEffectBonus_orig(cre, eff_switch , versus, elemental,
+                                   is_crit, save, save_vs, skill,
+                                   ability, is_offhand)
+end
+
+GetTotalEffectBonus_orig = Hook.hook {
+   address = 0x08132298,
+   func = Hook_GetTotalEffectBonus,
+   type = "int (*)(CNWSCreature *, uint8_t, CNWSObject *, int32_t, int32_t, uint8_t, uint8_t, uint8_t, uint8_t, int32_t)",
+   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE),
+   length = 5
+}
+
+local Eff = require 'solstice.effect'
+
 -- This is an additional effect type that's built in already.  It applies
 -- permenant hitpoints as an effect.  I.e. unlike temporary hitpoints they are
 -- fully healable. Since it's kind of annoying to have the effect applied but
