@@ -293,6 +293,7 @@ typedef struct Creature {
     uint32_t           id;
     CNWSCreature      *obj;
     CombatInfo        *ci;
+    bool               load_char_finished;
 } Creature;
 
 typedef struct Encounter {

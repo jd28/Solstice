@@ -54,6 +54,23 @@ local C = ffi.C
 local _OBJECTS = {}
 local _PCS = {}
 
+function _GET_CANONICAL_ID(cre)
+   local id = cre.id
+   if cre:GetIsPC() and not cre.load_char_finished then
+      local name = cre:GetPCPlayerName()
+      if #name == 0 then
+         name = cre:GetLocalString('pc_player_name')
+      end
+      name = name..cre:GetName()
+      if not _PCS[name] then
+         _PCS[name] = cre.id
+      else
+         id = _PCS[name]
+      end
+   end
+   return id
+end
+
 -- Get cached Solstice object.
 -- This should, generaly, be considered a private function and used
 -- only when necessary.
@@ -121,17 +138,15 @@ function _SOL_GET_CACHED_OBJECT(id)
    if type == OBJECT_TRUETYPE_CREATURE then
       object.id   = id
       object.obj  = C.nwn_GetCreatureByID(id)
-      local skip_cre = false
-      if object:GetIsPC() then
-         local name = object:GetPCPlayerName()..object:GetName()
-         if not _PCS[name] then
-            _PCS[name] = object.id
-         else
-            id = _PCS[name]
-            skip_cre = true
-         end
+      id = _GET_CANONICAL_ID(object)
+
+      -- When the canonical and current id are the same we know a) the player just logged in
+      -- or b) the character really has been reloaded after relogging.
+      if object.id == id then
+         object.load_char_finished = true
       end
-      object.ci   = C.Local_GetCombatInfo(id, skip_cre)
+
+      object.ci   = C.Local_GetCombatInfo(id, object.id ~= id)
       assert(object.ci ~= nil, "CombatInfo cannot be nil...")
    elseif type == OBJECT_TRUETYPE_MODULE then
       object.obj = C.nwn_GetModule()

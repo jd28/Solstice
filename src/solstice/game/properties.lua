@@ -10,7 +10,8 @@ local _PROPERTIES = {}
 -- @param obj Object.
 local function DeleteAllProperties(obj)
    if not obj:GetIsValid() then return end
-   _PROPERTIES[obj.id] = nil
+   local id = Game.GetCanonicalID(obj)
+   _PROPERTIES[id] = nil
 end
 
 --- Get all of an object's properties.
@@ -18,8 +19,9 @@ end
 -- @return nil if object is invalid, else all properties as a mutable lua table.
 local function GetAllProperties(obj)
    if not obj:GetIsValid() then return end
-   _PROPERTIES[obj.id] = _PROPERTIES[obj.id] or {}
-   return _PROPERTIES[obj.id]
+   local id = Game.GetCanonicalID(obj)
+   _PROPERTIES[id] = _PROPERTIES[id] or {}
+   return _PROPERTIES[id]
 end
 
 --- Get an object's properties.
@@ -28,8 +30,9 @@ end
 local function GetProperty(obj, prop)
    assert(type(prop) == 'string', 'Property name must be a string!')
    if not obj:GetIsValid() then return end
-   _PROPERTIES[obj.id] = _PROPERTIES[obj.id] or {}
-   return _PROPERTIES[obj.id][prop]
+   local id = Game.GetCanonicalID(obj)
+   _PROPERTIES[id] = _PROPERTIES[id] or {}
+   return _PROPERTIES[id][prop]
 end
 
 --- Set a property on an object.
@@ -40,8 +43,9 @@ end
 local function SetProperty(obj, prop, value)
    assert(type(prop) == 'string', 'Property name must be a string!')
    if not obj:GetIsValid() then return end
-   _PROPERTIES[obj.id] = _PROPERTIES[obj.id] or {}
-   _PROPERTIES[obj.id][prop] = value
+   local id = Game.GetCanonicalID(obj)
+   _PROPERTIES[id] = _PROPERTIES[id] or {}
+   _PROPERTIES[id][prop] = value
 end
 
 --- Get the global properties table.

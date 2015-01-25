@@ -46,6 +46,11 @@ function M.GetObjectByID(id)
    return _SOL_GET_CACHED_OBJECT(id)
 end
 
+--- Get canonical ID
+-- @param cre Player character
+function M.GetCanonicalID(cre)
+   return _GET_CANONICAL_ID(cre)
+end
 --- Remove object from Solstice object cache.
 -- @param obj Any object.
 function M.RemoveObject(obj)
