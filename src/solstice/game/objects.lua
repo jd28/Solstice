@@ -7,6 +7,7 @@
 local NWE = require 'solstice.nwn.engine'
 local C = require('ffi').C
 local M = require 'solstice.game.init'
+local ffi = require 'ffi'
 
 --- Create an object of a specified type at a given location
 -- NWScript: CreateObject
@@ -51,6 +52,23 @@ end
 function M.GetCanonicalID(cre)
    return _GET_CANONICAL_ID(cre)
 end
+
+--- Clear the effect cache.
+-- This function must be run on client leave, since effects
+-- are re-applied on enter.
+-- @param obj Creature object.
+function M.ClearCache(obj)
+   ffi.fill(obj.ci.defense.immunity, 4 * DAMAGE_INDEX_NUM)
+   ffi.fill(obj.ci.defense.immunity_misc, 4 * IMMUNITY_TYPE_NUM)
+   ffi.fill(obj.ci.ability_eff, 4 * ABILITY_NUM)
+   obj.ci.defense.hp_eff = 0
+   obj.load_char_finished = 0
+   if OPT.TA then
+      obj:SetLocalInt("gsp_mod_dc", 0)
+      M.DeleteProperty(obj, "TA_MOVE_SPEED")
+   end
+end
+
 --- Remove object from Solstice object cache.
 -- @param obj Any object.
 function M.RemoveObject(obj)
