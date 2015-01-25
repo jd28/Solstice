@@ -173,7 +173,32 @@ Hook.hook {
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
 }
 
-end
+-- This is an additional effect type that's built in already.  It applies
+-- permenant hitpoints as an effect.  I.e. unlike temporary hitpoints they are
+-- fully healable. Since it's kind of annoying to have the effect applied but
+-- not to have those HP usable this will heal the target amount for the
+-- additional hitpoints that it receives.
+NWNXEffects.RegisterEffectHandler(
+   function (eff, target, is_remove)
+      local amount = eff:GetInt(1)
+      if not is_remove then
+         if target:GetIsDead() then return true end
+         target.ci.defense.hp_eff = target.ci.defense.hp_eff + amount
+         target:ApplyEffect(DURATION_TYPE_INSTANT, Eff.Heal(amount))
+      else
+         target.ci.defense.hp_eff = target.ci.defense.hp_eff - amount
+      end
+   end,
+   CUSTOM_EFFECT_TYPE_HITPOINTS)
+
+NWNXEffects.RegisterEffectHandler(
+   function (effect, target, is_remove)
+      if not is_remove and target:GetIsDead() then
+         return true
+      end
+      return false
+   end,
+   CUSTOM_EFFECT_TYPE_RECURRING)
 
 NWNXEffects.RegisterEffectHandler(
    function (effect, target, is_remove)
@@ -193,3 +218,27 @@ NWNXEffects.RegisterEffectHandler(
    end,
    CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)
 
+NWNXEffects.RegisterEffectHandler(
+   function (eff, target, is_remove)
+      local new = 0
+      local old = target.obj.cre_combat_round.cr_effect_atks
+      if not is_remove then
+         if target:GetIsDead() or target:GetType() ~= OBJECT_TYPE_CREATURE then
+            return true
+         end
+         new = math.clamp(old + eff:GetInt(1), 0, 5)
+      else
+         local att = -eff:GetInt(1)
+         for eff in target:Effects(true) do
+            if eff:GetType() > 44 then break end
+            if eff:GetType() == 44
+               and eff:GetInt(0) == CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS
+            then
+               att = att + eff:GetInt(2)
+            end
+         end
+         new = math.clamp(att, 0, 5)
+      end
+      target.obj.cre_combat_round.cr_effect_atks = new
+   end,
+   CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS)
