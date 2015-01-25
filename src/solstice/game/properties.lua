@@ -35,6 +35,17 @@ local function GetProperty(obj, prop)
    return _PROPERTIES[id][prop]
 end
 
+--- Delete an object's property.
+-- @param obj Object.
+-- @param prop Property name.
+local function DeleteProperty(obj, prop)
+   assert(type(prop) == 'string', 'Property name must be a string!')
+   if not obj:GetIsValid() then return end
+   local id = Game.GetCanonicalID(obj)
+   if not _PROPERTIES[id] then return end
+   _PROPERTIES[id][prop] = nil
+end
+
 --- Set a property on an object.
 -- @param obj Object.
 -- @string prop Property name.
@@ -59,3 +70,4 @@ M.DeleteAllProperties = DeleteAllProperties
 M.GetAllProperties = GetAllProperties
 M.GetProperty = GetProperty
 M.GetGlobalProperties = GetGlobalProperties
+M.DeleteProperty = DeleteProperty

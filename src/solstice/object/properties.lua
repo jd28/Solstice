@@ -15,12 +15,12 @@ function Object:GetProperty(prop)
 end
 
 --- Set a PC property
--- Simple wrapper around `Game.GetProperty`
+-- Simple wrapper around `Game.SetProperty`
 -- @string prop Property name.
 -- @param value The value can be anything you choose number, string, location,
 -- lua table, etc, etc.
 function Object:SetProperty(prop, value)
-      Game.GetProperty(self, prop, value)
+   Game.SetProperty(self, prop, value)
 end
 
 --- Get all of an object's properties.
@@ -29,8 +29,14 @@ function Object:GetAllProperties()
    return Game.GetAllProperties(self)
 end
 
+--- Delete an object's property.
+-- Simple wrapper around `Game.DeleteProperty`
+-- @param prop property name.
+function Object:DeleteProperty(prop)
+   Game.DeleteProperty(self, prop)
+end
+
 --- Delete all of an object's properties.
--- @param obj Object.
 function Object:DeleteAllProperties()
    Game.DeleteAllProperties(self)
 end
