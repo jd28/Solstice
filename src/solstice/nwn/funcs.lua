@@ -49,7 +49,7 @@ ffi.cdef [[
 bool      nwn_GetIsClassBonusFeat(int32_t cls, uint16_t feat);
 bool      nwn_GetIsClassGeneralFeat(int32_t cls, uint16_t feat);
 uint8_t   nwn_GetIsClassGrantedFeat(int32_t cls, uint16_t feat);
-bool      nwn_GetIsClassSkill (int32_t idx, uint16_t skill);
+int32_t   nwn_GetIsClassSkill (int32_t idx, uint16_t skill);
 CNWFeat  *nwn_GetFeat(uint32_t feat);
 CNWSkill *nwn_GetSkill(uint32_t skill);
 CNWRace  *nwn_GetRace(uint32_t race);
