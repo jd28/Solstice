@@ -31,6 +31,9 @@ local log = require('solstice.system').GetLogger()
 require(OPT.CONSTANTS)
 require('solstice.preload')
 
+-- If you want to use a combat engine then best to place it here.
+-- e,g. `require 'ta.core_combat_engine'`
+
 -- Optional: If you don't want to use the database or if you want to
 -- do it yourself.
 if OPT.DATABASE_TYPE

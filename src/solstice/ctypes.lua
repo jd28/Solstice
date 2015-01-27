@@ -156,6 +156,7 @@ require 'solstice.nwn.ctypes.waypoint'
 -- @field target_ci Target CombatInfo ctype.
 -- @field attack Internal NWN attack data.
 -- @field weapon EQUIP_TYPE_* of current weapon.
+-- @field ranged_type RANGED_TYPE_*
 -- @field target_state Target state bitmask.
 -- @field situational_flags Situational bitmask.
 -- @field target_distance Distance to target.
@@ -380,6 +381,7 @@ typedef struct {
     CombatInfo           *target_ci;
     CNWSCombatAttackData *attack;
     int32_t               weapon;
+    int32_t               ranged_type;
     int32_t               target_state;
     int32_t               situational_flags;
     double                target_distance;
