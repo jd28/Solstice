@@ -1,7 +1,9 @@
 ----
 -- This module never needs to be required explicitly except in your
 -- preload.lua.  It sets loads the solstice library as well as setting
--- up a few hooks and custom effect handlers.
+-- up a few hooks and custom effect handlers.  Note that the hooks below
+-- are not protected calls!  Modifying the functions they call can result
+-- in crashes, if they contain errors.
 --
 -- Hooks:
 --

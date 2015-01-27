@@ -1,3 +1,9 @@
+----
+-- @module rules
+
+--- Levels
+-- @section levels
+
 local C = require('ffi').C
 local TDA = require 'solstice.2da'
 
