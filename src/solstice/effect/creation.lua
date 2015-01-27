@@ -234,7 +234,7 @@ end
 function M.Damage(amount, damage_type, power)
    damage_type = damage_type or DAMAGE_INDEX_MAGICAL
    local damage_flag = bit.lshift(1, damage_type)
-   power = power or DAMAGE_POWER_NORMAL
+   power = power or 0
 
    local eff = CreateSimple(EFFECT_TYPE_DAMAGE)
    eff:SetNumIntegers(20)
@@ -350,12 +350,14 @@ function M.DamageResistance(damage_type, amount, limit)
 end
 
 --- Damage Shield effect.
--- @param amount
--- @param random
+-- @param amount Base damage
+-- @param random DAMANGE_BONUS_*
 -- @param damage_type DAMAGE_INDEX_*
-function M.DamageShield(amount, random, damage_type)
+-- @param[opt=100] Perecent chance of doing damage to attacker.
+function M.DamageShield(amount, random, damage_type, chance)
    local damage_flag = bit.lshift(1, damage_type)
-   return CreateSimple(EFFECT_TYPE_DAMAGE_SHIELD, amount, random, damage_flag)
+   return CreateSimple(EFFECT_TYPE_DAMAGE_SHIELD, amount, random,
+                       damage_flag, chance)
 end
 
 --- Create a Darkness effect.

@@ -18,6 +18,7 @@
 -- * `CNWSCombatRound::InitializeNumberOfAttacks()`
 -- * `CNWSCreatureStats::GetCriticalHitMultiplier(int)`
 -- * `CNWSCreatureStats::GetCriticalHitRoll(int)`
+-- * `CNWSCreature::ResolveDamageShields(CNWSCreature *)`
 --
 -- Custom Effect Handlers:
 --
@@ -358,6 +359,78 @@ Hook.hook {
    flags = Hook.HOOK_DIRECT,
    length = 5
 }
+
+--[[
+local function Hook_GetArmorClassVersus(stats, vs, touch)
+   touch = touch == 1
+   local cre = GetObjectByID(stats.cs_original.obj.obj_id)
+   return cre:GetACVersus(OBJECT_INVALID, touch)
+end
+
+Hook.hook {
+   address = 0x0814088C,
+   func = Hook_GetArmorClassVersus,
+   type = "int32_t (*)(CNWSCreatureStats *, CNWSCreature *, int32_t)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+-- CNWSCreatureStats::GetAttackModifierVersus(CNWSCreature *)
+local function Hook_GetAttackModifierVersus(stats, cre)
+   local cre = GetObjectByID(stats.cs_original.obj.obj_id)
+   return cre:GetAttackBonusVs(OBJECT_INVALID)
+end
+
+Hook.hook {
+   address = 0x081445B4,
+   func = Hook_GetAttackModifierVersus,
+   type = "int32_t (*)(CNWSCreatureStats *, CNWSCreature *)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+--]]
+
+-- CNWSCreature::ResolveDamageShields(CNWSCreature *)
+local function Hook_ResolveDamageShields(cre, attacker)
+   if cre == nil or attacker == nil then return end
+   cre = GetObjectByID(cre.obj.obj_id)
+   attacker = GetObjectByID(attacker.obj.obj_id)
+
+   for i = cre.obj.cre_stats.cs_first_dmgshield_eff, cre.obj.obj.obj_effects_len - 1 do
+      if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_SHIELD then
+         break
+      end
+      local ip = cre.obj.obj.obj_effects[i].eff_integers[1]
+      local d, s, b = Rules.UnpackItempropDamageRoll(ip)
+      b = b + cre.obj.obj.obj_effects[i].eff_integers[0]
+      local dflag = cre.obj.obj.obj_effects[i].eff_integers[2]
+      local chance = cre.obj.obj.obj_effects[i].eff_integers[3]
+
+      if chance == 0 or chance <= math.random(chance) then
+         local dindex = ffi.C.ns_BitScanFFS(dflag)
+         local amt = Dice.Roll(d, s, b)
+         -- This HAS to be in a delay command as apply damage immediately
+         -- might cause the cross the Lua/C boundary multiple times.
+         cre:DelayCommand(0.1,
+                          function (self)
+                             if attacker:GetIsValid() then
+                                local e = Eff.Damage(amt, dindex)
+                                e:SetCreator(self)
+                                attacker:ApplyEffect(DURATION_TYPE_INSTANT, e)
+                             end
+                          end)
+      end
+   end
+end
+
+Hook.hook {
+   address = 0x080EFCAC,
+   func = Hook_ResolveDamageShields,
+   type = "void (*)(CNWSCreature *, CNWSCreature *)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
 local Eff = require 'solstice.effect'
 
 -- This is an additional effect type that's built in already.  It applies
