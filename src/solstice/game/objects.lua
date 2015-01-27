@@ -74,7 +74,7 @@ end
 function M.RemoveObject(obj)
    _SOL_REMOVE_CACHED_OBJECT(obj.id)
    if obj:GetType() == OBJECT_TYPE_CREATURE and not obj:GetIsPC() then
-      C.Local_DeleteCreature(obj.id)
+      M.DeleteAllProperties(obj.id)
    end
 end
 
