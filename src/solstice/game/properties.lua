@@ -9,8 +9,13 @@ local _PROPERTIES = {}
 --- Delete all of an object's properties.
 -- @param obj Object.
 local function DeleteAllProperties(obj)
-   if not obj:GetIsValid() then return end
-   local id = Game.GetCanonicalID(obj)
+   local id
+   if type(obj) == 'number' then
+      id = obj
+   else
+      if not obj:GetIsValid() then return end
+      id = Game.GetCanonicalID(obj)
+   end
    _PROPERTIES[id] = nil
 end
 
@@ -18,8 +23,13 @@ end
 -- @param obj Object.
 -- @return nil if object is invalid, else all properties as a mutable lua table.
 local function GetAllProperties(obj)
-   if not obj:GetIsValid() then return end
-   local id = Game.GetCanonicalID(obj)
+   local id
+   if type(obj) == 'number' then
+      id = obj
+   else
+      if not obj:GetIsValid() then return end
+      id = Game.GetCanonicalID(obj)
+   end
    _PROPERTIES[id] = _PROPERTIES[id] or {}
    return _PROPERTIES[id]
 end
@@ -29,8 +39,13 @@ end
 -- @param prop Property name.
 local function GetProperty(obj, prop)
    assert(type(prop) == 'string', 'Property name must be a string!')
-   if not obj:GetIsValid() then return end
-   local id = Game.GetCanonicalID(obj)
+   local id
+   if type(obj) == 'number' then
+      id = obj
+   else
+      if not obj:GetIsValid() then return end
+      id = Game.GetCanonicalID(obj)
+   end
    _PROPERTIES[id] = _PROPERTIES[id] or {}
    return _PROPERTIES[id][prop]
 end
@@ -40,8 +55,13 @@ end
 -- @param prop Property name.
 local function DeleteProperty(obj, prop)
    assert(type(prop) == 'string', 'Property name must be a string!')
-   if not obj:GetIsValid() then return end
-   local id = Game.GetCanonicalID(obj)
+   local id
+   if type(obj) == 'number' then
+      id = obj
+   else
+      if not obj:GetIsValid() then return end
+      id = Game.GetCanonicalID(obj)
+   end
    if not _PROPERTIES[id] then return end
    _PROPERTIES[id][prop] = nil
 end
@@ -53,8 +73,13 @@ end
 -- lua table, etc, etc.
 local function SetProperty(obj, prop, value)
    assert(type(prop) == 'string', 'Property name must be a string!')
-   if not obj:GetIsValid() then return end
-   local id = Game.GetCanonicalID(obj)
+   local id
+   if type(obj) == 'number' then
+      id = obj
+   else
+      if not obj:GetIsValid() then return end
+      id = Game.GetCanonicalID(obj)
+   end
    _PROPERTIES[id] = _PROPERTIES[id] or {}
    _PROPERTIES[id][prop] = value
 end
