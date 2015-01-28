@@ -105,7 +105,7 @@ end
 -- @param info AttackInfo.
 -- @param attacker Attacking creature.
 local function GetCriticalHitRoll(info, attacker)
-   return 21 - attacker:GetCriticalHitRange(info.weapon)
+   return 21 - attacker.ci.equips[info.weapon].crit_range
 end
 
 --- Get current weapon.
@@ -733,7 +733,7 @@ local function ResolveDamage(info, attacker, target)
    -- If this is a critical hit determine the multiplier.
    local mult = 1
    if GetIsCriticalHit(info) then
-      mult = attacker:GetCriticalHitMultiplier(info.weapon)
+      mult = attacker.ci.equips[info.weapon].crit_mult
    end
 
    ResolveDamageResult(info, attacker, mult, ki_strike)
@@ -1050,12 +1050,12 @@ end
 
 local info, attacker, target
 
-function NWNXSolstice_ResolvePreAttack(attacker_, target_)
-   info     = C.Local_GetAttack();
-   attacker = GetObjectByID(attacker_)
-   target   = GetObjectByID(target_)
-
+local function ResolvePreAttack(attacker_, target_)
+   info     = C.Local_GetAttack()
+   attacker = attacker_
+   target   = target_
    info.attacker_ci = attacker.ci
+   info.ranged_type = attacker.ci.offense.ranged_type
 
    -- If the target is a creature detirmine it's state and any situational modifiers that
    -- might come into play.  This only needs to be done once per attack group because
@@ -1120,10 +1120,6 @@ local function DoMeleeAttack()
    end
 end
 
-function NWNXSolstice_DoMeleeAttack()
-   DoMeleeAttack()
-end
-
 --- Do ranged attack.
 local function DoRangedAttack()
    ResolvePreRoll(info, attacker, target)
@@ -1178,6 +1174,12 @@ local function DoRangedAttack()
    end
 end
 
-function NWNXSolstice_DoRangedAttack()
-   DoRangedAttack()
-end
+local M = {
+   DoRangedAttack = DoRangedAttack,
+   DoMeleeAttack  = DoMeleeAttack,
+   DoPreAttack = ResolvePreAttack,
+}
+
+Rules.RegisterCombatEngine(M)
+
+return M

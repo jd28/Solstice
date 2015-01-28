@@ -5,7 +5,9 @@
 -- defined.
 --
 -- If you have any desire to change these... note which ones need to
--- be synced with nwnx_solstice.
+-- be synced with nwnx_solstice.  Typically any additions will work fine,
+-- any deletions will require a greater understanding of the entire
+-- library.
 --
 -- Note about documentation.  If a field is an array is it will be
 -- specified `field:` \[length\]
@@ -43,7 +45,7 @@ require 'solstice.nwn.ctypes.store'
 require 'solstice.nwn.ctypes.trigger'
 require 'solstice.nwn.ctypes.waypoint'
 
---- Types
+--- Unsynced structs.
 -- @section types
 
 --- Constructor: dice_roll_t
@@ -70,23 +72,6 @@ require 'solstice.nwn.ctypes.waypoint'
 -- @field ac AC bonus/penalty.
 -- @field dmd DamageRoll bonus/penalty.
 -- @field hp Hitpoint bonus/penalty.
-
---- Constructor damage_result_t
--- This struct is used by the combat engine to when determining a damage
--- roll.  The length of the arrays is determined by the global DAMAGE_INDEX_NUM
--- constant.
--- @table DamageResult
--- @field damages [DAMAGE_INDEX_NUM] damages.
--- @field damages_unblocked [DAMAGE_INDEX_NUM] unblockable damages.
--- @field immunity [DAMAGE_INDEX_NUM] damage immunity adjustments.
--- @field resist [DAMAGE_INDEX_NUM] damage resistance adjustments.
--- @field resist_remaining [DAMAGE_INDEX_NUM] damage resistance remaining.
--- This is to provide feedback for DamageResistance effects with limits.
--- @field reduction Damage reduction adjustment.
--- @field reduction_remaining Damage reduction remaining.
--- This is to provide feedback for DamageReduction effects with limits.
--- @field parry Parry adjustment for servers using the Critical Hit Parry
--- reduction designed by Higher Ground.
 
 --- Caches some offensive information.
 -- @table Offense
@@ -148,14 +133,38 @@ require 'solstice.nwn.ctypes.waypoint'
 -- @field ability_eff [ABILITY_NUM] Ability bonuses from effects.
 -- @field update_flags OBSOLETE
 
+--- Synched Structs
+-- @section synched
+
+--- Constructor damage_result_t
+-- This struct is used by the combat engine to when determining a damage
+-- roll.  The length of the arrays is determined by the global DAMAGE_INDEX_NUM
+-- constant.  NOTE: This struct MUST be synced with nwnx_solstice.
+-- @table DamageResult
+-- @field damages [DAMAGE_INDEX_NUM] damages.
+-- @field damages_unblocked [DAMAGE_INDEX_NUM] unblockable damages.
+-- @field immunity [DAMAGE_INDEX_NUM] damage immunity adjustments.
+-- @field resist [DAMAGE_INDEX_NUM] damage resistance adjustments.
+-- @field resist_remaining [DAMAGE_INDEX_NUM] damage resistance remaining.
+-- This is to provide feedback for DamageResistance effects with limits.
+-- @field reduction Damage reduction adjustment.
+-- @field reduction_remaining Damage reduction remaining.
+-- This is to provide feedback for DamageReduction effects with limits.
+-- @field parry Parry adjustment for servers using the Critical Hit Parry
+-- reduction designed by Higher Ground.
+
 --- Information for an attack.
+-- NOTE: This struct MUST be synced with nwnx_solstice.
 -- @table Attack
 -- @field attacker_nwn Internal attacker object.
 -- @field target_nwn Internal target object.
--- @field attacker_ci Attacker CombatInfo ctype.
--- @field target_ci Target CombatInfo ctype.
+-- @field attacker_ci Attacker CombatInfo ctype.  nwnx_solstice does
+-- not use this field, so it's a `void *` there.
+-- @field target_ci Target CombatInfo ctype.  nwnx_solstice does
+-- not use this field, so it's a `void *` there.
 -- @field attack Internal NWN attack data.
 -- @field weapon EQUIP_TYPE_* of current weapon.
+-- @field ranged_type RANGED_TYPE_*
 -- @field target_state Target state bitmask.
 -- @field situational_flags Situational bitmask.
 -- @field target_distance Distance to target.
@@ -380,6 +389,7 @@ typedef struct {
     CombatInfo           *target_ci;
     CNWSCombatAttackData *attack;
     int32_t               weapon;
+    int32_t               ranged_type;
     int32_t               target_state;
     int32_t               situational_flags;
     double                target_distance;

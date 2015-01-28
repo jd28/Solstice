@@ -501,11 +501,10 @@ EventItemprop *Local_GetLastItemPropEvent();
 CGameEffect   *Local_GetLastDamageEffect();
 Event         *Local_GetLastNWNXEvent();
 void           Local_NWNXLog(int32_t level, const char* log);
-void           Local_DeleteCreature(uint32_t id);
-CombatInfo    *Local_GetCombatInfo(uint32_t id, bool skip_cre);
 Attack        *Local_GetAttack();
 
 C2DA          *Local_GetPoly2da();
 CGameEffect   *Local_GetPolyEffect();
 void           Local_SetDamageInfo(int32_t index, const char* name, const char* color);
+void           Local_SetCombatEngineActive(bool active);
 ]]

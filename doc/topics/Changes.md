@@ -1,9 +1,30 @@
 # Differences
 
-## Combat Engine Differences
+## Incompatabilities
+
+Due to a number of hooks needed to replace the combat engine, this
+library and nwnx_solstice are not compatible with nwnx_weapons and
+nwnx_defense.  All their features are not supported.  In order to do
+so one would have create a custom combat engine.
+
+### What can nwnx_solstice do that they can't?
+
+* Pretty much anything you can think of.
+
+### What can they do that nwnx_solstice can't (without using a combat engine)?
+
+* Most modifications to the vanilla NWN combat engine, except critical
+multipliers and threat ranges.
+* Modifying the attack roll to show modified concealment.
+
+## Sample Combat Engine Differences
+
 * Weapons with multiple damage types are treated as being one or the other.
 * Little to no support for effects versus targets.  This does not
   include Favored Enemy, Training Verus, both of which are supported.
+* Attack roll shows modified concealment.
+* All ranged weapon types are automatically equipped when they run
+  out, if the player has extras.
 
 ## Effects
 ### General Changes:
@@ -33,7 +54,10 @@
   bonuses/penalties that are only applied on critical hits and/or
   are unblockable.  NOTE: This will require updating some NWN scripts
   as they will become blockable.  (This feature is dependent on using
-  the new combat engine.)
+  a combat engine replacement.)
+* Damage Shields - An additional parameter `chance` allowing you to
+  create effects that only have a chance of causing damage to the
+  attacker.
 
 ### Additional effect types:
 * Recurring - A placeholder effect for creating recurring effects a

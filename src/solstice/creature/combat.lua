@@ -109,18 +109,6 @@ function Creature:GetConcealment(vs, is_ranged)
    return Rules.GetConcealment(self, vs, is_ranged)
 end
 
---- Get Critical Hit Multiplier
--- @param equip EQUIP_TYPE_*
-function Creature:GetCriticalHitMultiplier(equip)
-   return self.ci.equips[equip].crit_mult
-end
-
---- Get Critical Hit Range
--- @param equip EQUIP_TYPE_*
-function Creature:GetCriticalHitRange(equip)
-   return self.ci.equips[equip].crit_range
-end
-
 --- Get creature's damage flags.
 function Creature:GetDamageFlags()
    if not self:GetIsValid() then return 0 end

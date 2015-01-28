@@ -90,8 +90,8 @@ local function GetEffectImmunity(cre, imm_type, vs)
       error "Net yet implimented"
    end
 
-   local innate = GetInnateImmunity(imm_type, self)
-   return math.max(self.ci.defense.immunity_misc[imm_type] + innate,
+   local innate = GetInnateImmunity(imm_type, cre)
+   return math.max(cre.ci.defense.immunity_misc[imm_type] + innate,
                    innate)
 end
 

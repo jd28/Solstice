@@ -1,11 +1,45 @@
+----
+-- This module never needs to be required explicitly except in your
+-- preload.lua.  It sets loads the solstice library as well as setting
+-- up a few hooks and custom effect handlers.  Note that the hooks below
+-- are not protected calls!  Modifying the functions they call can result
+-- in crashes, if they contain errors.
+--
+-- Hooks:
+--
+-- * `CNWSEffectListHandler::OnApplyDamageImmunityIncrease(CNWSObject \* ,CGameEffect *,int)`
+-- * `CNWSEffectListHandler::OnRemoveDamageImmunityIncrease(CNWSObject \* ,CGameEffect *)`
+-- * `CNWSEffectListHandler::OnApplyDamageImmunityDecrease(CNWSObject \*,CGameEffect *,int)`
+-- * `CNWSEffectListHandler::OnRemoveDamageImmunityDecrease(CNWSObject \*,CGameEffect *)`
+-- * `CNWSEffectListHandler::OnApplyEffectImmunity(CNWSObject \*,CGameEffect *,int)`
+-- * `CNWSEffectListHandler::OnRemoveEffectImmunity(CNWSObject \*,CGameEffect *)`
+-- * `CNWSEffectListHandler::OnRemoveEffectImmunity(CNWSObject \*,CGameEffect *)`
+-- * `CNWSCreature::GetTotalEffectBonus(uchar,CNWSObject \*,int,int,uchar,uchar,uchar,uchar,int)`
+-- * `CNWSCombatRound::InitializeNumberOfAttacks()`
+-- * `CNWSCreatureStats::GetCriticalHitMultiplier(int)`
+-- * `CNWSCreatureStats::GetCriticalHitRoll(int)`
+-- * `CNWSCreature::ResolveDamageShields(CNWSCreature *)`
+--
+-- Custom Effect Handlers:
+--
+-- * `CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS`
+-- * `CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE`
+-- * `CUSTOM_EFFECT_TYPE_RECURRING`
+-- * `CUSTOM_EFFECT_TYPE_HITPOINTS`
+--
+-- @module preload
+
 local ffi = require 'ffi'
 local C = ffi.C
 local fmt = string.format
 
 require 'solstice.global'
 require 'solstice.combat'
+
 local Hook = require 'solstice.hooks'
 local NWNXEffects = require 'solstice.nwnx.effects'
+local Dice = require 'solstice.dice'
+local Eff = require 'solstice.effect'
 
 if OPT.JIT_DUMP then
    local dump = require 'jit.dump'
@@ -24,6 +58,7 @@ typedef struct {
 } CNWSEffectListHandler;
 ]]
 
+-- CNWSEffectListHandler::OnApplyDamageImmunityIncrease(CNWSObject *,CGameEffect *,int)
 local Orig_OnApplyDamageImmunityIncrease
 local function Hook_OnApplyDamageImmunityIncrease(handler, obj, eff, force)
    local res = Orig_OnApplyDamageImmunityIncrease(handler, obj, eff, force)
@@ -44,6 +79,7 @@ Orig_OnApplyDamageImmunityIncrease = Hook.hook {
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
 }
 
+-- CNWSEffectListHandler::OnRemoveDamageImmunityIncrease(CNWSObject *,CGameEffect *)
 local Orig_OnRemoveDamageImmunityIncrease
 local function Hook_OnRemoveDamageImmunityIncrease(handler, obj, eff)
    local res = Orig_OnRemoveDamageImmunityIncrease(handler, obj, eff)
@@ -64,6 +100,7 @@ Orig_OnRemoveDamageImmunityIncrease = Hook.hook {
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
 }
 
+-- CNWSEffectListHandler::OnApplyDamageImmunityDecrease(CNWSObject *,CGameEffect *,int)
 local Orig_OnApplyDamageImmunityDecrease
 local function Hook_OnApplyDamageImmunityDecrease(handler, obj, eff, force)
    local res = Orig_OnApplyDamageImmunityDecrease(handler, obj, eff, force)
@@ -86,6 +123,7 @@ Orig_OnApplyDamageImmunityDecrease = Hook.hook {
 
 }
 
+-- CNWSEffectListHandler::OnRemoveDamageImmunityDecrease(CNWSObject *,CGameEffect *)
 local Orig_OnRemoveDamageImmunityDecrease
 local function Hook_OnRemoveDamageImmunityDecrease(handler, obj, eff)
    local res = Orig_OnRemoveDamageImmunityDecrease(handler, obj, eff)
@@ -173,6 +211,7 @@ Hook.hook {
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
 }
 
+-- CNWSCreature::GetTotalEffectBonus(uchar,CNWSObject *,int,int,uchar,uchar,uchar,uchar,int)
 local GetTotalEffectBonus_orig
 local function Hook_GetTotalEffectBonus(cre, eff_switch , versus, elemental,
                                         is_crit, save, save_vs, skill,
@@ -224,6 +263,171 @@ GetTotalEffectBonus_orig = Hook.hook {
    func = Hook_GetTotalEffectBonus,
    type = "int (*)(CNWSCreature *, uint8_t, CNWSObject *, int32_t, int32_t, uint8_t, uint8_t, uint8_t, uint8_t, int32_t)",
    flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE),
+   length = 5
+}
+
+-- CNWSCombatRound::InitializeNumberOfAttacks()
+local function Hook_InitializeNumberOfAttacks(cr)
+   local cre = GetObjectByID(cr.cr_original.obj.obj_id)
+   if not cre:GetIsValid() then return end
+   Rules.InitializeNumberOfAttacks(cre)
+end
+
+Hook.hook {
+   address = 0x080E2260,
+   func = Hook_InitializeNumberOfAttacks,
+   type = "void (*)(CNWSCombatRound *)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+-- CNWSCreatureStats::GetWeaponFinesse(CNWSItem *)
+local function Hook_GetWeaponFinesse(stats, item)
+   local cre  = GetObjectByID(stats.cs_original.obj.obj_id)
+   if item == nil then
+      item = OBJECT_INVALID
+   else
+      item = GetObjectByID(item.obj.obj_id)
+   end
+   return Rules.GetIsWeaponFinessable(item, cre)
+end
+
+Hook.hook {
+   address = 0x08155CF4,
+   func = Hook_GetWeaponFinesse,
+   type = "int32_t (*)(CNWSCreatureStats *, CNWSItem *)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+-- CNWSCreatureStats::GetCriticalHitMultiplier(int)
+local function Hook_GetCriticalHitMultiplier(stats, is_offhand)
+   local attacker = GetObjectByID(stats.cs_original.obj.obj_id)
+   is_offhand = is_offhand == 1
+   if not attacker:GetIsValid() then return 0 end
+   local equip = EQUIP_TYPE_UNARMED
+   local it
+   if is_offhand then
+      it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+      if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
+         return 0
+      end
+      equip = EQUIP_TYPE_OFFHAND
+   else
+      it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+      if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
+         equip = EQUIP_TYPE_ONHAND
+      end
+   end
+   return attacker.ci.equips[equip].crit_mult
+end
+
+Hook.hook {
+   address = 0x0814C4A0,
+   func = Hook_GetCriticalHitMultiplier,
+   type = "int32_t (*)(CNWSCreatureStats *, int32_t)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+-- CNWSCreatureStats::GetCriticalHitRoll(int)
+local function Hook_GetCriticalHitRoll(stats, is_offhand)
+   local attacker = GetObjectByID(stats.cs_original.obj.obj_id)
+   is_offhand = is_offhand == 1
+   if not attacker:GetIsValid() then return 0 end
+   local equip = EQUIP_TYPE_UNARMED
+   local it
+   if is_offhand then
+      it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+      if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
+         return 0
+      end
+      equip = EQUIP_TYPE_OFFHAND
+   else
+      it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+      if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
+         equip = EQUIP_TYPE_ONHAND
+      end
+   end
+   return 21 - attacker.ci.equips[equip].crit_range
+end
+
+Hook.hook {
+   address = 0x0814C31C,
+   func = Hook_GetCriticalHitRoll,
+   type = "int32_t (*)(CNWSCreatureStats *, int32_t)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+--[[
+local function Hook_GetArmorClassVersus(stats, vs, touch)
+   touch = touch == 1
+   local cre = GetObjectByID(stats.cs_original.obj.obj_id)
+   return cre:GetACVersus(OBJECT_INVALID, touch)
+end
+
+Hook.hook {
+   address = 0x0814088C,
+   func = Hook_GetArmorClassVersus,
+   type = "int32_t (*)(CNWSCreatureStats *, CNWSCreature *, int32_t)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+
+-- CNWSCreatureStats::GetAttackModifierVersus(CNWSCreature *)
+local function Hook_GetAttackModifierVersus(stats, cre)
+   local cre = GetObjectByID(stats.cs_original.obj.obj_id)
+   return cre:GetAttackBonusVs(OBJECT_INVALID)
+end
+
+Hook.hook {
+   address = 0x081445B4,
+   func = Hook_GetAttackModifierVersus,
+   type = "int32_t (*)(CNWSCreatureStats *, CNWSCreature *)",
+   flags = Hook.HOOK_DIRECT,
+   length = 5
+}
+--]]
+
+-- CNWSCreature::ResolveDamageShields(CNWSCreature *)
+local function Hook_ResolveDamageShields(cre, attacker)
+   if cre == nil or attacker == nil then return end
+   cre = GetObjectByID(cre.obj.obj_id)
+   attacker = GetObjectByID(attacker.obj.obj_id)
+
+   for i = cre.obj.cre_stats.cs_first_dmgshield_eff, cre.obj.obj.obj_effects_len - 1 do
+      if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_DAMAGE_SHIELD then
+         break
+      end
+      local ip = cre.obj.obj.obj_effects[i].eff_integers[1]
+      local d, s, b = Rules.UnpackItempropDamageRoll(ip)
+      b = b + cre.obj.obj.obj_effects[i].eff_integers[0]
+      local dflag = cre.obj.obj.obj_effects[i].eff_integers[2]
+      local chance = cre.obj.obj.obj_effects[i].eff_integers[3]
+
+      if chance == 0 or chance <= math.random(chance) then
+         local dindex = ffi.C.ns_BitScanFFS(dflag)
+         local amt = Dice.Roll(d, s, b)
+         -- This HAS to be in a delay command as apply damage immediately
+         -- might cause the cross the Lua/C boundary multiple times.
+         cre:DelayCommand(0.1,
+                          function (self)
+                             if attacker:GetIsValid() then
+                                local e = Eff.Damage(amt, dindex)
+                                e:SetCreator(self)
+                                attacker:ApplyEffect(DURATION_TYPE_INSTANT, e)
+                             end
+                          end)
+      end
+   end
+end
+
+Hook.hook {
+   address = 0x080EFCAC,
+   func = Hook_ResolveDamageShields,
+   type = "void (*)(CNWSCreature *, CNWSCreature *)",
+   flags = Hook.HOOK_DIRECT,
    length = 5
 }
 

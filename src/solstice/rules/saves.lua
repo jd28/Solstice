@@ -7,7 +7,7 @@
 --- Get save effect limits.
 -- @param cre Creature.
 -- @param save SAVING_THROW_*
--- @param save SAVING_THROW_VS_*
+-- @param save_vs SAVING_THROW_VS_*
 -- @return -20
 -- @return 20
 local function GetSaveEffectLimits(cre, save, save_vs)
@@ -17,7 +17,7 @@ end
 --- Get save effect bonus unclamped.
 -- @param cre Creature.
 -- @param save SAVING_THROW_*
--- @param save SAVING_THROW_VS_*
+-- @param save_vs SAVING_THROW_VS_*
 local function GetSaveEffectBonus(cre, save, save_vs)
    local res = 0
    for i = cre.obj.cre_stats.cs_first_save_eff, cre.obj.obj.obj_effects_len - 1 do

@@ -1,6 +1,9 @@
 local ffi = require 'ffi'
 
 ffi.cdef[[
+
+struct CNWSCreature_s;
+
 typedef struct {
     uint8_t com_attacks;
     uint8_t com_onhand_ab_mod;
@@ -153,6 +156,6 @@ typedef struct CNWSCombatRound_s {
     uint8_t                       field_132;                     /* 0x2153 */
     uint32_t                      cr_dodge_target;               /* 0x2154 */
     uint32_t                    **cr_sched_action_lst;           /* 0x2158 */
-    void                         *cr_original;                   /* 0x215C */
+    struct CNWSCreature_s        *cr_original;                   /* 0x215C */
 } CNWSCombatRound;
 ]]

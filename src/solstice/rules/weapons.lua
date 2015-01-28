@@ -710,66 +710,6 @@ local function GetDualWieldPenalty(cre)
    return on, off
 end
 
-local _ROLLS
-local _ROLLS_LEN = 0
-local function UnpackItempropDamageRoll(ip)
-   if _ROLLS_LEN == 0 then
-      local tda = TDA.GetCached2da("iprp_damagecost")
-      if tda == nil then error "Unable to locate iprp_damagecost.2da!" end
-
-      _ROLLS_LEN = TDA.GetRowCount(tda)
-      _ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
-
-      for i=1, TDA.GetRowCount(tda) - 1 do
-
-         local d = TDA.GetInt(tda, "NumDice", i)
-         local s = TDA.GetInt(tda, "Die", i)
-         if d == 0 then
-            _ROLLS[i].dice, _ROLLS[i].sides, _ROLLS[i].bonus = 0, 0, s
-         else
-            _ROLLS[i].dice, _ROLLS[i].sides, _ROLLS[i].bonus = d, s, 0
-         end
-      end
-   end
-
-   if ip < 0 or ip >= _ROLLS_LEN then
-      error(string.format("Invalid IP Const: %d, %s", ip, debug.traceback()))
-   end
-
-   return _ROLLS[ip].dice, _ROLLS[ip].sides, _ROLLS[ip].bonus
-
-end
-
-local _MONSTER_ROLLS
-local _MONSTER_ROLLS_LEN = 0
-local function UnpackItempropMonsterRoll(ip)
-   if _MONSTER_ROLLS_LEN == 0 then
-      local tda = TDA.GetCached2da("iprp_monstcost")
-      if tda == nil then error "Unable to locate iprp_monstcost!" end
-
-      _MONSTER_ROLLS_LEN = TDA.GetRowCount(tda)
-      _MONSTER_ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
-
-      for i=1, TDA.GetRowCount(tda) - 1 do
-
-         local d = TDA.GetInt(tda, "NumDice", i)
-         local s = TDA.GetInt(tda, "Die", i)
-         if d == 0 then
-            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = 0, 0, s
-         else
-            _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = d, s, 0
-         end
-      end
-   end
-
-   if ip < 0 or ip >= _MONSTER_ROLLS_LEN then
-      error(string.format("Invalid IP Const: %d, %s", ip, debug.traceback()))
-   end
-
-   return _MONSTER_ROLLS[ip].dice, _MONSTER_ROLLS[ip].sides, _MONSTER_ROLLS[ip].bonus
-end
-
-
 local function AttackTypeToEquipType(atype)
    assert(atype > 0)
    if atype == ATTACK_TYPE_OFFHAND then
@@ -945,7 +885,7 @@ local function GetCreatureDamageBonus(cre, item)
    if not item:GetIsValid() then return 0, 0, 0 end
    for ip in item:ItemProperties() do
       if ip:GetPropertyType() == ITEM_PROPERTY_MONSTER_DAMAGE then
-         d, s = UnpackItempropMonsterRoll(ip:GetCostTableValue())
+         d, s = M.UnpackItempropMonsterRoll(ip:GetCostTableValue())
          break
       end
    end
@@ -978,7 +918,6 @@ M.GetWeaponType                   = GetWeaponType
 M.GetWeaponPower                  = GetWeaponPower
 M.GetUnarmedDamageBonus           = GetUnarmedDamageBonus
 
-M.UnpackItempropDamageRoll        = UnpackItempropDamageRoll
 M.AttackTypeToEquipType           = AttackTypeToEquipType
 M.EquipTypeToAttackType           = EquipTypeToAttackType
 M.InventorySlotToAttackType       = InventorySlotToAttackType

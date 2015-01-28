@@ -1,10 +1,11 @@
 # Solstice
 
-Solstice is a scripting library and combat engine replacement for
-[Neverwinter Nights](http://neverwinternights.info/) (NWN).  My main goal
-was to expand NWN from a platform for building adventures to also allow building
-new/different rulesets.  The project also aims at a tight level of
-integration: where you could create a server with
+Solstice is a scripting library and optionally a combat engine
+replacement plugin system for
+[Neverwinter Nights](http://neverwinternights.info/) (NWN).  My main
+goal was to expand NWN from a platform for building adventures to also
+allow building new/different rulesets.  The project also aims at a
+tight level of integration: where you could create a server with
 no NWN scripts, but also where you could add/replace a script
 without having to change a single line of NWN script.
 
@@ -29,9 +30,8 @@ if you like the idea but not Lua or the implementation, there are other
 options.
 
 ## Status
-* Status: Very near beta.  The last overhaul brought massive performance
-  increases to the combat engine.
-* Working on getting nicer docs...
+* Status: Very near beta.
+* Working on getting nicer docs.
 * No build instructions yet.
 
 ## Dependencies
