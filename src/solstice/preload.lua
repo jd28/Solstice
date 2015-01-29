@@ -406,7 +406,7 @@ local function Hook_ResolveDamageShields(cre, attacker)
       local dflag = cre.obj.obj.obj_effects[i].eff_integers[2]
       local chance = cre.obj.obj.obj_effects[i].eff_integers[3]
 
-      if chance == 0 or chance <= math.random(chance) then
+      if chance == 0 or math.random(chance) <= chance then
          local dindex = ffi.C.ns_BitScanFFS(dflag)
          local amt = Dice.Roll(d, s, b)
          -- This HAS to be in a delay command as apply damage immediately

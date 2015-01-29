@@ -21,7 +21,7 @@ The code there is likewise MIT Licensed.
 
 If you're curious how everything comes together take a look at the Rules module,
 which is the core of the system.  If you want to see the details of
-the combat engine replacement see `src/solstice/attack.lua`, just be
+the combat engine replacement see `examples/core_combat_engine.lua`, just be
 aware that that code is atypical in that it's written for the highest
 performance possible.
 

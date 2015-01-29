@@ -35,6 +35,6 @@ function NWNXSolstice_UpdateCombatInfo(attacker)
    attacker:UpdateCombatInfo(true)
    local ce = Rules.GetCombatEngine()
    if ce and ce.UpdateCombatInformation then
-      ce.UpdateCombatInformation(GetObjectByID(attacker))
+      ce.UpdateCombatInformation(attacker)
    end
 end
