@@ -248,6 +248,9 @@ typedef struct {
     int32_t       weapon_type;
     DamageRoll    damage[20];
     int32_t       damage_len;
+    float         crit_chance_modifier;
+    float         crit_dmg_modifier;
+    float         damge_bonus_modifier;
 } Offense;
 
 typedef struct {
