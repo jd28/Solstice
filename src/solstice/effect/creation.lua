@@ -353,7 +353,7 @@ end
 -- @param amount Base damage
 -- @param random DAMANGE_BONUS_*
 -- @param damage_type DAMAGE_INDEX_*
--- @param[opt=100] Perecent chance of doing damage to attacker.
+-- @param[opt=100] chance Chance of doing damage to attacker.
 function M.DamageShield(amount, random, damage_type, chance)
    local damage_flag = bit.lshift(1, damage_type)
    return CreateSimple(EFFECT_TYPE_DAMAGE_SHIELD, amount, random,

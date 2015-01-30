@@ -902,7 +902,7 @@ local function ResolveQuiveringPalm(info, attacker, target)
    if GetSpecialAttack(info) ~= SPECIAL_ATTACK_QUIVERING_PALM or
       target:GetHitDice() >= attacker:GetHitDice()            or
       GetDamageTotal(info) <= 0                               or
-      target:GetIsImmune(IMMUNITY_TYPE_CRITICAL_HITS)            or
+      target:GetIsImmune(IMMUNITY_TYPE_CRITICAL_HIT)          or
       target:FortitudeSave(10 + (attacker:GetHitDice() / 2) + attacker:GetAbilityModifier(ABILITY_WISDOM),
                            0, attacker) == 0
    then
