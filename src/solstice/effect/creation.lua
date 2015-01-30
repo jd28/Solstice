@@ -246,6 +246,7 @@ function M.Damage(amount, damage_type, power)
    eff:SetInt(14, 1000)
    eff:SetInt(15, damage_flag)
    eff:SetInt(16, power)
+   eff:SetInt(17, 0)
 
    return eff
 end
