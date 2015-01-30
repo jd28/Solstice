@@ -654,6 +654,7 @@ local function GetWeaponCritMultiplier(cre, item)
    end
 
    if TA then
+      local style = cre:GetLocalInt("pc_style_fighting")
       feat = GetWeaponFeat(MASTERWEAPON_FEAT_CRIT_DEVASTATING, base)
       if feat ~= -1 and cre:GetHasFeat(feat) then
          mult = mult + 1
@@ -661,6 +662,8 @@ local function GetWeaponCritMultiplier(cre, item)
          and cre:GetLevelByClass(CLASS_TYPE_ROGUE) >= 35
          and GetIsWeaponSimple(item, cre)
       then
+         mult = mult + 1
+      elseif style == 5 and GetWeaponType(item) == 8 then
          mult = mult + 1
       end
    end
