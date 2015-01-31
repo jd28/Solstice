@@ -172,7 +172,6 @@ Orig_OnApplyEffectImmunity = Hook.hook {
 }
 
 -- CNWSEffectListHandler::OnRemoveEffectImmunity(CNWSObject *,CGameEffect *)    0x0817D2F0
-local Orig_OnRemoveEffectImmunity
 local function Hook_OnRemoveEffectImmunity(handler, obj, eff)
    local cre = Game.GetObjectByID(obj.obj_id)
    if cre:GetType() == OBJECT_TYPE_CREATURE
@@ -193,7 +192,7 @@ Orig_OnRemoveEffectImmunity = Hook.hook {
    length = 6,
    address = 0x0817D2F0,
    type = 'int32_t (*)(CNWSEffectListHandler *, CNWSObject *, CGameEffect *)',
-   flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE)
+   flags = Hook.HOOK_DIRECT
 }
 
 -- CNWSCreatureStats::GetEffectImmunity(uchar,CNWSCreature *) 0x0815FF10
