@@ -352,16 +352,17 @@ local function ResolveMissChance(info, attacker, target, hit, use_cached)
 
    -- The attacker has two possible chances to over come miss chance / concealment
    -- if they posses the blind fight feat.  If not they only have one chance to do so.
-   if random(100) <= chance
-      or (attacker:GetHasFeat(FEAT_BLIND_FIGHT) and random(100) <= chance)
+   if random(100) >= chance
+      or (attacker:GetHasFeat(FEAT_BLIND_FIGHT) and random(100) >= chance)
    then
+      return false
+   else
       SetResult(info, attack_result)
       -- Show the modified conceal/miss chance in the combat log.
       SetConcealment(info, floor((chance ^ 2) / 100))
       SetMissedBy(info, 1)
       return true
    end
-   return false
 end
 
 --- Resolves deflect arrow.
