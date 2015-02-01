@@ -274,4 +274,5 @@ void           Local_NWNXLog(int32_t level, const char* log);
 Attack        *Local_GetAttack();
 void           Local_SetDamageInfo(int32_t index, const char* name, const char* color);
 void           Local_SetCombatEngineActive(bool active);
+EffectData    *Local_GetLastEffect();
 ]]

@@ -408,6 +408,13 @@ typedef struct {
     int32_t               effects_to_remove_len;
 } Attack;
 
+typedef struct {
+    CNWSObject *obj;
+    CGameEffect *eff;
+    bool is_remove;
+} EffectData;
+
+
 ]], _CONSTS))
 
 require 'solstice.nwn.funcs'
