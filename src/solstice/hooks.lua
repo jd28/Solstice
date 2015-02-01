@@ -43,6 +43,7 @@ local HOOK_RETCODE = 0x2
 -- @param info HookDesc table
 -- @see HookDesc
 local function hook(info)
+   jit.off(info.func)
    local res = ffi.C.nx_hook_function(ffi.cast('void*', info.address),
                                       ffi.cast(info.type, info.func),
                                       info.length,
