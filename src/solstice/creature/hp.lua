@@ -40,9 +40,3 @@ function Creature:GetMaxHitPoints()
    self.ci.defense.hp_max = Rules.GetMaxHitPoints(self)
    return self.ci.defense.hp_max + self.ci.defense.hp_eff
 end
-
-function NWNXSolstice_GetMaxHitpoints(id)
-   local cre = GetObjectByID(id)
-   if not cre:GetIsValid() then return 0 end
-   return cre:GetMaxHitPoints()
-end

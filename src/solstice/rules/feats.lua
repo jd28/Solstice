@@ -51,11 +51,6 @@ function M.GetFeatSuccessors(feat)
    return res
 end
 
-function NWNXSolstice_GetMaximumFeatUses(feat, cre)
-   cre = GetObjectByID(cre)
-   return M.GetMaximumFeatUses(feat, cre)
-end
-
 --- Determine is first level feat only.
 -- @param feat FEAT_*
 function M.GetFeatIsFirstLevelOnly(feat)

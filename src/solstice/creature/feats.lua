@@ -244,8 +244,3 @@ function Creature:SetKnownFeatByLevel(level, index, feat)
 
    return ls.ls_featlist.data[index]
 end
-
-function NWNXSolstice_GetRemainingFeatUses(feat, cre)
-   cre = GetObjectByID(cre)
-   return cre:GetRemainingFeatUses(feat)
-end
