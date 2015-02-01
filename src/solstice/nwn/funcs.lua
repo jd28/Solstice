@@ -261,7 +261,8 @@ uint32_t ns_GetAmmunitionAvailable(CNWSCreature *attacker, int32_t num_attacks, 
 const char* ns_GetCombatDamageString(
     const char *attacker,
     const char *target,
-    const DamageResult *dmg);
+    const DamageResult *dmg,
+    bool simple);
 
 ChatMessage   *Local_GetLastChatMessage();
 CombatMessage *Local_GetLastCombatMessage();
