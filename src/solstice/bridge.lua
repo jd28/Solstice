@@ -104,7 +104,7 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
       local eid = eff.eff_id
       cre:DelayCommand(0.1,
                        function (self)
-                          self:RemoveEffectById(eid)
+                          self:RemoveEffectByID(eid)
                        end)
    end
 
@@ -151,7 +151,7 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
       local eid = eff.eff_id
       cre:DelayCommand(0.1,
                        function (self)
-                          self:RemoveEffectById(eid)
+                          self:RemoveEffectByID(eid)
                        end)
    end
 
