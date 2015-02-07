@@ -32,7 +32,6 @@ local sol_item  = require 'solstice.item'
 local sol_loc   = require 'solstice.location'
 Rules.RegisterConstant("LOCATION_INVALID", sol_loc.INVALID)
 
-local sol_lock  = require 'solstice.lock'
 local sol_mod   = require 'solstice.module'
 local sol_plc   = require 'solstice.placeable'
 local sol_snd   = require 'solstice.sound'
