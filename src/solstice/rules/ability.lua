@@ -30,6 +30,7 @@ local function GetAbilityEffectModifier(cre, ability)
    end
 
    local eff = 0
+   if cre.obj.obj.obj_effects_len <= 0 then return eff end
    if cre.obj.cre_stats.cs_first_ability_eff > 0 then
       for i = cre.obj.cre_stats.cs_first_ability_eff, cre.obj.obj.obj_effects_len - 1 do
          if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_ABILITY_INCREASE
