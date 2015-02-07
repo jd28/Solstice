@@ -27,6 +27,12 @@ function Item:GetACValue()
    return NWE.StackPopInteger()
 end
 
+--- Compute armor class.
+function Item:ComputeArmorClass()
+   if not self:GetIsValid() then return 0 end
+   return ffi.C.nwn_ComputeArmorClass(self.obj)
+end
+
 --- Gets Armor's Base AC bonus.
 -- Note this is currently hardcoded to the typical vanilla NWN values.
 -- @return -1 if item is not armor.

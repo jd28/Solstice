@@ -160,6 +160,7 @@ CNWItemProperty *nwn_GetPropertyByType(CNWSItem *item, uint16_t type);
 bool             nwn_HasPropertyType(CNWSItem *item, uint16_t type);
 CNWBaseItem     *nwn_GetBaseItem(uint32_t basetype);
 void             nwn_DestroyItem(CNWSItem *it);
+int32_t          nwn_ComputeArmorClass(CNWSItem *it);
 ]]
 
 -- message.h
