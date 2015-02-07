@@ -115,11 +115,23 @@ local function monk(cre, class)
    local level = cre:GetLevelByClass(class)
    if level == 0 then return false, 0 end
 
-   local can = (cre.obj.cre_stats.cs_ac_armour_base == 0 and
-                cre.obj.cre_stats.cs_ac_shield_base == 0) or
-      cre:GetIsPolymorphed()
+   if not cre:GetIsPolymorphed() then
+      local chest = cre:GetItemInSlot(INVENTORY_SLOT_CHEST)
+      if chest:GetIsValid() and chest:ComputeArmorClass() > 0 then
+         return false, level
+      end
 
-   return can, level
+      local shield = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+      if shield:GetIsValid() and
+         (shield:GetBaseType() == BASE_ITEM_SMALLSHIELD
+          or shield:GetBaseType() == BASE_ITEM_LARGESHIELD
+          or shield:GetBaseType() == BASE_ITEM_TOWERSHIELD)
+      then
+         return false, level
+      end
+   end
+
+   return true, level
 end
 
 local function ranger(cre, class)
