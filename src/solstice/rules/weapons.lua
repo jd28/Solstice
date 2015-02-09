@@ -106,6 +106,7 @@ local function GetIsWeaponSimple(item, cre)
       or base == BASE_ITEM_SLING
       or base == BASE_ITEM_TINY_SPEAR
       or base == BASE_ITEM_SHORTSPEAR
+      or base == BASE_ITEM_DAGGER_ASSN
 end
 
 --- Determine if weapon is finessable.
