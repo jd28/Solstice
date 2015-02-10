@@ -95,7 +95,7 @@ NWNXEffects.RegisterEffectHandler(
             if eff:GetType() == 44
                and eff:GetInt(0) == CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS
             then
-               att = att + eff:GetInt(2)
+               att = att + eff:GetInt(1)
             end
          end
          new = math.clamp(att, 0, 5)
