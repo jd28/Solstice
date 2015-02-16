@@ -212,6 +212,10 @@ local function GetFavoredEnemyCombatModifier(cre)
 
 end
 
+local function GetAbilityCombatModifier(cre)
+   ZeroCombatModifier(cre, COMBAT_MOD_ABILITY)
+end
+
 local _COMBAT_MOD = {
    [0] = GetAreaCombatModifier,
    GetClassCombatModifier,
@@ -220,7 +224,8 @@ local _COMBAT_MOD = {
    GetSizeCombatModifier,
    GetSkillCombatModifier,
    GetTrainingVsCombatModifier,
-   GetFavoredEnemyCombatModifier
+   GetFavoredEnemyCombatModifier,
+   GetAbilityCombatModifier,
 }
 
 --- Resolves combat modifier.
