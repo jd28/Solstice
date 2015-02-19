@@ -183,7 +183,9 @@ function M.GetSkillEffectModifier(cre, skill)
          then
             break
          end
-         if cre.obj.obj.obj_effects[i].eff_integers[0] == skill then
+         if cre.obj.obj.obj_effects[i].eff_integers[0] == skill
+            or cre.obj.obj.obj_effects[i].eff_integers[0] == 255
+         then
             if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_SKILL_INCREASE then
                eff = eff + cre.obj.obj.obj_effects[i].eff_integers[1]
             else
