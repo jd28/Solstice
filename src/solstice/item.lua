@@ -325,14 +325,16 @@ end
 function Item:GetInfiniteFlag()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(827, 1)
-   return NWE.StackPopBoolean
+   return NWE.StackPopBoolean()
 end
 
 --- Sets an item identified
 -- @param[opt=false] is_ided true or false.
 function Item:SetIdentified(is_ided)
    if not self:GetIsValid() then return end
-   self.obj.it_identified = is_ided and 1 or 0
+   NWE.StackPushBoolean(is_ided)
+   NWE.StackPushObject(self)
+   NWE.ExecuteCommand(333, 2)
 end
 
 --- Sets and items infinite quantity flag.
