@@ -173,7 +173,12 @@ end
 
 function NWNXSolstice_HandleEffect()
    local data = ffi.C.Local_GetLastEffect()
-   if data == nil then return end
+   if data == nil
+      or data.obj == nil
+      or data.eff == nil
+   then
+      return
+   end
 
    local cre = GetObjectByID(data.obj.obj_id)
    if not cre:GetIsValid() then return end
@@ -203,12 +208,16 @@ function NWNXSolstice_HandleEffect()
       local idx = data.eff.eff_integers[0]
       local amt = data.eff.eff_integers[1]
       if data.is_remove then amt = -amt end
-      cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
+      if idx >= 0 and idx < ABILITY_NUM then
+         cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
+      end
    elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE then
       local idx = data.eff.eff_integers[0]
       local amt = data.eff.eff_integers[1]
       if not data.is_remove then amt = -amt end
-      cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
+      if idx >= 0 and idx < ABILITY_NUM then
+         cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
+      end
    end
 end
 
