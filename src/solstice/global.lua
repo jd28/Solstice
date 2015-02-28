@@ -236,7 +236,6 @@ end
 -- Internal Function handling DelayCommand
 local function _RUN_DELAY_COMMAND (token)
    if _COMMANDS[token] ~= nil then
-      print("Delay Token: " .. token)
       local f = _COMMANDS[token]["f"]
       f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
    end
@@ -255,7 +254,6 @@ local function _RUN_REPEAT_COMMAND(token)
             _COMMANDS[token] = nil
          else
             _COMMANDS[token]["d"] = newdelay
-            print("Repeat Delay:", newdelay)
             return newdelay
          end
       else
