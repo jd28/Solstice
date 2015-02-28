@@ -146,7 +146,7 @@ end
 local function assassin(cre, class)
    local level = cre:GetLevelByClass(class)
    if level == 0 then return false, 0 end
-   local can = cre.obj.cre_stats.cs_ac_armour_base == 0
+   local can = cre.obj.cre_stats.cs_ac_armour_base > 0
 
    return can, level
 end
