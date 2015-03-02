@@ -684,33 +684,50 @@ local function UpdateCriticalDamage(self, equip_num, item)
    end
 end
 
+
+
 --- Updates a creature's combat modifiers.
 -- See ConbatMod ctype.
 -- @bool all Force all combat information to be updated.
 function Creature:UpdateCombatInfo(all)
-   self.ci.fe_mask = self:GetFavoredEnemenyMask()
-   self.ci.training_vs_mask = self:GetTrainingVsMask()
+   if not all and self.ci.update_flags == 0 then return end
 
-   UpdateCombatEquips(self)
-   UpdateCombatWeaponInfo(self)
-
-   Rules.ResolveCombatModifiers(self)
-   Rules.ResolveSituationModifiers(self)
-
-   UpdateAttacks(self)
-   UpdateDamage(self)
-
-   if self.ci.offense.ranged_type > 0 then
-      UpdateAmmoDamage(self)
+   if self.ci.update_flags == -1 then
+      all = true
    end
 
-   for i = 0, EQUIP_TYPE_NUM - 1 do
-      local weap = GetObjectByID(self.ci.equips[i].id)
-      UpdateCriticalDamage(self, i, weap)
+   if all then
+      UpdateCombatEquips(self)
+      UpdateCombatWeaponInfo(self)
+      self.ci.fe_mask = self:GetFavoredEnemenyMask()
+      self.ci.training_vs_mask = self:GetTrainingVsMask()
+      Rules.ResolveCombatModifiers(self)
+      Rules.ResolveSituationModifiers(self)
+      UpdateAttacks(self)
    end
 
-   UpdateAttackBonus(self)
-   UpdateDamageReduction(self)
-   UpdateDamageResistance(self)
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE) then
+      UpdateDamage(self)
+      if self.ci.offense.ranged_type > 0 then
+         UpdateAmmoDamage(self)
+      end
+      for i = 0, EQUIP_TYPE_NUM - 1 do
+         local weap = GetObjectByID(self.ci.equips[i].id)
+         UpdateCriticalDamage(self, i, weap)
+      end
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_ATTACK_BONUS) then
+      UpdateAttackBonus(self)
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_REDUCTION) then
+      UpdateDamageReduction(self)
+   end
+
+   if all or bit.band(self.ci.update_flags, COMBAT_UPDATE_DAMAGE_RESISTANCE) then
+      UpdateDamageResistance(self)
+   end
    UpdateDamageImmunity(self)
+   self.ci.update_flags = 0
 end
