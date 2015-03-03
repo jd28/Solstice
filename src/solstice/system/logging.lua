@@ -67,3 +67,10 @@ end
 function M.GetLogger()
    return assert(_LOGGER)
 end
+
+--- Create file logger
+-- @param filename File name.
+-- @param date_time Date/time format see os.date
+function M.FileLogger(filename, date_time)
+   return file(filename, date_time)
+end
