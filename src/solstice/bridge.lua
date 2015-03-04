@@ -5,22 +5,28 @@ local Eff = require 'solstice.effect'
 local GetObjectByID = require('solstice.game').GetObjectByID
 
 function NWNXSolstice_GetMaximumFeatUses(feat, cre)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetMaximumFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
    cre = GetObjectByID(cre)
    return Rules.GetMaximumFeatUses(feat, cre)
 end
 
 function NWNXSolstice_GetRemainingFeatUses(feat, cre)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetRemainingFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
    cre = GetObjectByID(cre)
    return cre:GetRemainingFeatUses(feat)
 end
 
 function NWNXSolstice_GetMaxHitpoints(id)
+   --_SOL_LOG_INTERNAL:debug("NWNXSolstice_GetMaxHitpoints: Creature: 0x%x", id)
+
    local cre = GetObjectByID(id)
    if not cre:GetIsValid() then return 0 end
    return cre:GetMaxHitPoints()
 end
 
 function NWNXSolstice_GetArmorClass(cre)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetArmorClass: Creature: 0x%x", cre)
+
    cre = Game.GetObjectByID(cre)
    if not cre:GetIsValid() or cre.type ~= OBJECT_TRUETYPE_CREATURE then
       return 0
@@ -44,6 +50,8 @@ function NWNXSolstice_ResolvePreAttack(attacker_, target_)
 end
 
 function NWNXSolstice_UpdateCombatInfo(attacker)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetArmorClass: Creature: 0x%x", attacker)
+
    attacker = GetObjectByID(attacker)
    attacker:UpdateCombatInfo(true)
    local ce = Rules.GetCombatEngine()
@@ -55,6 +63,7 @@ end
 local result = damage_result_t()
 
 function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageImmunity")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    local idx = C.ns_BitScanFFS(flags)
@@ -80,6 +89,7 @@ function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
 end
 
 function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageResistance")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    local idx = C.ns_BitScanFFS(flags)
@@ -126,6 +136,7 @@ end
 
 function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
                                         no_feedback)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageReduction")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    local idx = 12
