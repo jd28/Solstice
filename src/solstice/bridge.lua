@@ -192,43 +192,32 @@ function NWNXSolstice_HandleEffect()
    end
 
    local cre = GetObjectByID(data.obj.obj_id)
-   if not cre:GetIsValid() then return end
+   if not cre:GetIsValid() or cre.ci == nil then
+      return
+   end
 
-   if data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE then
-      local idx = C.ns_BitScanFFS(data.eff.eff_integers[0])
-      local amt = data.eff.eff_integers[1]
-      if data.is_remove then amt = -amt end
-      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] + amt
-   elseif data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE then
-      local idx = C.ns_BitScanFFS(data.eff.eff_integers[0])
-      local amt = data.eff.eff_integers[1]
-      if not data.is_remove then amt = -amt end
-      cre.ci.defense.immunity[idx] = cre.ci.defense.immunity[idx] + amt
+   _SOL_LOG_INTERNAL:debug("Handling effect of type: %d, on object: 0x%x remove: %d",
+                           data.eff.eff_type, data.obj.obj_id, data.is_remove and 1 or 0)
+
+   if data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE
+      or data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE
+   then
+      Rules.UpdateDamageImmunityEffects(cre)
    elseif data.eff.eff_type == EFFECT_TYPE_IMMUNITY then
       if data.eff.eff_integers[1] == 28
          and data.eff.eff_integers[2] == 0
          and data.eff.eff_integers[3] == 0
       then
-         local amt = data.eff.eff_integers[4]
-         amt = amt == 0 and 100 or amt
-         local idx = data.eff.eff_integers[0]
-         if data.is_remove then amt = -amt end
-         cre.ci.defense.immunity_misc[idx] = cre.ci.defense.immunity_misc[idx] + amt
+         Rules.UpdateMiscImmunityEffects(cre)
       end
-   elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_INCREASE then
-      local idx = data.eff.eff_integers[0]
-      local amt = data.eff.eff_integers[1]
-      if data.is_remove then amt = -amt end
-      if idx >= 0 and idx < ABILITY_NUM then
-         cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
-      end
-   elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE then
-      local idx = data.eff.eff_integers[0]
-      local amt = data.eff.eff_integers[1]
-      if not data.is_remove then amt = -amt end
-      if idx >= 0 and idx < ABILITY_NUM then
-         cre.ci.ability_eff[idx] = cre.ci.ability_eff[idx] + amt
-      end
+   elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_INCREASE
+      or data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE
+   then
+      Rules.UpdateAbilityEffects(cre)
+   elseif data.eff.eff_type == EFFECT_TYPE_ATTACK_INCREASE
+      or data.eff.eff_type == EFFECT_TYPE_ATTACK_DECREASE
+   then
+      Rules.UpdateAttackBonusEffects(cre)
    end
 end
 
