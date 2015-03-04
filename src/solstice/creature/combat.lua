@@ -457,65 +457,9 @@ end
 
 local function UpdateAttackBonus(self)
    self.ci.offense.ab_base = self:GetBaseAttackBonus()
-
    self.ci.offense.offhand_penalty_on,
    self.ci.offense.offhand_penalty_off = Rules.GetDualWieldPenalty(self)
-
-   local bon, pen = {}, {}
-
-   for i = self.obj.cre_stats.cs_first_ab_eff, self.obj.obj.obj_effects_len - 1 do
-      if self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_ATTACK_INCREASE and
-         self.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_ATTACK_DECREASE
-      then
-         break
-      end
-
-      local amount    = self.obj.obj.obj_effects[i].eff_integers[0]
-      local atktype   = self.obj.obj.obj_effects[i].eff_integers[1]
-      local race      = self.obj.obj.obj_effects[i].eff_integers[2]
-      local lawchaos  = self.obj.obj.obj_effects[i].eff_integers[3]
-      local goodevil  = self.obj.obj.obj_effects[i].eff_integers[4]
-
-      bon[atktype] = bon[atktype] or 0
-      pen[atktype] = pen[atktype] or 0
-
-      if race == 28 and lawchaos == 0 and goodevil == 0 then
-         if self.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE then
-            if atktype == ATTACK_TYPE_MISC then
-               bon[atktype] = bon[atktype] + amount
-            else
-               bon[atktype] = math.max(bon[atktype], amount)
-            end
-         elseif self.obj.obj.obj_effects[i].eff_type ==  EFFECT_TYPE_ATTACK_DECREASE then
-            if atktype == ATTACK_TYPE_MISC then
-               pen[atktype] = pen[atktype] + amount
-            else
-               pen[atktype] = math.max(pen[atktype], amount)
-            end
-         end
-      end
-   end
-
-   self.ci.offense.ab_transient =
-      (bon[ATTACK_TYPE_MISC] or 0) - (pen[ATTACK_TYPE_MISC] or 0)
-
-   self.ci.equips[EQUIP_TYPE_ONHAND].transient_ab_mod =
-      (bon[ATTACK_TYPE_ONHAND] or 0) - (pen[ATTACK_TYPE_ONHAND] or 0)
-
-   self.ci.equips[EQUIP_TYPE_OFFHAND].transient_ab_mod =
-      (bon[ATTACK_TYPE_OFFHAND] or 0) - (pen[ATTACK_TYPE_OFFHAND] or 0)
-
-   self.ci.equips[EQUIP_TYPE_UNARMED].transient_ab_mod =
-      (bon[ATTACK_TYPE_UNARMED] or 0) - (pen[ATTACK_TYPE_UNARMED] or 0)
-
-   self.ci.equips[EQUIP_TYPE_CREATURE_1].transient_ab_mod =
-      (bon[ATTACK_TYPE_CWEAPON1] or 0) - (pen[ATTACK_TYPE_CWEAPON1] or 0)
-
-   self.ci.equips[EQUIP_TYPE_CREATURE_2].transient_ab_mod =
-      (bon[ATTACK_TYPE_CWEAPON2] or 0) - (pen[ATTACK_TYPE_CWEAPON2] or 0)
-
-   self.ci.equips[EQUIP_TYPE_CREATURE_3].transient_ab_mod =
-      (bon[ATTACK_TYPE_CWEAPON3] or 0) - (pen[ATTACK_TYPE_CWEAPON3] or 0)
+   Rules.UpdateAttackBonusEffects(self)
 end
 
 local function AddDamageToEquip(self, equip_num, type, dice, sides, bonus, mask)

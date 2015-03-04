@@ -41,6 +41,8 @@ local sol_trig  = require 'solstice.trigger'
 local sol_way   = require 'solstice.waypoint'
 
 local Log = System.GetLogger()
+_SOL_LOG_INTERNAL = System.FileLogger(OPT.LOG_DIR .. "/solstice_internal.txt", "[%Y-%m-%d %X]")
+
 
 -- 'Private' globals.
 local ffi = require 'ffi'
@@ -203,6 +205,8 @@ function _SOL_RUN_SCRIPT(script, obj)
    if not f or not type(f) == "function" then
       return 0
    end
+
+   _SOL_LOG_INTERNAL:debug("Running Script: '%s' on 0x%x", script, obj)
 
    local result = f(_SOL_GET_CACHED_OBJECT(obj))
    if result == nil then

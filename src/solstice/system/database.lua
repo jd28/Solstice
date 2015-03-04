@@ -3,8 +3,6 @@
 -- @alias M
 
 local M = require 'solstice.system.init'
-local Log = M.GetLogger()
-
 local _DATABASE = nil
 
 --- Database
@@ -25,6 +23,7 @@ local function ConnectDatabase(driver_name, dbname, dbuser,
                                 dbpassword, dbhost, dbport)
 
    if not dbh then
+      local Log = M.GetLogger()
       Log:error("Cannot connect to database: %s\n", err)
    else
       dbh:autocommit(true)

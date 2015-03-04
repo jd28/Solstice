@@ -50,9 +50,7 @@ void           Local_NWNXLog(int32_t level, const char* log);
 ]]
 
 local M = require 'solstice.system.init'
-M.FileLog = file(OPT.LOG_FILE, OPT.LOG_DATE_PATTERN)
-
-local _LOGGER = M.FileLog
+local _LOGGER = nil
 
 --- Logging
 -- @section logging
@@ -66,4 +64,11 @@ end
 --- Get current logger.
 function M.GetLogger()
    return assert(_LOGGER)
+end
+
+--- Create file logger
+-- @param filename File name.
+-- @param date_time Date/time format see os.date
+function M.FileLogger(filename, date_time)
+   return file(filename, date_time)
 end
