@@ -13,8 +13,8 @@ function M.CollectGarbage()
    return before - collectgarbage("count")
 end
 
-local Log = M.GetLogger()
 function M.LogGlobalTable()
+   local Log = M.GetLogger()
    for k, v in pairs(_G) do
       local m = string.format("Key: %s, Value: %s\n", tostring(k), tostring(v))
       Log:info(m)

@@ -50,9 +50,7 @@ void           Local_NWNXLog(int32_t level, const char* log);
 ]]
 
 local M = require 'solstice.system.init'
-M.FileLog = file(OPT.LOG_FILE, OPT.LOG_DATE_PATTERN)
-
-local _LOGGER = M.FileLog
+local _LOGGER = nil
 
 --- Logging
 -- @section logging
