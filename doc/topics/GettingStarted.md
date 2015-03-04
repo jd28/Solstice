@@ -27,6 +27,7 @@ for your database (this is optional, if you don't use the
 * MySQL: `sudo luarocks install luadbi-mysql`
 * Sqlite3: `sudo luarocks install luadbi-sqlite3`
 * PostgreSQL: `sudo luarocks install luadbi-postgresql`
+* lua-inih: `sudo luarocks install inih`
 
 ### NWNX
 

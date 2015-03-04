@@ -7,25 +7,43 @@ local lfs = require 'lfs'
 local ffi = require 'ffi'
 local C = ffi.C
 local fmt = string.format
+local inih = require 'inih'
 
--- Must be the same as in nwnx2.ini
+-- Some sane defaults, can be overwritten in nwnx2.ini.
 local script_dir = 'lua'
-
--- Required: package path so Lua can find your scripts and libraries.
-package.path = package.path .. ";./"..script_dir.."/?.lua;"
+local log_dir = "logs.0"
 
 -- Required: loads Lua extensions and utility functions required for
 -- loading Solstice.
 require "solstice.util"
 
+-- Read pertinent settings from nwnx2.ini
+print(inih.parse('nwnx2.ini',
+           function(section, name, value)
+              if section == "SOLSTICE" and name == "script_dir" then
+                 script_dir = (script_dir or value:trim())
+              end
+              if section == "LogDir" and name == 'logdir' then
+                 log_dir = lfs.currentdir() .. '/' .. (log_dir or value:trim())
+              end
+              return true
+           end))
+
+-- Required: package path so Lua can find your scripts and libraries.
+package.path = package.path .. ";./"..script_dir.."/?.lua;"
+
 -- Required: Load your settings into global table `OPT`.
 OPT = runfile(fmt('./%s/settings.lua', script_dir))
+OPT.LOG_DIR = log_dir
+OPT.SCRIPT_DIR = script_dir
 
 -- Required: Initialize the Logger.  If you'd change default logging
 -- behavior or add additional loggers, you could do that here.  LuaLogging
 -- can be made to support anything.  Logging to databases, files, sending
 -- emails (if you have an SMTP server).
-local log = require('solstice.system').GetLogger()
+local Sys = require 'solstice.system'
+local log = Sys.FileLogger(OPT.LOG_DIR .. '/' .. OPT.LOG_FILE, OPT.LOG_DATE_PATTERN)
+Sys.SetLogger(log)
 
 -- Required: Constants MUST be loaded before solstice.
 require(OPT.CONSTANTS)
