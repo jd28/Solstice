@@ -50,9 +50,11 @@ function NWNXSolstice_ResolvePreAttack(attacker_, target_)
 end
 
 function NWNXSolstice_UpdateCombatInfo(attacker)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetArmorClass: Creature: 0x%x", attacker)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_UpdateCombatInfo: Creature: 0x%x", attacker)
 
    attacker = GetObjectByID(attacker)
+   if not attacker:GetIsValid() then return end
+
    attacker:UpdateCombatInfo(true)
    local ce = Rules.GetCombatEngine()
    if ce and ce.UpdateCombatInformation then
@@ -66,6 +68,8 @@ function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
    _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageImmunity")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
+   if not cre:GetIsValid() then return amount end
+
    local idx = C.ns_BitScanFFS(flags)
    local amt, adj = cre:DoDamageImmunity(amount, idx)
 
@@ -83,7 +87,12 @@ function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
                               cre:GetName(),
                               result,
                               true))
-      cre:DelayCommand(0.1, function (cre) cre:SendMessage(s) end)
+      cre:DelayCommand(0.1,
+                       function (cre)
+                          if cre:GetIsValid() then
+                             cre:SendMessage(s)
+                          end
+                       end)
    end
    return amt
 end
@@ -92,6 +101,8 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
    _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageResistance")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
+   if not cre:GetIsValid() then return amount end
+
    local idx = C.ns_BitScanFFS(flags)
 
    local start
@@ -114,7 +125,9 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
       local eid = eff.eff_id
       cre:DelayCommand(0.1,
                        function (self)
-                          self:RemoveEffectByID(eid)
+                          if self:GetIsValid() then
+                             self:RemoveEffectByID(eid)
+                          end
                        end)
    end
 
@@ -128,7 +141,12 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
                                                       cre:GetName(),
                                                       result,
                                                       true))
-      cre:DelayCommand(0.1, function (cre) cre:SendMessage(s) end)
+      cre:DelayCommand(0.1,
+                       function (cre)
+                          if cre:GetIsValid() then
+                             cre:SendMessage(s)
+                          end
+                       end)
    end
 
    return amt
@@ -139,8 +157,9 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
    _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageReduction")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
-   local idx = 12
+   if not cre:GetIsValid() then return amount end
 
+   local idx = 12
    local start
 
    if cre.type == OBJECT_TRUETYPE_CREATURE then
@@ -162,7 +181,9 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
       local eid = eff.eff_id
       cre:DelayCommand(0.1,
                        function (self)
-                          self:RemoveEffectByID(eid)
+                          if self:GetIsValid() then
+                             self:RemoveEffectByID(eid)
+                          end
                        end)
    end
 
@@ -176,7 +197,12 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
                                                       cre:GetName(),
                                                       result,
                                                       true))
-      cre:DelayCommand(0.1, function (cre) cre:SendMessage(s) end)
+      cre:DelayCommand(0.1,
+                       function (cre)
+                          if cre:GetIsValid() then
+                             cre:SendMessage(s)
+                          end
+                       end)
    end
 
    return amt
@@ -222,6 +248,7 @@ function NWNXSolstice_HandleEffect()
 end
 
 function NWNXSolstice_GetEffectImmunity(obj, imm)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetEffectImmunity: 0x%x, %d", obj, imm)
    local cre = Game.GetObjectByID(obj)
    if not cre:GetIsValid() then return false end
    return cre:GetIsImmune(imm, OBJECT_INVALID)
@@ -331,6 +358,9 @@ function NWNXSolstice_GetCriticalHitRoll(obj, is_offhand)
 end
 
 function NWNXSolstice_ResolveDamageShields(cre, attacker)
+   _SOL_LOG_INTERNAL:debug("NWNXSolstice_ResolveDamageShields: 0x%x, 0x%x",
+                           cre, attacker)
+
    cre = GetObjectByID(cre)
    attacker = GetObjectByID(attacker)
 
@@ -351,7 +381,7 @@ function NWNXSolstice_ResolveDamageShields(cre, attacker)
          -- might cause the cross the Lua/C boundary multiple times.
          cre:DelayCommand(0.1,
                           function (self)
-                             if attacker:GetIsValid() then
+                             if attacker:GetIsValid() and self:GetIsValid() then
                                 local e = Eff.Damage(amt, dindex)
                                 e:SetCreator(self)
                                 attacker:ApplyEffect(DURATION_TYPE_INSTANT, e)

@@ -212,7 +212,8 @@ end
 function Object:SetTimer(var_name, duration, on_expire)
    self:SetLocalBool(var_name, true)
    self:DelayCommand(duration,
-                     function ()
+                     function (self)
+                        if not self:GetIsValid() then return end
                         self:DeleteLocalBool(var_name)
                         if on_expire then
                            on_expire(self, var_name)
