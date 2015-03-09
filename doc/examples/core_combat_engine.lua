@@ -8,6 +8,7 @@ local floor  = math.floor
 local min    = math.min
 local GetObjectByID = Game.GetObjectByID
 
+local jit    = require 'jit'
 local bit    = require 'bit'
 local bor    = bit.bor
 local band   = bit.band
@@ -202,7 +203,7 @@ local function GetIterationPenalty(info, attacker)
    local iter_pen = 0
    local spec_att = GetSpecialAttack(info)
 
-   -- Deterimine the iteration penalty for an attack.  Not all attack types are
+   -- Deterimine the iteration penalty for an attack.  Not all attack types
    -- have it.
    if GetType(info) == ATTACK_TYPE_OFFHAND then
       iter_pen = 5 * attacker.obj.cre_combat_round.cr_offhand_taken
@@ -304,8 +305,6 @@ local function ResolvePreRoll(info, attacker, target)
 end
 
 --- Resolves Armor Class Roll
---  A large part of the AC is calculated in Creature:GetAC, only those parts
---  that are potentially determined by the target are calculated below.
 -- @param info AttackInfo.
 -- @param attacker Attacker
 -- @param target Target
@@ -322,26 +321,20 @@ local function ResolveAttackModifier(info, attacker, target)
 end
 
 --- Determine miss chance / concealment.
-
 -- @param hit Is hit.
 -- @param use_cached
 -- @return Returns true if the attacker failed to over come miss chance
 -- or concealment.
 local function ResolveMissChance(info, attacker, target, hit, use_cached)
    -- Miss Chance
-   local miss_chance = 0
+   local miss_chance = Rules.GetMissChance(attacker, GetIsRangedAttack(info))
    -- Conceal
    local conceal = target:GetConcealment(attacker, info.attack)
-
-   -- If concealment and mis-chance are less than or equal to zero
-   -- there is no chance of them affecting the outcome of an attack.
    if conceal <= 0 and miss_chance <= 0 then return false end
 
    local chance, attack_result
 
    -- Deterimine which of miss chance and concealment is higher.
-   -- attack_result is a magic number for the NWN combat engine that
-   -- determines which combat messages are sent to the player.
    if miss_chance < conceal then
       chance = conceal
       attack_result = 8
@@ -359,6 +352,7 @@ local function ResolveMissChance(info, attacker, target, hit, use_cached)
    else
       SetResult(info, attack_result)
       -- Show the modified conceal/miss chance in the combat log.
+      -- TODO[josh]: This should only be modified iff Blind Fight was used.
       SetConcealment(info, floor((chance ^ 2) / 100))
       SetMissedBy(info, 1)
       return true
@@ -678,9 +672,11 @@ local function ResolveOnHitEffect(info, attacker, target)
    C.nwn_ResolveOnHitEffect(attacker.obj, target.obj.obj, info.is_offhand,
                             GetIsCriticalHit(info))
 end
+-- ResolveOnHitEffect cannot be jited.  The C function will call back
+-- into the interpreter.
+jit.off(ResolveOnHitEffect)
 
 --- Resolve on hit visual effects.
---    This is not default behavior.
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
 local function ResolveOnHitVFX(info, attacker)
@@ -842,8 +838,8 @@ local function ResolveCoupDeGrace(info, attacker, target)
 end
 
 --- Resolves Devastating Critical.
--- Applies death effect if applicable, whether this used is determined by
--- settings.
+-- Applies death effect if applicable, whether this is used is determined by
+-- the setting `DEVCRIT_DISABLE_ALL`.
 -- @param info Attack ctype.
 -- @param attacker Attacking creature.
 -- @param target Target object.
@@ -894,6 +890,9 @@ local function ResolveDeathAttack(info, attacker, target)
       C.nwn_ApplyOnHitDeathAttack(attacker.obj, target.obj.obj, random(6) + attacker:GetHitDice())
    end
 end
+-- ResolveDeathAttack cannot be jited.  The C function will call back
+-- into the interpreter.
+jit.off(ResolveDeathAttack)
 
 --- Resolves Quivering Palm
 -- @param info Attack ctype.
@@ -1057,7 +1056,7 @@ local function ResolvePreAttack(attacker_, target_)
    info.attacker_ci = attacker.ci
    info.ranged_type = attacker.ci.offense.ranged_type
 
-   -- If the target is a creature detirmine it's state and any situational modifiers that
+   -- If the target is a creature determine its state and any situational modifiers that
    -- might come into play.  This only needs to be done once per attack group because
    -- the values can't change.
    if target.type == OBJECT_TRUETYPE_CREATURE then
@@ -1085,7 +1084,7 @@ local function DoMeleeAttack()
 
    ResolvePostDamage(info, attacker, target, false)
 
-   -- Attempt to resolve a special attack one was
+   -- Attempt to resolve a special attack if one was
    -- a) Used
    -- b) The attack is a hit.
    if GetIsSpecialAttack(info) then
@@ -1110,7 +1109,7 @@ local function DoMeleeAttack()
          else
             -- If the special attack failed because it wasn't
             -- applicable or the targets skill check (for example)
-            -- was success full set the attack result to 5.
+            -- was successfull set the attack result to 5.
             SetResult(info, 5)
          end
       else
@@ -1137,7 +1136,7 @@ local function DoRangedAttack()
 
    ResolvePostDamage(info, attacker, target, true)
 
-   -- Attempt to resolve a special attack one was
+   -- Attempt to resolve a special attack if one was
    -- a) Used
    -- b) The attack is a hit.
    if GetIsSpecialAttack(info) then
@@ -1157,14 +1156,12 @@ local function DoRangedAttack()
                -- Set effect to direct so that Lua will not delete the
                -- effect.  It will be deleted by the combat engine.
                eff.direct = true
-               -- Add the effect to the onhit effect list so that it can
-               -- be applied when damage is signaled.
                AddEffect(info, attacker, eff)
             end
          else
             -- If the special attack failed because it wasn't
             -- applicable or the targets skill check (for example)
-            -- was success full set the attack result to 5.
+            -- was successfull set the attack result to 5.
             SetResult(info, 5)
          end
       else
