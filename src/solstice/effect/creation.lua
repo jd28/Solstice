@@ -145,7 +145,7 @@ function M.AttackBonus(amount, modifier_type)
    local type, amt = determine_type_amount(EFFECT_TYPE_ATTACK_INCREASE,
                                            EFFECT_TYPE_ATTACK_DECREASE,
                                            amount)
-   return CreateSimple(type, amt, modifier_type or ATTACK_BONUS_MISC, 28)
+   return CreateSimple(type, amt, modifier_type or ATTACK_TYPE_MISC, 28)
 end
 
 --- Create a Beam effect.
