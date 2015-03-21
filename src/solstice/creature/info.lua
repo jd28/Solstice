@@ -137,10 +137,24 @@ function Creature:GetTail()
    return self.obj.cre_stats.cs_tail
 end
 
+--- Sets creature's tail
+-- @param tail Tail type constant.
+function Creature:SetTail(tail)
+   if not self:GetIsValid() then return end
+   self.obj.cre_stats.cs_tail = tail
+end
+
 --- Gets creature's wings
 function Creature:GetWings()
    if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_wings
+end
+
+--- Sets creature's wings
+-- @para wings Wing type constant.
+function Creature:SetWings(wings)
+   if not self:GetIsValid() then return end
+   self.obj.cre_stats.cs_wings = wings
 end
 
 ---
