@@ -86,7 +86,7 @@ end
 
 --- Gets creature's gender
 function Creature:GetGender()
-   if not self:GeIsValid() then return -1 end
+   if not self:GetIsValid() then return -1 end
    return self.obj.cre_stats.cs_gender
 end
 
