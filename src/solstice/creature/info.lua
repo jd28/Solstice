@@ -122,7 +122,11 @@ end
 
 --- Gets creature's subrace
 function Creature:GetSubrace()
-   if not self:GetIsValid() then return "" end
+   if not self:GetIsValid()
+      or self.obj.cre_stats.cs_subrace == nil
+   then
+      return ""
+   end
    return ffi.string(self.obj.cre_stats.cs_subrace)
 end
 
