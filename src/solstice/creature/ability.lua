@@ -123,7 +123,8 @@ end
 -- @return Returns the ability score of type ability for self
 -- (otherwise -1).
 function Creature:SetAbilityScore(ability, value)
-   value = math.clamp(value, 3, 255)
+   if not self:GetIsValid() then return -1 end
+   value = math.clamp(value - Rules.GetRaceAbilityBonus(self:GetRacialType(), ability), 3, 255)
    return C.nwn_SetAbilityScore(self.obj.cre_stats, ability, value)
 end
 
