@@ -46,8 +46,10 @@ end
 -- @param equips A list of items to equip
 function Creature:ForceEquip(equips)
    self:ClearAllActions(true)
-   for _, equip in ipairs(equips) do
-      self:ActionEquipItem(equip[2], equip[1])
+   for i = 0, INVENTORY_SLOT_NUM - 1 do
+      if equips[i] then
+         self:ActionEquipItem(equips[i], i)
+      end
    end
    self:DoCommand(function (self) self:SetCommandable(true) end)
    self:SetCommandable(false)
