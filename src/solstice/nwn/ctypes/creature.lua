@@ -104,7 +104,10 @@ typedef struct {
     CExoLocString               cs_desc_override;       /* 0060 */
 
     int32_t                     cs_age;                 /* 0068 */
-    uint32_t                    cs_gender;              /* 006C */
+    uint8_t                     cs_gender;              /* 006C */
+    uint8_t                     field_6D;
+    uint8_t                     field_6E;
+    uint8_t                     field_6F;
     uint32_t                    cs_xp;                  /* 0070 */
     uint32_t                    cs_is_pc;               /* 0074 */
     uint32_t                    cs_is_dm;               /* 0078 */
