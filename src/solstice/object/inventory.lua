@@ -47,6 +47,7 @@ function Object:GetItemPossessedBy(tag, is_resref)
          end
       end
    end
+   return OBJECT_INVALID
 end
 
 --- Iterator over items in an object's inventory
@@ -82,7 +83,7 @@ end
 function Object:GiveItem(resref, stack_size, new_tag, only_once)
    if only_once then
       local item = self:GetItemPossessedBy(resref, true)
-      if item then return item end
+      if item:GetIsValid() then return item end
    end
    stack_size = stack_size or 1
    new_tag = new_tag or ""
