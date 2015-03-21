@@ -173,8 +173,12 @@ function Creature:PopUpGUIPanel(gui_panel)
 end
 
 --- Sends a message to the PC.
--- @param message Message to be sent to the PC.
-function Creature:SendMessage(message)
+-- @param message Format string, see string.format
+-- @param ... Arguments to format string
+function Creature:SendMessage(message, ...)
+   if select("#", ...) > 0 then
+      message = string.format(message, ...)
+   end
    ne.StackPushString(message)
    ne.StackPushObject(self)
    ne.ExecuteCommand(374, 2)
@@ -224,20 +228,31 @@ end
 
 --- Simple wrapper around solstice.chat.SendChatMessage
 -- that sends a server message to a player.
--- @param message Text to send.
+-- @param message Format string, see string.format
+-- @param ... Arguments to format string
 function Creature:SendServerMessage(message)
    if not self:GetIsValid() then return end
    self:SendChatMessage(5, self, message)
 end
 
 --- Send error message on server channel.
--- @param message Text to send.
-function Creature:ErrorMessage(message)
-   self:SendServerMessage(Color.RED .. message .. "</c>")
+-- @param message Format string, see string.format
+-- @param ... Arguments to format string
+function Creature:ErrorMessage(message, ...)
+   if select("#", ...) > 0 then
+      self:SendServerMessage(Color.RED .. string.format(message, ...) .. "</c>")
+   else
+      self:SendServerMessage(Color.RED .. message .. "</c>")
+   end
 end
 
 --- Send success message on server channel.
--- @param message Text to send.
-function Creature:SuccessMessage(message)
-   self:SendServerMessage(Color.GREEN .. message .. "</c>")
+-- @param message Format string, see string.format
+-- @param ... Arguments to format string
+function Creature:SuccessMessage(message, ...)
+   if select("#", ...) > 0 then
+      self:SendServerMessage(Color.GREEN .. string.format(message, ...) .. "</c>")
+   else
+      self:SendServerMessage(Color.GREEN .. message .. "</c>")
+   end
 end
