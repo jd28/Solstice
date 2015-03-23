@@ -636,6 +636,8 @@ local function GetWeaponCritMultiplier(cre, item)
    if tda == nil then error "Unable to locate wpnprops.2da!" end
    local mult = TDA.GetInt(tda, "CritMult", BaseitemToWeapon(base))
    local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
+   local feat = -1
+
    if override > 0 then
       if override == 1 then
          mult = 2
