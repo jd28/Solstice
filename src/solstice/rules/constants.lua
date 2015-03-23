@@ -6,7 +6,10 @@ local TDA = require 'solstice.2da'
 local M = require 'solstice.rules.init'
 
 _CONSTS = {}
-setmetatable(_G, { __index = _CONSTS })
+
+local global_mt = getmetatable(_G) or {}
+global_mt.__index = _CONSTS
+setmetatable(_G, global_mt)
 
 -- Helper function for loading the 2da values.
 local function load(into, lookup)
