@@ -5,6 +5,47 @@
 -- @section scripts
 
 local NWE = require 'solstice.nwn.engine'
+local Log = System.GetLogger()
+
+local __SCRIPT_ENV = {}
+setmetatable(__SCRIPT_ENV, {__index = _G})
+
+--- Load script file.
+local function LoadScript(fname)
+   local f = loadfile(fname)
+   if not f then
+      Log:error("Unable to load file: %s", fname)
+   end
+   setfenv(f, __SCRIPT_ENV)
+   local result, err = pcall(f)
+   if not result then
+      Log:error("Unable to load file: %s.  Error: %s", fname, err)
+   end
+end
+
+--- Run script.
+-- @param name Script name.
+-- @param script Script to call.
+-- @param target Object to run the script on.
+local function RunScript(script, target)
+   if not __SCRIPT_ENV[script] then return end
+   _SOL_LOG_INTERNAL:debug("Running Script: '%s' on 0x%x", script, target.id)
+   return true, __SCRIPT_ENV[script](target)
+end
+
+--- Locks the script environment.
+-- After this is called no variables can be set globally in the
+-- script environment
+local function LockScriptEnvironment()
+   GLOBAL_lock(__SCRIPT_ENV)
+end
+
+--- Unlocks the script environment.
+-- After this is called variables can be set globally in the
+-- script environment
+local function UnlockScriptEnvironment()
+   GLOBAL_unlock(__SCRIPT_ENV)
+end
 
 --- Executes a script on a specified target
 -- The following operates like the NWScript ExecuteScriptAndReturnInt
@@ -17,9 +58,11 @@ local function ExecuteScript(script, target)
       target:DeleteLocalInt("X2_L_LAST_RETVAR")
    end
 
-   NWE.StackPushObject(target)
-   NWE.StackPushString(script)
-   NWE.ExecuteCommand(8, 2)
+   if not RunScript(script, target) then
+      NWE.StackPushObject(target)
+      NWE.StackPushString(script)
+      NWE.ExecuteCommand(8, 2)
+   end
 
    if target:GetIsValid() then
       return target:GetLocalInt("X2_L_LAST_RETVAR")
@@ -96,5 +139,9 @@ M.GetItemEventName     = GetItemEventName
 M.SetItemEventPrefix   = SetItemEventPrefix
 M.SetScriptReturnValue = SetScriptReturnValue
 M.GetItemEventType     = GetItemEventType
+M.LoadScript           = LoadScript
 M.SetItemEventType     = SetItemEventType
-M.ExecuteItemEvent     = ExecuteItemEvent
+M.ExecuteItemEvent        = ExecuteItemEvent
+M.RunScript               = RunScript
+M.LockScriptEnvironment   = LockScriptEnvironment
+M.UnlockScriptEnvironment = UnlockScriptEnvironment
