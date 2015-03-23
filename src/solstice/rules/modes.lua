@@ -13,7 +13,7 @@ GetObjectByID = Game.GetObjectByID
 -- Internal toggle mode function
 -- @param cre Creature to toggle mode on
 -- @param mode ACTION_MODE_*
-function NSToggleMode(cre, mode)
+function __ToggleMode(cre, mode)
    cre = GetObjectByID(cre)
    if not cre:GetIsValid() then return false end
 

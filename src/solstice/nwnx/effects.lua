@@ -50,7 +50,7 @@ function M.RegisterEffectHandler(handler, ...)
    end
 end
 
-function NWNXEffects_HandleEffectEvent()
+function __NWNXEffectsHandleEffectEvent()
    local ev = C.Local_GetLastEffectEvent()
    if ev == nil then return 0 end
 

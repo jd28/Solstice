@@ -19,12 +19,12 @@ function M.SetCombatMessageHandler(func)
    CC_HANDLER = func
 end
 
-function NWNXChat_HandleChatMessage()
+function __HandleChatMessage()
    if not CHAT_HANDLER then return false end
 
    local msg = C.Local_GetLastChatMessage()
    if msg == nil then
-      error "NWNXChat_HandleChatMessage : NULL msg!"
+      error "__HandleChatMessage : NULL msg!"
    end
 
    local to = OBJECT_INVALID
@@ -42,12 +42,12 @@ function NWNXChat_HandleChatMessage()
    return msg.suppress
 end
 
-function NWNXChat_HandleCombatMessage()
+function __HandleCombatMessage()
    if not CC_HANDLER then return false end
 
    local msg = C.Local_GetLastCombatMessage()
    if msg == nil then
-      error "NWNXChat_HandleCombatMessage : NULL msg!"
+      error "__HandleCombatMessage : NULL msg!"
    end
 
    msg.suppress = CC_HANDLER(msg)

@@ -18,10 +18,12 @@ local _DATABASE = nil
 -- @param dbport Port.
 local function ConnectDatabase(driver_name, dbname, dbuser,
                                dbpassword, dbhost, dbport)
+   -- Apparently this library declares globals...
+   GLOBAL_unlock(_G)
    local DBI = require 'DBI'
    local dbh, err = DBI.Connect(driver_name, dbname, dbuser,
                                 dbpassword, dbhost, dbport)
-
+   GLOBAL_lock(_G)
    if not dbh then
       local Log = M.GetLogger()
       Log:error("Cannot connect to database: %s\n", err)

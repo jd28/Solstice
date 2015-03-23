@@ -177,7 +177,7 @@ for _, func in pairs(M) do
 end
 
 -- Bridge function to hand NWNXEvent events
-function NWNXEvents_HandleEvent(event_type)
+function __NWNXEventsHandleEvent(event_type)
    -- If there isn't an event handler than return 0 so that some other plugin
    -- or script can handle the event.
    local f = EVENT_HANDLERS[event_type]
@@ -186,7 +186,7 @@ function NWNXEvents_HandleEvent(event_type)
    return f(M.GetEventInfo())
 end
 
-function NWNXEvents_HandleExamineEvent(obj, identified)
+function __NWNXEventsHandleExamineEvent(obj, identified)
    obj = GetObjectByID(obj)
    identified = identified or true
 

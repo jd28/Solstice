@@ -7,6 +7,45 @@
 local tremove = table.remove
 local tinsert = table.insert
 
+--===================================================
+--=  Niklas Frykholm
+-- basically if user tries to create global variable
+-- the system will not let them!!
+-- call GLOBAL_lock(_G)
+--
+--===================================================
+
+local function lock_new_index(t, k, v)
+   if (k~="_" and string.sub(k,1,2) ~= "__") then
+      --GLOBAL_unlock(_G)
+      error("GLOBALS are locked -- " .. k ..
+         " must be declared local or prefix with '__' for globals.", 2)
+   else
+      rawset(t, k, v)
+   end
+end
+
+local function unlock_new_index(t, k, v)
+  rawset(t, k, v)
+end
+
+--- Locks table from adding new global variables.
+-- @param t Table.
+function GLOBAL_lock(t)
+   local mt = getmetatable(t) or {}
+   mt.__newindex = lock_new_index
+   setmetatable(t, mt)
+end
+
+--- Unlocks table from adding new global variables.
+-- @param t Table.
+function GLOBAL_unlock(t)
+   local mt = getmetatable(t) or {}
+   mt.__newindex = unlock_new_index
+   setmetatable(t, mt)
+end
+
+
 --- Types
 -- @section types
 
@@ -200,15 +239,10 @@ end
 -- Entry point for nwnx_solstice run script hook.
 -- Should never be used directly.
 function _SOL_RUN_SCRIPT(script, obj)
-   -- See if the function exist in the global namespace
-   local f = _G[script]
-   if not f or not type(f) == "function" then
-      return 0
-   end
+   obj = _SOL_GET_CACHED_OBJECT(obj)
+   local found, result = Game.RunScript(script, obj)
+   if not found then return 0 end
 
-   _SOL_LOG_INTERNAL:debug("Running Script: '%s' on 0x%x", script, obj)
-
-   local result = f(_SOL_GET_CACHED_OBJECT(obj))
    if result == nil then
       result = -1
    elseif result then
@@ -288,3 +322,6 @@ function _RUN_COMMAND(ctype, token, objid)
 
    return res
 end
+
+-- Lock _G after all globals have been inserted.
+GLOBAL_lock(_G)

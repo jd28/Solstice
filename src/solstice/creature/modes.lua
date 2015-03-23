@@ -110,7 +110,7 @@ jit.off(Creature.SetCombatMode)
 -- @param cre Creature in question.
 -- @param mode solstice.modes type constant.
 -- @param change If false the combat mode is already active.
-function NSSetCombatMode(cre, mode, change)
+function __SetCombatMode(cre, mode, change)
    cre = GetObjectByID(cre)
    cre:SetCombatMode(mode, change)
 end

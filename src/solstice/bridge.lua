@@ -4,28 +4,28 @@ local Dice = require 'solstice.dice'
 local Eff = require 'solstice.effect'
 local GetObjectByID = require('solstice.game').GetObjectByID
 
-function NWNXSolstice_GetMaximumFeatUses(feat, cre)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetMaximumFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
+function __GetMaximumFeatUses(feat, cre)
+   _SOL_LOG_INTERNAL:debug("__GetMaximumFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
    cre = GetObjectByID(cre)
    return Rules.GetMaximumFeatUses(feat, cre)
 end
 
-function NWNXSolstice_GetRemainingFeatUses(feat, cre)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetRemainingFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
+function __GetRemainingFeatUses(feat, cre)
+   _SOL_LOG_INTERNAL:debug("__GetRemainingFeatUses: Creature: 0x%x, Feat: %d", cre, feat)
    cre = GetObjectByID(cre)
    return cre:GetRemainingFeatUses(feat)
 end
 
-function NWNXSolstice_GetMaxHitpoints(id)
-   --_SOL_LOG_INTERNAL:debug("NWNXSolstice_GetMaxHitpoints: Creature: 0x%x", id)
+function __GetMaxHitpoints(id)
+   --_SOL_LOG_INTERNAL:debug("__GetMaxHitpoints: Creature: 0x%x", id)
 
    local cre = GetObjectByID(id)
    if not cre:GetIsValid() then return 0 end
    return cre:GetMaxHitPoints()
 end
 
-function NWNXSolstice_GetArmorClass(cre)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetArmorClass: Creature: 0x%x", cre)
+function __GetArmorClass(cre)
+   _SOL_LOG_INTERNAL:debug("__GetArmorClass: Creature: 0x%x", cre)
 
    cre = Game.GetObjectByID(cre)
    if not cre:GetIsValid() or cre.type ~= OBJECT_TRUETYPE_CREATURE then
@@ -34,23 +34,23 @@ function NWNXSolstice_GetArmorClass(cre)
    return cre:GetACVersus(OBJECT_INVALID, false)
 end
 
-function NWNXSolstice_DoMeleeAttack()
+function __DoMeleeAttack()
    local ce = Rules.GetCombatEngine()
    ce.DoMeleeAttack()
 end
 
-function NWNXSolstice_DoRangedAttack()
+function __DoRangedAttack()
    local ce = Rules.GetCombatEngine()
    ce.DoRangedAttack()
 end
 
-function NWNXSolstice_ResolvePreAttack(attacker_, target_)
+function __ResolvePreAttack(attacker_, target_)
    local ce = Rules.GetCombatEngine()
    ce.DoPreAttack(GetObjectByID(attacker_), GetObjectByID(target_))
 end
 
-function NWNXSolstice_UpdateCombatInfo(attacker)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_UpdateCombatInfo: Creature: 0x%x", attacker)
+function __UpdateCombatInfo(attacker)
+   _SOL_LOG_INTERNAL:debug("__UpdateCombatInfo: Creature: 0x%x", attacker)
 
    attacker = GetObjectByID(attacker)
    if not attacker:GetIsValid() then return end
@@ -64,8 +64,8 @@ end
 
 local result = damage_result_t()
 
-function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageImmunity")
+function __DoDamageImmunity(obj, vs, amount, flags, no_feedback)
+   _SOL_LOG_INTERNAL:debug("__DoDamageImmunity")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    if not cre:GetIsValid() then return amount end
@@ -97,8 +97,8 @@ function NWNXSolstice_DoDamageImmunity(obj, vs, amount, flags, no_feedback)
    return amt
 end
 
-function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageResistance")
+function __DoDamageResistance(obj, vs, amount, flags, no_feedback)
+   _SOL_LOG_INTERNAL:debug("__DoDamageResistance")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    if not cre:GetIsValid() then return amount end
@@ -152,9 +152,9 @@ function NWNXSolstice_DoDamageResistance(obj, vs, amount, flags, no_feedback)
    return amt
 end
 
-function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
+function __DoDamageReduction(obj, vs, amount, power,
                                         no_feedback)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_DoDamageReduction")
+   _SOL_LOG_INTERNAL:debug("__DoDamageReduction")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
    if not cre:GetIsValid() then return amount end
@@ -208,7 +208,7 @@ function NWNXSolstice_DoDamageReduction(obj, vs, amount, power,
    return amt
 end
 
-function NWNXSolstice_HandleEffect()
+function __HandleEffect()
    local data = ffi.C.Local_GetLastEffect()
    if data == nil
       or data.obj == nil
@@ -247,14 +247,14 @@ function NWNXSolstice_HandleEffect()
    end
 end
 
-function NWNXSolstice_GetEffectImmunity(obj, imm)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_GetEffectImmunity: 0x%x, %d", obj, imm)
+function __GetEffectImmunity(obj, imm)
+   _SOL_LOG_INTERNAL:debug("__GetEffectImmunity: 0x%x, %d", obj, imm)
    local cre = Game.GetObjectByID(obj)
    if not cre:GetIsValid() then return false end
    return cre:GetIsImmune(imm, OBJECT_INVALID)
 end
 
-function NWNXSolstice_GetSaveEffectBonus(obj, save, save_vs)
+function __GetSaveEffectBonus(obj, save, save_vs)
    obj = Game.GetObjectByID(obj)
    if not obj:GetIsValid() or obj:GetType() ~= OBJECT_TYPE_CREATURE then
       return 0
@@ -264,7 +264,7 @@ function NWNXSolstice_GetSaveEffectBonus(obj, save, save_vs)
    return  math.clamp(eff, min, max)
 end
 
-function NWNXSolstice_GetAbilityEffectBonus(obj, ability)
+function __GetAbilityEffectBonus(obj, ability)
    obj = Game.GetObjectByID(obj)
    if not obj:GetIsValid() or obj:GetType() ~= OBJECT_TYPE_CREATURE then
       return 0
@@ -294,7 +294,7 @@ function NWNXSolstice_GetAbilityEffectBonus(obj, ability)
    return eff
 end
 
-function NWNXSolstice_GetSkillEffectBonus(obj, skill)
+function __GetSkillEffectBonus(obj, skill)
    obj = Game.GetObjectByID(obj)
    if not obj:GetIsValid() or obj:GetType() ~= OBJECT_TYPE_CREATURE then
       return 0
@@ -305,19 +305,19 @@ function NWNXSolstice_GetSkillEffectBonus(obj, skill)
    return math.clamp(eff, min, max)
 end
 
-function NWNXSolstice_InitializeNumberOfAttacks(id)
+function __InitializeNumberOfAttacks(id)
     local cre = GetObjectByID(id)
     if not cre:GetIsValid() then return end
     Rules.InitializeNumberOfAttacks(cre)
 end
 
-function NWNXSolstice_GetWeaponFinesse(obj, it)
+function __GetWeaponFinesse(obj, it)
    local cre  = GetObjectByID(obj)
    local item = GetObjectByID(it)
    return Rules.GetIsWeaponFinessable(item, cre)
 end
 
-function NWNXSolstice_GetCriticalHitMultiplier(obj, is_offhand)
+function __GetCriticalHitMultiplier(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
    local equip = EQUIP_TYPE_UNARMED
@@ -337,7 +337,7 @@ function NWNXSolstice_GetCriticalHitMultiplier(obj, is_offhand)
    return attacker.ci.equips[equip].crit_mult
 end
 
-function NWNXSolstice_GetCriticalHitRoll(obj, is_offhand)
+function __GetCriticalHitRoll(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
    local equip = EQUIP_TYPE_UNARMED
@@ -357,8 +357,8 @@ function NWNXSolstice_GetCriticalHitRoll(obj, is_offhand)
    return 21 - attacker.ci.equips[equip].crit_range
 end
 
-function NWNXSolstice_ResolveDamageShields(cre, attacker)
-   _SOL_LOG_INTERNAL:debug("NWNXSolstice_ResolveDamageShields: 0x%x, 0x%x",
+function __ResolveDamageShields(cre, attacker)
+   _SOL_LOG_INTERNAL:debug("__ResolveDamageShields: 0x%x, 0x%x",
                            cre, attacker)
 
    cre = GetObjectByID(cre)

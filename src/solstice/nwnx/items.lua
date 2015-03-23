@@ -117,7 +117,7 @@ function M.SetResult(result)
    current_event.result = result and 1 or 0
 end
 
-function NWNXItems_HandleItemEvent()
+function __NWNXItemsHandleItemEvent()
    local ev = C.Local_GetLastItemEvent()
    if ev == nil then
       error("NWNXItems : Local_GetLastItemEvent is nil!")
@@ -137,7 +137,7 @@ function NWNXItems_HandleItemEvent()
    return true
 end
 
-function NWNXItems_HandleItemPropEvent()
+function __NWNXItemsHandleItemPropEvent()
    local ev = C.Local_GetLastItemPropEvent()
    if ev == nil then
       error("NWNXItems : Local_GetLastItemPropEvent is nil!")
