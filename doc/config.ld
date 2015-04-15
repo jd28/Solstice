@@ -123,9 +123,8 @@ This has a some side effects:
   data through LocalStrings.
 * Access to more data structures: arrays, tables, and the ability to implement
   your own.
-* Constants don't need to be predefined but can be loaded from
-  modified 2DAs, ensuring that they're never out of date or
-  inconsistent.  This does require some 2da merging or a lot of data entry.
+* Constants are not defined directly, but loaded at run time.  You can do this
+  however you chose.  Read from 2das, parse nwscript, or another document.
 * Advanced NWNX users can directly hook nwserver functions with Lua
   functions.
 
