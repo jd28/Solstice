@@ -6,6 +6,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local ne = require 'solstice.nwn.engine'
 local Color = require 'solstice.color'
+local fmt = string.format
 local Creature = M.Creature
 
 --- PC
@@ -223,7 +224,12 @@ end
 -- @param from Sender.
 -- @param message Text to send.
 function Creature:SendChatMessage(channel, from, message)
-   C.nwn_SendMessage(channel, from.id, message, self.id)
+   if not from:GetIsValid() then return end
+   if string.find(message, "\xAC") then return end
+   if channel == 4 and not self:GetIsValid() then return end
+
+   from:SetLocalString("NWNX!CHAT!SPEAK",
+                       fmt("%x\xAC%x\xAC%d\xAC%s", from.id, self.id, channel, message))
 end
 
 --- Simple wrapper around solstice.chat.SendChatMessage

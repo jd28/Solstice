@@ -134,7 +134,6 @@ int32_t       nwn_SetKnownSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t 
 int32_t       nwn_SetMemorizedSpell (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_idx, uint32_t sp_spell, uint32_t sp_meta, uint32_t sp_flags);
 void      nwn_SetMovementRate(CNWSCreature *cre, int rate);
 int32_t       nwn_SetRemainingSpellSlots (CNWSCreature *cre, uint32_t sp_class, uint32_t sp_level, uint32_t sp_slots);
-void      nwn_SendMessage(uint32_t mode, uint32_t id, const char *msg, uint32_t to);
 void      nwn_EquipItem(CNWSCreature *cre, int32_t slot, CNWSItem *it, int32_t a, int32_t b);
 void      nwn_UnequipItem(CNWSCreature *cre, CNWSItem *it, int32_t a);
 void      nwn_CreateItemAndEquip(CNWSCreature *cre, const char *resref, int32_t slot);
