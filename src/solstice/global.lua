@@ -260,7 +260,6 @@ _COMMANDS = { }
 
 _COMMANDS.COMMAND_TYPE_DELAY      = 0
 _COMMANDS.COMMAND_TYPE_DO         = 1
-_COMMANDS.COMMAND_TYPE_REPEAT     = 2
 
 -- Internal Function handling DoCommand
 local function _RUN_DO_COMMAND (token)
@@ -278,27 +277,6 @@ local function _RUN_DELAY_COMMAND (token)
       f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
    end
    _COMMANDS[token] = nil
-end
-
--- Internal Function handling RepeatCommand
--- @return If nil the command ceases repeating, if true it will continue to repeat
-local function _RUN_REPEAT_COMMAND(token)
-   if token and _COMMANDS[token] ~= nil then
-      local f = _COMMANDS[token]["f"]
-      if f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id)) then
-         local newdelay = _COMMANDS[token]["d"] + _COMMANDS[token]["s"];
-         -- Delay can never be a negative or equal to zero.
-         if newdelay <= 0 then
-            _COMMANDS[token] = nil
-         else
-            _COMMANDS[token]["d"] = newdelay
-            return newdelay
-         end
-      else
-         _COMMANDS[token] = nil
-      end
-      return 0
-   end
 end
 
 -- Internal Function handling for running the various

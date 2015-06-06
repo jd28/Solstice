@@ -30,22 +30,6 @@ function Object:DelayCommand(delay, action)
    C.ns_DelayCommand(self.id, delay, count)
 end
 
---- Repeats a command.
--- @param delay Time in seconds.
--- @param action A closure
--- @param step Change in seconds from one application to the next.
-function Object:RepeatCommand(delay, action, step)
-   local count = table.maxn(_COMMANDS) + 1
-
-   -- No zero or negative .
-   if delay <= 0 then return end
-
-   step = step or 0
-   _COMMANDS[count] = { f = action, d = delay, s = step, self = self }
-
-   C.ns_RepeatCommand(self.id, delay, count)
-end
-
 --- Inserts action into acction queue
 -- @param action A closure
 function Object:DoCommand(action)

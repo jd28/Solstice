@@ -242,7 +242,6 @@ ffi.cdef [[
 void ns_ActionDoCommand(CNWSObject * object, uint32_t token);
 int32_t ns_BitScanFFS(uint32_t mask);
 void ns_DelayCommand(uint32_t objid, float delay, uint32_t token);
-void ns_RepeatCommand(uint32_t objid, float delay, uint32_t token);
 const char** str_split(const char* s, const char* sep, bool isany);
 const char* str_rtrim(const char* str);
 const char* str_ltrim(const char* str);
