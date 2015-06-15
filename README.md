@@ -41,8 +41,6 @@ options.
 * lualogging
 * nwnx_effects
 * nwnx_solstice
-* nwnx_nsevents (Temporary?)
-* nwnx_nschat (Temporary?)
 
 ## git
 * `develop` is the branch with ongoing development.
