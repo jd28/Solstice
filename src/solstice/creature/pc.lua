@@ -85,6 +85,13 @@ function Creature:GetIsPC()
    return not (ffi.C.nwn_GetPlayerByID(self.id) == nil)
 end
 
+--- Get PC's bic file name.
+function Creature:GetBICFileName()
+   if not self:GetIsValid() then return "" end
+   if not self:GetIsPC() then return "" end
+   return ffi.string(C.nwn_GetPCFileName(self.obj))
+end
+
 --- Determine if creature is an AI
 function Creature:GetIsAI()
    if not self:GetIsValid() then return false end
