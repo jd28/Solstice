@@ -1,10 +1,16 @@
 --- Sound
 -- @module sound
 
+local ffi = require 'ffi'
+local Obj = require 'solstice.object'
 local NWE = require 'solstice.nwn.engine'
 
 local M = {}
-M.Sound = {}
+local Sound = inheritsFrom({}, Obj.Object)
+M.Sound = Sound
+
+-- Internal ctype.
+M.sound_t = ffi.metatype("Sound", { __index = M.Sound })
 
 function M.Sound:Play()
    NWE.StackPushObject(self)

@@ -42,6 +42,7 @@ require 'solstice.nwn.ctypes.skill'
 require 'solstice.nwn.ctypes.placeable'
 require 'solstice.nwn.ctypes.race'
 require 'solstice.nwn.ctypes.store'
+require 'solstice.nwn.ctypes.sound'
 require 'solstice.nwn.ctypes.trigger'
 require 'solstice.nwn.ctypes.waypoint'
 
@@ -359,6 +360,12 @@ typedef struct Placeable {
     uint32_t        id;
     CNWSPlaceable   *obj;
 } Placeable;
+
+typedef struct Sound {
+    uint32_t         type;
+    uint32_t         id;
+    CNWSSoundObject *obj;
+} Sound;
 
 typedef struct Store {
     uint32_t        type;

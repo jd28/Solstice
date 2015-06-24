@@ -75,6 +75,7 @@ local sol_mod   = require 'solstice.module'
 local sol_plc   = require 'solstice.placeable'
 local sol_snd   = require 'solstice.sound'
 local sol_store = require 'solstice.store'
+local sol_sound = require 'solstice.sound'
 local sol_trap  = require 'solstice.trap'
 local sol_trig  = require 'solstice.trigger'
 local sol_way   = require 'solstice.waypoint'
@@ -159,7 +160,7 @@ function _SOL_GET_CACHED_OBJECT(id)
       elseif type == OBJECT_TRUETYPE_STORE then
          object = sol_store.store_t(type, id)
       elseif type == OBJECT_TRUETYPE_SOUND then
-         return OBJECT_INVALID
+      object = sol_sound.sound_t(type, id)
       elseif type == OBJECT_TRUETYPE_PORTAL then
          return OBJECT_INVALID
       elseif type == OBJECT_TRUETYPE_GUI then
@@ -212,9 +213,9 @@ function _SOL_GET_CACHED_OBJECT(id)
       object.obj = ffi.cast("CNWSEncounter*", obj)
    elseif type == OBJECT_TRUETYPE_STORE then
       object.obj = ffi.cast("CNWSStore*", obj)
-   --[[
    elseif type == OBJECT_TRUETYPE_SOUND then
-      object.obj =
+      object.obj = ffi.cast("CNWSSoundObject*", obj)
+   --[[
    elseif type == OBJECT_TRUETYPE_PORTAL then
       object.obj =
    elseif type == OBJECT_TRUETYPE_GUI then
