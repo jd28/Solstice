@@ -30,7 +30,12 @@ end
 
 --- Calculates vector's magnitude
 function Vector:Magnitude()
-   return math.sqrt((self.x * self.x) + (self.y * self.y) + (self.z * self.z))
+   return math.sqrt(self:MagnitudeSquared())
+end
+
+--- Calculates vector's magnitude squared
+function Vector:MagnitudeSquared()
+   return (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
 end
 
 --- Checks if target is in line of sight.
@@ -47,6 +52,12 @@ function Vector.FromAngle(angle)
    NWE.StackPushFloat(angle)
    NWE.ExecuteCommand(144, 1)
    return NWE.StackPopVector()
+end
+
+--- Subtract vectors.
+-- @param other Vector.
+function Vector:Subtract(other)
+  return M.vector_t(self.x-other.x, self.y-other.y, self.z-other.z)
 end
 
 --- Converts a string to a Vector
