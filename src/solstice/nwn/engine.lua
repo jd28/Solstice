@@ -60,7 +60,7 @@ end
 
 --- Pops a boolean value from the NWNW stack.
 function M.StackPopBoolean()
-   return C.nwn_StackPopBoolean()
+   return C.nwn_StackPopInteger() ~= 0
 end
 
 local Eff, IP
