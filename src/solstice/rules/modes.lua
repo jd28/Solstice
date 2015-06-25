@@ -149,7 +149,7 @@ function __ToggleMode(cre, mode)
    return true
 end
 
-jit.off(NSToggleMode)
+jit.off(__ToggleMode)
 
 --- Register a combat mode.
 -- @param mode
