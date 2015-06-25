@@ -6,6 +6,7 @@
 
 local NWE = require 'solstice.nwn.engine'
 local Log = System.GetLogger()
+local M = require 'solstice.game.init'
 
 local __SCRIPT_ENV = {}
 setmetatable(__SCRIPT_ENV, {__index = _G})
@@ -29,6 +30,9 @@ end
 -- @param target Object to run the script on.
 local function RunScript(script, target)
    if not __SCRIPT_ENV[script] then return end
+   if type(target) == "number" then
+      target = M.GetObjectByID(target)
+   end
    _SOL_LOG_INTERNAL:debug("Running Script: '%s' on 0x%x", script, target.id)
    return true, __SCRIPT_ENV[script](target)
 end
@@ -133,7 +137,6 @@ local function ExecuteItemEvent(obj, item, event)
    end
 end
 
-local M = require 'solstice.game.init'
 M.ExecuteScript        = ExecuteScript
 M.GetItemEventName     = GetItemEventName
 M.SetItemEventPrefix   = SetItemEventPrefix

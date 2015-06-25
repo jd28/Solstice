@@ -240,7 +240,6 @@ end
 -- Entry point for nwnx_solstice run script hook.
 -- Should never be used directly.
 function _SOL_RUN_SCRIPT(script, obj)
-   obj = _SOL_GET_CACHED_OBJECT(obj)
    local found, result = Game.RunScript(script, obj)
    if not found then return 0 end
 
