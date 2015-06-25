@@ -293,8 +293,6 @@ function _RUN_COMMAND(ctype, token, objid)
       _RUN_DELAY_COMMAND(token)
    elseif ctype == _COMMANDS.COMMAND_TYPE_DO then
       _RUN_DO_COMMAND(token)
-   elseif ctype == _COMMANDS.COMMAND_TYPE_REPEAT then
-      res = _RUN_REPEAT_COMMAND(token)
    else
       error(string.format("ERROR: Invalid Command Type %d", ctype))
    end
