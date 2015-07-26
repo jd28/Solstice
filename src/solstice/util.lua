@@ -280,3 +280,23 @@ end
 function table.pack(...)
   return { n = select("#", ...), ... }
 end
+
+ffi.cdef[[
+    typedef long time_t;
+    typedef int clockid_t;
+
+    typedef struct timespec {
+            time_t   tv_sec;        /* seconds */
+            long     tv_nsec;       /* nanoseconds */
+    } nanotime;
+    int clock_gettime(clockid_t clk_id, struct timespec *tp);
+]]
+
+--- High Resolution Timer.
+-- @return Time in microseconds.
+local pnano = assert(ffi.new("nanotime[?]", 1))
+function clock_gettime()
+    -- CLOCK_REALTIME -> 0
+    ffi.C.clock_gettime(0, pnano)
+    return (pnano[0].tv_sec * 1000000000 + pnano[0].tv_nsec) / 1000
+end
