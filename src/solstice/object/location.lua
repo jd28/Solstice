@@ -11,7 +11,7 @@ local Object = M.Object
 --- Get area object is in.
 function Object:GetArea()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(24, 1)
+   NWE.ExecuteCommandUnsafe(24, 1)
    return NWE.StackPopObject()
 end
 

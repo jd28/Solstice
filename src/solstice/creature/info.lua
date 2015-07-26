@@ -62,14 +62,13 @@ end
 -- Determines if Creature is a DM
 function Creature:GetIsDM()
    if not self:GetIsValid() then return false end
-
    return self.obj.cre_stats.cs_is_dm ~= 0
 end
 
 --- Gets if creature is possessed by DM.
 function Creature:GetIsDMPossessed()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(723, 1)
+   NWE.ExecuteCommandUnsafe(723, 1)
    return NWE.StackPopBoolean()
 end
 

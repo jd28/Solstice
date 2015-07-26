@@ -12,7 +12,7 @@ local NWE = require 'solstice.nwn.engine'
 function Object:GetColor(channel)
    NWE.StackPushInteger(channel)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(843, 2)
+   NWE.ExecuteCommandUnsafe(843, 2)
    return NWE.StackPopInteger()
 end
 
@@ -25,14 +25,14 @@ function Object:GetDescription(original, identified)
    NWE.StackPushBoolean(identified)
    NWE.StackPushBoolean(original)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(836, 3)
+   NWE.ExecuteCommandUnsafe(836, 3)
    return NWE.StackPopString()
 end
 
 --- Get object's gold.
 function Object:GetGold()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(418, 1)
+   NWE.ExecuteCommandUnsafe(418, 1)
    return NWE.StackPopInteger()
 end
 
@@ -42,7 +42,7 @@ end
 function Object:GetName(original)
    NWE.StackPushBoolean(original)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(253, 2)
+   NWE.ExecuteCommandUnsafe(253, 2)
    return NWE.StackPopString()
 end
 
@@ -87,21 +87,21 @@ end
 --- Get plot flag
 function Object:GetPlotFlag()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(455, 1)
+   NWE.ExecuteCommandUnsafe(455, 1)
    return NWE.StackPopBoolean()
 end
 
 --- Get portrait ID
 function Object:GetPortraitId()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(831, 1)
+   NWE.ExecuteCommandUnsafe(831, 1)
    return NWE.StackPopInteger()
 end
 
 --- Get portrait resref
 function Object:GetPortraitResRef()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(833, 1)
+   NWE.ExecuteCommandUnsafe(833, 1)
    return NWE.StackPopString()
 end
 
@@ -109,7 +109,7 @@ end
 -- @return The Resref, empty string on error.
 function Object:GetResRef()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(582, 1)
+   NWE.ExecuteCommandUnsafe(582, 1)
    return NWE.StackPopString()
 end
 
@@ -117,7 +117,7 @@ end
 -- @return Tag of the object, empty string on error.
 function Object:GetTag()
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(168, 1)
+   NWE.ExecuteCommandUnsafe(168, 1)
    return NWE.StackPopString()
 end
 
@@ -126,7 +126,7 @@ function Object:SetColor(channel, value)
    NWE.StackPushInteger(value)
    NWE.StackPushInteger(channel)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(844, 3)
+   NWE.ExecuteCommandUnsafe(844, 3)
 end
 
 ---
@@ -139,7 +139,7 @@ function Object:SetDescription(description, identified)
    NWE.StackPushBoolean(identified)
    NWE.StackPushString(description)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(837, 3)
+   NWE.ExecuteCommandUnsafe(837, 3)
 end
 
 ---
@@ -152,7 +152,7 @@ function Object:SetIsDestroyable(destroyable, raiseable, selectable)
    NWE.StackPushBoolean(selectable)
    NWE.StackPushBoolean(raiseable)
    NWE.StackPushBoolean(destroyable)
-   NWE.ExecuteCommand(323, 3)
+   NWE.ExecuteCommandUnsafe(323, 3)
 end
 
 --- Set object's name
@@ -162,7 +162,7 @@ function Object:SetName(name)
 
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(830, 2)
+   NWE.ExecuteCommandUnsafe(830, 2)
 end
 
 --- Set object's plot flag
@@ -170,7 +170,7 @@ end
 function Object:SetPlotFlag(flag)
    NWE.StackPushBoolean(flag)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(456, 2)
+   NWE.ExecuteCommandUnsafe(456, 2)
 end
 
 --- Set portrait ID
@@ -178,7 +178,7 @@ end
 function Object:SetPortraitId(id)
    NWE.StackPushInteger(id)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(832, 2)
+   NWE.ExecuteCommandUnsafe(832, 2)
 end
 
 --- Set Portrait resref
@@ -186,5 +186,5 @@ end
 function Object:SetPortraitResRef(resref)
    NWE.StackPushString(resref)
    NWE.StackPushObject(self)
-   NWE.ExecuteCommand(834, 2)
+   NWE.ExecuteCommandUnsafe(834, 2)
 end

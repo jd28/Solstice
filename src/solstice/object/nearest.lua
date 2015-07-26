@@ -39,7 +39,7 @@ function Object:GetNearestObject(obj_type, nth)
    NWE.StackPushInteger(nth)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(obj_type)
-   NWE.ExecuteCommand(227, 3)
+   NWE.ExecuteCommandUnsafe(227, 3)
    return NWE.StackPopObject()
 end
 
