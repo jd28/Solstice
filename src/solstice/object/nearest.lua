@@ -30,7 +30,7 @@ function Object:GetNearestCreature(type1, value1, nth, ...)
 end
 
 --- Get nearest object
--- @param[opt=solstice.object.ALL] obj_type solstice.object type constant.
+-- @param[opt=OBJECT_TYPE_ALL] obj_type OBJECT_TYPE_*
 -- @param[opt=1] nth Which object to return.
 function Object:GetNearestObject(obj_type, nth)
    obj_type = obj_type or OBJECT_TYPE_ALL

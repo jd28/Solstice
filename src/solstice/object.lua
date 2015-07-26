@@ -151,8 +151,8 @@ function Object:SetTag(tag)
 end
 
 --- Traps an objeect
--- @param type solstice.nwn.TRAP\_BASE\_TYPE_*
--- @param faction solstice.nwn.STANDARD\_FACTION\_*
+-- @param type TRAP\_BASE\_TYPE_*
+-- @param faction STANDARD\_FACTION\_*
 -- @param[opt=""] on_disarm OnDisarmed script.
 -- @param[opt=""] on_trigger OnTriggered script.
 function Object:Trap(type, faction, on_disarm, on_trigger)
