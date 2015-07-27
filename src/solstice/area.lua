@@ -78,16 +78,21 @@ function Area:GetObjectAtIndex(idx)
    return OBJECT_INVALID
 end
 
+local area_obj_idx = 0
+local area_iter_area = OBJECT_INVALID
+local function area_obj_iter()
+   local obj = area_iter_area:GetObjectAtIndex(area_obj_idx)
+   if obj:GetIsValid() then
+      area_obj_idx = area_obj_idx + 1
+      return obj
+   end
+end
+
 --- Iterator returning all objects in a specified area.
 function Area:Objects()
-   local i = 0
-   return function()
-      local obj = self:GetObjectIndex(i)
-      if obj:GetIsValid() then
-         i = i + 1
-         return obj
-      end
-   end
+   area_obj_idx = 0
+   area_iter_area = self
+   return area_obj_iter
 end
 
 --- Changes the ambient soundtracks of an area.
