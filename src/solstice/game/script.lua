@@ -137,6 +137,12 @@ local function ExecuteItemEvent(obj, item, event)
    end
 end
 
+local inspect = require('solstice.external.inspect')
+--- Gets a string representation of the script environment.
+local function DumpScriptEnvironment()
+   return inspect(__SCRIPT_ENV)
+end
+
 M.ExecuteScript        = ExecuteScript
 M.GetItemEventName     = GetItemEventName
 M.SetItemEventPrefix   = SetItemEventPrefix
@@ -148,3 +154,4 @@ M.ExecuteItemEvent        = ExecuteItemEvent
 M.RunScript               = RunScript
 M.LockScriptEnvironment   = LockScriptEnvironment
 M.UnlockScriptEnvironment = UnlockScriptEnvironment
+M.DumpScriptEnvironment   = DumpScriptEnvironment
