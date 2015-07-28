@@ -98,15 +98,11 @@ local _PCS = {}
 function _GET_CANONICAL_ID(cre)
    local id = cre.id
    if cre:GetIsPC() and not cre.load_char_finished then
-      local name = cre:GetPCPlayerName()
-      if #name == 0 then
-         name = cre:GetLocalString('pc_player_name')
-      end
-      name = name..cre:GetName()
-      if not _PCS[name] then
-         _PCS[name] = cre.id
+      local canon_id = cre:GetLocalInt("pc_canon_id")
+      if canon_id == 0 then
+         cre:SetLocalInt("pc_canon_id", id)
       else
-         id = _PCS[name]
+         id = canon_id
       end
    end
    return id
