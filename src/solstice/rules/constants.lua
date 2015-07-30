@@ -1,8 +1,6 @@
 --- Rules.
 -- @module rules
 
-local TDA = require 'solstice.2da'
-
 local M = require 'solstice.rules.init'
 
 _CONSTS = {}
@@ -17,10 +15,10 @@ local function load(into, lookup)
       error "sol.consant.Load: invalid tda or column label!"
    end
 
-   local twoda = TDA.GetCached2da(lookup.tda)
-   local size = TDA.GetRowCount(twoda) - 1
+   local twoda = Game.GetCached2da(lookup.tda)
+   local size = Game.Get2daRowCount(twoda) - 1
    for i = 0, size do
-      local const = TDA.GetString(twoda, lookup.column_label, i)
+      local const = Game.Get2daString(twoda, lookup.column_label, i)
       if #const > 0 and const ~= "****" then
          if lookup.extract then
             const = string.match(const, lookup.extract)
@@ -29,11 +27,11 @@ local function load(into, lookup)
             if lookup.value_label then
                local val
                if lookup.value_type == "string" then
-                  val = TDA.GetString(twoda, lookup.value_label, i)
+                  val = Game.Get2daString(twoda, lookup.value_label, i)
                elseif lookup.value_type == "float" then
-                  val = TDA.GetFloat(twoda, lookup.value_label, i)
+                  val = Game.Get2daFloat(twoda, lookup.value_label, i)
                elseif lookup.value_type == "int" then
-                  val = TDA.GetInt(twoda, lookup.value_label, i)
+                  val = Game.Get2daInt(twoda, lookup.value_label, i)
                else
                   error(string.format("solstice.constant.Load: Invalid value type %s!",
                                       lookup.value_type))
