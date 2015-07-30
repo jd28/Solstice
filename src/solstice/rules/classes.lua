@@ -5,8 +5,6 @@
 -- The following functions.
 -- @section class
 
-local TDA = require 'solstice.2da'
-local TLK = require 'solstice.tlk'
 local _CLASS = {}
 local _TIERS = {}
 
@@ -15,16 +13,16 @@ local _TIER3 = {}
 
 local _FEATS = {}
 
-for i=0, TDA.GetRowCount("cls_atk_2") - 1 do
-   _TIER2[i] = TDA.GetInt("cls_atk_2", "BAB", i)
+for i=0, Game.Get2daRowCount("cls_atk_2") - 1 do
+   _TIER2[i] = Game.Get2daInt("cls_atk_2", "BAB", i)
 end
 
-for i=0, TDA.GetRowCount("cls_atk_3") - 1 do
-   _TIER3[i] = TDA.GetInt("cls_atk_3", "BAB", i)
+for i=0, Game.Get2daRowCount("cls_atk_3") - 1 do
+   _TIER3[i] = Game.Get2daInt("cls_atk_3", "BAB", i)
 end
 
-for i=0, TDA.GetRowCount("classes") - 1 do
-   local atk = TDA.GetString("classes", "AttackBonusTable", i)
+for i=0, Game.Get2daRowCount("classes") - 1 do
+   local atk = Game.Get2daString("classes", "AttackBonusTable", i)
    if atk == 'CLS_ATK_1' then
       _TIERS[i] = 1
    elseif atk == 'CLS_ATK_2' then
@@ -35,7 +33,7 @@ for i=0, TDA.GetRowCount("classes") - 1 do
       _TIERS[i] = 0
    end
 
-   _FEATS[i] = TDA.GetString("classes", "FeatsTable", i):lower()
+   _FEATS[i] = Game.Get2daString("classes", "FeatsTable", i):lower()
 end
 
 --- Get base attack bonus
@@ -165,9 +163,9 @@ local function GetLevelBonusFeats(cre, class, level)
    local s = _FEATS[class]
    if not s or #s == 0 then return t end
 
-   for i = 0, TDA.GetRowCount(s) - 1 do
-      if TDA.GetInt(s, "GrantedOnLevel", i) == level then
-         table.insert(t, TDA.GetInt(s, "FeatIndex", i))
+   for i = 0, Game.Get2daRowCount(s) - 1 do
+      if Game.Get2daInt(s, "GrantedOnLevel", i) == level then
+         table.insert(t, Game.Get2daInt(s, "FeatIndex", i))
       end
    end
 
@@ -177,18 +175,18 @@ end
 --- Get class name.
 -- @param class CLASS_TYPE_*
 local function GetClassName(class)
-   local strref = TDA.GetInt('classes', 'Name', class)
+   local strref = Game.Get2daInt('classes', 'Name', class)
    if strref == 0 then
       error("Unknown class: " .. tostring(class))
    end
-   return TLK.GetString(strref)
+   return Game.GetTlkString(strref)
 end
 
 --- Get number of skillpoints class gains on level up.
 -- @param class CLASS_TYPE_*
 -- @param pc PC
 local function GetSkillPointsGainedOnLevelUp(class, pc)
-   local sps = TDA.GetInt('classes', 'SkillPointBase', class)
+   local sps = Game.Get2daInt('classes', 'SkillPointBase', class)
    if pc:GetRacialType(pc) == RACIAL_TYPE_HUMAN then
       sps = sps + 1
    end
@@ -200,7 +198,7 @@ end
 -- @param class CLASS_TYPE_*
 -- @param pc PC
 local function GetHitPointsGainedOnLevelUp(class, pc)
-   local hp = TDA.GetInt('classes', 'HitDie', class)
+   local hp = Game.Get2daInt('classes', 'HitDie', class)
    if class == CLASS_TYPE_DRAGON_DISCIPLE then
       local level = pc:GetLevelByClass(CLASS_TYPE_DRAGON_DISCIPLE) + 1
       if level >= 6 then

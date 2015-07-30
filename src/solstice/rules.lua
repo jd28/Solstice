@@ -5,7 +5,6 @@
 local ffi = require 'ffi'
 local bit = require 'bit'
 local C = ffi.C
-local TLK = require 'solstice.tlk'
 
 local M = require 'solstice.rules.init'
 safe_require 'solstice.rules.ability'

@@ -1,8 +1,6 @@
 --- Rules
 -- @module rules
 
-local TLK = require 'solstice.tlk'
-local TDA = require 'solstice.2da'
 local Color = require 'solstice.color'
 local ffi = require 'ffi'
 local C = ffi.C
@@ -11,18 +9,18 @@ local C = ffi.C
 -- @section damages
 
 local function GetDamageName(index)
-   return TLK.GetString(TDA.GetInt('damages', 'Name', index))
+   return Game.GetTlkString(Game.Get2daInt('damages', 'Name', index))
 end
 
 local function GetDamageColor(index)
-   return Color.Encode(TDA.GetInt('damages', 'R', index),
-                       TDA.GetInt('damages', 'G', index),
-                       TDA.GetInt('damages', 'B', index))
+   return Color.Encode(Game.Get2daInt('damages', 'R', index),
+                       Game.Get2daInt('damages', 'G', index),
+                       Game.Get2daInt('damages', 'B', index))
 end
 
 local DMG_VFX = {}
-for i = 0, TDA.GetRowCount("damagehitvisual") - 1 do
-   DMG_VFX[i] = TDA.GetInt("damagehitvisual", "VisualEffectID", i)
+for i = 0, Game.Get2daRowCount("damagehitvisual") - 1 do
+   DMG_VFX[i] = Game.Get2daInt("damagehitvisual", "VisualEffectID", i)
 end
 
 --- Get damage impact visual.
@@ -129,16 +127,16 @@ local _ROLLS
 local _ROLLS_LEN = 0
 local function UnpackItempropDamageRoll(ip)
    if _ROLLS_LEN == 0 then
-      local tda = TDA.GetCached2da("iprp_damagecost")
+      local tda = Game.GetCached2da("iprp_damagecost")
       if tda == nil then error "Unable to locate iprp_damagecost.2da!" end
 
-      _ROLLS_LEN = TDA.GetRowCount(tda)
+      _ROLLS_LEN = Game.Get2daRowCount(tda)
       _ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
 
-      for i=1, TDA.GetRowCount(tda) - 1 do
+      for i=1, Game.Get2daRowCount(tda) - 1 do
 
-         local d = TDA.GetInt(tda, "NumDice", i)
-         local s = TDA.GetInt(tda, "Die", i)
+         local d = Game.Get2daInt(tda, "NumDice", i)
+         local s = Game.Get2daInt(tda, "Die", i)
          if d == 0 then
             _ROLLS[i].dice, _ROLLS[i].sides, _ROLLS[i].bonus = 0, 0, s
          else
@@ -159,16 +157,16 @@ local _MONSTER_ROLLS
 local _MONSTER_ROLLS_LEN = 0
 local function UnpackItempropMonsterRoll(ip)
    if _MONSTER_ROLLS_LEN == 0 then
-      local tda = TDA.GetCached2da("iprp_monstcost")
+      local tda = Game.GetCached2da("iprp_monstcost")
       if tda == nil then error "Unable to locate iprp_monstcost!" end
 
-      _MONSTER_ROLLS_LEN = TDA.GetRowCount(tda)
+      _MONSTER_ROLLS_LEN = Game.Get2daRowCount(tda)
       _MONSTER_ROLLS = ffi.new("DiceRoll[?]", _ROLLS_LEN)
 
-      for i=1, TDA.GetRowCount(tda) - 1 do
+      for i=1, Game.Get2daRowCount(tda) - 1 do
 
-         local d = TDA.GetInt(tda, "NumDice", i)
-         local s = TDA.GetInt(tda, "Die", i)
+         local d = Game.Get2daInt(tda, "NumDice", i)
+         local s = Game.Get2daInt(tda, "Die", i)
          if d == 0 then
             _MONSTER_ROLLS[i].dice, _MONSTER_ROLLS[i].sides, _MONSTER_ROLLS[i].bonus = 0, 0, s
          else

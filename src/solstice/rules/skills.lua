@@ -6,7 +6,6 @@
 
 local ffi = require 'ffi'
 local C = ffi.C
-local TLK   = require 'solstice.tlk'
 local M = require 'solstice.rules.init'
 
 --- Get skill's associated ability.
@@ -50,7 +49,7 @@ function M.GetSkillName(skill)
    local sk = C.nwn_GetSkill(skill)
    if sk == nil then return "" end
 
-   return TLK.GetString(sk.sk_name_strref)
+   return Game.GetTlkString(sk.sk_name_strref)
 end
 
 --- Determin penalty from armor/shield.

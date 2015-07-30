@@ -9,14 +9,12 @@ local ffi = require 'ffi'
 local C   = ffi.C
 require 'solstice.nwn.ctypes.2da'
 
-local M = {}
-
--- Get a cached 2da file.
+--- Get a cached 2da file.
 -- Note: You do not want to store the return of this variable
 -- as it can be deleted from the NWN 2da cache.
 -- @param twoda 2da name (minus .2da extention)
 -- @return A cached 2da or nil.
-function M.GetCached2da(twoda)
+local function GetCached2da(twoda)
    if type(twoda) ~= "string" then
       error "solstice.2da.GetCached2da: parameter is not a string type!"
    end
@@ -31,9 +29,9 @@ end
 
 --- Get number of columns in 2da.
 -- @param twoda 2da file.
-function M.GetColumnCount(twoda)
+local function Get2daColumnCount(twoda)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)
+      twoda = GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -44,9 +42,9 @@ end
 
 --- Get number of rows in 2da.
 -- @param twoda 2da file.
-function M.GetRowCount(twoda)
+local function Get2daRowCount(twoda)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)
+      twoda = GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -59,9 +57,9 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.GetFloat(twoda, col, row)
+local function Get2daFloat(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)
+      twoda = GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -81,9 +79,9 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.GetInt(twoda, col, row)
+local function Get2daInt(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)
+      twoda = GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -104,9 +102,9 @@ end
 -- @param twoda 2da file.
 -- @param col Column label or index.
 -- @param row Row index.
-function M.GetString(twoda, col, row)
+local function Get2daString(twoda, col, row)
    if type(twoda) == "string" then
-      twoda = M.GetCached2da(twoda)
+      twoda = GetCached2da(twoda)
    end
 
    if twoda == nil then
@@ -122,4 +120,11 @@ function M.GetString(twoda, col, row)
    end
 end
 
-return M
+-- Exports
+local M = require 'solstice.game.init'
+M.GetCached2da = GetCached2da
+M.Get2daColumnCount = Get2daColumnCount
+M.Get2daRowCount = Get2daRowCount
+M.Get2daFloat = Get2daFloat
+M.Get2daInt = Get2daInt
+M.Get2daString = Get2daString
