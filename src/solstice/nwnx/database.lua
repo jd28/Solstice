@@ -1,7 +1,6 @@
 --- NWNX Database
 -- @module nwnx.database
 
-local CDB = require 'solstice.campaigndb'
 local M = {}
 
 local DEFAULT_TABLE = "pwdata"
@@ -207,7 +206,7 @@ function M.SetObject(object, varname, obj, expires, is_global, table)
          "('" .. tag .. "','" .. varname .. "',%s," .. expires .. ")"
    end
    mod:SetLocalString("NWNX!ODBC!SETSCORCOSQL", sql);
-   CDB.StoreCampaignObject ("NWNX", "-", obj);
+   System.StoreCampaignObject ("NWNX", "-", obj);
 end
 
 --- TODO
@@ -226,7 +225,7 @@ function M.GetObject(object, varname, owner, is_global, table)
         owner = object
     end
 
-    return CDB.RetrieveCampaignObject ("NWNX", "-", owner:GetLocation(), owner)
+    return System.RetrieveCampaignObject ("NWNX", "-", owner:GetLocation(), owner)
 end
 
 --- TODO

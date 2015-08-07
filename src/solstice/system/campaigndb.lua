@@ -1,7 +1,7 @@
 --- Campaign Database
 -- @module campaigndb
 
-local M = {}
+local M = require 'solstice.system.init'
 
 local NWE = require 'solstice.nwn.engine'
 
@@ -12,7 +12,7 @@ local NWE = require 'solstice.nwn.engine'
 -- @param name Campaign to delete the variable from (case-sensitive).
 -- @param var Variable name to delete.
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
-function M.DeleteVariable(name, var, player)
+function M.DeleteCampaignVariable(name, var, player)
    player = player or OBJECT_INVALID
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -22,7 +22,7 @@ end
 
 --- Destroys a campaign database.
 -- @param name Campaign to delete.
-function M.DestroyDatabase(name)
+function M.DestroyCampaignDatabase(name)
    NWE.StackPushString(name)
    NWE.ExecuteCommand(594, 1)
 end
@@ -31,7 +31,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param player Player associated with a variable.
-function M.GetFloat(name, var, player)
+function M.GetCampaignFloat(name, var, player)
    player = player or OBJECT_INVALID
    NWE.StackPushObject(player)
    NWE.StackPushString(var)
@@ -44,7 +44,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
-function M.GetInt(name, var, player)
+function M.GetCampaignInt(name, var, player)
    player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
@@ -58,7 +58,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
-function M.GetLocation(name, var, player)
+function M.GetCampaignLocation(name, var, player)
    player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
@@ -72,7 +72,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
-function M.GetString(name, var, player)
+function M.GetCampaignString(name, var, player)
    player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
@@ -86,7 +86,7 @@ end
 -- @param name Campaign to get the variable from (case-sensitive).
 -- @param var Variable name
 -- @param[opt=OBJECT_INVALID] player Player associated with a variable.
-function M.GetVector(name, var, player)
+function M.GetCampaignVector(name, var, player)
    player = player or OBJECT_INVALID
 
    NWE.StackPushObject(player)
