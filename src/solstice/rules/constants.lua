@@ -1,8 +1,6 @@
 --- Rules.
 -- @module rules
 
-local TDA = require 'solstice.2da'
-
 local M = require 'solstice.rules.init'
 
 _CONSTS = {}
@@ -17,10 +15,10 @@ local function load(into, lookup)
       error "sol.consant.Load: invalid tda or column label!"
    end
 
-   local twoda = TDA.GetCached2da(lookup.tda)
-   local size = TDA.GetRowCount(twoda) - 1
+   local twoda = Game.GetCached2da(lookup.tda)
+   local size = Game.Get2daRowCount(twoda) - 1
    for i = 0, size do
-      local const = TDA.GetString(twoda, lookup.column_label, i)
+      local const = Game.Get2daString(twoda, lookup.column_label, i)
       if #const > 0 and const ~= "****" then
          if lookup.extract then
             const = string.match(const, lookup.extract)
@@ -29,11 +27,11 @@ local function load(into, lookup)
             if lookup.value_label then
                local val
                if lookup.value_type == "string" then
-                  val = TDA.GetString(twoda, lookup.value_label, i)
+                  val = Game.Get2daString(twoda, lookup.value_label, i)
                elseif lookup.value_type == "float" then
-                  val = TDA.GetFloat(twoda, lookup.value_label, i)
+                  val = Game.Get2daFloat(twoda, lookup.value_label, i)
                elseif lookup.value_type == "int" then
-                  val = TDA.GetInt(twoda, lookup.value_label, i)
+                  val = Game.Get2daInt(twoda, lookup.value_label, i)
                else
                   error(string.format("solstice.constant.Load: Invalid value type %s!",
                                       lookup.value_type))
@@ -74,6 +72,80 @@ end
 function M.RegisterConstant(name, value)
    assert(type(name) == "string")
    _CONSTS[name] = value
+end
+
+function M.ConvertSaveToItempropConstant(const)
+   if const == SAVING_THROW_FORT then
+      return IP_CONST_SAVEBASETYPE_FORTITUDE
+   elseif const == SAVING_THROW_REFLEX then
+      return IP_CONST_SAVEBASETYPE_REFLEX
+   elseif const == SAVING_THROW_WILL then
+      return IP_CONST_SAVEBASETYPE_WILL
+   else
+      error "Unable to convert save contant to IP constant."
+   end
+end
+
+function M.ConvertSaveVsToItempropConstant(const)
+   if const == SAVING_THROW_VS_ALL then
+      return IP_CONST_SAVEVS_UNIVERSAL
+   elseif const == SAVING_THROW_VS_ACID then
+      return IP_CONST_SAVEVS_ACID
+   elseif const == SAVING_THROW_VS_COLD then
+      return IP_CONST_SAVEVS_COLD
+   elseif const == SAVING_THROW_VS_DEATH then
+      return IP_CONST_SAVEVS_DEATH
+   elseif const == SAVING_THROW_VS_DISEASE then
+      return IP_CONST_SAVEVS_DISEASE
+   elseif const == SAVING_THROW_VS_DIVINE then
+      return IP_CONST_SAVEVS_DIVINE
+   elseif const == SAVING_THROW_VS_ELECTRICITY then
+      return IP_CONST_SAVEVS_ELECTRICAL
+   elseif const == SAVING_THROW_VS_FEAR then
+      return IP_CONST_SAVEVS_FEAR
+   elseif const == SAVING_THROW_VS_FIRE then
+      return IP_CONST_SAVEVS_FIRE
+   elseif const == SAVING_THROW_VS_MIND_SPELLS then
+      return IP_CONST_SAVEVS_MINDAFFECTING
+   elseif const == SAVING_THROW_VS_NEGATIVE then
+      return IP_CONST_SAVEVS_NEGATIVE
+   elseif const == SAVING_THROW_VS_POISON then
+      return IP_CONST_SAVEVS_POISON
+   elseif const == SAVING_THROW_VS_POSITIVE then
+      return IP_CONST_SAVEVS_POSITIVE
+   elseif const == SAVING_THROW_VS_SONIC then
+      return IP_CONST_SAVEVS_SONIC
+   else
+      error "Unable to convert save contant to IP constant."
+   end
+end
+
+function M.ConvertImmunityToIPConstant(const)
+   if const == IMMUNITY_TYPE_SNEAK_ATTACK then
+      return IP_CONST_IMMUNITYMISC_BACKSTAB
+   elseif const == IMMUNITY_TYPE_ABILITY_DECREASE then
+      return IP_CONST_IMMUNITYMISC_LEVEL_ABIL_DRAIN
+   elseif const == IMMUNITY_TYPE_NEGATIVE_LEVEL then
+      return IP_CONST_IMMUNITYMISC_LEVEL_ABIL_DRAIN
+   elseif const == IMMUNITY_TYPE_MIND_SPELLS then
+      return IP_CONST_IMMUNITYMISC_MINDSPELLS
+   elseif const == IMMUNITY_TYPE_POISON then
+      return IP_CONST_IMMUNITYMISC_POISON
+   elseif const == IMMUNITY_TYPE_DISEASE then
+      return IP_CONST_IMMUNITYMISC_DISEASE
+   elseif const == IMMUNITY_TYPE_FEAR then
+      return IP_CONST_IMMUNITYMISC_FEAR
+   elseif const == IMMUNITY_TYPE_KNOCKDOWN then
+      return IP_CONST_IMMUNITYMISC_KNOCKDOWN
+   elseif const == IMMUNITY_TYPE_PARALYSIS then
+      return IP_CONST_IMMUNITYMISC_PARALYSIS
+   elseif const == IMMUNITY_TYPE_CRITICAL_HIT then
+      return IP_CONST_IMMUNITYMISC_CRITICAL_HITS
+   elseif const == IMMUNITY_TYPE_DEATH then
+      return IP_CONST_IMMUNITYMISC_DEATH_MAGIC
+   else
+      error "Unable to convert immunity contant to IP constant."
+   end
 end
 
 return M

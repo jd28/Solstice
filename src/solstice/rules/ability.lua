@@ -1,14 +1,11 @@
 --- Rules
 -- @module rules
 
-local TLK = require 'solstice.tlk'
-local TDA = require 'solstice.2da'
-
 --- Abilities
 -- @section ability
 
 local function GetAbilityName(ability)
-   return TLK.GetString(TDA.GetInt("abilities", "Name", ability))
+   return Game.GetTlkString(TDA.GetInt("abilities", "Name", ability))
 end
 
 --- Get the limits of ability effects

@@ -5,12 +5,11 @@
 -- @section levels
 
 local C = require('ffi').C
-local TDA = require 'solstice.2da'
 
 --- Determine XP requirements for level.
 -- @param level Character level
 local function GetXPLevelRequirement(level)
-   return TDA.GetInt('exptable', 'XP', level - 1)
+   return Game.Get2daInt('exptable', 'XP', level - 1)
 end
 
 --- Determine if an ability score is gained on level up.

@@ -8,7 +8,6 @@ local M = require 'solstice.rules.init'
 
 local ffi = require 'ffi'
 local max = math.max
-local TDA = require 'solstice.2da'
 local Log = require('solstice.system').GetLogger()
 local TA = OPT.TA
 
@@ -17,10 +16,10 @@ local WEAP_CONV
 local function BaseitemToWeapon(base)
    if not WEAP_CONV then
       WEAP_CONV = {}
-      local tda = TDA.GetCached2da("wpnprops")
+      local tda = Game.GetCached2da("wpnprops")
       if tda == nil then error "Unable to locate wpnprops.2da!" end
-      for i = 0, TDA.GetRowCount(tda) - 1 do
-         WEAP_CONV[TDA.GetInt(tda, "Baseitems", i)] = i
+      for i = 0, Game.Get2daRowCount(tda) - 1 do
+         WEAP_CONV[Game.Get2daInt(tda, "Baseitems", i)] = i
       end
    end
 
@@ -36,11 +35,11 @@ end
 
 local _WEAPON_FEAT = {}
 
-for c = 0, TDA.GetRowCount("mstrwpnfeats") - 1 do
+for c = 0, Game.Get2daRowCount("mstrwpnfeats") - 1 do
    _WEAPON_FEAT[c] = {}
-   for r = 0, TDA.GetRowCount("wpnfeats") - 1 do
+   for r = 0, Game.Get2daRowCount("wpnfeats") - 1 do
       -- offset column by one, because of the labels...
-      local feat = TDA.GetInt("wpnfeats", c+1, r)
+      local feat = Game.Get2daInt("wpnfeats", c+1, r)
       _WEAPON_FEAT[c][r] = feat
    end
 end
@@ -62,19 +61,19 @@ local function SetWeaponFeat(masterfeat, basetype, feat)
 end
 
 local function GetWeaponType(item)
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   return TDA.GetInt(tda, "Type", BaseitemToWeapon(item))
+   return Game.Get2daInt(tda, "Type", BaseitemToWeapon(item))
 end
 
 local function GetIsMonkWeapon(item, cre)
-   return TDA.GetInt("wpnprops", "Monk", BaseitemToWeapon(item)) ~= 0
+   return Game.Get2daInt("wpnprops", "Monk", BaseitemToWeapon(item)) ~= 0
 end
 
 local function GetIsRangedWeapon(item)
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   return TDA.GetInt(tda, "Ranged", BaseitemToWeapon(item)) ~= 0
+   return Game.Get2daInt(tda, "Ranged", BaseitemToWeapon(item)) ~= 0
 end
 
 --- Determine if weapon is light.
@@ -116,7 +115,7 @@ local function GetIsWeaponFinessable(item, cre)
    if GetIsWeaponLight(item, cre) then return true end
    local size = cre:GetSize()
    local rel = cre:GetRelativeWeaponSize(item)
-   local fin = TDA.GetInt("wpnprops", "Finesse", BaseitemToWeapon(item))
+   local fin = Game.Get2daInt("wpnprops", "Finesse", BaseitemToWeapon(item))
    if fin > 0 and size >= fin then return true end
 
 
@@ -424,9 +423,9 @@ end
 -- NOTE: This does not support multiple weapon damage types and most likely never will.
 -- @param item Weapon.
 local function GetWeaponBaseDamageType(item)
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   local t = TDA.GetInt(tda, "BaseDamage", BaseitemToWeapon(item))
+   local t = Game.Get2daInt(tda, "BaseDamage", BaseitemToWeapon(item))
    local type = 0
 
    if t == 1 then
@@ -445,11 +444,11 @@ end
 -- @param item Weapon.
 -- @param cre Creature
 local function GetWeaponBaseDamage(item, cre)
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   local d = TDA.GetInt(tda, "Dice", BaseitemToWeapon(item))
-   local s = TDA.GetInt(tda, "Sides", BaseitemToWeapon(item))
-   local b = TDA.GetInt(tda, "Bonus", BaseitemToWeapon(item))
+   local d = Game.Get2daInt(tda, "Dice", BaseitemToWeapon(item))
+   local s = Game.Get2daInt(tda, "Sides", BaseitemToWeapon(item))
+   local b = Game.Get2daInt(tda, "Bonus", BaseitemToWeapon(item))
    local base = type(item) == 'number' and item or item:GetBaseType()
    local found = false
    local feat
@@ -566,9 +565,9 @@ end
 -- @param item Weapon.
 local function GetWeaponCritRange(cre, item)
    local base = item
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   local basethreat = TDA.GetInt(tda, "CritThreat", BaseitemToWeapon(base))
+   local basethreat = Game.Get2daInt(tda, "CritThreat", BaseitemToWeapon(base))
    local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
    if override > 0 then
       if override == 1 then
@@ -632,9 +631,9 @@ end
 -- @param item Weapon.
 local function GetWeaponCritMultiplier(cre, item)
    local base = item
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   local mult = TDA.GetInt(tda, "CritMult", BaseitemToWeapon(base))
+   local mult = Game.Get2daInt(tda, "CritMult", BaseitemToWeapon(base))
    local override = item:GetLocalInt("PL_CRIT_OVERRIDE")
    local feat = -1
 
@@ -687,9 +686,9 @@ local function GetDualWieldPenalty(cre)
       return 0, 0
    end
 
-   local tda = TDA.GetCached2da("wpnprops")
+   local tda = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
-   local is_double = TDA.GetInt(tda, "Type", BaseitemToWeapon(rh)) == 7
+   local is_double = Game.Get2daInt(tda, "Type", BaseitemToWeapon(rh)) == 7
 
    local on, off = 0, 0
    local rel = cre:GetRelativeWeaponSize(rh)
@@ -808,10 +807,10 @@ end
 -- @param cre Creature
 local function GetOffhandAttacks(cre)
    local rh   = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-   local tda  = TDA.GetCached2da("wpnprops")
+   local tda  = Game.GetCached2da("wpnprops")
    if tda == nil then error "Unable to locate wpnprops.2da!" end
 
-   local is_double = TDA.GetInt(tda, "Type", BaseitemToWeapon(rh)) == 7
+   local is_double = Game.Get2daInt(tda, "Type", BaseitemToWeapon(rh)) == 7
    local item      = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
    if BaseitemToWeapon(item) == 0 and not is_double then return 0 end
 

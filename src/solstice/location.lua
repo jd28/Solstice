@@ -19,7 +19,7 @@ M.location_t = ffi.metatype("CScriptLocation",
 -- Aliased globally as LOCATION_INVALID.
 M.INVALID = M.location_t(Vec.vector_t(0,0,0),
                          Vec.vector_t(0,0,0),
-                         OBJECT_INVALID.id)
+                         0xffffffff)
 
 --- Functions
 -- @section

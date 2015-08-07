@@ -57,28 +57,12 @@ Game     = require 'solstice.game'
 Effect   = require 'solstice.effect'
 ItemProp = require 'solstice.itemprop'
 Rules    = require 'solstice.rules'
+Objects  = require 'solstice.objects'
 
-local Obj       = require 'solstice.object'
-Rules.RegisterConstant("OBJECT_INVALID", Obj.INVALID)
-
-local sol_aoe   = require 'solstice.aoe'
-local sol_area  = require 'solstice.area'
-local sol_cre   = require 'solstice.creature'
-local sol_door  = require 'solstice.door'
-local sol_enc   = require 'solstice.encounter'
-local sol_item  = require 'solstice.item'
+Rules.RegisterConstant("OBJECT_INVALID", Objects.INVALID)
 
 local sol_loc   = require 'solstice.location'
 Rules.RegisterConstant("LOCATION_INVALID", sol_loc.INVALID)
-
-local sol_mod   = require 'solstice.module'
-local sol_plc   = require 'solstice.placeable'
-local sol_snd   = require 'solstice.sound'
-local sol_store = require 'solstice.store'
-local sol_sound = require 'solstice.sound'
-local sol_trap  = require 'solstice.trap'
-local sol_trig  = require 'solstice.trigger'
-local sol_way   = require 'solstice.waypoint'
 
 local Log = System.GetLogger()
 _SOL_LOG_INTERNAL = System.FileLogger(OPT.LOG_DIR .. "/solstice_internal.txt", "[%Y-%m-%d %X]")
@@ -134,29 +118,29 @@ function _SOL_GET_CACHED_OBJECT(id)
       object = _OBJECTS[id]
    else
       if type == OBJECT_TRUETYPE_CREATURE then
-         object = sol_cre.creature_t(type, id)
+         object = Objects.creature_t(type, id)
       elseif type == OBJECT_TRUETYPE_MODULE then
-         object = sol_mod.module_t(type, id)
+         object = Objects.module_t(type, id)
       elseif type == OBJECT_TRUETYPE_AREA then
-         object = sol_area.area_t(type, id)
+         object = Objects.area_t(type, id)
       elseif type == OBJECT_TRUETYPE_ITEM then
-         object = sol_item.item_t(type, id)
+         object = Objects.item_t(type, id)
       elseif type == OBJECT_TRUETYPE_TRIGGER then
-         object = sol_trig.trigger_t(type, id)
+         object = Objects.trigger_t(type, id)
       elseif type == OBJECT_TRUETYPE_PLACEABLE then
-         object = sol_plc.placeable_t(type, id)
+         object = Objects.placeable_t(type, id)
       elseif type == OBJECT_TRUETYPE_DOOR then
-         object = sol_door.door_t(type, id)
+         object = Objects.door_t(type, id)
       elseif type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
-         object = sol_aoe.aoe_t(type, id)
+         object = Objects.aoe_t(type, id)
       elseif type == OBJECT_TRUETYPE_WAYPOINT then
-         object = sol_way.waypoint_t(type, id)
+         object = Objects.waypoint_t(type, id)
       elseif type == OBJECT_TRUETYPE_ENCOUNTER then
-         object = sol_enc.encounter_t(type, id)
+         object = Objects.encounter_t(type, id)
       elseif type == OBJECT_TRUETYPE_STORE then
-         object = sol_store.store_t(type, id)
+         object = Objects.store_t(type, id)
       elseif type == OBJECT_TRUETYPE_SOUND then
-      object = sol_sound.sound_t(type, id)
+      object = Objects.sound_t(type, id)
       elseif type == OBJECT_TRUETYPE_PORTAL then
          return OBJECT_INVALID
       elseif type == OBJECT_TRUETYPE_GUI then

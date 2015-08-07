@@ -8,9 +8,6 @@ local M = require 'solstice.rules.init'
 local C = require('ffi').C
 local GetObjectByID = Game.GetObjectByID
 
-local TDA = require 'solstice.2da'
-local TLK = require 'solstice.tlk'
-
 local FEAT_USES = {}
 
 --- Determines a creatures maximum feat uses.
@@ -21,7 +18,7 @@ function M.GetMaximumFeatUses(feat, cre)
    local res = f and f(feat, cre)
    if res then return res end
 
-   local tda = TDA.GetString("feat", "USESPERDAY", feat)
+   local tda = Game.Get2daString("feat", "USESPERDAY", feat)
    if #tda == 0 then return 100 end
    return tonumber(tda) or 100
 end
@@ -64,7 +61,7 @@ end
 function M.GetFeatName(feat)
    local f = C.nwn_GetFeat(feat)
    if f == nil then return "" end
-   return TLK.GetString(f.feat_name_strref)
+   return Game.GetTlkString(f.feat_name_strref)
 end
 
 --- Determine if feat is class general feat.
@@ -90,5 +87,5 @@ end
 --- Get Master Feat Name
 -- @param master master feat
 function M.GetMasterFeatName(master)
-   return TLK.GetString(TDA.GetInt('masterfeats', 'STRREF', master))
+   return Game.GetTlkString(Game.Get2daInt('masterfeats', 'STRREF', master))
 end

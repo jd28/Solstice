@@ -6,10 +6,12 @@
 local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.game.init'
+safe_require 'solstice.game.2da'
 safe_require 'solstice.game.objects'
 safe_require 'solstice.game.events'
 safe_require 'solstice.game.script'
 safe_require 'solstice.game.properties'
+safe_require 'solstice.game.tlk'
 
 --- Export all characters.
 function M.ExportAllCharacters()
