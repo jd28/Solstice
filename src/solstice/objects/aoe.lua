@@ -88,7 +88,7 @@ function AoE:GetSpellDC()
 end
 
 --- Gets AoEs spell level.
-function AoE:GetSpellLevel(level)
+function AoE:GetSpellLevel()
    if not self:GetIsValid() then return -1 end
    return self.obj.aoe_spell_level
 end

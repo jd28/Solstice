@@ -168,14 +168,14 @@ end
 -- @param value
 function Item:SetAppearance(index, value)
    if not self:GetIsValid()
-      or index < ITME_APPR_COLOR_LEATHER_1
-      or index > ITME_APPR_ARMOR_MODEL_ROBE
+      or index < ITEM_APPR_COLOR_LEATHER_1
+      or index > ITEM_APPR_ARMOR_MODEL_ROBE
       or value < 0 or value > 255
    then
       return -1
    end
 
-   if index < ITME_APPR_MODEL_PART_1 then
+   if index < ITEM_APPR_MODEL_PART_1 then
       self.obj.it_color[index + 9] = value
    else
       self.obj.it_model[index + 3] = value

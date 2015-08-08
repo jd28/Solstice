@@ -224,7 +224,7 @@ function Area:SetAreaTransitionBMP(predef, custom)
    NWE.ExecuteCommand(203, 2)
 end
 
---- Gets the sky that is displayed in the specified area.
+--- Sets the sky that is displayed in the specified area.
 -- @param skybox A SKYBOX_* constant (associated with skyboxes.2da)
 function Area:SetSkyBox(skybox)
    NWE.StackPushObject(self)
