@@ -1,8 +1,6 @@
 --- NWN Engine
 -- @module nwn
 
-require 'solstice.nwn.funcs'
-
 local ffi = require "ffi"
 local C = ffi.C
 local sm = string.strip_margin

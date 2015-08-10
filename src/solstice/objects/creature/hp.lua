@@ -8,8 +8,6 @@ GetObjectByID = Game.GetObjectByID
 --- Hitpoints
 -- @section hitpoints
 
-require 'solstice.nwn.funcs'
-
 --- Get max hit points by level
 -- @param level The level in question.
 function Creature:GetMaxHitPointsByLevel(level)

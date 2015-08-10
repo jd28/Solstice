@@ -3,7 +3,7 @@
 
 local M = require 'solstice.system.init'
 require 'solstice.system.logging'
-safe_require 'solstice.system.campaigndb'
+require 'solstice.system.campaigndb'
 require 'solstice.system.database'
 
 --- Run Lua garbage collector.
