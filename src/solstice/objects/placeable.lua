@@ -9,8 +9,13 @@ local M = require 'solstice.objects.init'
 local Placeable = inheritsFrom({}, M.Object)
 M.Placeable = Placeable
 
--- Internal ctype.
-M.placeable_t = ffi.metatype("Placeable", { __index = M.Placeable })
+function Placeable.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_PLACEABLE
+      },
+      { __index = Placeable })
+end
 
 --- Make placeable do an action
 -- @param action Action to do.

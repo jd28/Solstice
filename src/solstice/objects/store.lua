@@ -8,10 +8,16 @@ local ffi = require 'ffi'
 local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.objects.init'
-M.Store = inheritsFrom({}, M.Object)
+local Store = inheritsFrom({}, M.Object)
+M.Store = Store
 
---- Internal ctype
-M.store_t = ffi.metatype("Store", { __index = M.Store })
+function Store.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_STORE
+      },
+      { __index = M.Store })
+end
 
 --- Class Store
 -- @section store

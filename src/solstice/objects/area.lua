@@ -13,8 +13,13 @@ local M = require 'solstice.objects.init'
 local Area = inheritsFrom({}, M.Object)
 M.Area = Area
 
--- Internal ctype
-M.area_t = ffi.metatype("Area", { __index = Area })
+function Area.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_AREA
+      },
+      { __index = Area })
+end
 
 --- Determines if there is a clear line of sight between two objects
 -- @param loc1 Location A

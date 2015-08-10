@@ -9,16 +9,20 @@ local C = ffi.C
 local Object = {}
 M.Object = Object
 
--- Internal Object ctype.
--- See sol/ctypes.lua for definition.
-M.object_t = ffi.metatype("Object", { __index = M.Object })
+function Object.new(id)
+   return setmetatable({
+         id = id,
+         type = -1
+      },
+      { __index = Object })
+end
 
 --- Constants
 -- @section class_object
 
 --- Invalid Object.
 -- Create invalid object so don't have to test nullity and validity.
-M.INVALID = M.object_t(-1, 0x7F000000, nil)
+M.INVALID = Object.new(0x7F000000)
 
 safe_require "solstice.objects.object.action"
 safe_require "solstice.objects.object.combat"

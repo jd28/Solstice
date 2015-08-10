@@ -7,6 +7,10 @@ local M = require 'solstice.objects.init'
 
 M.Trigger = inheritsFrom({}, M.Object)
 
--- Internal ctype.
-M.trigger_t = ffi.metatype("Trigger", { __index = M.Trigger })
-
+function M.Trigger.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_TRIGGER
+      },
+      { __index = M.Trigger })
+end

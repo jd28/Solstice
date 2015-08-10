@@ -9,8 +9,13 @@ local M = require 'solstice.objects.init'
 local Encounter = inheritsFrom({}, M.Object)
 M.Encounter = Encounter
 
--- Internal ctype.
-M.encounter_t = ffi.metatype("Encounter", { __index = Encounter })
+function Encounter.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_ENCOUNTER
+      },
+      { __index = Encounter })
+end
 
 --- Class Encounter
 -- @section encounter

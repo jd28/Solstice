@@ -12,8 +12,13 @@ local M = require 'solstice.objects.init'
 local Item = inheritsFrom({}, M.Object)
 M.Item = Item
 
--- Internal ctype.
-M.item_t = ffi.metatype("Item", { __index = M.Item })
+function Item.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_ITEM
+      },
+      { __index = Item })
+end
 
 --- Armor Class
 -- @section

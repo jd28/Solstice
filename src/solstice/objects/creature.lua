@@ -8,10 +8,16 @@ local NWE = require 'solstice.nwn.engine'
 
 local M = require 'solstice.objects.init'
 local Creature = inheritsFrom({}, M.Object)
+
 M.Creature  = Creature
 
--- Internal ctype.
-M.creature_t = ffi.metatype("Creature", { __index = Creature })
+function Creature.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_CREATURE
+      },
+      { __index = Creature })
+end
 
 safe_require 'solstice.objects.creature.ability'
 safe_require 'solstice.objects.creature.action'

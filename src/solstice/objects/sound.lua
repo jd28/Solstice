@@ -8,8 +8,13 @@ local M = require 'solstice.objects.init'
 local Sound = inheritsFrom({}, M.Object)
 M.Sound = Sound
 
--- Internal ctype.
-M.sound_t = ffi.metatype("Sound", { __index = M.Sound })
+function Sound.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_SOUND
+      },
+      { __index = Sound })
+end
 
 function M.Sound:Play()
    NWE.StackPushObject(self)

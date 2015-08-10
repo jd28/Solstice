@@ -118,29 +118,29 @@ function _SOL_GET_CACHED_OBJECT(id)
       object = _OBJECTS[id]
    else
       if type == OBJECT_TRUETYPE_CREATURE then
-         object = Objects.creature_t(type, id)
+         object = Objects.Creature.new(id)
       elseif type == OBJECT_TRUETYPE_MODULE then
-         object = Objects.module_t(type, id)
+         object = Objects.Module.new(id)
       elseif type == OBJECT_TRUETYPE_AREA then
-         object = Objects.area_t(type, id)
+         object = Objects.Area.new(id)
       elseif type == OBJECT_TRUETYPE_ITEM then
-         object = Objects.item_t(type, id)
+         object = Objects.Item.new(id)
       elseif type == OBJECT_TRUETYPE_TRIGGER then
-         object = Objects.trigger_t(type, id)
+         object = Objects.Trigger.new(id)
       elseif type == OBJECT_TRUETYPE_PLACEABLE then
-         object = Objects.placeable_t(type, id)
+         object = Objects.Placeable.new(id)
       elseif type == OBJECT_TRUETYPE_DOOR then
-         object = Objects.door_t(type, id)
+         object = Objects.Door.new(id)
       elseif type == OBJECT_TRUETYPE_AREA_OF_EFFECT then
-         object = Objects.aoe_t(type, id)
+         object = Objects.AoE.new(id)
       elseif type == OBJECT_TRUETYPE_WAYPOINT then
-         object = Objects.waypoint_t(type, id)
+         object = Objects.Waypoint.new(id)
       elseif type == OBJECT_TRUETYPE_ENCOUNTER then
-         object = Objects.encounter_t(type, id)
+         object = Objects.Encounter.new(id)
       elseif type == OBJECT_TRUETYPE_STORE then
-         object = Objects.store_t(type, id)
+         object = Objects.Store.new(id)
       elseif type == OBJECT_TRUETYPE_SOUND then
-      object = Objects.sound_t(type, id)
+      object = Objects.Sound.new(id)
       elseif type == OBJECT_TRUETYPE_PORTAL then
          return OBJECT_INVALID
       elseif type == OBJECT_TRUETYPE_GUI then

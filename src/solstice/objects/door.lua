@@ -8,8 +8,13 @@ local M = require 'solstice.objects.init'
 local Door = inheritsFrom({}, M.Object)
 M.Door = Door
 
--- Internal ctype
-M.door_t = ffi.metatype("Door", { __index = Door })
+function Door.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_DOOR
+      },
+      { __index = Door })
+end
 
 --- Actions
 -- @section

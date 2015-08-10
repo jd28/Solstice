@@ -10,7 +10,14 @@ local M = require 'solstice.objects.init'
 
 local AoE = inheritsFrom({}, M.Object)
 M.AoE = AoE
-M.aoe_t = ffi.metatype("AoE", { __index = AoE })
+
+function AoE.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_AREA_OF_EFFECT
+      },
+      { __index = AoE })
+end
 
 --- Class AoE
 -- @section

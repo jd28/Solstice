@@ -289,107 +289,15 @@ typedef struct {
     int32_t            update_flags;
 } CombatInfo;
 
-typedef struct {
-    uint32_t          type;
-    uint32_t          id;
-    CNWSAreaOfEffectObject *obj;
-} AoE;
-
-typedef struct Area {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSArea       *obj;
-} Area;
-
-typedef struct Creature {
-    uint32_t           type;
-    uint32_t           id;
-    CNWSCreature      *obj;
-    CombatInfo        *ci;
-    bool               load_char_finished;
-} Creature;
-
-typedef struct Encounter {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSEncounter  *obj;
-} Encounter;
-
-typedef struct Door {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSDoor       *obj;
-} Door;
-
 typedef struct Effect {
     CGameEffect     *eff;
     bool            direct;
 } Effect;
 
-typedef struct Item {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSItem       *obj;
-} Item;
-
 typedef struct Itemprop {
     CGameEffect     *eff;
     bool            direct;
 } Itemprop;
-
-typedef struct Lock {
-    uint32_t        type;
-    uint32_t        id;
-    CGameObject     *obj;
-} Lock;
-
-typedef struct Module {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSModule     *obj;
-} Module;
-
-typedef struct Object {
-    uint32_t        type;
-    uint32_t        id;
-    CGameObject     *obj;
-} Object;
-
-typedef struct Placeable {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSPlaceable   *obj;
-} Placeable;
-
-typedef struct Sound {
-    uint32_t         type;
-    uint32_t         id;
-    CNWSSoundObject *obj;
-} Sound;
-
-typedef struct Store {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSStore      *obj;
-} Store;
-
-typedef struct Trap {
-    uint32_t        type;
-    uint32_t        id;
-    CGameObject     *obj;
-} Trap;
-
-typedef struct Trigger {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSTrigger    *obj;
-} Trigger;
-
-typedef struct Waypoint {
-    uint32_t        type;
-    uint32_t        id;
-    CNWSWaypoint   *obj;
-} Waypoint;
 
 typedef struct {
     CNWSCreature         *attacker_nwn;

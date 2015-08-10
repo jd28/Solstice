@@ -11,8 +11,13 @@ local M = require 'solstice.objects.init'
 local Module = inheritsFrom({}, M.Object)
 M.Module = Module
 
--- Internal ctype.
-M.module_t = ffi.metatype("Module", { __index = M.Module })
+function Module.new(id)
+   return setmetatable({
+         id = id,
+         type = OBJECT_TRUETYPE_MODULE
+      },
+      { __index = Module })
+end
 
 --- Class Module
 -- @section
