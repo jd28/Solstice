@@ -11,7 +11,6 @@ safe_require 'solstice.objects.placeable'
 safe_require 'solstice.objects.sound'
 safe_require 'solstice.objects.store'
 safe_require 'solstice.objects.sound'
-safe_require 'solstice.objects.trap'
 safe_require 'solstice.objects.trigger'
 safe_require 'solstice.objects.waypoint'
 return M

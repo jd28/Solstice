@@ -33,6 +33,7 @@ safe_require "solstice.objects.object.lock"
 safe_require "solstice.objects.object.nearest"
 safe_require "solstice.objects.object.saves"
 safe_require "solstice.objects.object.spells"
+safe_require "solstice.objects.object.trap"
 safe_require "solstice.objects.object.vars"
 safe_require 'solstice.objects.object.properties'
 
