@@ -7,7 +7,7 @@ local OBJECT_TYPES = bit.bor(OBJECT_TYPE_DOOR, OBJECT_TYPE_PLACEABLE,
 --- Gets traps base type.
 function Object:GetTrapBaseType()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun -1
+    return -1
   end
   return self.obj.trap_basetype
 end
@@ -37,7 +37,7 @@ end
 --- Get if trap is detectable.
 function Object:GetTrapDetectable()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun false
+    return false
   end
   return self.obj.trap_detectable == 1
 end
@@ -45,7 +45,7 @@ end
 --- Get the DC required to detect trap.
 function Object:GetTrapDetectDC()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun -1
+    return -1
   end
   return self.obj.trap_detect_dc
 end
@@ -53,7 +53,7 @@ end
 --- Get if trap is disarmable
 function Object:GetTrapDisarmable()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun false
+    return false
   end
   return self.obj.trap_disarmable == 1
 end
@@ -61,7 +61,7 @@ end
 --- Get DC required to disarm trap
 function Object:GetTrapDisarmDC()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun -1
+    return -1
   end
   return self.obj.trap_disarm_dc
 end
@@ -69,7 +69,7 @@ end
 --- Get if trap is flagged
 function Object:GetTrapFlagged()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun false
+    return false
   end
   return self.obj.trap_flagged == 1
 end
@@ -77,7 +77,7 @@ end
 --- Get if trap is oneshot
 function Object:GetTrapOneShot()
   if not self:GetIsValid() or bit.band(self:GetType(), OBJECT_TYPES) == 0 then
-    retun false
+    return false
   end
   return self.obj.trap_oneshot == 1
 end

@@ -8,11 +8,6 @@ local Vec = require 'solstice.vector'
 local Object = M.Object
 local GetObjectByID = Game.GetObjectByID
 
--- TODO: Move this...
-ffi.cdef [[
-uint32_t nl_CalculateSpellDC(CWNSCreature *cre, uint32_t spellid);
-]]
-
 --- Class Object: Spells
 -- @section spells
 

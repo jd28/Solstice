@@ -275,3 +275,7 @@ void           Local_SetDamageInfo(int32_t index, const char* name, const char* 
 void           Local_SetCombatEngineActive(bool active);
 EffectData    *Local_GetLastEffect();
 ]]
+
+ffi.cdef [[
+uint32_t nl_CalculateSpellDC(CWNSCreature *cre, uint32_t spellid);
+]]
