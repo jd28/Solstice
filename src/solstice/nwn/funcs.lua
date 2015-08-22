@@ -277,5 +277,5 @@ EffectData    *Local_GetLastEffect();
 ]]
 
 ffi.cdef [[
-uint32_t nl_CalculateSpellDC(CWNSCreature *cre, uint32_t spellid);
+uint32_t nl_CalculateSpellDC(CNWSCreature *cre, uint32_t spellid);
 ]]
