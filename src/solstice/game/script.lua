@@ -24,6 +24,13 @@ local function LoadScript(fname)
    end
 end
 
+local function RegisterScript(name, func)
+   if #name > 16 then
+      error("Script name is too long!", 2)
+   end
+   __SCRIPT_ENV[name] = func
+end
+
 --- Run script.
 -- @param name Script name.
 -- @param script Script to call.
@@ -143,13 +150,14 @@ local function DumpScriptEnvironment()
    return inspect(__SCRIPT_ENV)
 end
 
-M.ExecuteScript        = ExecuteScript
-M.GetItemEventName     = GetItemEventName
-M.SetItemEventPrefix   = SetItemEventPrefix
-M.SetScriptReturnValue = SetScriptReturnValue
-M.GetItemEventType     = GetItemEventType
-M.LoadScript           = LoadScript
-M.SetItemEventType     = SetItemEventType
+M.ExecuteScript           = ExecuteScript
+M.GetItemEventName        = GetItemEventName
+M.SetItemEventPrefix      = SetItemEventPrefix
+M.SetScriptReturnValue    = SetScriptReturnValue
+M.GetItemEventType        = GetItemEventType
+M.LoadScript              = LoadScript
+M.RegisterScript          = RegisterScript
+M.SetItemEventType        = SetItemEventType
 M.ExecuteItemEvent        = ExecuteItemEvent
 M.RunScript               = RunScript
 M.LockScriptEnvironment   = LockScriptEnvironment
