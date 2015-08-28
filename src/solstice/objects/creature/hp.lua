@@ -35,6 +35,5 @@ end
 
 --- Get cretures maximum hit points.
 function Creature:GetMaxHitPoints()
-   self.ci.defense.hp_max = Rules.GetMaxHitPoints(self)
-   return self.ci.defense.hp_max + self.ci.defense.hp_eff
+   return Rules.GetMaxHitPoints(self)
 end

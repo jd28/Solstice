@@ -17,11 +17,9 @@ function __GetRemainingFeatUses(feat, cre)
 end
 
 function __GetMaxHitpoints(id)
-   --_SOL_LOG_INTERNAL:debug("__GetMaxHitpoints: Creature: 0x%x", id)
-
-   local cre = GetObjectByID(id)
-   if not cre:GetIsValid() then return 0 end
-   return cre:GetMaxHitPoints()
+  local cre = GetObjectByID(id)
+  if not cre:GetIsValid() then return 0 end
+  return Rules.GetMaxHitpoints
 end
 
 function __GetArmorClass(cre)
