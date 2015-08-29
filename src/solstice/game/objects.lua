@@ -30,6 +30,15 @@ function M.CreateObject(object_type, template, loc, appear, newtag)
    return NWE.StackPopObject()
 end
 
+--- Export single character.
+-- @param player Object to export.
+function M.ExportSingleCharacter(player)
+   M.OnPreExportCharacter:notify(player)
+   NWE.StackPushObject(player)
+   NWE.ExecuteCommand(719, 1)
+   M.OnPostExportCharacter:notify(player)
+end
+
 local mod
 --- Get Module.
 function M.GetModule()

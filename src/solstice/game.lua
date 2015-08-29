@@ -10,17 +10,10 @@ safe_require 'solstice.game.2da'
 safe_require 'solstice.game.objects'
 safe_require 'solstice.game.events'
 safe_require 'solstice.game.plugins'
-safe_require 'solstice.game.script'
 safe_require 'solstice.game.properties'
+safe_require 'solstice.game.script'
 safe_require 'solstice.game.signals'
 safe_require 'solstice.game.tlk'
-
---- Export single character.
--- @param player Object to export.
-function M.ExportSingleCharacter(player)
-   NWE.StackPushObject(player)
-   NWE.ExecuteCommand(719, 1)
-end
 
 --- Get if it's day
 function M.GetIsDay()

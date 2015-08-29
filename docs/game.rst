@@ -70,6 +70,8 @@ Objects
 
 .. function:: CreateObject(object_type, template, loc, appear, newtag)
 
+.. function:: ExportSingleCharacter(player)
+
 .. function:: GetCanonicalID(cre)
 
 .. function:: GetFirstObjectInShape(shape, size, location, line_of_sight, mask, origin)
