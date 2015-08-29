@@ -12,6 +12,7 @@ safe_require 'solstice.game.events'
 safe_require 'solstice.game.plugins'
 safe_require 'solstice.game.script'
 safe_require 'solstice.game.properties'
+safe_require 'solstice.game.signals'
 safe_require 'solstice.game.tlk'
 
 --- Export single character.
