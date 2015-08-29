@@ -11,6 +11,12 @@ local M = require 'solstice.objects.init'
 local Store = inheritsFrom({}, M.Object)
 M.Store = Store
 
+local Signal = require 'solstice.external.signal'
+Store.signals = {
+  OnOpen = Signal.signal(),
+  OnClose = Signal.signal(),
+}
+
 function Store.new(id)
    return setmetatable({
          id = id,

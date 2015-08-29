@@ -6,6 +6,23 @@ class Store
 
 .. class:: Store
 
+Signals
+-------
+
+.. data:: Store.signals
+
+  A Lua table containing signals for store events.
+
+  .. note::
+
+    These signals are shared by **all** :class:`Store` instances.  If special behavior
+    is required for a specific store it must be filtered by a signal handler.
+
+
+  .. data:: Store.signals.OnOpen
+
+  .. data:: Store.signals.OnClose
+
 Methods
 -------
 

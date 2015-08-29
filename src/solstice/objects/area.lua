@@ -13,6 +13,15 @@ local M = require 'solstice.objects.init'
 local Area = inheritsFrom({}, M.Object)
 M.Area = Area
 
+local Signal = require 'solstice.external.signal'
+Area.signals = {
+  OnEnter = Signal.signal(),
+  OnExit = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+  OnUserDefined = Signal.signal(),
+  OnInitialize = Signal.signal(),
+}
+
 function Area.new(id)
    return setmetatable({
          id = id,

@@ -8,6 +8,24 @@ local M = require 'solstice.objects.init'
 local Door = inheritsFrom({}, M.Object)
 M.Door = Door
 
+local Signal = require 'solstice.external.signal'
+Door.signals = {
+  OnAreaTransitionClick = Signal.signal(),
+  OnClose = Signal.signal(),
+  OnOpen = Signal.signal(),
+  OnDamaged = Signal.signal(),
+  OnDeath = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+  OnPhysicalAttacked = Signal.signal(),
+  OnSpellCastAt = Signal.signal(),
+  OnUserDefined = Signal.signal(),
+  OnFailToOpen = Signal.signal(),
+  OnLock = Signal.signal(),
+  OnUnlock = Signal.signal(),
+  OnDisarm = Signal.signal(),
+  OnTrapTriggered = Signal.signal(),
+}
+
 function Door.new(id)
    return setmetatable({
          id = id,

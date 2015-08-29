@@ -6,6 +6,25 @@
 class AoE
 =========
 
+Signals
+-------
+
+.. data:: AoE.signals
+
+  A Lua table containing signals for area of effect events.
+
+  .. note::
+
+    These signals are shared by **all** :class:`AoE` instances.  Due to this fact these
+    signals would likely only be useful for generic global behavior.  However, one could
+    use them and dispatch on the type of the AoE.
+
+  .. data:: AoE.signals.OnEnter
+
+  .. data:: AoE.signals.OnExit
+
+  .. data:: AoE.signals.OnHeartbeat
+
 Methods
 -------
 

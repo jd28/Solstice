@@ -6,6 +6,45 @@ class Creature
 
 .. class:: Creature
 
+Signals
+-------
+
+.. data:: Creature.signals
+
+  A Lua table containing signals for creature events.
+
+  .. note::
+
+    These signals are shared by **all** :class:`Creature` instances.  If special behavior
+    is required for a specific creature it must be filtered by a signal handler.
+
+  .. data:: Creature.signals.OnConversation
+
+  .. data:: Creature.signals.OnBlocked
+
+  .. data:: Creature.signals.OnDisturbed
+
+  .. data:: Creature.signals.OnPerception
+
+  .. data:: Creature.signals.OnSpellCastAt
+
+  .. data:: Creature.signals.OnCombatRoundEnd
+
+  .. data:: Creature.signals.OnDamaged
+
+  .. data:: Creature.signals.OnPhysicalAttacked
+
+  .. data:: Creature.signals.OnDeath
+
+  .. data:: Creature.signals.OnHeartbeat
+
+  .. data:: Creature.signals.OnRested
+
+  .. data:: Creature.signals.OnSpawn
+
+  .. data:: Creature.signals.OnUserDefined
+
+
 Abilities
 ~~~~~~~~~
 

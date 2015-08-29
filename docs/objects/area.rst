@@ -7,6 +7,57 @@ class Area
 
 .. class:: Area
 
+Signals
+-------
+
+.. data:: Area.signals
+
+  A Lua table containing signals for area events.
+
+  .. note::
+
+    These signals are shared by **all** :class:`Area` instances.  If special behavior
+    is required for a specific area it must be filtered by a signal handler.
+
+  .. data:: Area.signals.OnEnter
+
+    **Signal Arguments**
+
+    area : :class:`Area`
+      Area being entered.
+    obj : :class:`Object`
+      Object entering the area.
+
+  .. data:: Area.signals.OnExit
+
+    **Signal Arguments**
+
+    area : :class:`Area`
+      Area being exited.
+    obj : :class:`Object`
+      Object exiting the area.
+
+  .. data:: Area.signals.OnHeartbeat
+
+    **Signal Arguments**
+
+    area : :class:`Area`
+      Area object.
+
+  .. data:: Area.signals.OnUserDefined
+
+    **Signal Arguments**
+
+    area : :class:`Area`
+      Area object.
+
+  .. data:: Area.signals.OnInitialize
+
+    **Signal Arguments**
+
+    area : :class:`Area`
+      Area object.
+
 Methods
 -------
 

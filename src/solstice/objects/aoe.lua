@@ -11,6 +11,13 @@ local M = require 'solstice.objects.init'
 local AoE = inheritsFrom({}, M.Object)
 M.AoE = AoE
 
+local Signal = require 'solstice.external.signal'
+AoE.signals = {
+  OnEnter = Signal.signal(),
+  OnExit = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+}
+
 function AoE.new(id)
    return setmetatable({
          id = id,

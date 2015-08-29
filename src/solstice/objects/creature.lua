@@ -11,6 +11,23 @@ local Creature = inheritsFrom({}, M.Object)
 
 M.Creature  = Creature
 
+local Signal = require 'solstice.external.signal'
+Creature.signals = {
+  OnConversation = Signal.signal(),
+  OnBlocked = Signal.signal(),
+  OnDisturbed = Signal.signal(),
+  OnPerception = Signal.signal(),
+  OnSpellCastAt = Signal.signal(),
+  OnCombatRoundEnd = Signal.signal(),
+  OnDamaged = Signal.signal(),
+  OnPhysicalAttacked = Signal.signal(),
+  OnDeath = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+  OnRested = Signal.signal(),
+  OnSpawn = Signal.signal(),
+  OnUserDefined = Signal.signal(),
+}
+
 function Creature.new(id)
    return setmetatable({
          id = id,

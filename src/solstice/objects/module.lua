@@ -11,6 +11,26 @@ local M = require 'solstice.objects.init'
 local Module = inheritsFrom({}, M.Object)
 M.Module = Module
 
+local Signal = require 'solstice.external.signal'
+Module.signals = {
+  OnAcquireItem = Signal.signal(),
+  OnUnAcquireItem = Signal.signal(),
+  OnClientEnter = Signal.signal(),
+  OnClientLeave = Signal.signal(),
+  OnPlayerDeath = Signal.signal(),
+  OnPlayerDying = Signal.signal(),
+  OnPlayerEquipItem = Signal.signal(),
+  OnPlayerUnEquipItem = Signal.signal(),
+  OnPlayerLevelUp = Signal.signal(),
+  OnPlayerRespawn = Signal.signal(),
+  OnPlayerRest = Signal.signal(),
+  OnActivateItem = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+  OnModuleLoad = Signal.signal(),
+  OnUserDefined = Signal.signal(),
+  OnCutsceneAbort = Signal.signal(),
+}
+
 function Module.new(id)
    return setmetatable({
          id = id,

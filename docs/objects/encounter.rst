@@ -6,6 +6,29 @@
 class Encounter
 ===============
 
+Signals
+-------
+
+.. data:: Encounter.signals
+
+  A Lua table containing signals for encounter events.
+
+  .. note::
+
+    These signals are shared by **all** :class:`Encounter` instances.  If special
+    behavior is required for a specific encounter it must be filtered by a signal handler.
+
+  .. data:: Encounter.signals.OnEnter
+
+  .. data:: Encounter.signals.OnExit
+
+  .. data:: Encounter.signals.OnExhausted
+
+  .. data:: Encounter.signals.OnHeartbeat
+
+  .. data:: Encounter.signals.OnUserDefined
+
+
 Methods
 -------
 

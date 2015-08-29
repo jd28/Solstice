@@ -9,6 +9,15 @@ local M = require 'solstice.objects.init'
 local Encounter = inheritsFrom({}, M.Object)
 M.Encounter = Encounter
 
+local Signal = require 'solstice.external.signal'
+Encounter.signals = {
+  OnEnter = Signal.signal(),
+  OnExit = Signal.signal(),
+  OnExhausted = Signal.signal(),
+  OnHeartbeat = Signal.signal(),
+  OnUserDefined = Signal.signal(),
+}
+
 function Encounter.new(id)
    return setmetatable({
          id = id,
