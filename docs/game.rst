@@ -202,8 +202,6 @@ Scripts
 Time
 ----
 
-.. function:: ExportAllCharacters()
-
 .. function:: ExportSingleCharacter(player)
 
 .. function:: GetDay()

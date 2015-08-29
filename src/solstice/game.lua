@@ -14,11 +14,6 @@ safe_require 'solstice.game.script'
 safe_require 'solstice.game.properties'
 safe_require 'solstice.game.tlk'
 
---- Export all characters.
-function M.ExportAllCharacters()
-   NWE.ExecuteCommand(557, 0)
-end
-
 --- Export single character.
 -- @param player Object to export.
 function M.ExportSingleCharacter(player)
