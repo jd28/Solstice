@@ -174,4 +174,11 @@ function __NWNXEventsHandleEvent(event_type)
    return f(M.GetEventInfo())
 end
 
+M.RegisterEventHandler(M.EVENT_TYPE_TOGGLE_MODE,
+  function (info)
+    M.BypassEvent()
+    __ToggleMode(info.object.id, info.type)
+    return true
+  end)
+
 return M
