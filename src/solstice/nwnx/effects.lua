@@ -50,17 +50,31 @@ function M.RegisterEffectHandler(handler, ...)
    end
 end
 
-function __NWNXEffectsHandleEffectEvent()
-   local ev = C.Local_GetLastEffectEvent()
+function __NWNXEffectsHandleRemoveEvent()
+   local ev = C.Local_GetLastEffectRemoveEvent()
    if ev == nil then return 0 end
 
-   local obj = GetObjectByID(ev.obj.obj_id)
+   local obj = GetObjectByID(ev.object)
 
-   local h = EFF_HANDLERS[ev.eff.eff_integers[0]]
+   local h = EFF_HANDLERS[ev.effect.eff_type]
    if not h then return 0 end
 
-   local del = h(Eff.effect_t(ev.eff, true), obj, ev.is_remove)
-   ev.delete_eff = del and 1 or 0
+   local del = h(Eff.effect_t(ev.effect, true), obj, true)
+   ev.failed = del and 1 or 0
+
+   return 1
+end
+
+function __NWNXEffectsHandleApplyEvent()
+   local ev = C.Local_GetLastEffectApplyEvent()
+   if ev == nil then return 0 end
+
+   local obj = GetObjectByID(ev.object)
+
+   local h = EFF_HANDLERS[ev.effect.eff_type]
+   if not h then return 0 end
+
+   local del = h(Eff.effect_t(ev.effect, true), obj, false)
 
    return 1
 end

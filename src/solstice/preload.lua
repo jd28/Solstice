@@ -41,7 +41,7 @@ local Eff = require 'solstice.effect'
 -- additional hitpoints that it receives.
 NWNXEffects.RegisterEffectHandler(
    function (eff, target, is_remove)
-      local amount = eff:GetInt(1)
+      local amount = eff:GetInt(0)
       if not is_remove then
          if target:GetIsDead() then return true end
          target.ci.defense.hp_eff = target.ci.defense.hp_eff + amount
@@ -54,17 +54,8 @@ NWNXEffects.RegisterEffectHandler(
 
 NWNXEffects.RegisterEffectHandler(
    function (effect, target, is_remove)
-      if not is_remove and target:GetIsDead() then
-         return true
-      end
-      return false
-   end,
-   CUSTOM_EFFECT_TYPE_RECURRING)
-
-NWNXEffects.RegisterEffectHandler(
-   function (effect, target, is_remove)
-      local immunity = effect:GetInt(1)
-      local amount   = effect:GetInt(4)
+      local immunity = effect:GetInt(0)
+      local amount   = effect:GetInt(1)
       local new      = target.ci.defense.immunity_misc[immunity]
 
       if not is_remove then
@@ -78,28 +69,3 @@ NWNXEffects.RegisterEffectHandler(
       return false
    end,
    CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)
-
-NWNXEffects.RegisterEffectHandler(
-   function (eff, target, is_remove)
-      local new = 0
-      local old = target.obj.cre_combat_round.cr_effect_atks
-      if not is_remove then
-         if target:GetIsDead() or target:GetType() ~= OBJECT_TYPE_CREATURE then
-            return true
-         end
-         new = math.clamp(old + eff:GetInt(1), 0, 5)
-      else
-         local att = -eff:GetInt(1)
-         for eff in target:Effects(true) do
-            if eff:GetType() > 44 then break end
-            if eff:GetType() == 44
-               and eff:GetInt(0) == CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS
-            then
-               att = att + eff:GetInt(1)
-            end
-         end
-         new = math.clamp(att, 0, 5)
-      end
-      target.obj.cre_combat_round.cr_effect_atks = new
-   end,
-   CUSTOM_EFFECT_TYPE_ADDITIONAL_ATTACKS)

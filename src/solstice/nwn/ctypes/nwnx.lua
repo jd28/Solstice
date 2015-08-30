@@ -19,11 +19,20 @@ typedef struct {
 } CombatMessage;
 
 typedef struct {
-    int type;
-    bool event_type; // exists if one wanted to have apply/remove be the same...
-    bool success;
+    /* The object on which the effect is applied/removed. */
+    CNWSObject  *object;
+    /* The effect itself. */
     CGameEffect *effect;
-} CustomEffect;
+    /* Return true here if the effect cant be applied; this deletes it. */
+    bool         failed;
+} EffectsCustomApplyEvent;
+
+typedef struct {
+    /* The object on which the effect is applied/removed. */
+    CNWSObject  *object;
+    /* The effect itself. */
+    CGameEffect *effect;
+} EffectsCustomRemoveEvent;
 
 typedef struct {
     int      type;
