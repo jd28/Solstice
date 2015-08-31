@@ -176,6 +176,34 @@ Faction
 
   .. method:: Object:SetFactionId(faction)
 
+  .. method:: Object:GetFactionAverageGoodEvilAlignment()
+
+  .. method:: Object:GetFactionAverageLawChaosAlignment()
+
+  .. method:: Object:GetFactionAverageLevel()
+
+  .. method:: Object:GetFactionAverageReputation(target)
+
+  .. method:: Object:GetFactionAverageXP()
+
+  .. method:: Object:GetFactionBestAC(visible)
+
+  .. method:: Object:GetFactionGold()
+
+  .. method:: Object:GetFactionLeastDamagedMember(visible)
+
+  .. method:: Object:GetFactionMostDamagedMember(visible)
+
+  .. method:: Object:GetFactionMostFrequentClass()
+
+  .. method:: Object:GetFactionLeader()
+
+  .. method:: Object:GetFactionStrongestMember(visible)
+
+  .. method:: Object:GetFactionWeakestMember(visible)
+
+  .. method:: Object:GetFactionWorstAC(visible)
+
 Hitpoints
 ---------
 
