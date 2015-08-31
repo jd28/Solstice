@@ -89,7 +89,11 @@ end
 function Creature:GetBICFileName()
    if not self:GetIsValid() then return "" end
    if not self:GetIsPC() then return "" end
-   return ffi.string(C.nwn_GetPCFileName(self.obj))
+   local c = C.nwn_GetPCFileName(self.id)
+   if c == nil then return "" end
+   local s = ffi.string(c)
+   C.free(c)
+   return s
 end
 
 --- Determine if creature is an AI

@@ -42,7 +42,7 @@ const char           *nwn_GetCExoLocStringText(CExoLocString* str, uint32_t loca
 ffi.cdef [[
 CNWSPlayer *nwn_GetPlayerByPlayerID (uint32_t id);
 void        nwn_BootPCWithMessage(nwn_objid_t id, int32_t strref);
-const char* nwn_GetPCFileName(CNWSCreature *cre);
+char*       nwn_GetPCFileName(uint32_t id);
 ]]
 
 -- rules.h
