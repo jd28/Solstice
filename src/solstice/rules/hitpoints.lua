@@ -43,7 +43,7 @@ local function GetMaxHitPoints(cre)
    end
 
    if OPT.TA then
-      res = res + self.ci.defense.hp_eff
+      res = res + cre.ci.defense.hp_eff
    end
 
    if not_pc then

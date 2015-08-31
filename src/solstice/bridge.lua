@@ -19,7 +19,7 @@ end
 function __GetMaxHitpoints(id)
   local cre = GetObjectByID(id)
   if not cre:GetIsValid() then return 0 end
-  return Rules.GetMaxHitpoints
+  return Rules.GetMaxHitPoints(cre)
 end
 
 function __GetArmorClass(cre)
