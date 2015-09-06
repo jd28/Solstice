@@ -220,7 +220,7 @@ end
 -- Entry point for nwnx_solstice run script hook.
 -- Should never be used directly.
 function _SOL_RUN_SCRIPT(script, obj)
-   local found, result = Game.RunScript(script, obj)
+   local found, result = Game.RunScript(script:lower(), obj)
    if not found then return 0 end
 
    if result == nil then
