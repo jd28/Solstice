@@ -88,11 +88,16 @@ Tables
 Functions
 ---------
 
-.. function:: GetEventInfo()
-
 .. function:: BypassEvent()
 
 .. function:: RegisterEventHandler(event_type, f)
+
+  **Arguments**
+
+  event_type : ``int``
+    EVENT_TYPE_*
+  f : ``function``
+    This function will be called when an event occurs.  It will be passed one parameter a :data:`NWNXEventInfo` table.
 
 .. function:: SetEventReturnValue(val)
 

@@ -3,9 +3,10 @@
 -- @alias M
 
 local Vec = require 'solstice.vector'
+local Signal = require 'solstice.external.signal'
 local Log = System.GetLogger()
 local GetObjectByID = Game.GetObjectByID
-
+local SIGNAL = Signal.signal()
 local M = {}
 
 local mod
@@ -44,17 +45,7 @@ M.LANGUAGE_CHINESE_TRADITIONAL = 129
 M.LANGUAGE_CHINESE_SIMPLIFIED  = 130
 M.LANGUAGE_JAPANESE            = 131
 
---- Event Info Table
--- @table NWNXEventInfo
--- @field type Event type
--- @field subtype Event subtype
--- @field target Event target or OBJECT_INVALID
--- @field item Event item or OBJECT_INVALID
--- @field pos Event location vector
-
---- Gets information about the current event.
--- @return see table type NWNXEventInfo
-function M.GetEventInfo()
+local function GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
    if e == nil then
       Log:error("GetEventInfo GetLastNWNXEvent is null")
@@ -76,12 +67,21 @@ function M.BypassEvent()
    mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
 end
 
+local function register_helper(evtype, f)
+  return function(info)
+    if info.type ~= evtype then return end
+    return f(info)
+  end
+end
+
+jit.off(register_helper)
+
 --- Register NWNXEvent event handler.
--- @param event_type M.EVENT_TYPE_*
+-- @param event_type M.EVENT_TYPE_*/
 -- @param f A function to handle the event.  When the event fires the function will
 -- be called with one paramenter a NWNXEventInfo table.
-function M.RegisterEventHandler(event_type, f)
-   EVENT_HANDLERS[event_type] = f
+function M.RegisterEventHandler(type, f)
+  SIGNAL:register(nil, register_helper(type, f))
 end
 
 --- Sets a value for NWNX Events to return from a hook.
@@ -166,19 +166,14 @@ end
 
 -- Bridge function to hand NWNXEvent events
 function __NWNXEventsHandleEvent(event_type)
-   -- If there isn't an event handler than return 0 so that some other plugin
-   -- or script can handle the event.
-   local f = EVENT_HANDLERS[event_type]
-   if not f then return false end
-
-   return f(M.GetEventInfo())
+  SIGNAL:notify(M.GetEventInfo())
 end
 
 M.RegisterEventHandler(M.EVENT_TYPE_TOGGLE_MODE,
   function (info)
+    print(info.type, M.EVENT_TYPE_TOGGLE_MODE)
     M.BypassEvent()
     __ToggleMode(info.object.id, info.type)
-    return true
   end)
 
 return M
