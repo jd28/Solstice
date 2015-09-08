@@ -23,11 +23,16 @@ end
 
 -- Notify
 local function notify(self, ...)
-  local i
-  local n = #self
-  for i = 1, n do
-    self[i].m(self[i].o, ...)
+  local res = true
+  for i=1, #self do
+    if self[i].o then
+      res = res and self[i].m(self[i].o, ...)
+    else
+      -- If there is no observer, just pass the parameters.
+      res = res and self[i].m(...)
+    end
   end
+  return res
 end
 
 -- signal metatable
