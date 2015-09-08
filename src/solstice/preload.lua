@@ -18,6 +18,7 @@ local fmt = string.format
 
 require 'solstice.global'
 require 'solstice.bridge'
+require 'solstice.objects'
 require 'solstice.scripts'
 
 local NWNXEffects = require 'solstice.nwnx.effects'
