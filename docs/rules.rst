@@ -1,7 +1,7 @@
 .. highlight:: lua
 .. default-domain:: lua
 
-.. module:: rules
+.. module:: Rules
 
 Rules
 =====
@@ -13,26 +13,19 @@ Abilities
 
   Gets the name of an ability.
 
-  **Arguments**
-
-  ability : ``int``
-    ABILITY_*
+  :param int ability: ABILITY_*
+  :rtype: string
 
 .. function:: GetAbilityEffectLimits(cre, ability)
 
   Get the limits of ability effects
 
-  **Arguments**
+  :param cre: Creature instance
+  :type cre: :class:`Creature`
+  :param int ability: ABILITY_*
+  :return: -12,  12
+  :rtype: int
 
-  cre : :class:`Creature`
-    Creature instance.
-  ability : ``int``
-    ABILITY_*
-
-  **Returns**
-
-  - -12
-  - 12
 
 .. function:: GetAbilityEffectModifier(cre, ability)
 
