@@ -3,10 +3,8 @@
 -- @alias M
 
 local Vec = require 'solstice.vector'
-local Signal = require 'solstice.external.signal'
 local Log = System.GetLogger()
 local GetObjectByID = Game.GetObjectByID
-local SIGNAL = Signal.signal()
 local M = {}
 
 local mod
@@ -24,7 +22,8 @@ M.EVENT_TYPE_QUICKCHAT         = 5
 M.EVENT_TYPE_EXAMINE           = 6
 M.EVENT_TYPE_USE_SKILL         = 7
 M.EVENT_TYPE_USE_FEAT          = 8
-M.EVENT_TYPE_TOGGLE_MODE       = 9
+-- The toggle mode event is not exposed.  This already handled in the Solstice mode code.
+local EVENT_TYPE_TOGGLE_MODE       = 9
 M.EVENT_TYPE_CAST_SPELL        = 10
 M.EVENT_TYPE_TOGGLE_PAUSE      = 11
 M.EVENT_TYPE_POSSESS_FAMILIAR  = 12
@@ -67,21 +66,15 @@ function M.BypassEvent()
    mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
 end
 
-local function register_helper(evtype, f)
-  return function(info)
-    if info.type ~= evtype then return end
-    return f(info)
-  end
-end
-
-jit.off(register_helper)
-
 --- Register NWNXEvent event handler.
 -- @param event_type M.EVENT_TYPE_*/
 -- @param f A function to handle the event.  When the event fires the function will
 -- be called with one paramenter a NWNXEventInfo table.
 function M.RegisterEventHandler(type, f)
-  SIGNAL:register(nil, register_helper(type, f))
+  if EVENT_HANDLERS[type] then
+    Log:warning("Overiding event handler for event: %d", type)
+  end
+  EVENT_HANDLERS[type] = f
 end
 
 --- Sets a value for NWNX Events to return from a hook.
@@ -166,14 +159,16 @@ end
 
 -- Bridge function to hand NWNXEvent events
 function __NWNXEventsHandleEvent(event_type)
-  SIGNAL:notify(GetEventInfo())
-end
-
-M.RegisterEventHandler(M.EVENT_TYPE_TOGGLE_MODE,
-  function (info)
-    print(info.type, M.EVENT_TYPE_TOGGLE_MODE)
+  if event_type == EVENT_TYPE_TOGGLE_MODE then
     M.BypassEvent()
-    __ToggleMode(info.object.id, info.type)
-  end)
+    local e = C.Local_GetLastNWNXEvent()
+    __ToggleMode(e.object, e.type)
+    return
+  end
+
+  if EVENT_HANDLERS[type] then
+    EVENT_HANDLERS[type](GetEventInfo())
+  end
+end
 
 return M
