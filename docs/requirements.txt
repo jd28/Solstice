@@ -1,0 +1,1 @@
+-e git+https://github.com/jd28/sphinx-lua.git#egg=sphinx_lua

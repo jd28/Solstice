@@ -31,7 +31,7 @@ import shlex
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-  'redjack.sphinx.lua',
+  'sphinx_lua.lua',
   'sphinx.ext.autodoc',
   'sphinx.ext.napoleon'
 ]
