@@ -166,7 +166,7 @@ end
 
 -- Bridge function to hand NWNXEvent events
 function __NWNXEventsHandleEvent(event_type)
-  SIGNAL:notify(M.GetEventInfo())
+  SIGNAL:notify(GetEventInfo())
 end
 
 M.RegisterEventHandler(M.EVENT_TYPE_TOGGLE_MODE,

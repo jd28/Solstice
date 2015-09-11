@@ -262,19 +262,17 @@ const char* ns_GetCombatDamageString(
     const DamageResult *dmg,
     bool simple);
 
-ChatMessage   *Local_GetLastChatMessage();
-CombatMessage *Local_GetLastCombatMessage();
-ItemEvent    *Local_GetLastItemEvent();
-EffectsCustomApplyEvent *Local_GetLastEffectApplyEvent();
-EffectsCustomRemoveEvent *Local_GetLastEffectRemoveEvent();
-EventItemprop *Local_GetLastItemPropEvent();
-CGameEffect   *Local_GetLastDamageEffect();
-Event         *Local_GetLastNWNXEvent();
-void           Local_NWNXLog(int32_t level, const char* log);
-Attack        *Local_GetAttack();
-void           Local_SetDamageInfo(int32_t index, const char* name, const char* color);
-void           Local_SetCombatEngineActive(bool active);
-EffectData    *Local_GetLastEffect();
+ChatMessageEvent *Local_GetLastChatMessage();
+ChatCCMessageEvent *Local_GetLastCombatMessage();
+EffectsCustomEvent *Local_GetLastEffectApplyEvent();
+EffectsCustomEvent *Local_GetLastEffectRemoveEvent();
+ItemsInfoEvent   *Local_GetLastItemEvent();
+EffectsItempropEvent *Local_GetLastItemPropEvent();
+Event            *Local_GetLastNWNXEvent();
+void              Local_NWNXLog(int level, const char* log);
+void              Local_SetDamageInfo(int32_t index, const char* name, const char* color);
+void              Local_SetCombatEngineActive(bool active);
+EffectData       *Local_GetLastEffect();
 ]]
 
 ffi.cdef [[

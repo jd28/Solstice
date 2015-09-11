@@ -137,24 +137,4 @@ function __NWNXItemsHandleItemEvent()
    return true
 end
 
-function __NWNXItemsHandleItemPropEvent()
-   local ev = C.Local_GetLastItemPropEvent()
-   if ev == nil then
-      error("NWNXItems : Local_GetLastItemPropEvent is nil!")
-      return false
-   end
-
-   local f = IP_HANDLERS[ev.ip.ip_type]
-   if not f then return false end
-
-   current_event = ev
-   local cre  = GetObjectByID(ev.obj.obj.obj_id)
-   local item = GetObjectByID(ev.item.obj.obj_id)
-   f(item, cre, ev.ip, ffi.C.ns_BitScanFFS(ev.slot), ev.remove)
-
-   current_event = nil
-   return true
-end
-
-
 return M

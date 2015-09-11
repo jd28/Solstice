@@ -8,7 +8,7 @@ typedef struct {
     uint32_t from;
     uint8_t channel;
     bool suppress;
-} ChatMessage;
+} ChatMessageEvent;
 
 typedef struct {
     int type;
@@ -16,7 +16,7 @@ typedef struct {
     uint32_t to;
     CNWCCMessageData *msg_data;
     bool suppress;
-} CombatMessage;
+} ChatCCMessageEvent;
 
 typedef struct {
     /* The object on which the effect is applied/removed. */
@@ -25,14 +25,7 @@ typedef struct {
     CGameEffect *effect;
     /* Return true here if the effect cant be applied; this deletes it. */
     bool         failed;
-} EffectsCustomApplyEvent;
-
-typedef struct {
-    /* The object on which the effect is applied/removed. */
-    CNWSObject  *object;
-    /* The effect itself. */
-    CGameEffect *effect;
-} EffectsCustomRemoveEvent;
+} EffectsCustomEvent;
 
 typedef struct {
     int      type;
@@ -51,14 +44,7 @@ typedef struct {
     uint32_t item;
     bool     use_result;
     uint32_t  result;
-} ItemEvent;
-
-typedef struct {
-    CNWSObject  *obj;
-    CGameEffect *eff;
-    bool         is_remove;
-    bool         delete_eff;
-} EventEffect;
+} ItemsInfoEvent;
 
 typedef struct {
     CNWSCreature    *obj;
@@ -66,6 +52,5 @@ typedef struct {
     CNWItemProperty *ip;
     uint32_t         slot;
     bool             suppress;
-    bool             remove;
-} EventItemprop;
+} EffectsItempropEvent;
 ]]
