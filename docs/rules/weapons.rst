@@ -14,108 +14,80 @@ Weapons
 
 .. function:: GetWeaponType(item)
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetIsMonkWeapon(item, cre)
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
-  cre : :class:`Creature`
-    Creature instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetIsRangedWeapon(item)
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetIsWeaponLight(item, cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetIsWeaponSimple(item, cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetIsWeaponFinessable(item, cre)
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
-  cre : :class:`Creature`
-    Creature instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetWeaponIteration(cre, item)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetWeaponAttackAbility(cre, item)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetWeaponDamageAbility(cre, item)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: SetWeaponAttackAbilityOverride(ability, func)
 
-  **Arguments**
-
-  ability : ``int``
-    ABILITY_*
+  :param int ability: ABILITY_*
 
 .. function:: SetWeaponDamageAbilityOverride(ability, func)
 
-  **Arguments**
-
-  ability : ``int``
-    ABILITY_*
+  :param int ability: ABILITY_*
 
 .. function:: GetWeaponAttackBonus(cre, weap)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetWeaponPower(cre, item)
 
   Determine weapons damage power.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetWeaponBaseDamageType(item)
 
@@ -125,127 +97,92 @@ Weapons
 
     This does not support multiple weapon damage types and most likely never will.
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetWeaponBaseDamage(item, cre)
 
   Determine weapons base damage roll.
 
-  **Arguments**
-
-  item : :class:`Item`
-    Item instance.
-  cre : :class:`Creature`
-    Creature instance.
+  :parm item: Item instance.
+  :type item: :class:`Item`
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetUnarmedDamageBonus(cre)
 
   Determine unarmed damage bonus.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetWeaponCritRange(cre, item)
 
   Determine weapons critical hit range.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetWeaponCritMultiplier(cre, item)
 
   Determine weapons critical hit multiplier.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`
 
 .. function:: GetDualWieldPenalty(cre)
 
   Get dual wielding penalty.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: AttackTypeToEquipType(atype)
 
-  **Arguments**
+  :param int atype: ATTACK_TYPE\_*
 
-  atype : ``int``
-    ATTACK_TYPE\_*
-
-  **Returns**
-
-  EQUIP_TYPE\_*
+  :rtype: EQUIP_TYPE_*
 
 .. function:: EquipTypeToAttackType(atype)
 
-  **Arguments**
+  :param int atype: EQUIP_TYPE\_*
 
-  atype : ``int``
-    EQUIP_TYPE\_*
-
-  **Returns**
-
-  ATTACK_TYPE\_*
+  :rtype: ATTACK_TYPE_*
 
 .. function:: InventorySlotToAttackType(atype)
 
-  **Arguments**
+  :param int atype: Inventory slot constant.
 
-  atype : ``int``
-    Inventory slot constant.
-
-  **Returns**
-
-  ATTACK_TYPE\_*
+  :rtype: ATTACK_TYPE_*
 
 .. function:: GetOnhandAttacks(cre)
 
   Determine number of onhand attacks.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetOffhandAttacks(cre)
 
   Determine number of offhand attacks.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: InitializeNumberOfAttacks(cre)
 
   Initialize combat rounds attack counts.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: GetCreatureDamageBonus(cre, item)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  item : :class:`Item`
-    Item instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :parm item: Item instance.
+  :type item: :class:`Item`

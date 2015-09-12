@@ -10,9 +10,5 @@ Races
 
   Determine race's ability bonus.
 
-  **Arguments**
-
-  race : ``int``
-    RACIAL_TYPE_*
-  ability : ``int``
-    ABILITY_*
+  :param int race: RACIAL_TYPE_*
+  :param int ability: ABILITY_*

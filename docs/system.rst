@@ -41,8 +41,7 @@ Database
 
   Connect to a database.
 
-  :param driver_name: 'MySQL', 'PostgreSQL', or 'SQLite3' depending on
-    which database you use.
+  :param driver_name: 'MySQL', 'PostgreSQL', or 'SQLite3' depending on which database you use.
   :param dbname: Name.
   :param dbuser: User.
   :param dbpassword: Password.
@@ -60,10 +59,7 @@ Logging
 
   Sets the default logging function.
 
-  **Arguments:**
-
-  logger
-    See `LuaLogging`_.
+  :param logger: See `LuaLogging`_.
 
 .. function:: GetLogger()
 
@@ -73,12 +69,8 @@ Logging
 
   Create a file logger.
 
-  **Arguments:**
-
-  filename : ``string``
-    File name.
-  date_time : ``string``
-    Date/time format see os.date
+  :param string filename: File name.
+  :param string date_time: Date/time format see os.date
 
 Lua
 ---
@@ -87,7 +79,7 @@ Lua
 
   Run Lua garbage collector.
 
-  :return: The amount in KB freed.
+  :rtype: The amount in KB freed.
 
 .. function:: LogGlobalTable()
 

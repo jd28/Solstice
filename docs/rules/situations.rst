@@ -8,23 +8,17 @@ Situations
 
 .. function:: ZeroSituationMod(cre, situ)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: SetSituationModiferOverride(situation, func)
 
 .. function:: ResolveSituationModifier(type, cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: ResolveSituationModifiers(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`

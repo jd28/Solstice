@@ -30,10 +30,8 @@ Combat
 
   Register a combat engine.
 
-  **Arguments**
-
-  engine : :data:`CombatEngine`
-    Combat engine.
+  :param engine: Combat engine.
+  :type engine: :data:`CombatEngine`
 
 .. function:: GetCombatEngine()
 
@@ -43,7 +41,4 @@ Combat
 
   Set combat engine active.  This is implicitly called by RegisterCombatEngine.
 
-  **Arguments**
-
-  active : ``bool``
-    Turn combat engine on or off.
+  :param boolean active: Turn combat engine on or off.

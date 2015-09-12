@@ -6,61 +6,38 @@ class Item
 
 .. class:: Item
 
-Appearance
-----------
-
   .. method:: Item:GetEntireAppearance()
 
     Encodes an items appearance.  Source: nwnx_funcs by Acaos
 
-    **Returns**
-
-    A string encoding the appearance
+    :rtype: A string encoding the appearance
 
   .. method:: Item:GetItemAppearance(appearance_type, index)
 
     Returns the appearance of an item
 
-    **Arguments**
-
-    appearance_type
-      ITEM_APPR_TYPE_*
-    index
-      ITEM_APPR_WEAPON_* or ITEM_APPR_ARMOR_*
+    :param int appearance_type: ITEM_APPR_TYPE_*
+    :param int index: ITEM_APPR_WEAPON_* or ITEM_APPR_ARMOR_*
 
   .. method:: Item:RestoreAppearance(appearance)
 
     Restores an items appearance.
 
-    **Arguments**
-
-    appearance : ``string``
-      An encoding from :meth:`Item:GetEntireAppearance`
+    :param string appearance: An encoding from :meth:`Item:GetEntireAppearance`
 
   .. method:: Item:SetAppearance(index, value)
 
     Set item appearance
 
-    **Arguments**
-
-    index
-      index
-    value
-      value
+    :param int index: index
+    :param int value: value
 
   .. method:: Item:SetColor(index, value)
 
     Set item color
 
-    **Arguments**
-
-    index
-      index
-    value
-      value
-
-Armor Class
------------
+    :param int index: index
+    :param int value: value
 
   .. method:: Item:GetACValue()
 
@@ -78,61 +55,36 @@ Armor Class
 
       Note this is currently hardcoded to the typical vanilla NWN values.
 
-    **Returns**
-
-    -1 if item is not armor.
-
-Copying
--------
+    :rtype: -1 if item is not armor.
 
   .. method:: Item:Copy([target, copy_vars]])
 
     Duplicates an item.
 
-    **Arguments**
-
-    target : :class:`Object`
-      Create the item within this object's inventory.  (Default: ``OBJECT_INVALID``)
-    copy_vars : ``bool``
-      If true, local variables on item are copied.  (Default: ``false``)
+    :param target: Create the item within this object's inventory.  (Default: ``OBJECT_INVALID``)
+    :type target: :class:`Object`
+    :param boolean copy_vars: If true, local variables on item are copied.  (Default: ``false``)
 
   .. method:: Item:CopyAndModify(modtype, index, value, copy_vars)
 
     Copies an item, making a single modification to it
 
-    **Arguments**
-
-    modtype
-      Type of modification to make.
-    index
-      Index of the modification to make.
-    value
-      New value of the modified index
-    copy_vars : ``bool``
-      If true, local variables on item are copied.  (Default: ``false``)
-
-Type
-----
+    :param modtype: Type of modification to make.
+    :param int index: Index of the modification to make.
+    :param int value: New value of the modified index
+    :param boolean copy_vars: If true, local variables on item are copied.  (Default: ``false``)
 
   .. method:: Item:GetBaseType()
 
     Get the base item type.
 
-    **Returns**
-
-    BASE_ITEM_INVALID if invalid item.
+    :rtype: BASE_ITEM_INVALID if invalid item.
 
   .. method:: Item:SetBaseType(value)
 
     Sets an items base type
 
-    **Arguments**
-
-    value
-      BASE_ITEM_*
-
-Info
-----
+    :param int value: BASE_ITEM_*
 
   .. method:: Item:GetGoldValue()
 
@@ -143,10 +95,7 @@ Info
     Sets an items gold piece value when IDed
     Source: nwnx_funcs by Acaos
 
-    **Arguments**
-
-    value
-      New gold value.
+    :param int value: New gold value.
 
   .. method:: Item:GetStackSize()
 
@@ -156,37 +105,26 @@ Info
 
     Set item's stack size.
 
-    **Arguments**
-
-    value
-      New stack size.
+    :param int value: New stack size.
 
   .. method:: Item:GetPossesor()
 
     Get item possessor.
 
-Properties
-----------
-
   .. method:: Item:AddItemProperty(dur_type, ip, duration)
 
     Add an itemproperty to an item
 
-    **Arguments**
-
-    dur_type : ``int``
-      DURATION_TYPE_*
-    ip : :class:`Itemprop`
-      Itemproperty to add.
-    duration : ``number``
-      Duration Duration in seconds in added temporarily.  (Default: 0.0)
+    :param int dur_type: DURATION_TYPE_*
+    :param ip: Itemproperty to add.
+    :type ip: :class:`Itemprop`
+    :param float duration: Duration Duration in seconds in added temporarily.  (Default: 0.0)
 
   .. method:: Item:GetHasItemProperty(ip_type)
 
     Check whether an item has a given property.
 
-    ip_type
-      ITEM_PROPERTY_*
+    :param int ip_type: ITEM_PROPERTY_*
 
   .. method:: Item:ItemProperties()
 
@@ -196,13 +134,8 @@ Properties
 
     Removes an item property
 
-    **Arguments**
-
-    ip : :class:`Itemprop`
-      Item property to remove.
-
-Flags
------
+    :param ip: Item property to remove.
+    :type ip: :class:`Itemprop`
 
   .. method:: Item:GetDroppable()
 
@@ -212,11 +145,7 @@ Flags
 
     Set droppable flag.
 
-    **Arguments**
-
-    flag
-      New value.
-
+    :param boolean flag: New value.
 
   .. method:: Item:GetIdentified()
 
@@ -230,20 +159,13 @@ Flags
 
     Sets an item identified
 
-    **Arguments**
-
-    is_ided : ``bool``
-      (Default: ``false``)
+    :param boolean is_ided: (Default: ``false``)
 
   .. method:: Item:SetInfiniteFlag([infinite])
 
     Sets and items infinite quantity flag.
 
-    **Arguments**
-
-    infinite
-      (Defaut: ``false``)
-
+    :param boolean infinite: (Defaut: ``false``)
 
   .. method:: Item:GetCursedFlag()
 
@@ -253,13 +175,8 @@ Flags
 
     Set item cursed flag.
 
-    **Arguments**
+    :param boolean flag: New flag.
 
-    flag : ``bool``
-      New flag.
-
-Weight
-------
   .. method:: Item:GetWeight()
 
     Gets item weight.
@@ -268,7 +185,4 @@ Weight
 
     Sets item's weight.
 
-    **Arguments**
-
-    weight : ``int``
-      New weight.
+    :param int weight: New weight.

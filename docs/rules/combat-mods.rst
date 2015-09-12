@@ -8,103 +8,73 @@ Combat Modifiers
 
 .. function:: ZeroCombatModifier(cre, mod)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  mod : ``int``
-    COMBAT_MOD_*
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
+  :param int mod: COMBAT_MOD_*
 
 .. function:: GetAreaCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetClassCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetFeatCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetRaceCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetSizeCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetSkillCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetTrainingVsCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetFavoredEnemyCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetAbilityCombatModifier(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: ResolveCombatModifier(type, cre)
 
   Resolves combat modifier.
 
-  **Arguments**
-
-  type : ``int``
-    COMBAT_MOD\_*
-  cre : :class:`Creature`
-    Creature instance.
+  :param int type: COMBAT_MOD\_*
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: ResolveCombatModifiers(cre)
 
   Resolves all combat modifiers
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
 
 .. function:: SetCombatModifierOverride(type, func)
 
   Sets combat modifier override.
 
-  **Arguments**
-
-  type : ``int``
-    COMBAT_MOD\_*
-  func : ``function``
-    (:class:`Creature`) -> ``nil``
+  :param int type: COMBAT_MOD_*
+  :param function func: (:class:`Creature`) -> ``nil``

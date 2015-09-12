@@ -8,24 +8,15 @@ Damage
 
 .. function:: GetDamageName(index)
 
-  **Arguments**
-
-  index : ``int``
-    DAMAGE_INDEX_*
+  :param int index: DAMAGE_INDEX_*
 
 .. function:: GetDamageColor(index)
 
-  **Arguments**
-
-  index : ``int``
-    DAMAGE_INDEX_*
+  :param int index: DAMAGE_INDEX_*
 
 .. function:: GetDamageVisual(dmg)
 
-  **Arguments**
-
-  dmg : ``int``
-    DAMAGE_INDEX_*
+  :param int dmg: DAMAGE_INDEX_*
 
 .. function:: ConvertDamageToItempropConstant(const)
 

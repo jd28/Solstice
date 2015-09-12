@@ -10,31 +10,21 @@ Immunities
 
   Get innate immunity.
 
-  **Arguments**
-
-  imm : ``int``
-    IMMUNITY_TYPE\_* constant.
-  cre : :class:`Creature`
-    Creature instance.
+  :param int imm: IMMUNITY_TYPE_* constant.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: SetInnateImmunityOverride(func, ...)
 
-  **Arguments**
-
-  func : ``function``
-    Function taking a creature parameter and returning a percent immunity.
-  ... : ``int[]``
-    List of IMMUNITY_TYPE\_* constants.
+  :param func: Function taking a creature parameter and returning a percent immunity.
+  :param ...: List of IMMUNITY_TYPE_* constants.
 
 .. function:: GetEffectImmunity(cre, imm, vs)
 
   Determine if creature has an immunity.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  imm : ``int``
-    IMMUNITY_TYPE\_* constant.
-  vs : :class:`Creature`
-    ``cre``'s attacker.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :param int imm: IMMUNITY_TYPE_* constant.
+  :param vs: Creature.
+  :type vs: :class:`Creature`

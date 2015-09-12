@@ -114,65 +114,36 @@ and optionally enforcing a particular interface.
 
   Registers a plugin interface.
 
-  **Arguments:**
-
-  name : ``string``
-    Plugin interface name.
-  enforcer : ``function``
-    Function that is called when a plugin attempts to load.  This is to allow
-    eforcing a particular interface.
+  :param string name: Plugin interface name.
+  :param function enforcer: Function that is called when a plugin attempts to load.  This is to allow eforcing a particular interface.
 
 .. function:: LoadPlugin(name, interface)
 
   Loads a plugin for a given plugin interface.  If the plugin is successfully
   loaded the plugin system will attempt to call ``plugin.OnLoad`` if it exists.
 
-  **Arguments:**
-
-  name : ``string``
-    Plugin interface name.
-  interface : ``table``
-    A table of functions that satisfy the plugin interface.
+  :param string name: Plugin interface name.
+  :param table interface: A table of functions that satisfy the plugin interface.
 
 .. function:: GetPlugin(name)
 
   Gets a plugin by name.
 
-  name : ``string``
-    Plugin interface name.
+  :param string name: Plugin interface name.
 
 .. function:: UnloadPlugin(name)
 
   Unloads a plugin for a given plugin interface.  Rhe plugin system will attempt to
   call ``plugin.OnUnload`` if it exists.
 
-  **Arguments:**
-
-  name : ``string``
-    Plugin interface name.
+  :param string name: Plugin interface name.
 
 .. function:: IsPluginLoaded(name)
 
   Determines if a plugin is loaded.
 
-  name : ``string``
-    Plugin interface name.
+  :param string name: Plugin interface name.
 
-
-Properties
-----------
-
-.. function:: DeleteAllProperties(obj)
-
-.. function:: DeleteProperty(obj, prop)
-
-.. function:: GetAllProperties(obj)
-
-.. function:: GetGlobalProperties()
-
-.. function:: GetProperty(obj, prop)
-
-.. function:: SetProperty(obj, prop, value)
 
 Scripts
 -------

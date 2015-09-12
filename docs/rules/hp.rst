@@ -1,3 +1,8 @@
+.. highlight:: lua
+.. default-domain:: lua
+
+.. module:: Rules
+
 Hitpoints
 ---------
 
@@ -5,7 +10,5 @@ Hitpoints
 
   Determine Maximum Hitpoints.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`

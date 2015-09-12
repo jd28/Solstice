@@ -20,32 +20,20 @@ Functions
 
     Create a new location
 
-    **Arguments**
-
-    position : :class:`Vector`
-      Location's position
-    orientation : :class:`Vector`
-      Location's orientation
-    area : :class:`Area`
-      Location's area
-
-    **Returns**
-
-    :class:`Location` instance.
-
+    :param position: Location's position
+    :type position: :class:`Vector`
+    :param orientation: Location's orientation
+    :type orientation: :class:`Vector`
+    :param area: Location's area
+    :type area: :class:`Area`
+    :rtype: :class:`Location` instance.
 
   .. function:: Location.FromString(str)
 
     Convert string to location.
 
-    **Arguments**
-
-    str : ``string``
-      String representation of a location.  Format: "area_tag (x, y, z) orientation"
-
-    **Returns**
-
-    :class:`Location` instance.
+    :param string str: String representation of a location.  Format: "area_tag (x, y, z) orientation"
+    :rtype: :class:`Location` instance.
 
 Methods
 -------
@@ -54,58 +42,36 @@ Methods
 
     Applies an effect to a location.
 
-    **Arguments**
-
-    durtype : ``int``
-      DURATION_TYPE_*
-    eff : :class:`Effect`
-      Effect to apply.
-    duration : ``number``
-      Duration in seconds.  If not passed the visual will be applied as   DURATION_TYPE_INSTANT.
+    :param int durtype: DURATION_TYPE_*
+    :param eff: Effect to apply.
+    :type eff: :class:`Effect`
+    :param float duration: Duration in seconds.  If not passed the visual will be applied as   DURATION_TYPE_INSTANT.
 
   .. method:: Location:ApplyVisual(vfx, duration)
 
     Applies a visual effect to a location
 
-    **Arguments**
-
-    vfx : ``int``
-      VFX_*
-    duration : ``number``
-      Duration in seconds.  If not passed the visual will be applied as   DURATION_TYPE_INSTANT.
+    :param int vfx: VFX_*
+    :param float duration: Duration in seconds.  If not passed the visual will be applied as   DURATION_TYPE_INSTANT.
 
   .. method:: Location:GetNearestObject(mask, nth)
 
     Gets nearest object to location
 
-    **Arguments**
-
-    mask : ``int``
-      OBJECT_TYPE_*
-    nth : ``int``
-      Which object to find.
-
+    :param int mask: OBJECT_TYPE_*
+    :param int nth: Which object to find.
 
   .. method:: Location:GetNearestCreature(type1, value1, nth, ...)
 
     Gets nearest creature to location.
 
-    **Arguments**
-
-    type1 : ``int``
-      First criteria type
-    value1
-      First crieria value
-    nth : ``int``
-      Nth nearest.
-    type2 : ``int``
-      Second criteria type.  (Default: -1)
-    value2 : ``int``
-      Second criteria value.  (Default: -1)
-    type3 : ``int``
-      Third criteria type.  (Default: -1)
-    value3 : ``int``
-      Third criteria value.  (Default: -1)
+    :param int type1: First criteria type
+    :param int value1: First crieria value
+    :param int nth: Nth nearest.
+    :param int type2: Second criteria type.  (Default: -1)
+    :param int value2: Second criteria value.  (Default: -1)
+    :param int type3: Third criteria type.  (Default: -1)
+    :param int value3: Third criteria value.  (Default: -1)
 
   .. method:: Location:ToString()
 
@@ -115,75 +81,51 @@ Methods
 
     Create square trap at location.
 
-    type : ``int``
-      TRAP_BASE_TYPE_*
-    size : ``number``
-      (Default 2.0)
-    tag : ``string``
-      Trap tag.  (Default: "")
-    faction : ``int``
-      Trap faction.  (Default: STANDARD_FACTION_HOSTILE)
-    on_disarm : ``string``
-      OnDisarm script.  (Default: "")
-    on_trigger : ``string``
-      OnTriggered script.  (Default: "")
+    :param int type: TRAP_BASE_TYPE_*
+    :param float size: (Default 2.0)
+    :param string tag: Trap tag.  (Default: "")
+    :param int faction: Trap faction.  (Default: STANDARD_FACTION_HOSTILE)
+    :param string on_disarm: OnDisarm script.  (Default: "")
+    :param string on_trigger: OnTriggered script.  (Default: "")
 
   .. method:: Location:SetTileMainLightColor(color1, color2)
 
     Sets the main light colors for a tile.
 
-    **Arguments**
-
-    color1 : ``int``
-      AREA_TILE_SOURCE_LIGHT_COLOR_*
-    color2 : ``int``
-      AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :param int color1: AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :param int color2: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
   .. method:: Location:SetTileSourceLightColor(color1, color2)
 
     Sets the source light color for a tile.
 
-    **Arguments**
-
-    color1 : ``int``
-      AREA_TILE_SOURCE_LIGHT_COLOR_*
-    color2 : ``int``
-      AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :param int color1: AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :param int color2: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
 
   .. method:: Location:GetTileMainLight1Color()
 
     Determines the color of the first main light of a tile.
 
-    **Returns**
-
-    AREA_TILE_SOURCE_LIGHT_COLOR_*
-
+    :rtype: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
   .. method:: Location:GetTileMainLight2Color()
 
     Determines the color of the second main light of a tile.
 
-    **Returns**
-
-    AREA_TILE_SOURCE_LIGHT_COLOR_*
-
+    :rtype: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
   .. method:: Location:GetTileSourceLight1Color()
 
     Determines the color of the first source light of a tile.
 
-    **Returns**
-
-    AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :rtype: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
   .. method:: Location:GetTileSourceLight2Color()
 
     Determines the color of the second source light of a tile.
 
-    **Returns**
-
-    AREA_TILE_SOURCE_LIGHT_COLOR_*
+    :rtype: AREA_TILE_SOURCE_LIGHT_COLOR_*
 
   .. method:: Location:GetArea()
 
@@ -193,10 +135,8 @@ Methods
 
     Gets distance between two locations.
 
-    **Arguments**
-
-    to : :class:`Location`
-      The location to get the distance from.
+    :param to: The location to get the distance from.
+    :type to: :class:`Location`
 
   .. method:: Location:GetFacing()
 

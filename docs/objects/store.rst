@@ -6,26 +6,6 @@ class Store
 
 .. class:: Store
 
-Signals
--------
-
-.. data:: Store.signals
-
-  A Lua table containing signals for store events.
-
-  .. note::
-
-    These signals are shared by **all** :class:`Store` instances.  If special behavior
-    is required for a specific store it must be filtered by a signal handler.
-
-
-  .. data:: Store.signals.OnOpen
-
-  .. data:: Store.signals.OnClose
-
-Methods
--------
-
   .. method:: GetGold()
 
     Get store's gold
@@ -42,14 +22,10 @@ Methods
 
     Open store
 
-    **Arguments:**
-
-    pc : :class:`Creature`
-      PC to open the store for.
-    up
-      Bonus markup
-    down
-      Bonus markdown
+    :param pc: PC to open the store for.
+    :type pc: :class:`Creature`
+    :param int up: Bonus markup
+    :param int down: Bonus markdown
 
   .. method:: SetGold(gold)
 

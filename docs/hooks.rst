@@ -89,11 +89,7 @@ Functions
 
 .. function:: hook(info)
 
-  **Arguments:**
+  :param info: Table with hook data.
+  :type info: :data:`HookDesc`
 
-    info : :data:`HookDesc`
-      Table with hook data.
-
-  **Returns**
-
-    Function pointer to the trampoline.
+  :rtype: Function pointer to the trampoline.

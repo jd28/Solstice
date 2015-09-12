@@ -6,51 +6,6 @@
 Special Attacks
 ---------------
 
-.. function:: GetSpecialAttackDamage(special_attack, info, attacker, target)
-
-  Determine special attack damage.
-
-  **Arguments**
-
-  special_attack
-    SPECIAL_ATTACK\_*
-  info
-    Attack ctype from combat engine.
-  attacker
-    Attacking creature.
-  target
-    Attacked creature.
-
-.. function:: GetSpecialAttackEffect(special_attack, info, attacker, target)
-
-  Determine special attack effect.
-
-  **Arguments**
-
-  special_attack
-    FEAT_* or SPECIAL_ATTACK_*
-  info
-    Attack ctype from combat engine.
-  attacker
-    Attacking creature.
-  target
-    Attacked creature.
-
-.. function:: GetSpecialAttackModifier(special_attack, info, attacker, target)
-
-  Determine special attack bonus modifier.
-
-  **Arguments**
-
-  special_attack
-    SPECIAL_ATTACK\_*
-  info
-    Attack ctype from combat engine.
-  attacker
-    Attacking creature.
-  target
-    Attacked creature.
-
 .. data:: SpecialAttack
 
   Table interface for special attacks.  All fields are optional.
@@ -75,6 +30,40 @@ Special Attacks
     called with the following parameters: special attack type, INFO, attacker,
     target and it must return an a :data:`DamageRoll` ctype.
 
+
+.. function:: GetSpecialAttackDamage(special_attack, info, attacker, target)
+
+  Determine special attack damage.
+
+  :param int special_attack: SPECIAL_ATTACK\_*
+  :param info: Attack ctype from combat engine.
+  :param attacker: Attacking creature.
+  :type attacker: :class:`Creature`
+  :param target: Attacked creature.
+  :type target: :class:`Creature`
+
+.. function:: GetSpecialAttackEffect(special_attack, info, attacker, target)
+
+  Determine special attack effect.
+
+  :param int special_attack: FEAT_* or SPECIAL_ATTACK_*
+  :param info: Attack ctype from combat engine.
+  :param attacker: Attacking creature.
+  :type attacker: :class:`Creature`
+  :param target: Attacked creature.
+  :type target: :class:`Creature`
+
+.. function:: GetSpecialAttackModifier(special_attack, info, attacker, target)
+
+  Determine special attack bonus modifier.
+
+  :param int special_attack: SPECIAL_ATTACK\_*
+  :param info: Attack ctype from combat engine.
+  :param attacker: Attacking creature.
+  :type attacker: :class:`Creature`
+  :param target: Attacked creature.
+  :type target: :class:`Creature`
+
 .. function:: RegisterSpecialAttack(feat, special_attack)
 
   Register special attack handlers.
@@ -85,9 +74,5 @@ Special Attacks
 
     Because the special attack type is passed as a parameter to the special attack handler functions, a special attack handler can be used for multiple special attacks.
 
-  **Arguments**
-
-  feat
-    FEAT_*
-  special_attack
-    See the :data:`SpecialAttack` interface.
+  :param int feat: FEAT_*
+  :param special_attack: See the :data:`SpecialAttack` interface.

@@ -4,31 +4,28 @@
 .. highlight:: lua
 
 Color
------
+=====
 
 .. warning::
   It's not wise to use strings taken from NWN scripts.  There are are number of
   text encoding issues that will cause undesirable results.
 
+Functions
+---------
+
 .. function:: Encode(r, g, b)
 
   Encodes RGB values.
 
-  **Arguments:**
-
-  r : ``int``
-    Red
-  g : ``int``
-    Green
-  b : ``int``
-    Blue
+  :param int r: Red
+  :param int g: Green
+  :param int b: Blue
 
 .. function:: EncodeHex(hex)
 
   Encodes a hex color string.
 
-  hex : ``string``
-    Same format as HTML: "#000000"
+  :param string hex: Same format as HTML: "#000000"
 
 .. code-block:: lua
 
@@ -36,7 +33,7 @@ Color
   assert(C.EncodeHex('#FF0000') == C.Enocde(255, 0, 0))
 
 Constants
-~~~~~~~~~
+---------
 
 .. data:: BLUE
 

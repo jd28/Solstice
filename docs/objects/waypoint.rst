@@ -2,7 +2,7 @@
 .. default-domain:: lua
 
 class Waypoint
---------------
+==============
 
 .. class:: Waypoint
 

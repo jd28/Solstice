@@ -6,9 +6,6 @@ class Sound
 
 .. class:: Sound
 
-Methods
--------
-
 .. method:: Sound:Play()
 
 .. method:: Sound:Stop()

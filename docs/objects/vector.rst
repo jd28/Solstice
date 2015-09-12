@@ -6,8 +6,13 @@ class Vector
 
 .. class:: Vector
 
-Methods
--------
+  .. function:: Vector.FromAngle(angle)
+
+    Converts angle to vector
+
+  .. function:: Vector.FromString(str)
+
+    Converts a string to a Vector.  Format: "<x>, <y>, <z>"
 
   .. method:: Vector:Normalize()
 
@@ -27,17 +32,15 @@ Methods
 
     **Arguments**
 
-    target : :class:`Object`
-      Any object
+    :param target: Any object
+    :type target: :class:`Object`
 
   .. method:: Vector:Subtract(other)
 
     Subtract vectors.
 
-    **Arguments**
-
-    other : :class:`Vector`
-      Vector to subtract.
+    :param other: Vector to subtract.
+    :type other: :class:`Vector`
 
   .. method:: Vector:ToAngle()
 
@@ -46,15 +49,3 @@ Methods
   .. method:: Vector:ToString()
 
     Converts Vector to string
-
-Functions
----------
-
-  .. function:: Vector.FromAngle(angle)
-
-    Converts angle to vector
-
-  .. function:: Vector.FromString(str)
-
-    Converts a string to a Vector.
-    Format: "<x>, <y>, <z>"

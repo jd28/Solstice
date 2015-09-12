@@ -6,48 +6,6 @@ class Creature
 
 .. class:: Creature
 
-Signals
--------
-
-.. data:: Creature.signals
-
-  A Lua table containing signals for creature events.
-
-  .. note::
-
-    These signals are shared by **all** :class:`Creature` instances.  If special behavior
-    is required for a specific creature it must be filtered by a signal handler.
-
-  .. data:: Creature.signals.OnConversation
-
-  .. data:: Creature.signals.OnBlocked
-
-  .. data:: Creature.signals.OnDisturbed
-
-  .. data:: Creature.signals.OnPerception
-
-  .. data:: Creature.signals.OnSpellCastAt
-
-  .. data:: Creature.signals.OnCombatRoundEnd
-
-  .. data:: Creature.signals.OnDamaged
-
-  .. data:: Creature.signals.OnPhysicalAttacked
-
-  .. data:: Creature.signals.OnDeath
-
-  .. data:: Creature.signals.OnHeartbeat
-
-  .. data:: Creature.signals.OnRested
-
-  .. data:: Creature.signals.OnSpawn
-
-  .. data:: Creature.signals.OnUserDefined
-
-
-Methods
--------
-
   .. method:: Creature:ActionAttack(target, passive)
 
   .. method:: Creature:ActionCastFakeSpellAtLocation(spell, target, path_type)
@@ -196,44 +154,25 @@ Methods
 
     Get the ability score of a specific type for a creature.
 
-    **Arguments**
+    :param int ability: ABILITY_*.
+    :param boolean base: If ``true`` will return the base ability modifier without bonuses (e.g. ability bonuses granted from equipped items).  (Default: ``false``)
 
-    ability
-      ABILITY_*.
-    base
-      If ``true`` will return the base ability modifier
-      without bonuses (e.g. ability bonuses granted from equipped
-      items).  (Default: ``false``)
-
-    **Returns**
-
-    Returns the ability modifier of type ability for self (otherwise -1).
+    :rtype: Returns the ability modifier of type ability for self (otherwise -1).
 
   .. method:: Creature:GetAbilityScore(ability[, base])
 
     Get the ability score of a specific type for a creature.
 
-    **Arguments**
+    :param int ability: ABILITY_*.
+    :param boolean base: If ``true`` will return the base ability score without bonuses (e.g. ability bonuses granted from equipped items).  (Default: ``false``)
 
-    ability
-      ABILITY_*.
-    base
-      If ``true`` will return the base ability score
-      without bonuses (e.g. ability bonuses granted from equipped
-      items).  (Default: ``false``)
-
-    **Returns**
-
-    Returns the ability score of type ability for self (otherwise -1).
+    :rtype: Returns the ability score of type ability for self (otherwise -1).
 
   .. method:: Creature:GetDexMod([armor_check])
 
     Gets a creatures dexterity modifier.
 
-    **Arguments**
-
-    armor_check
-      If true uses armor check penalty.  (Default: ``false``)
+    :param boolean armor_check: If true uses armor check penalty.  (Default: ``false``)
 
   .. method:: Creature:GetACVersus(vs, touch, is_ranged, attack, state)
 
@@ -577,14 +516,10 @@ Methods
 
     Modifies the ability score of a specific type for a creature.
 
-    **Arguments**
+    :param int ability: ABILITY_*.
+    :param int value: Amount to modify ability score
 
-    ability
-      ABILITY_*.
-    value
-      Amount to modify ability score
-
-    .. method:: Creature:RecalculateDexModifier()
+  .. method:: Creature:RecalculateDexModifier()
 
     Recalculates a creatures dexterity modifier.
 

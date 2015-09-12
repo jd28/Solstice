@@ -8,9 +8,6 @@ Itemprop inherits from :class:`Effect`
 
 .. class:: Itemprop
 
-Methods
--------
-
   .. method:: Itemprop:ToString()
 
     Convert itemprop effect to formatted string.  Overrides

@@ -8,15 +8,9 @@ Modes
 
 .. function:: RegisterMode(mode, f)
 
-  **Arguments**
-
 .. function:: ResolveMode(mode, cre, off)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: ToAction(mode)
-
-  **Arguments**

@@ -8,28 +8,20 @@ Effects
 
 .. function:: UpdateAttackBonusEffects(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: UpdateAbilityEffects(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: UpdateMiscImmunityEffects(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`
 
 .. function:: UpdateDamageImmunityEffects(cre)
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
+  :param cre: Creature.
+  :type cre: :class:`Creature`

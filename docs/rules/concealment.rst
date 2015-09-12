@@ -10,11 +10,8 @@ Concealment
 
   Determine concealment.
 
-  **Arguments**
-
-  cre : :class:`Creature`
-    Creature instance.
-  vs : :class:`Creature`
-    Creature instance.
-  is_ranged : ``bool``
-    Check versus ranged attack.
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :param vs: Creature instance.
+  :type vs: :class:`Creature`
+  :param boolean is_ranged: Check versus ranged attack.
