@@ -68,11 +68,34 @@ Special Attacks
 
   Register special attack handlers.
 
-  The ``feat`` parameter can be any usable feat, it is not limited to hardcoded special attacks.  When a special attack is registered a nwnx.events.UseFeat event handler is registered.  It will bypass the event and handle adding the special attack action.
+  The ``feat`` parameter can be any usable feat, it is not limited to hardcoded special attacks.  When a special attack is registered a use feat event handler is registered.  It will bypass the event and handle adding the special attack action.
 
   .. note::
 
     Because the special attack type is passed as a parameter to the special attack handler functions, a special attack handler can be used for multiple special attacks.
 
-  :param int feat: FEAT_*
+  :param int feat: FEAT_* or SPECIAL_ATTACK_*
   :param special_attack: See the :data:`SpecialAttack` interface.
+
+  **Example**
+
+  .. code:: lua
+
+    local function kd_impact(id, info, attacker, target)
+      local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
+      if target:GetSize() > attacker:GetSize() + size_bonus then return false end
+
+      if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
+         target:GetSkillRank(SKILL_DISCIPLINE)
+      then
+         local eff = Eff.Knockdown()
+         eff:SetDurationType(DURATION_TYPE_TEMPORARY)
+         eff:SetDuration(6)
+         return true, eff
+      end
+
+      return false
+    end
+
+    RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, { effect = kd_impact, ab = -4})
+    RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, { effect = kd_impact, ab = -4})
