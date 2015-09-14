@@ -12,28 +12,18 @@ Special Attacks
 
   **Fields:**
 
-  use : ``function``
-    Determines if a special attack is useable.  The function will be
-    called with the following parameters: special attack type, attacker,
-    target and it must return ``true`` or ``false``.
   ab : ``function`` or ``int``
-    Determines attack bonus modifier.  If this field is a integer that value is
-    returned for every special attack.  If it is a function it will be called with
-    the following parameters: special attack type, INFO, attacker, target and it
-    must return an integer.
+    Determines attack bonus modifier.  If this field is a integer that value is returned for every special attack.  If it is a function it must satisfy the same function signature as :func:`GetSpecialAttackModifier`
+  damage : ``function`` or :data:`DamageRoll`
+    Determines damage modifier.  If the value is a :data:`DamageRoll` that value is returned for every special attack.  If it is a function it must satisfy the same function signature as :func:`GetSpecialAttackDamage`
   effect : ``function``
-    Determines any effect to be applied on a successful attack.  The function will be
-    called with the following parameters: special attack type, INFO, attacker,
-    target and it must return ``true`` or ``false`` and optionally a :class:`Effect` or an array of :class:`Effect`s.
-  damage : ``function``
-    Determines damage modifier.  The function will be
-    called with the following parameters: special attack type, INFO, attacker,
-    target and it must return an a :data:`DamageRoll` ctype.
-
+    Determines any effect to be applied on a successful attack.  The function must satisfy the same function signature as :func:`GetSpecialAttackEffect`
+  use : ``function``
+    Determines if a special attack is useable.  The function will be called with the following parameters: special attack type, attacker, target and it must return ``true`` or ``false``.  Note: the function is responsible for providing any feedback to the player.
 
 .. function:: GetSpecialAttackDamage(special_attack, info, attacker, target)
 
-  Determine special attack damage.
+  Determine special attack damage.  Should only every be called from a combat engine.
 
   :param int special_attack: SPECIAL_ATTACK\_*
   :param info: Attack ctype from combat engine.
@@ -41,10 +31,11 @@ Special Attacks
   :type attacker: :class:`Creature`
   :param target: Attacked creature.
   :type target: :class:`Creature`
+  :rtype: :data:`DamageRoll`
 
 .. function:: GetSpecialAttackEffect(special_attack, info, attacker, target)
 
-  Determine special attack effect.
+  Determine special attack effect.  Should only every be called from a combat engine.
 
   :param int special_attack: FEAT_* or SPECIAL_ATTACK_*
   :param info: Attack ctype from combat engine.
@@ -52,10 +43,11 @@ Special Attacks
   :type attacker: :class:`Creature`
   :param target: Attacked creature.
   :type target: :class:`Creature`
+  :rtype: ``boolean``, :class:`Effect`, or an array of :class:`Effect`.
 
 .. function:: GetSpecialAttackModifier(special_attack, info, attacker, target)
 
-  Determine special attack bonus modifier.
+  Determine special attack bonus modifier.  Should only every be called from a combat engine.
 
   :param int special_attack: SPECIAL_ATTACK\_*
   :param info: Attack ctype from combat engine.
@@ -63,12 +55,13 @@ Special Attacks
   :type attacker: :class:`Creature`
   :param target: Attacked creature.
   :type target: :class:`Creature`
+  :rtype: ``int``
 
 .. function:: RegisterSpecialAttack(feat, special_attack)
 
   Register special attack handlers.
 
-  The ``feat`` parameter can be any usable feat, it is not limited to hardcoded special attacks.  When a special attack is registered a use feat event handler is registered.  It will bypass the event and handle adding the special attack action.
+  The ``feat`` parameter can be any usable feat, it is not limited to hard-coded special attacks.  When a special attack is registered a use feat event handler is also registered, it will handle adding the special attack action.
 
   .. note::
 
@@ -81,6 +74,7 @@ Special Attacks
 
   .. code:: lua
 
+    local Eff = require 'solstice.effect'
     local function kd_impact(id, info, attacker, target)
       local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
       if target:GetSize() > attacker:GetSize() + size_bonus then return false end
@@ -97,5 +91,5 @@ Special Attacks
       return false
     end
 
-    RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, { effect = kd_impact, ab = -4})
-    RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, { effect = kd_impact, ab = -4})
+    Rules.RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, { effect = kd_impact, ab = -4})
+    Rules.RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, { effect = kd_impact, ab = -4})
