@@ -6,6 +6,14 @@
 Classes
 =======
 
+.. function:: CanUseClassAbilities(cre, class)
+
+  Determine if creature can use class abilites.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :param int class: CLASS_TYPE_*
+
 .. function:: GetBaseAttackBonus(cre, [pre_epic=false])
 
   Get base attack bonus.
@@ -14,14 +22,39 @@ Classes
   :type cre: :class:`Creature`
   :param boolean pre_epic: If ``true`` only calculate pre-epic BAB.
 
+.. function:: GetClassName(class)
 
-.. function:: CanUseClassAbilities(cre, class)
+  Get class name.
 
-  Determine if creature can use class abilites.
+  **Arguments**
+
+  :param int class: CLASS_TYPE_*
+  :rtype: string
+
+.. function:: GetHitPointsGainedOnLevelUp(class, pc)
+
+  Get number of hitpoints class gains on level up.
+
+  :param int class: CLASS_TYPE_*
+  :param pc: Creature instance.
+  :type pc: :class:`Creature`
+
+.. function:: GetLevelBonusFeats(cre, class, level)
+
+  Get bonus feats for level.
 
   :param cre: Creature instance.
   :type cre: :class:`Creature`
   :param int class: CLASS_TYPE_*
+  :param int level: Class level.
+
+.. function:: GetSkillPointsGainedOnLevelUp(class, pc)
+
+  Get number of skillpoints class gains on level up.
+
+  :param int class: CLASS_TYPE_*
+  :param pc: Creature instance.
+  :type pc: :class:`Creature`
 
 .. function:: SetCanUseClassAbilitiesOverride(class, func)
 
@@ -58,37 +91,3 @@ Classes
     end
 
     Rules.SetCanUseClassAbilitiesOverride(CLASS_TYPE_MONK, monk)
-
-.. function:: GetLevelBonusFeats(cre, class, level)
-
-  Get bonus feats for level.
-
-  :param cre: Creature instance.
-  :type cre: :class:`Creature`
-  :param int class: CLASS_TYPE_*
-  :param int level: Class level.
-
-.. function:: GetClassName(class)
-
-  Get class name.
-
-  **Arguments**
-
-  :param int class: CLASS_TYPE_*
-  :rtype: string
-
-.. function:: GetSkillPointsGainedOnLevelUp(class, pc)
-
-  Get number of skillpoints class gains on level up.
-
-  :param int class: CLASS_TYPE_*
-  :param pc: Creature instance.
-  :type pc: :class:`Creature`
-
-.. function:: GetHitPointsGainedOnLevelUp(class, pc)
-
-  Get number of hitpoints class gains on level up.
-
-  :param int class: CLASS_TYPE_*
-  :param pc: Creature instance.
-  :type pc: :class:`Creature`

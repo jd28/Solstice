@@ -24,7 +24,7 @@ Special Attacks
   effect : ``function``
     Determines any effect to be applied on a successful attack.  The function will be
     called with the following parameters: special attack type, INFO, attacker,
-    target and it must return ``true`` or ``false``.
+    target and it must return ``true`` or ``false`` and optionally a :class:`Effect` or an array of :class:`Effect`s.
   damage : ``function``
     Determines damage modifier.  The function will be
     called with the following parameters: special attack type, INFO, attacker,

@@ -6,12 +6,21 @@
 Effects
 -------
 
-.. function:: UpdateAttackBonusEffects(cre)
+.. warning::
+
+  This submodule will be deprecated.
+
+.. function:: UpdateAbilityEffects(cre)
 
   :param cre: Creature.
   :type cre: :class:`Creature`
 
-.. function:: UpdateAbilityEffects(cre)
+.. function:: UpdateDamageImmunityEffects(cre)
+
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+
+.. function:: UpdateAttackBonusEffects(cre)
 
   :param cre: Creature.
   :type cre: :class:`Creature`
@@ -21,7 +30,3 @@ Effects
   :param cre: Creature.
   :type cre: :class:`Creature`
 
-.. function:: UpdateDamageImmunityEffects(cre)
-
-  :param cre: Creature.
-  :type cre: :class:`Creature`

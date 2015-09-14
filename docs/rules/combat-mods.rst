@@ -6,11 +6,10 @@
 Combat Modifiers
 ----------------
 
-.. function:: ZeroCombatModifier(cre, mod)
+.. function:: GetAbilityCombatModifier(cre)
 
   :param cre: Creture instance.
   :type cre: :class:`Creature`
-  :param int mod: COMBAT_MOD_*
 
 .. function:: GetAreaCombatModifier(cre)
 
@@ -18,6 +17,11 @@ Combat Modifiers
   :type cre: :class:`Creature`
 
 .. function:: GetClassCombatModifier(cre)
+
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
+
+.. function:: GetFavoredEnemyCombatModifier(cre)
 
   :param cre: Creture instance.
   :type cre: :class:`Creature`
@@ -47,16 +51,6 @@ Combat Modifiers
   :param cre: Creture instance.
   :type cre: :class:`Creature`
 
-.. function:: GetFavoredEnemyCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetAbilityCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
 .. function:: ResolveCombatModifier(type, cre)
 
   Resolves combat modifier.
@@ -78,3 +72,9 @@ Combat Modifiers
 
   :param int type: COMBAT_MOD_*
   :param function func: (:class:`Creature`) -> ``nil``
+
+.. function:: ZeroCombatModifier(cre, mod)
+
+  :param cre: Creture instance.
+  :type cre: :class:`Creature`
+  :param int mod: COMBAT_MOD_*

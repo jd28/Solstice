@@ -3,6 +3,10 @@
 
 .. module:: itemprop
 
+.. warning::
+
+  There are some non-default behaviors currently here.
+
 Itemprop
 ========
 

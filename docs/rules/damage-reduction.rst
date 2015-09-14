@@ -14,6 +14,25 @@ Damage Reduction
   :type cre: :class:`Creature`
   :param int dmgidx: DAMAGE_INDEX_*
 
+.. function:: GetBaseDamageReduction(cre)
+
+  Get base damage reduction.
+
+  .. note::
+
+    This function doesn't have a user supplied override.  To modify its behavior simply replace the function.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+
+.. function:: GetBaseDamageResistance(cre, dmgidx)
+
+  Get base damage resistance.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :param int dmgidx: DAMAGE_INDEX_*
+
 .. function:: SetBaseDamageImmunityOverride(func, ...)
 
   Sets a damage immunity override function.
@@ -33,23 +52,7 @@ Damage Reduction
     Rules.SetBaseDamageImmunityOverride(rdd, DAMAGE_INDEX_FIRE)
 
   :param function func: (:class:`Creature`) -> ``int``
-
   :param ...: DAMAGE_INDEX_* constants.
-
-.. function:: GetBaseDamageReduction(cre)
-
-  Get base damage reduction.
-
-  :param cre: Creature instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetBaseDamageResistance(cre, dmgidx)
-
-  Get base damage resistance.
-
-  :param cre: Creature instance.
-  :type cre: :class:`Creature`
-  :param int dmgidx: DAMAGE_INDEX_*
 
 .. function:: SetBaseDamageResistanceOverride(func, ...)
 

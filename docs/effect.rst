@@ -3,6 +3,10 @@
 
 .. module:: effect
 
+.. warning::
+
+  There are some non-default behaviors currently here.
+
 Effect
 ------
 

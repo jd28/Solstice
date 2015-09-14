@@ -16,7 +16,7 @@ Saves
   :param int save_vs: SAVING_THROW_VS_* constant.
   :rtype: -20, 20
 
-.. function:: GetSaveEffectBonus(cre, save, save_vs)
+.. function:: GetSaveEffectModifer(cre, save, save_vs)
 
   Get save effect bonus unclamped.
 

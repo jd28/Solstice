@@ -6,6 +6,18 @@
 Constants
 ---------
 
+.. function:: ConvertSaveToItempropConstant(const)
+
+  :param int const: SAVING_THROW_*
+
+.. function:: ConvertSaveVsToItempropConstant(const)
+
+  :param int const: SAVING_THROW_VS_*
+
+.. function:: ConvertImmunityToIPConstant(const)
+
+  :param int const: IMMUNITY_TYPE_*
+
 .. function:: RegisterConstants(tda, column_label[, extract[, value_label[, value_type]]])
 
   Register constant loader.
@@ -22,16 +34,3 @@ Constants
 
   :param string name: Constant's name.
   :param value: Consants's value.  Can be any Lua object.
-
-.. function:: ConvertSaveToItempropConstant(const)
-
-  :param int const: SAVING_THROW_*
-
-.. function:: ConvertSaveVsToItempropConstant(const)
-
-  :param int const: SAVING_THROW_VS_*
-
-.. function:: ConvertImmunityToIPConstant(const)
-
-  :param int const: IMMUNITY_TYPE_*
-

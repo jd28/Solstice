@@ -6,21 +6,6 @@
 Feats
 -----
 
-.. function:: GetMaximumFeatUses(feat[, cre])
-
-  Determines a creatures maximum feat uses.
-
-  :param int feat: FEAT_*
-  :param cre: Creature instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetFeatSuccessors(feat)
-
-  Get array of feats successors.
-
-  :param int feat: FEAT_*
-  :rtype: Array of FEAT_* constants.
-
 .. function:: GetFeatIsFirstLevelOnly(feat)
 
   Determine is first level feat only.
@@ -33,16 +18,23 @@ Feats
 
   :param int feat: FEAT_*
 
-.. function:: GetIsClassGeneralFeat(feat, class)
+.. function:: GetFeatSuccessors(feat)
 
-  Determine if feat is class general feat.
+  Get array of feats successors.
 
   :param int feat: FEAT_*
-  :param int class: CLASS_TYPE_*
+  :rtype: Array of FEAT_* constants.
 
 .. function:: GetIsClassBonusFeat(feat, class)
 
   Determine if feat is class bonus feat.
+
+  :param int feat: FEAT_*
+  :param int class: CLASS_TYPE_*
+
+.. function:: GetIsClassGeneralFeat(feat, class)
+
+  Determine if feat is class general feat.
 
   :param int feat: FEAT_*
   :param int class: CLASS_TYPE_*
@@ -53,6 +45,14 @@ Feats
 
   :param int feat: FEAT_*
   :param int class: CLASS_TYPE_*
+
+.. function:: GetMaximumFeatUses(feat[, cre])
+
+  Determines a creatures maximum feat uses.
+
+  :param int feat: FEAT_*
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
 
 .. function:: GetMasterFeatName(master)
 

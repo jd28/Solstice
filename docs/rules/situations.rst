@@ -6,13 +6,6 @@
 Situations
 ----------
 
-.. function:: ZeroSituationMod(cre, situ)
-
-  :param cre: Creature.
-  :type cre: :class:`Creature`
-
-.. function:: SetSituationModiferOverride(situation, func)
-
 .. function:: ResolveSituationModifier(type, cre)
 
   :param cre: Creature.
@@ -22,3 +15,13 @@ Situations
 
   :param cre: Creature.
   :type cre: :class:`Creature`
+
+.. function:: ZeroSituationMod(cre, situ)
+
+  Zeros all fields of a situation modifier
+
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+
+.. function:: SetSituationModiferOverride(situation, func)
+

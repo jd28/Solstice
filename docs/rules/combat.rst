@@ -6,9 +6,10 @@
 Combat
 ------
 
-.. data:: CombatEngine
+Interfaces
+~~~~~~~~~~
 
-  Table CombatEngine
+.. data:: CombatEngine
 
   **Fields**
 
@@ -26,16 +27,21 @@ Combat
     taking a Creature object instance.  This is optional can be used to do
     any other book keeping you might need.
 
+Functions
+~~~~~~~~~
+
+.. function:: GetCombatEngine()
+
+  Get current combat engine.
+
+  :rtype: :data:`CombatEngine`
+
 .. function:: RegisterCombatEngine(engine)
 
   Register a combat engine.
 
   :param engine: Combat engine.
   :type engine: :data:`CombatEngine`
-
-.. function:: GetCombatEngine()
-
-  Get current combat engine.
 
 .. function:: SetCombatEngineActive(active)
 

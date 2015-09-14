@@ -6,35 +6,36 @@
 Skills
 ------
 
+.. function:: CanUseSkill(skill, cre)
+
+  Determines if a creature can use a skill.
+
+  :param int skill: SKILL_*
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :rtype: ``boolean``
+
+.. function:: GetIsClassSkill(skill, class)
+
+  Determines if a skill is a class skill.
+
+  :param int skill: SKILL_*
+  :param int class: CLASS_TYPE_*
+  :rtype: ``boolean``
+
 .. function:: GetSkillAbility(skill)
 
   Get skill's associated ability.
 
   :param int skill: SKILL_*
+  :rtype: ABILITY_* or -1
 
 .. function:: GetSkillAllCanUse(skill)
 
   Check if skill requires training.
 
   :param int skill: SKILL_*
-
-.. function:: GetSkillHasArmorCheckPenalty(skill)
-
-  Check if skill has armor check penalty.
-
-  :param int skill: SKILL_*
-
-.. function:: GetSkillIsUntrained(skill)
-
-  Check if skill requires training.
-
-  :param int skill: SKILL_*
-
-.. function:: GetSkillName(skill)
-
-  Get Skill name.
-
-  :param int skill: SKILL_*
+  :rtype: ``boolean``
 
 .. function:: GetSkillArmorCheckPenalty(cre, skill)
 
@@ -43,14 +44,7 @@ Skills
   :param cre: Creature.
   :type cre: :class:`Creature`
   :param int skill: SKILL_*
-
-.. function:: GetSkillFeatBonus(cre, skill)
-
-  Get Skill Bonuses from feats.
-
-  :param cre: Creature.
-  :type cre: :class:`Creature`
-  :param int skill: SKILL_*
+  :rtype: ``int``
 
 .. function:: GetSkillEffectLimits(cre, skill)
 
@@ -69,17 +63,32 @@ Skills
   :type cre: :class:`Creature`
   :param int skill: SKILL_*
 
-.. function:: CanUseSkill(skill, cre)
+.. function:: GetSkillFeatBonus(cre, skill)
 
-  Determines if a creature can use a skill.
+  Get Skill Bonuses from feats.
 
-  :param int skill: SKILL_*
   :param cre: Creature.
   :type cre: :class:`Creature`
+  :param int skill: SKILL_*
+  :rtype: ``int``
 
-.. function:: GetIsClassSkill(skill, class)
+.. function:: GetSkillHasArmorCheckPenalty(skill)
 
-  Determines if a skill is a class skill.
+  Check if skill has armor check penalty.
 
   :param int skill: SKILL_*
-  :param int class: CLASS_TYPE_*
+  :rtype: ``boolean``
+
+.. function:: GetSkillIsUntrained(skill)
+
+  Check if skill requires training.
+
+  :param int skill: SKILL_*
+  :rtype: ``boolean``
+
+.. function:: GetSkillName(skill)
+
+  Get Skill name.
+
+  :param int skill: SKILL_*
+  :rtype: ``string``
