@@ -7,8 +7,31 @@
 local M = require 'solstice.rules.init'
 local C = require('ffi').C
 local GetObjectByID = Game.GetObjectByID
+local NWNXEvents = require 'solstice.nwnx.events'
 
+local USE_FEAT = {}
 local FEAT_USES = {}
+
+local function use_feat_handler(info)
+  if not USE_FEAT[info.type] then return end
+  if USE_FEAT[info.type](info.subtype, info.object, info.target, info.pos) then
+    NWNXEvents.ByPassEvent()
+  end
+end
+
+NWNXEvents.RegisterEventHandler(8, use_feat_handler)
+
+function M.SetUseFeatOverride(func, ...)
+  local Log = System.GetLogger()
+  local t = table.pack(...)
+  assert(t.n > 0)
+  for i=1, t.n do
+    if USE_FEAT[t[i]] then
+      Log:warning("Overriding feat use handler for feat %d", t[i])
+    end
+    USE_FEAT[t[i]] = func
+  end
+end
 
 --- Determines a creatures maximum feat uses.
 -- @param feat
@@ -23,16 +46,16 @@ function M.GetMaximumFeatUses(feat, cre)
    return tonumber(tda) or 100
 end
 
---- Register a function to determine maximum feat uses.
--- @param func A function taking two argument, a Creature instance and
--- and a FEAT_* constant.
--- @param ... Vararg list FEAT_* constants.
-function M.RegisterFeatUses(func, ...)
-   local t = {...}
-   assert(#t > 0)
-   for _, feat in ipairs(t) do
-      FEAT_USES[feat] = func
-   end
+function M.SetMaximumFeatUsesOverride(func, ...)
+  local Log = System.GetLogger()
+  local t = table.pack(...)
+  assert(t.n > 0)
+  for i=1, t.n do
+    if FEAT_USES[t[i]] then
+      Log:warning("Overriding feat use handler for feat %d", t[i])
+    end
+    FEAT_USES[t[i]] = func
+  end
 end
 
 --- Get array of feats successors.
