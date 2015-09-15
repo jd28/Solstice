@@ -16,8 +16,11 @@ Special Attacks
     Determines attack bonus modifier.  If this field is a integer that value is returned for every special attack.  If it is a function it must satisfy the same function signature as :func:`GetSpecialAttackModifier`
   damage : ``function`` or :data:`DamageRoll`
     Determines damage modifier.  If the value is a :data:`DamageRoll` that value is returned for every special attack.  If it is a function it must satisfy the same function signature as :func:`GetSpecialAttackDamage`
-  effect : ``function``
-    Determines any effect to be applied on a successful attack.  The function must satisfy the same function signature as :func:`GetSpecialAttackEffect`
+  impact : ``function``
+    Determines if a special attack is successful and optionally any effect(s) to be applied.  The function, if any, must satisfy the same function signature as :func:`GetSpecialAttackImpact`.  Its ``boolean`` return value indicates whether a special attack was successful or not, ``false`` or ``nil`` indicates the target has resisted the attack.
+
+    If no function is set, the special attack is always successful.
+
   use : ``function``
     Determines if a special attack is useable.  The function will be called with the following parameters: special attack type, attacker, target and it must return ``true`` or ``false``.  Note: the function is responsible for providing any feedback to the player.
 
@@ -33,9 +36,12 @@ Special Attacks
   :type target: :class:`Creature`
   :rtype: :data:`DamageRoll`
 
-.. function:: GetSpecialAttackEffect(special_attack, info, attacker, target)
+.. function:: GetSpecialAttackImpact(special_attack, info, attacker, target)
 
   Determine special attack effect.  Should only every be called from a combat engine.
+
+  .. note::
+
 
   :param int special_attack: FEAT_* or SPECIAL_ATTACK_*
   :param info: Attack ctype from combat engine.
@@ -43,7 +49,7 @@ Special Attacks
   :type attacker: :class:`Creature`
   :param target: Attacked creature.
   :type target: :class:`Creature`
-  :rtype: ``boolean``, :class:`Effect`, or an array of :class:`Effect`.
+  :rtype: ``boolean`` and optionally an :class:`Effect` or an array of :class:`Effect`.
 
 .. function:: GetSpecialAttackModifier(special_attack, info, attacker, target)
 
@@ -61,11 +67,7 @@ Special Attacks
 
   Register special attack handlers.
 
-  The vararg parameter(s) can be any usable feat, it is not limited to hard-coded special attacks.  When a special attack is registered, a use feat event handler is also registered; it will handle adding the special attack action, will override any other uses of the feat, and any feedback messages like *Special Attack Resisted* floating strings.
-
-  .. note::
-
-    Because the special attack type is passed as a parameter to the special attack handler functions, a special attack handler can be used for multiple special attacks.
+  The vararg parameter(s) can be any usable feat, it is not limited to hard-coded special attacks.  When a special attack is registered, a use feat event handler is also registered; it will handle adding the special attack action, will override any other uses of the feat, and any feedback messages like \*Special Attack Resisted\* floating strings.
 
   :param special_attack: See the :data:`SpecialAttack` interface.
   :param ...: FEAT_* or SPECIAL_ATTACK_* constants.
@@ -77,7 +79,7 @@ Special Attacks
     local Eff = require 'solstice.effect'
 
     local function kd_use(id, attacker, target)
-      if not Rules.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
+      if Rules.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
         if attacker:GetIsPC() then
           -- Normally for these hardcoded feats a localized string would be sent,
           -- but this is just an example.
@@ -104,6 +106,6 @@ Special Attacks
       return false
     end
 
-    Rules.RegisterSpecialAttack({ use = kd_use, effect = kd_impact, ab = -4},
+    Rules.RegisterSpecialAttack({ use = kd_use, impact = kd_impact, ab = -4},
                                 SPECIAL_ATTACK_KNOCKDOWN_IMPROVED,
                                 SPECIAL_ATTACK_KNOCKDOWN)

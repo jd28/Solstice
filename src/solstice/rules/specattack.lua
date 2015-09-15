@@ -21,8 +21,8 @@ local function GetSpecialAttackDamage(id, info, attacker, target)
 end
 
 -- For combat engine, don't publicly document
-local function GetSpecialAttackEffect(id, info, attacker, target)
-   local f = _SPEC[id] and _SPEC[id].effect
+local function GetSpecialAttackImpact(id, info, attacker, target)
+   local f = _SPEC[id] and _SPEC[id].impact
    if not f then return true end
    return f(id, info, attacker, target)
 end
@@ -44,6 +44,7 @@ local function RegisterSpecialAttack(special_attack, ...)
   for i=1, t.n do
     M.SetUseFeatOverride(
       function (feat, user, target, pos)
+        if not target:GetIsValid() then return true end
         C.nwn_AddAttackActions(user.obj, target.id);
 
         if not _SPEC[feat] then return false end
@@ -219,7 +220,7 @@ local function sap_impact(id, info, attacker, target)
 end
 
 local function kd_use(id, attacker, target)
-  if not M.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
+  if M.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
     if attacker:GetIsPC() then
       attacker:SendMessage("You can not use Knockdown with ranged weapons.")
     end
@@ -244,25 +245,25 @@ local function kd_impact(id, info, attacker, target)
    return false
 end
 
-RegisterSpecialAttack({ effect = sap_impact, ab = -4}, SPECIAL_ATTACK_SAP)
-RegisterSpecialAttack({ use = kd_use, effect = kd_impact, ab = -4},
+RegisterSpecialAttack({ impact = sap_impact, ab = -4}, SPECIAL_ATTACK_SAP)
+RegisterSpecialAttack({ use = kd_use, impact = kd_impact, ab = -4},
                       SPECIAL_ATTACK_KNOCKDOWN_IMPROVED,
                       SPECIAL_ATTACK_KNOCKDOWN)
-RegisterSpecialAttack({ effect = called_shot_impact, ab = -4},
+RegisterSpecialAttack({ impact = called_shot_impact, ab = -4},
                       SPECIAL_ATTACK_CALLED_SHOT_ARM,
                       SPECIAL_ATTACK_CALLED_SHOT_LEG)
 RegisterSpecialAttack({ ab = -4}, SPECIAL_ATTACK_STUNNING_FIST)
 RegisterSpecialAttack({ ab = aoo }, SPECIAL_ATTACK_AOO)
-RegisterSpecialAttack({ damage = smite_dmg, effect = smite_impact, ab = smite_ab },
+RegisterSpecialAttack({ damage = smite_dmg, impact = smite_impact, ab = smite_ab },
                       SPECIAL_ATTACK_SMITE_EVIL)
 
-RegisterSpecialAttack({ damage = smite_dmg, effect = smite_impact, ab = smite_ab }, SPECIAL_ATTACK_SMITE_GOOD)
-RegisterSpecialAttack({ effect = disarm_impact, ab = disarm_ab },
+RegisterSpecialAttack({ damage = smite_dmg, impact = smite_impact, ab = smite_ab }, SPECIAL_ATTACK_SMITE_GOOD)
+RegisterSpecialAttack({ impact = disarm_impact, ab = disarm_ab },
                       SPECIAL_ATTACK_DISARM_IMPROVED,
                       SPECIAL_ATTACK_DISARM)
 
 M.GetSpecialAttackDamage   = GetSpecialAttackDamage
-M.GetSpecialAttackEffect   = GetSpecialAttackEffect
+M.GetSpecialAttackImpact   = GetSpecialAttackImpact
 M.GetSpecialAttackModifier = GetSpecialAttackModifier
 M.RegisterSpecialAttack    = RegisterSpecialAttack
 
