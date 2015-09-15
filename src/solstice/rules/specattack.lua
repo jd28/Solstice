@@ -44,15 +44,12 @@ local function RegisterSpecialAttack(id, special_attack)
     function (feat, user, target, pos)
       C.nwn_AddAttackActions(user.obj, target.id);
 
-      if _SPEC[id]
-         and _SPEC[id].use
-         and not _SPEC[id].use(feat, user, target)
-      then
-         return
+      if not _SPEC[id] then return false end
+      if not _SPEC[id].use or _SPEC[id].use(feat, user, target) then
+        C.nwn_AddSpecialAttack(user.obj.cre_combat_round, feat);
       end
 
-      C.nwn_AddSpecialAttack(user.obj.cre_combat_round, feat);
-      NWNXEvents.BypassEvent()
+      return true
     end,
     id)
   _SPEC[id] = special_attack
@@ -243,8 +240,8 @@ RegisterSpecialAttack(SPECIAL_ATTACK_STUNNING_FIST, { ab = -4})
 RegisterSpecialAttack(SPECIAL_ATTACK_AOO, { ab = aoo })
 RegisterSpecialAttack(SPECIAL_ATTACK_SMITE_EVIL, { damage = smite_dmg, effect = smite_impact, ab = smite_ab })
 RegisterSpecialAttack(SPECIAL_ATTACK_SMITE_GOOD, { damage = smite_dmg, effect = smite_impact, ab = smite_ab })
-RegisterSpecialAttack(SPECIAL_ATTACK_DISARM_IMPROVED, { ab = disarm_ab })
-RegisterSpecialAttack(SPECIAL_ATTACK_DISARM, disarm_impact, { ab = disarm_ab })
+RegisterSpecialAttack(SPECIAL_ATTACK_DISARM_IMPROVED, { effect = disarm_impact, ab = disarm_ab })
+RegisterSpecialAttack(SPECIAL_ATTACK_DISARM, { effect = disarm_impact, ab = disarm_ab })
 
 M.GetSpecialAttackDamage   = GetSpecialAttackDamage
 M.GetSpecialAttackEffect   = GetSpecialAttackEffect
