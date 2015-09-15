@@ -275,6 +275,7 @@ void              Local_NWNXLog(int level, const char* log);
 void              Local_SetDamageInfo(int32_t index, const char* name, const char* color);
 void              Local_SetCombatEngineActive(bool active);
 EffectData       *Local_GetLastEffect();
+Attack        *Local_GetAttack();
 ]]
 
 ffi.cdef [[
