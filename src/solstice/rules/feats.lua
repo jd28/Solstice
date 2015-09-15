@@ -13,8 +13,8 @@ local USE_FEAT = {}
 local FEAT_USES = {}
 
 local function use_feat_handler(info)
-  if not USE_FEAT[info.type] then return end
-  if USE_FEAT[info.type](info.subtype, info.object, info.target, info.pos) then
+  if not USE_FEAT[info.subtype] then return end
+  if USE_FEAT[info.subtype](info.subtype, info.object, info.target, info.pos) then
     NWNXEvents.ByPassEvent()
   end
 end
