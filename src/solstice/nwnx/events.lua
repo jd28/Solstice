@@ -165,9 +165,8 @@ function __NWNXEventsHandleEvent(event_type)
     __ToggleMode(e.object, e.type)
     return
   end
-
-  if EVENT_HANDLERS[type] then
-    EVENT_HANDLERS[type](GetEventInfo())
+  if EVENT_HANDLERS[event_type] then
+    EVENT_HANDLERS[event_type](GetEventInfo())
   end
 end
 
