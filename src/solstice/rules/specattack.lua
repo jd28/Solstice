@@ -4,7 +4,7 @@
 local Eff = require 'solstice.effect'
 local C = require('ffi').C
 local M = require 'solstice.rules.init'
-
+local Log = System.GetLogger()
 NWNXEvents = require 'solstice.nwnx.events'
 
 local _SPEC = {}
@@ -39,20 +39,23 @@ local function GetSpecialAttackModifier(id, info, attacker, target)
 end
 
 --- Register special attack handlers.
-local function RegisterSpecialAttack(id, special_attack)
-  M.SetUseFeatOverride(
-    function (feat, user, target, pos)
-      C.nwn_AddAttackActions(user.obj, target.id);
+local function RegisterSpecialAttack(special_attack, ...)
+  local t = table.pack(...)
+  for i=1, t.n do
+    M.SetUseFeatOverride(
+      function (feat, user, target, pos)
+        C.nwn_AddAttackActions(user.obj, target.id);
 
-      if not _SPEC[id] then return false end
-      if not _SPEC[id].use or _SPEC[id].use(feat, user, target) then
-        C.nwn_AddSpecialAttack(user.obj.cre_combat_round, feat);
-      end
+        if not _SPEC[feat] then return false end
+        if not _SPEC[feat].use or _SPEC[feat].use(feat, user, target) then
+          C.nwn_AddSpecialAttack(user.obj.cre_combat_round, feat);
+        end
 
-      return true
-    end,
-    id)
-  _SPEC[id] = special_attack
+        return true
+      end,
+      t[i])
+    _SPEC[t[i]] = special_attack
+  end
 end
 
 -- Default implementations.
@@ -215,6 +218,16 @@ local function sap_impact(id, info, attacker, target)
    return true
 end
 
+local function kd_use(id, attacker, target)
+  if not M.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
+    if attacker:GetIsPC() then
+      attacker:SendMessage("You can not use Knockdown with ranged weapons.")
+    end
+    return false
+  end
+  return true
+end
+
 local function kd_impact(id, info, attacker, target)
    local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
    if target:GetSize() > attacker:GetSize() + size_bonus then return false end
@@ -231,17 +244,22 @@ local function kd_impact(id, info, attacker, target)
    return false
 end
 
-RegisterSpecialAttack(SPECIAL_ATTACK_SAP, { effect = sap_impact, ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, { effect = kd_impact, ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, { effect = kd_impact, ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_CALLED_SHOT_ARM, { effect = called_shot_impact, ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_CALLED_SHOT_LEG, { effect = called_shot_impact, ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_STUNNING_FIST, { ab = -4})
-RegisterSpecialAttack(SPECIAL_ATTACK_AOO, { ab = aoo })
-RegisterSpecialAttack(SPECIAL_ATTACK_SMITE_EVIL, { damage = smite_dmg, effect = smite_impact, ab = smite_ab })
-RegisterSpecialAttack(SPECIAL_ATTACK_SMITE_GOOD, { damage = smite_dmg, effect = smite_impact, ab = smite_ab })
-RegisterSpecialAttack(SPECIAL_ATTACK_DISARM_IMPROVED, { effect = disarm_impact, ab = disarm_ab })
-RegisterSpecialAttack(SPECIAL_ATTACK_DISARM, { effect = disarm_impact, ab = disarm_ab })
+RegisterSpecialAttack({ effect = sap_impact, ab = -4}, SPECIAL_ATTACK_SAP)
+RegisterSpecialAttack({ use = kd_use, effect = kd_impact, ab = -4},
+                      SPECIAL_ATTACK_KNOCKDOWN_IMPROVED,
+                      SPECIAL_ATTACK_KNOCKDOWN)
+RegisterSpecialAttack({ effect = called_shot_impact, ab = -4},
+                      SPECIAL_ATTACK_CALLED_SHOT_ARM,
+                      SPECIAL_ATTACK_CALLED_SHOT_LEG)
+RegisterSpecialAttack({ ab = -4}, SPECIAL_ATTACK_STUNNING_FIST)
+RegisterSpecialAttack({ ab = aoo }, SPECIAL_ATTACK_AOO)
+RegisterSpecialAttack({ damage = smite_dmg, effect = smite_impact, ab = smite_ab },
+                      SPECIAL_ATTACK_SMITE_EVIL)
+
+RegisterSpecialAttack({ damage = smite_dmg, effect = smite_impact, ab = smite_ab }, SPECIAL_ATTACK_SMITE_GOOD)
+RegisterSpecialAttack({ effect = disarm_impact, ab = disarm_ab },
+                      SPECIAL_ATTACK_DISARM_IMPROVED,
+                      SPECIAL_ATTACK_DISARM)
 
 M.GetSpecialAttackDamage   = GetSpecialAttackDamage
 M.GetSpecialAttackEffect   = GetSpecialAttackEffect

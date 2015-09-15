@@ -25,7 +25,7 @@ Special Attacks
 
   Determine special attack damage.  Should only every be called from a combat engine.
 
-  :param int special_attack: SPECIAL_ATTACK\_*
+  :param int special_attack: SPECIAL_ATTACK_*
   :param info: Attack ctype from combat engine.
   :param attacker: Attacking creature.
   :type attacker: :class:`Creature`
@@ -49,7 +49,7 @@ Special Attacks
 
   Determine special attack bonus modifier.  Should only every be called from a combat engine.
 
-  :param int special_attack: SPECIAL_ATTACK\_*
+  :param int special_attack: SPECIAL_ATTACK_*
   :param info: Attack ctype from combat engine.
   :param attacker: Attacking creature.
   :type attacker: :class:`Creature`
@@ -57,24 +57,37 @@ Special Attacks
   :type target: :class:`Creature`
   :rtype: ``int``
 
-.. function:: RegisterSpecialAttack(feat, special_attack)
+.. function:: RegisterSpecialAttack(special_attack, ...)
 
   Register special attack handlers.
 
-  The ``feat`` parameter can be any usable feat, it is not limited to hard-coded special attacks.  When a special attack is registered a use feat event handler is also registered, it will handle adding the special attack action.
+  The vararg parameter(s) can be any usable feat, it is not limited to hard-coded special attacks.  When a special attack is registered, a use feat event handler is also registered; it will handle adding the special attack action, will override any other uses of the feat, and any feedback messages like *Special Attack Resisted* floating strings.
 
   .. note::
 
     Because the special attack type is passed as a parameter to the special attack handler functions, a special attack handler can be used for multiple special attacks.
 
-  :param int feat: FEAT_* or SPECIAL_ATTACK_*
   :param special_attack: See the :data:`SpecialAttack` interface.
+  :param ...: FEAT_* or SPECIAL_ATTACK_* constants.
 
   **Example**
 
   .. code:: lua
 
     local Eff = require 'solstice.effect'
+
+    local function kd_use(id, attacker, target)
+      if not Rules.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
+        if attacker:GetIsPC() then
+          -- Normally for these hardcoded feats a localized string would be sent,
+          -- but this is just an example.
+          attacker:SendMessage("You can not use Knockdown with ranged weapons.")
+        end
+        return false
+      end
+      return true
+    end
+
     local function kd_impact(id, info, attacker, target)
       local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
       if target:GetSize() > attacker:GetSize() + size_bonus then return false end
@@ -91,5 +104,6 @@ Special Attacks
       return false
     end
 
-    Rules.RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN_IMPROVED, { effect = kd_impact, ab = -4})
-    Rules.RegisterSpecialAttack(SPECIAL_ATTACK_KNOCKDOWN, { effect = kd_impact, ab = -4})
+    Rules.RegisterSpecialAttack({ use = kd_use, effect = kd_impact, ab = -4},
+                                SPECIAL_ATTACK_KNOCKDOWN_IMPROVED,
+                                SPECIAL_ATTACK_KNOCKDOWN)
