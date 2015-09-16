@@ -9,33 +9,15 @@ nwnx.events
 Constants
 ---------
 
-.. data:: EVENT_TYPE_SAVE_CHAR
-
-.. data:: EVENT_TYPE_PICKPOCKET
-
-.. data:: EVENT_TYPE_ATTACK
-
-.. data:: EVENT_TYPE_USE_ITEM
-
-.. data:: EVENT_TYPE_QUICKCHAT
-
-.. data:: EVENT_TYPE_EXAMINE
-
-.. data:: EVENT_TYPE_USE_SKILL
-
-.. data:: EVENT_TYPE_CAST_SPELL
-
-.. data:: EVENT_TYPE_TOGGLE_PAUSE
-
-.. data:: EVENT_TYPE_POSSESS_FAMILIAR
-
-.. data:: EVENT_TYPE_DESTROY_OBJECT
-
-.. data:: NODE_TYPE_STARTING_NODE
-
 .. data:: NODE_TYPE_ENTRY_NODE
 
 .. data:: NODE_TYPE_REPLY_NODE
+
+.. data:: NODE_TYPE_STARTING_NODE
+
+.. data:: LANGUAGE_CHINESE_SIMPLIFIED
+
+.. data:: LANGUAGE_CHINESE_TRADITIONAL
 
 .. data:: LANGUAGE_ENGLISH
 
@@ -45,17 +27,34 @@ Constants
 
 .. data:: LANGUAGE_ITALIAN
 
-.. data:: LANGUAGE_SPANISH
-
-.. data:: LANGUAGE_POLISH
+.. data:: LANGUAGE_JAPANESE
 
 .. data:: LANGUAGE_KOREAN
 
-.. data:: LANGUAGE_CHINESE_TRADITIONAL
+.. data:: LANGUAGE_POLISH
 
-.. data:: LANGUAGE_CHINESE_SIMPLIFIED
+.. data:: LANGUAGE_SPANISH
 
-.. data:: LANGUAGE_JAPANESE
+Signals
+-------
+
+.. data:: SaveCharacter
+
+.. data:: PickPocket
+
+.. data:: Attack
+
+.. data:: QuickChat
+
+.. data:: Examine
+
+.. data:: CastSpell
+
+.. data:: TogglePause
+
+.. data:: PossessFamiliar
+
+.. data:: DestroyObject
 
 Tables
 ------
@@ -82,29 +81,25 @@ Functions
 
 .. function:: BypassEvent()
 
-.. function:: RegisterEventHandler(event_type, f)
-
-  **Arguments**
-
-  event_type : ``int``
-    EVENT_TYPE_*
-  f : ``function``
-    This function will be called when an event occurs.  It will be passed one parameter a :data:`NWNXEventInfo` table.
-
-.. function:: SetEventReturnValue(val)
-
-.. function:: GetCurrentNodeType()
+.. function:: GetCurrentAbsoluteNodeID()
 
 .. function:: GetCurrentNodeID()
 
-.. function:: GetCurrentAbsoluteNodeID()
+.. function:: GetCurrentNodeText(nLangID, nGender)
 
-.. function:: GetSelectedNodeID()
+.. function:: GetCurrentNodeType()
+
+.. function:: GetEventSignal(event)
+
+  :param int event: EVENT_TYPE_*
+  :rtype: A signal.
 
 .. function:: GetSelectedAbsoluteNodeID()
 
+.. function:: GetSelectedNodeID()
+
 .. function:: GetSelectedNodeText(nLangID, nGender)
 
-.. function:: GetCurrentNodeText(nLangID, nGender)
-
 .. function:: SetCurrentNodeText(sText, nLangID, nGender)
+
+.. function:: SetEventReturnValue(val)

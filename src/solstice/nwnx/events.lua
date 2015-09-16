@@ -3,32 +3,16 @@
 -- @alias M
 
 local Vec = require 'solstice.vector'
+local Signal = require 'solstice.external.signal'
 local Log = System.GetLogger()
 local GetObjectByID = Game.GetObjectByID
 local M = {}
 
-local mod
 local EVENT_HANDLERS = {}
-local EXAMINE_HANDLERS = {}
+
+local mod
 local ffi = require 'ffi'
 local C = ffi.C
-
--- Unexposed events.  Solstice will provide an interface for them.
-local EVENT_TYPE_ALL               = 0
-local EVENT_TYPE_USE_FEAT          = 8
-local EVENT_TYPE_TOGGLE_MODE       = 9
-M.EVENT_TYPE_SAVE_CHAR         = 1
-M.EVENT_TYPE_PICKPOCKET        = 2
-M.EVENT_TYPE_ATTACK            = 3
-M.EVENT_TYPE_USE_ITEM          = 4
-M.EVENT_TYPE_QUICKCHAT         = 5
-M.EVENT_TYPE_EXAMINE           = 6
-M.EVENT_TYPE_USE_SKILL         = 7
-
-M.EVENT_TYPE_CAST_SPELL        = 10
-M.EVENT_TYPE_TOGGLE_PAUSE      = 11
-M.EVENT_TYPE_POSSESS_FAMILIAR  = 12
-M.EVENT_TYPE_DESTROY_OBJECT    = 14
 
 M.NODE_TYPE_STARTING_NODE      = 0
 M.NODE_TYPE_ENTRY_NODE         = 1
@@ -44,6 +28,32 @@ M.LANGUAGE_KOREAN              = 128
 M.LANGUAGE_CHINESE_TRADITIONAL = 129
 M.LANGUAGE_CHINESE_SIMPLIFIED  = 130
 M.LANGUAGE_JAPANESE            = 131
+
+-- Unexposed events.  Solstice will provide an interface for them.
+local EVENT_TYPE_USE_FEAT          = 8
+local EVENT_TYPE_TOGGLE_MODE       = 9
+local EVENT_TYPE_USE_ITEM          = 4
+local EVENT_TYPE_USE_SKILL         = 7
+
+local EVENT_TYPE_SAVE_CHAR         = 1
+local EVENT_TYPE_PICKPOCKET        = 2
+local EVENT_TYPE_ATTACK            = 3
+local EVENT_TYPE_QUICKCHAT         = 5
+local EVENT_TYPE_EXAMINE           = 6
+local EVENT_TYPE_CAST_SPELL        = 10
+local EVENT_TYPE_TOGGLE_PAUSE      = 11
+local EVENT_TYPE_POSSESS_FAMILIAR  = 12
+local EVENT_TYPE_DESTROY_OBJECT    = 14
+
+M.SaveCharacter = Signal.signal()
+M.PickPocket = Signal.signal()
+M.Attack = Signal.signal()
+M.QuickChat = Signal.signal()
+M.Examine = Signal.signal()
+M.CastSpell = Signal.signal()
+M.TogglePause = Signal.signal()
+M.PossessFamiliar = Signal.signal()
+M.DestroyObject = Signal.signal()
 
 local function GetEventInfo()
    local e = C.Local_GetLastNWNXEvent()
@@ -61,21 +71,17 @@ local function GetEventInfo()
           }
 end
 
---- Bypass current event.
-function M.BypassEvent()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
-end
-
---- Register NWNXEvent event handler.
--- @param event_type M.EVENT_TYPE_*/
--- @param f A function to handle the event.  When the event fires the function will
--- be called with one paramenter a NWNXEventInfo table.
-function M.RegisterEventHandler(type, f)
+function M.__SetEventHandlerInternal(type, f)
   if EVENT_HANDLERS[type] then
     Log:warning("Overiding event handler for event: %d", type)
   end
   EVENT_HANDLERS[type] = f
+end
+
+--- Bypass current event.
+function M.BypassEvent()
+   if not mod then mod = Game.GetModule() end
+   mod:SetLocalString("NWNX!EVENTS!BYPASS", "1")
 end
 
 --- Sets a value for NWNX Events to return from a hook.
@@ -159,15 +165,32 @@ for _, func in pairs(M) do
 end
 
 -- Bridge function to hand NWNXEvent events
-function __NWNXEventsHandleEvent(event_type)
-  if event_type == EVENT_TYPE_TOGGLE_MODE then
+function __NWNXEventsHandleEvent(event)
+  if event == EVENT_TYPE_TOGGLE_MODE then
     M.BypassEvent()
     local e = C.Local_GetLastNWNXEvent()
     __ToggleMode(e.object, e.type)
     return
-  end
-  if EVENT_HANDLERS[event_type] then
-    EVENT_HANDLERS[event_type](GetEventInfo())
+  elseif event == EVENT_TYPE_SAVE_CHAR then
+    M.SaveCharacter:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_PICKPOCKET then
+    M.PickPocket:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_ATTACK then
+    M.Attack:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_QUICKCHAT then
+    M.QuickChat:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_EXAMINE then
+    M.Examine:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_CAST_SPELL then
+    M.CastSpell:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_TOGGLE_PAUSE then
+    M.TogglePause:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_POSSESS_FAMILIAR then
+    M.PossessFamiliar:notify(GetEventInfo())
+  elseif event == EVENT_TYPE_DESTROY_OBJECT then
+    M.DestroyObject:notify(GetEventInfo())
+  elseif EVENT_HANDLERS[event] then
+    EVENT_HANDLERS[event](GetEventInfo())
   end
 end
 

@@ -19,7 +19,7 @@ local function use_feat_handler(info)
   end
 end
 
-NWNXEvents.RegisterEventHandler(8, use_feat_handler)
+NWNXEvents.__SetEventHandlerInternal(8, use_feat_handler)
 
 function M.SetUseFeatOverride(func, ...)
   local Log = System.GetLogger()
