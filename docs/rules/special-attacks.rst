@@ -77,6 +77,8 @@ Special Attacks
   .. code:: lua
 
     local Eff = require 'solstice.effect'
+    local Attack = require 'solstice.attack'
+    local GetAttackRoll = Attack.GetAttackRoll
 
     local function kd_use(id, attacker, target)
       if Rules.GetIsRangedWeapon(attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)) then
@@ -94,9 +96,7 @@ Special Attacks
       local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
       if target:GetSize() > attacker:GetSize() + size_bonus then return false end
 
-      if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
-         target:GetSkillRank(SKILL_DISCIPLINE)
-      then
+      if GetAttackRoll(info) > target:GetSkillRank(SKILL_DISCIPLINE) then
          local eff = Eff.Knockdown()
          eff:SetDurationType(DURATION_TYPE_TEMPORARY)
          eff:SetDuration(6)

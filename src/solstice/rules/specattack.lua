@@ -61,6 +61,10 @@ end
 
 -- Default implementations.
 
+local Attack = require 'solstice.attack'
+local GetAttackRoll = Attack.GetAttackRoll
+local GetResult = Attack.GetResult
+
 local function smite_impact(id, info, attacker, target)
    local level = 0
    local eff
@@ -130,7 +134,7 @@ local function stunning_fist_dmg(id, info, attacker, target)
 end
 
 local function stunning_fist_impact(id, info, attacker, target)
-   if info.attack.cad_attack_result ~= 3 then return false end
+   if GetResult(info) ~= 3 then return false end
    local dc = attacker:GetAbilityModifier(ABILITY_WISDOM) +
       attacker:GetLevelByClass(CLASS_TYPE_MONK)
 
@@ -176,9 +180,7 @@ local function disarm_ab(id, info, attacker, target)
 end
 
 local function called_shot_impact(id, info, attacker, target)
-   if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
-      target:GetSkillRank(SKILL_DISCIPLINE)
-   then
+   if GetAttackRoll(info) > target:GetSkillRank(SKILL_DISCIPLINE) then
       local eff
       if id == SPECIAL_ATTACK_CALLED_SHOT_ARM then
          eff = Eff.AttackBonus(-2)
@@ -204,9 +206,7 @@ local function disarm_impact(id, info, attacker, target)
    local vs_weap = target:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
    if not vs_weap:GetIsValid() then return false end
 
-   if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
-      target:GetSkillRank(SKILL_DISCIPLINE)
-   then
+   if GetAttackRoll(info) > target:GetSkillRank(SKILL_DISCIPLINE) then
       local eff = Eff.Disarm()
       eff:SetDurationType(DURATION_TYPE_INSTANT)
       return true, eff
@@ -233,9 +233,7 @@ local function kd_impact(id, info, attacker, target)
    local size_bonus = id == SPECIAL_ATTACK_KNOCKDOWN_IMPROVED and 1 or 0
    if target:GetSize() > attacker:GetSize() + size_bonus then return false end
 
-   if info.attack.cad_attack_roll + info.attack.cad_attack_mod >
-      target:GetSkillRank(SKILL_DISCIPLINE)
-   then
+   if GetAttackRoll(info) > target:GetSkillRank(SKILL_DISCIPLINE) then
       local eff = Eff.Knockdown()
       eff:SetDurationType(DURATION_TYPE_TEMPORARY)
       eff:SetDuration(6)
