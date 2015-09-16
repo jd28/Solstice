@@ -13,7 +13,10 @@ local EXAMINE_HANDLERS = {}
 local ffi = require 'ffi'
 local C = ffi.C
 
-M.EVENT_TYPE_ALL               = 0
+-- Unexposed events.  Solstice will provide an interface for them.
+local EVENT_TYPE_ALL               = 0
+local EVENT_TYPE_USE_FEAT          = 8
+local EVENT_TYPE_TOGGLE_MODE       = 9
 M.EVENT_TYPE_SAVE_CHAR         = 1
 M.EVENT_TYPE_PICKPOCKET        = 2
 M.EVENT_TYPE_ATTACK            = 3
@@ -21,9 +24,7 @@ M.EVENT_TYPE_USE_ITEM          = 4
 M.EVENT_TYPE_QUICKCHAT         = 5
 M.EVENT_TYPE_EXAMINE           = 6
 M.EVENT_TYPE_USE_SKILL         = 7
-M.EVENT_TYPE_USE_FEAT          = 8
--- The toggle mode event is not exposed.  This already handled in the Solstice mode code.
-local EVENT_TYPE_TOGGLE_MODE       = 9
+
 M.EVENT_TYPE_CAST_SPELL        = 10
 M.EVENT_TYPE_TOGGLE_PAUSE      = 11
 M.EVENT_TYPE_POSSESS_FAMILIAR  = 12

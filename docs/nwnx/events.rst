@@ -9,8 +9,6 @@ nwnx.events
 Constants
 ---------
 
-.. data:: EVENT_TYPE_ALL
-
 .. data:: EVENT_TYPE_SAVE_CHAR
 
 .. data:: EVENT_TYPE_PICKPOCKET
@@ -25,10 +23,6 @@ Constants
 
 .. data:: EVENT_TYPE_USE_SKILL
 
-.. data:: EVENT_TYPE_USE_FEAT
-
-.. data:: EVENT_TYPE_TOGGLE_MODE
-
 .. data:: EVENT_TYPE_CAST_SPELL
 
 .. data:: EVENT_TYPE_TOGGLE_PAUSE
@@ -37,13 +31,11 @@ Constants
 
 .. data:: EVENT_TYPE_DESTROY_OBJECT
 
-
 .. data:: NODE_TYPE_STARTING_NODE
 
 .. data:: NODE_TYPE_ENTRY_NODE
 
 .. data:: NODE_TYPE_REPLY_NODE
-
 
 .. data:: LANGUAGE_ENGLISH
 
