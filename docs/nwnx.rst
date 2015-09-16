@@ -10,6 +10,7 @@ are currently implemented.
   :maxdepth: 2
 
   nwnx/chat
+  nwnx/core
   nwnx/events
   nwnx/database
   nwnx/dmactions
