@@ -13,7 +13,7 @@ ctypes
 
 .. warning::
 
-  The following ctypes **must** be syncronized with nwnx_solstice.  If not bad, bad things will happen.
+  The following ctypes **must** be syncronized with nwnx_solstice.  If not bad, bad things will happen.  Good news is it's unlikely that will every be necessary.
 
 .. c:type:: DamageResult
 
@@ -61,19 +61,11 @@ ctypes
 
   .. c:member:: CNWSCreature* attacker_nwn
 
-    Internal attacker object.
+    Internal attacker object, unused in Lua.
 
   .. c:member:: CNWSObject* target_nwn
 
-    Internal target object.
-
-  .. c:member:: CombatInfo attacker_ci
-
-    Attacker CombatInfo ctype. nwnx_solstice does not use this field, so it's a `void *` there.
-
-  .. c:member:: CombatInfo target_ci
-
-    Target CombatInfo ctype. nwnx_solstice does not use this field, so it's a `void *` there.
+    Internal target object, unused in Lua.
 
   .. c:member:: CNWSCombatAttackData* attack
 

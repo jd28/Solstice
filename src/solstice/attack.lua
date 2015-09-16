@@ -36,8 +36,6 @@ typedef struct {
     CNWSCreature         *attacker_nwn;
     CNWSObject           *target_nwn;
 
-    CombatInfo           *attacker_ci;
-    CombatInfo           *target_ci;
     CNWSCombatAttackData *attack;
     int32_t               weapon;
     int32_t               ranged_type;
