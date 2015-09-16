@@ -134,50 +134,6 @@ require 'solstice.nwn.ctypes.waypoint'
 -- @field ability_eff [ABILITY_NUM] Ability bonuses from effects.
 -- @field update_flags OBSOLETE
 
---- Synched Structs
--- @section synched
-
---- Constructor damage_result_t
--- This struct is used by the combat engine to when determining a damage
--- roll.  The length of the arrays is determined by the global DAMAGE_INDEX_NUM
--- constant.  NOTE: This struct MUST be synced with nwnx_solstice.
--- @table DamageResult
--- @field damages [DAMAGE_INDEX_NUM] damages.
--- @field damages_unblocked [DAMAGE_INDEX_NUM] unblockable damages.
--- @field immunity [DAMAGE_INDEX_NUM] damage immunity adjustments.
--- @field resist [DAMAGE_INDEX_NUM] damage resistance adjustments.
--- @field resist_remaining [DAMAGE_INDEX_NUM] damage resistance remaining.
--- This is to provide feedback for DamageResistance effects with limits.
--- @field reduction Damage reduction adjustment.
--- @field reduction_remaining Damage reduction remaining.
--- This is to provide feedback for DamageReduction effects with limits.
--- @field parry Parry adjustment for servers using the Critical Hit Parry
--- reduction designed by Higher Ground.
-
---- Information for an attack.
--- NOTE: This struct MUST be synced with nwnx_solstice.
--- @table Attack
--- @field attacker_nwn Internal attacker object.
--- @field target_nwn Internal target object.
--- @field attacker_ci Attacker CombatInfo ctype.  nwnx_solstice does
--- not use this field, so it's a `void *` there.
--- @field target_ci Target CombatInfo ctype.  nwnx_solstice does
--- not use this field, so it's a `void *` there.
--- @field attack Internal NWN attack data.
--- @field weapon EQUIP_TYPE_* of current weapon.
--- @field ranged_type RANGED_TYPE_*
--- @field target_state Target state bitmask.
--- @field situational_flags Situational bitmask.
--- @field target_distance Distance to target.
--- @field is_offhand Is offhand attack.
--- @field is_sneak Is sneak attack.
--- @field is_death Is death attack.
--- @field is_killing Is killing blow.
--- @field damage_total Total damage done.
--- @field dmg_result DamageResult ctype.
--- @field effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
--- @field effects_to_remove_len;
-
 ffi.cdef(interp([[
 typedef struct {
    int32_t      dice;
@@ -190,15 +146,6 @@ typedef struct {
     DiceRoll roll;
     int32_t  mask;
 } DamageRoll;
-
-typedef struct {
-    int32_t    damages[${DAMAGE_INDEX_NUM}];
-    int32_t    damages_unblocked[${DAMAGE_INDEX_NUM}];
-    int32_t    immunity[${DAMAGE_INDEX_NUM}];
-    int32_t    resist[${DAMAGE_INDEX_NUM}];
-    int32_t    resist_remaining[${DAMAGE_INDEX_NUM}];
-    int32_t    reduction, reduction_remaining, parry;
-} DamageResult;
 
 typedef struct {
    int32_t      save;
@@ -300,30 +247,6 @@ typedef struct Itemprop {
 } Itemprop;
 
 typedef struct {
-    CNWSCreature         *attacker_nwn;
-    CNWSObject           *target_nwn;
-
-    CombatInfo           *attacker_ci;
-    CombatInfo           *target_ci;
-    CNWSCombatAttackData *attack;
-    int32_t               weapon;
-    int32_t               ranged_type;
-    int32_t               target_state;
-    int32_t               situational_flags;
-    double                target_distance;
-    bool                  is_offhand;
-    bool                  is_sneak;
-    bool                  is_death;
-    bool                  is_killing;
-
-    int32_t               damage_total;
-    DamageResult          dmg_result;
-
-    int32_t               effects_to_remove[${DAMAGE_INDEX_NUM} + 1];
-    int32_t               effects_to_remove_len;
-} Attack;
-
-typedef struct {
     CNWSObject *obj;
     CGameEffect *eff;
     bool is_remove;
@@ -336,7 +259,6 @@ require 'solstice.nwn.funcs'
 
 combat_info_t = ffi.typeof('CombatInfo')
 combat_mod_t = ffi.typeof('CombatMod')
-damage_result_t = ffi.typeof('DamageResult')
 dice_roll_t = ffi.typeof('DiceRoll')
 damage_roll_t = ffi.typeof('DamageRoll')
 spell_duration_impact_t = ffi.typeof('SpellDurationImpact')

@@ -50,6 +50,7 @@ end
 -- @section types
 
 require 'solstice.ctypes'
+require 'solstice.attack'
 
 -- Global modules
 System   = require 'solstice.system'

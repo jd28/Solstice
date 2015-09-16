@@ -4,8 +4,6 @@
 
 local ffi = require 'ffi'
 local C   = ffi.C
-local NWE = require 'solstice.nwn.engine'
-local GetObjectByID = Game.GetObjectByID
 
 local M = require 'solstice.effect.init'
 require 'solstice.effect.creation'
@@ -54,7 +52,7 @@ end
 
 --- Returns effect's creator.
 function Effect:GetCreator()
-    return GetObjectByID(self.eff.eff_creator)
+    return Game.GetObjectByID(self.eff.eff_creator)
 end
 
 --- Gets the duration of an effect.
@@ -115,7 +113,7 @@ function Effect:GetObject(index)
    if index < 0 or index > 3 then
       error "Effect:GetObject must be between 0 and 3"
    end
-   return GetObjectByID(self.eff.eff_objects[index])
+   return Game.GetObjectByID(self.eff.eff_objects[index])
 end
 
 --- Gets Spell Id associated with effect

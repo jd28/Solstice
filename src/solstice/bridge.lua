@@ -60,9 +60,10 @@ function __UpdateCombatInfo(attacker)
    end
 end
 
-local result = damage_result_t()
+local result
 
 function __DoDamageImmunity(obj, vs, amount, flags, no_feedback)
+  if not result then result = damage_result_t() end
    _SOL_LOG_INTERNAL:debug("__DoDamageImmunity")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
@@ -96,6 +97,7 @@ function __DoDamageImmunity(obj, vs, amount, flags, no_feedback)
 end
 
 function __DoDamageResistance(obj, vs, amount, flags, no_feedback)
+  if not result then result = damage_result_t() end
    _SOL_LOG_INTERNAL:debug("__DoDamageResistance")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)
@@ -150,8 +152,8 @@ function __DoDamageResistance(obj, vs, amount, flags, no_feedback)
    return amt
 end
 
-function __DoDamageReduction(obj, vs, amount, power,
-                                        no_feedback)
+function __DoDamageReduction(obj, vs, amount, power, no_feedback)
+  if not result then result = damage_result_t() end
    _SOL_LOG_INTERNAL:debug("__DoDamageReduction")
    ffi.fill(result, ffi.sizeof('DamageResult'))
    local cre = Game.GetObjectByID(obj)

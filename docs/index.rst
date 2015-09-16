@@ -110,6 +110,7 @@ This has a some side effects:
   :caption: Modules
   :maxdepth: 3
 
+  attack
   color
   dice
   effect
