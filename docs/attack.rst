@@ -149,7 +149,7 @@ Functions
   :param info: Attack info.
   :type info: :c:type:`Attack`
   :param attacker: :class:`Creature`
-  :param : :class:`Effect`
+  :param eff: :class:`Effect`
 
 .. function:: AddVFX(info, attacker, vfx)
 
