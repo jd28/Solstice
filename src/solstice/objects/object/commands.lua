@@ -24,19 +24,15 @@ end
 -- @param action A closure
 function Object:DelayCommand(delay, action)
    local delay = delay or 0
-   local count = table.maxn(_COMMANDS) + 1
-   _COMMANDS[count] = { f = action, id = self.id }
-
-   C.ns_DelayCommand(self.id, delay, count)
+   local token = _SOL_ADD_COMMAND(self.id, action)
+   C.ns_DelayCommand(self.id, delay, token)
 end
 
 --- Inserts action into acction queue
 -- @param action A closure
 function Object:DoCommand(action)
-   local count = table.maxn(_COMMANDS) + 1
-   _COMMANDS[count] = { f = action, id = self.id }
-
-   C.ns_ActionDoCommand(self.obj.obj, count)
+   local token = _SOL_ADD_COMMAND(self.id, action)
+   C.ns_ActionDoCommand(self.obj.obj, token)
 end
 
 --- Get is object commandable

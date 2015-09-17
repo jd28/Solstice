@@ -237,48 +237,30 @@ end
 
 -- Command related functions
 -- Table holding stored commands.  See DoCommand, DelayCommand, etc.
-_COMMANDS = { }
+local _COMMANDS = {}
+local _COMMANDS_COUNT = 0
 
-_COMMANDS.COMMAND_TYPE_DELAY      = 0
-_COMMANDS.COMMAND_TYPE_DO         = 1
-
--- Internal Function handling DoCommand
-local function _RUN_DO_COMMAND (token)
-   if _COMMANDS[token] ~= nil then
-      local f = _COMMANDS[token]["f"]
-      f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
-   end
-   _COMMANDS[token] = nil
+function _SOL_ADD_COMMAND(id, action)
+  local token = _COMMANDS_COUNT + 1
+  _COMMANDS[token] = { f = action, id = id }
+  _COMMANDS_COUNT = token
+  return token
 end
 
--- Internal Function handling DelayCommand
-local function _RUN_DELAY_COMMAND (token)
-   if _COMMANDS[token] ~= nil then
-      local f = _COMMANDS[token]["f"]
-      f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
+local NWNXCore = require 'solstice.nwnx.core'
+local function run_scriptsit(event)
+   event = ffi.cast("struct CoreRunScriptSituationEvent*", event)
+   local mark = ffi.string(event.marker)
+   if mark == "$solstice"
+      and _COMMANDS[event.token]
+      and _COMMANDS[event.token].f
+   then
+      _COMMANDS[event.token].f(_SOL_GET_CACHED_OBJECT(_COMMANDS[event.token].id))
+      return 1
    end
-   _COMMANDS[token] = nil
+   return 0
 end
-
--- Internal Function handling for running the various
--- command functions.  Entry point for nwnx_solstice
--- RunScriptSituation hook.
-function _RUN_COMMAND(ctype, token, objid)
-   assert(ctype)
-   assert(token)
-   assert(objid)
-
-   local res = 0
-   if ctype == _COMMANDS.COMMAND_TYPE_DELAY then
-      _RUN_DELAY_COMMAND(token)
-   elseif ctype == _COMMANDS.COMMAND_TYPE_DO then
-      _RUN_DO_COMMAND(token)
-   else
-      error(string.format("ERROR: Invalid Command Type %d", ctype))
-   end
-
-   return res
-end
+NWNXCore.HookEvent(NWNXCore.EVENT_CORE_RUNSCRIPT_SITUATION, run_scriptsit)
 
 -- Lock _G after all globals have been inserted.
 GLOBAL_lock(_G)
