@@ -16,6 +16,7 @@ local ffi = require 'ffi'
 local C = ffi.C
 local fmt = string.format
 
+require 'solstice.ctypes'
 require 'solstice.global'
 require 'solstice.bridge'
 require 'solstice.objects'

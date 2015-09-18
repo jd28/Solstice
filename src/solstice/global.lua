@@ -49,7 +49,6 @@ end
 --- Types
 -- @section types
 
-require 'solstice.ctypes'
 require 'solstice.attack'
 
 -- Global modules
