@@ -14,6 +14,21 @@ local mod
 local ffi = require 'ffi'
 local C = ffi.C
 
+local NWNX_EVENTS_EVENT = "Events/Event"
+
+ffi.cdef[[
+struct EventsEvent {
+    int type;
+    int subtype;
+    uint32_t object;
+    uint32_t target;
+    uint32_t item;
+    Vector position;
+    bool bypass;
+    int  result;
+};
+]]
+
 M.NODE_TYPE_STARTING_NODE      = 0
 M.NODE_TYPE_ENTRY_NODE         = 1
 M.NODE_TYPE_REPLY_NODE         = 2
@@ -54,22 +69,6 @@ M.CastSpell = Signal.signal()
 M.TogglePause = Signal.signal()
 M.PossessFamiliar = Signal.signal()
 M.DestroyObject = Signal.signal()
-
-local function GetEventInfo()
-   local e = C.Local_GetLastNWNXEvent()
-   if e == nil then
-      Log:error("GetEventInfo GetLastNWNXEvent is null")
-      return
-   end
-
-   return { type = e.type,
-            subtype = e.subtype,
-            object = GetObjectByID(e.object),
-            target = GetObjectByID(e.target),
-            item = GetObjectByID(e.item),
-            pos = Vec.vector_t(e.loc.x, e.loc.y, e.loc.z)
-          }
-end
 
 function M.__SetEventHandlerInternal(type, f)
   if EVENT_HANDLERS[type] then
@@ -164,34 +163,62 @@ for _, func in pairs(M) do
    end
 end
 
--- Bridge function to hand NWNXEvent events
-function __NWNXEventsHandleEvent(event)
-  if event == EVENT_TYPE_TOGGLE_MODE then
+local function GetEventInfo(e)
+   return { type = e.type,
+            subtype = e.subtype,
+            object = GetObjectByID(e.object),
+            target = GetObjectByID(e.target),
+            item = GetObjectByID(e.item),
+            pos = Vec.vector_t(e.position.x, e.position.y, e.position.z)
+          }
+end
+
+local function handle_event(event)
+  local e = ffi.cast("struct EventsEvent*", event)
+  if e == nil then
+    Log:error("GetEventInfo GetLastNWNXEvent is null")
+    return
+  end
+  if e.type == EVENT_TYPE_TOGGLE_MODE then
     M.BypassEvent()
     local e = C.Local_GetLastNWNXEvent()
-    __ToggleMode(e.object, e.type)
-    return
-  elseif event == EVENT_TYPE_SAVE_CHAR then
-    M.SaveCharacter:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_PICKPOCKET then
-    M.PickPocket:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_ATTACK then
-    M.Attack:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_QUICKCHAT then
-    M.QuickChat:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_EXAMINE then
-    M.Examine:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_CAST_SPELL then
-    M.CastSpell:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_TOGGLE_PAUSE then
-    M.TogglePause:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_POSSESS_FAMILIAR then
-    M.PossessFamiliar:notify(GetEventInfo())
-  elseif event == EVENT_TYPE_DESTROY_OBJECT then
-    M.DestroyObject:notify(GetEventInfo())
-  elseif EVENT_HANDLERS[event] then
-    EVENT_HANDLERS[event](GetEventInfo())
+    __ToggleMode(e.object, e.subtype)
+  elseif e.type == EVENT_TYPE_SAVE_CHAR then
+    M.SaveCharacter:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_PICKPOCKET then
+    M.PickPocket:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_ATTACK then
+    M.Attack:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_QUICKCHAT then
+    M.QuickChat:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_EXAMINE then
+    M.Examine:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_CAST_SPELL then
+    M.CastSpell:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_TOGGLE_PAUSE then
+    M.TogglePause:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_POSSESS_FAMILIAR then
+    M.PossessFamiliar:notify(GetEventInfo(e))
+  elseif e.type == EVENT_TYPE_DESTROY_OBJECT then
+    M.DestroyObject:notify(GetEventInfo(e))
+  elseif EVENT_HANDLERS[e.type] then
+    EVENT_HANDLERS[e.type](GetEventInfo(e))
   end
+  return e.bypass and 1 or 0
+end
+
+function __NWNXEventsHandleEvent(event)
+  local ok, ret = pcall(handle_event, event)
+  if not ok then
+    local Log = System.GetLogger()
+    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
+    return 0
+  end
+  return ret
+end
+local NWNXCore = require 'solstice.nwnx.core'
+if not NWNXCore.HookEvent(NWNX_EVENTS_EVENT, __NWNXEventsHandleEvent) then
+   print(NWNX_EVENTS_EVENT)
 end
 
 return M

@@ -258,13 +258,6 @@ void ns_PostPolymorph(CNWSCreature *cre, int32_t ignore_pos, bool is_apply);
 
 uint32_t ns_GetAmmunitionAvailable(CNWSCreature *attacker, int32_t num_attacks, int32_t ranged_type, bool equip);
 
-ChatMessageEvent *Local_GetLastChatMessage();
-ChatCCMessageEvent *Local_GetLastCombatMessage();
-EffectsCustomEvent *Local_GetLastEffectApplyEvent();
-EffectsCustomEvent *Local_GetLastEffectRemoveEvent();
-ItemsInfoEvent   *Local_GetLastItemEvent();
-EffectsItempropEvent *Local_GetLastItemPropEvent();
-Event            *Local_GetLastNWNXEvent();
 void              Local_NWNXLog(int level, const char* log);
 void              Local_SetDamageInfo(int32_t index, const char* name, const char* color);
 void              Local_SetCombatEngineActive(bool active);

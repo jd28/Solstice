@@ -20,6 +20,17 @@ local ffi = require 'ffi'
 local C = ffi.C
 local GetObjectByID = Game.GetObjectByID
 
+local EVENT_ITEMS_INFO = "Items/Info"
+ffi.cdef[[
+typedef struct {
+    int       type;
+    uint32_t  object;
+    uint32_t  item;
+    bool      use_result;
+    uint32_t  result;
+} ItemsInfoEvent;
+]]
+
 local M = {}
 local EVENT_HANDLERS = {}
 
@@ -101,24 +112,37 @@ function M.SetResult(result)
    current_event.result = result and 1 or 0
 end
 
-function __NWNXItemsHandleItemEvent()
-   local ev = C.Local_GetLastItemEvent()
-   if ev == nil then
-      error("NWNXItems : Local_GetLastItemEvent is nil!")
-      return false
-   end
+local function handle_item_event(ev)
+  ev = ffi.cast("ItemsInfoEvent*", ev)
+  if ev == nil then
+     return false
+  end
 
-   local f = EVENT_HANDLERS[ev.type] or EVENT_HANDLERS[M.EVENT_ALL]
-   if not f then return false end
+  local f = EVENT_HANDLERS[ev.type] or EVENT_HANDLERS[M.EVENT_ALL]
+  if not f then return false end
 
-   current_event = ev
-   local cre  = GetObjectByID(ev.object)
-   local item = GetObjectByID(ev.item)
+  current_event = ev
+  local cre  = GetObjectByID(ev.object)
+  local item = GetObjectByID(ev.item)
 
-   f(item, cre, ev.type)
+  f(item, cre, ev.type)
 
-   current_event = nil
-   return true
+  current_event = nil
+  return true
+end
+
+function __NWNXItemsHandleItemEvent(event)
+    local ok, ret = pcall(handle_item_event, event)
+  if not ok then
+    local Log = System.GetLogger()
+    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
+    return false
+  end
+  return ret
+end
+local NWNXCore = require 'solstice.nwnx.core'
+if not NWNXCore.HookEvent(EVENT_ITEMS_INFO, __NWNXItemsHandleItemEvent) then
+   print(EVENT_ITEMS_INFO)
 end
 
 return M
