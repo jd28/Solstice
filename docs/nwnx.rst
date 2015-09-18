@@ -12,7 +12,6 @@ are currently implemented.
   nwnx/chat
   nwnx/core
   nwnx/events
-  nwnx/database
   nwnx/dmactions
   nwnx/effects
   nwnx/events
