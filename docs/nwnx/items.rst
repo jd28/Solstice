@@ -13,13 +13,6 @@ nwnx_items allows orrividing some aspects of items:
 - The items minimum level required to equip. Note: this requires using the ILR setting on
   your server.
 
-It also allows you to override or create new itemproperty add/
-remove events.  E,g. if you added an item property to grant spell
-DC increase, you could use this to directly modify some local int
-that your spell system uses to calculate DC.  The alternative to
-this is looping through all item properties when the item is
-(un)equipped.
-
 Constants
 ---------
 
@@ -61,8 +54,6 @@ Functions
 ---------
 
 .. function:: RegisterItemEventHandler(ev_type, f)
-
-.. function:: RegisterItempropHandler(f, ...)
 
 .. function:: GetDefaultILR(item)
 

@@ -22,7 +22,6 @@ local GetObjectByID = Game.GetObjectByID
 
 local M = {}
 local EVENT_HANDLERS = {}
-local IP_HANDLERS = {}
 
 --- Constants
 -- @section constants
@@ -74,21 +73,6 @@ function M.RegisterItemEventHandler(ev_type, f)
    end
 
    EVENT_HANDLERS[ev_type] = f
-end
-
---- Register an item propert handler.
--- @param f A function taking up to four parameters: An item, the object
--- equipping the item, the item property, the slot the item is being
--- equipped to, and a boolean indicating whether the item property is being removed.
--- The item property is a C struct `CNWItemProperty` as
--- defined in solstice/nwn/ctypes/itemprop.lua, it is not an ItemProp
--- class instance.
--- @param ... An item property constant.
-function M.RegisterItempropHandler(f, ...)
-   local t = table.pack(...)
-   for i=1, t.n do
-      IP_HANDLERS[t[i]] = f
-   end
 end
 
 --- Gets the default ILR for an item.
