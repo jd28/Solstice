@@ -214,8 +214,4 @@ Time
 TLK
 ---
 
-.. function:: GetTlkSoundDuration(strref)
-
-.. function:: GetTlkSoundLength(strref)
-
-.. function:: GetTlkString(strref, female)
+.. function:: GetTlkString(strref)

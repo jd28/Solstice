@@ -233,6 +233,11 @@ void      nwn_StackPushObject(uint32_t value);
 void      nwn_StackPushEngineStructure(uint32_t type, void * value);
 ]]
 
+-- tlk.h
+ffi.cdef[[
+char *nwn_GetStringByStrref(uint32_t strref);
+]]
+
 -- waypoint.h
 ffi.cdef [[
 CNWSWaypoint *nwn_GetWaypointByID(uint32_t id);
