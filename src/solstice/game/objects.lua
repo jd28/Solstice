@@ -74,7 +74,7 @@ function M.ClearCache(obj)
    obj.load_char_finished = 0
    if OPT.TA then
       obj:SetLocalInt("gsp_mod_dc", 0)
-      M.DeleteProperty(obj, "TA_MOVE_SPEED")
+      obj.ta_move_speed = 0
    end
 end
 
@@ -83,7 +83,6 @@ end
 function M.RemoveObject(obj)
    _SOL_REMOVE_CACHED_OBJECT(obj.id)
    if obj:GetType() == OBJECT_TYPE_CREATURE and not obj:GetIsPC() then
-      M.DeleteAllProperties(obj.id)
    end
 end
 

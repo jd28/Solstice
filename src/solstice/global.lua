@@ -166,12 +166,9 @@ function _SOL_GET_CACHED_OBJECT(id)
       if object.id == id then
          object.load_char_finished = true
       end
-      local ci = Game.GetProperty(id, "SOL_COMBAT_INFO")
-      if not ci then
-         ci = combat_info_t()
-         Game.SetProperty(id, "SOL_COMBAT_INFO", ci)
+      if not object.ci then
+         object.ci = combat_info_t()
       end
-      object.ci = ci
       assert(object.ci ~= nil, "CombatInfo cannot be nil...")
    elseif type == OBJECT_TRUETYPE_MODULE then
       object.obj = C.nwn_GetModule()

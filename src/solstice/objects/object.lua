@@ -39,7 +39,6 @@ safe_require "solstice.objects.object.saves"
 safe_require "solstice.objects.object.spells"
 safe_require "solstice.objects.object.trap"
 safe_require "solstice.objects.object.vars"
-safe_require 'solstice.objects.object.properties'
 
 --- Class Object
 -- @section class_object
