@@ -25,7 +25,6 @@ void *nx_hook_function (void *addr, void *func, size_t len, uint32_t flags);
 -- @field type Function pointer type.
 -- @field func Function to be called by hook.
 -- @field length Length of the hook.
--- @field flags See HOOK_DIRECT and HOOK_RETCODE
 
 --- Constants
 -- @section constants
@@ -39,21 +38,54 @@ local HOOK_RETCODE = 0x2
 --- Functions
 -- @section functions
 
+local HOOKS = {
+
+}
+
+local function helper(name)
+  return function(...)
+    if HOOKS[name].func then
+      local ok, ret = pcall(HOOKS[name].func, ...)
+      if not ok then
+        local Log = System.GetLogger()
+        Log:error("Error calling hook '%s': %s", name, ret)
+      else
+        return ret
+      end
+    end
+    -- If we get here something bad happened, return the original function.
+    return HOOKS[name].orig(...)
+  end
+end
+
 --- Hooks a function.
 -- @param info HookDesc table
 -- @see HookDesc
 local function hook(info)
-   jit.off(info.func)
-   local res = ffi.C.nx_hook_function(ffi.cast('void*', info.address),
-                                      ffi.cast(info.type, info.func),
-                                      info.length,
-                                      info.flags)
-   return ffi.cast(info.type, res)
+  if not info.name and type(info.name) ~= 'string' then
+    error("A hook name must be specified!", 2)
+  end
+
+  if HOOKS[info.name] then
+    local Log = System.GetLogger()
+    jit.off(info.func)
+    HOOKS[info.name].func = info.func
+    Log:notice("Overriding hook '%s'", info.name)
+  else
+    local func = helper(info.name)
+    local res = ffi.C.nx_hook_function(ffi.cast('void*', info.address),
+                                       ffi.cast(info.type, func),
+                                       info.length,
+                                       bit.bor(HOOK_DIRECT, HOOK_RETCODE))
+    HOOKS[info.name] = {
+      orig = ffi.cast(info.type, res),
+      func = info.func
+    }
+  end
+  return HOOKS[info.name].orig
 end
 
 local M = {
-   HOOK_DIRECT = HOOK_DIRECT,
-   HOOK_RETCODE = HOOK_RETCODE,
    hook = hook
 }
 

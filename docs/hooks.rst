@@ -5,13 +5,12 @@ Hook
 ====
 
 .. danger::
+
   Please note this is very advanced module.  Using it incorrectly will result in segfaults.  This is a very thin wrapper around the Acaos' NWNX `nx_hook_function` any documentation can probably (not) be found in the NWNX repository.
 
-It allows you to hook nwserver functions and replace them with Lua functions directly.
-Note that the lua function and the original function returned by `hook` must be castable
-to the function pointer type passed in `HookDesc.type`, which means that the types
-of the parameters must be defined.  Currently not all types are defined, see
-src/solstice/nwn/ctypes for those that are.
+It allows you to hook nwserver functions and replace them with Lua functions directly. Note that the lua function and the original function returned by `hook` must be castable to the function pointer type passed in `HookDesc.type`, which means that the types of the parameters must be defined.  Currently not all types are defined, see src/solstice/nwn/ctypes for those that are.
+
+Internally your hook is wrapped in an anonymous function which uses ``pcall``.  If for whatever reason your hook fails, the original function will be called.  This will mitigate most segfaults and also allows hook script files to be reloaded without requiring a server reboot.
 
 Examples
 --------
@@ -48,7 +47,6 @@ Examples
      address = 0x08132298,
      func = Hook_GetTotalEffectBonus,
      type = "int (*)(CNWSCreature *, uint8_t, CNWSObject *, int32_t, int32_t, uint8_t, uint8_t, uint8_t, uint8_t, int32_t)",
-     flags = bit.bor(Hook.HOOK_DIRECT, Hook.HOOK_RETCODE),
      length = 5
   }
 
@@ -62,6 +60,8 @@ Tables
 
   **Fields:**
 
+  name : ``string``
+    Name of hook.
   address : ``int``
     Address of function to hook
   type : ``string``
@@ -70,19 +70,6 @@ Tables
     Function to be called by hook.
   length : ``int``
     Length of the hook.
-  flags : ``int``
-    See :data:`HOOK_DIRECT` and :data:`HOOK_RETCODE`
-
-Constants
----------
-
-.. data:: HOOK_DIRECT
-
-  See NWNX docs.
-
-.. data:: HOOK_RETCODE
-
-  See NWNX docs.
 
 Functions
 ---------
