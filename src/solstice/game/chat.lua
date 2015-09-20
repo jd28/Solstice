@@ -7,7 +7,17 @@ local C = ffi.C
 local CHAT_HANDLER
 local CC_HANDLER
 
-local M = {}
+local M = require 'solstice.game.init'
+
+--- TODO
+function M.SetChatHandler(func)
+   CHAT_HANDLER = func
+end
+
+--- TODO
+function M.SetCombatMessageHandler(func)
+   CC_HANDLER = func
+end
 
 local EVENT_CHAT_MESSAGE = "Chat/Message";
 local EVENT_CHAT_CCMESSAGE = "Chat/CCMessage";
@@ -54,17 +64,7 @@ typedef struct {
 ChatCCMessageEvent;
 ]]
 
---- TODO
-function M.SetChatHandler(func)
-   CHAT_HANDLER = func
-end
-
---- TODO
-function M.SetCombatMessageHandler(func)
-   CC_HANDLER = func
-end
-
-function __HandleChatMessage(event)
+local function HandleChatMessage(event)
    if not CHAT_HANDLER then return 0 end
 
    local msg = ffi.cast("ChatMessageEvent*", event)
@@ -81,14 +81,14 @@ function __HandleChatMessage(event)
    end
 
    msg.suppress = CHAT_HANDLER(msg.channel,
-			       Game.GetObjectByID(msg.from),
-			       ffi.string(msg.msg),
-			       to)
+                Game.GetObjectByID(msg.from),
+                ffi.string(msg.msg),
+                to)
 
    return msg.suppress and 1 or 0
 end
 
-function __HandleCombatMessage(event)
+local function HandleCombatMessage(event)
    if not CC_HANDLER then return 0 end
 
    local msg = ffi.cast("ChatCCMessageEvent*", event)
@@ -101,6 +101,27 @@ function __HandleCombatMessage(event)
    return msg.suppress and 1 or 0
 end
 
+local function __HandleChatMessage(event)
+   local ok, ret = pcall(HandleChatMessage, event)
+   if not ok then
+      local Log = System.GetLogger()
+      Log:error("HandleChatMessage: %s", ret)
+      return 0
+   end
+   return ret
+end
+
+local function __HandleCombatMessage(event)
+   local ok, ret = pcall(HandleCombatMessage, event)
+   if not ok then
+      local Log = System.GetLogger()
+      Log:error("HandleCombatMessage: %s", ret)
+      return 0
+   end
+   return ret
+end
+
+
 local Log = System.GetLogger()
 local NWNXCore = require 'solstice.nwnx.core'
 if not NWNXCore.HookEvent(EVENT_CHAT_MESSAGE, __HandleChatMessage) then
@@ -110,4 +131,3 @@ if not NWNXCore.HookEvent(EVENT_CHAT_CCMESSAGE, __HandleCombatMessage) then
   Log:error("Unable to hook EVENT_CHAT_CCMESSAGE!")
 end
 
-return M

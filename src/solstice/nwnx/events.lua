@@ -29,21 +29,6 @@ struct EventsEvent {
 };
 ]]
 
-M.NODE_TYPE_STARTING_NODE      = 0
-M.NODE_TYPE_ENTRY_NODE         = 1
-M.NODE_TYPE_REPLY_NODE         = 2
-
-M.LANGUAGE_ENGLISH             = 0
-M.LANGUAGE_FRENCH              = 1
-M.LANGUAGE_GERMAN              = 2
-M.LANGUAGE_ITALIAN             = 3
-M.LANGUAGE_SPANISH             = 4
-M.LANGUAGE_POLISH              = 5
-M.LANGUAGE_KOREAN              = 128
-M.LANGUAGE_CHINESE_TRADITIONAL = 129
-M.LANGUAGE_CHINESE_SIMPLIFIED  = 130
-M.LANGUAGE_JAPANESE            = 131
-
 -- Unexposed events.  Solstice will provide an interface for them.
 local EVENT_TYPE_USE_FEAT          = 8
 local EVENT_TYPE_TOGGLE_MODE       = 9
@@ -88,71 +73,6 @@ end
 function M.SetEventReturnValue(val)
    if not mod then mod = Game.GetModule() end
    mod:SetLocalString("NWNX!EVENTS!RETURN", tostring(val));
-end
-
---- Get current conversation node type.
-function M.GetCurrentNodeType()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!GET_NODE_TYPE", "      ")
-   return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_TYPE"))
-end
-
---- Get current conversation node ID.
-function M.GetCurrentNodeID()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!GET_NODE_ID", "      ")
-   return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_NODE_ID"))
-end
-
---- Get current conversation absolute node ID.
-function M.GetCurrentAbsoluteNodeID()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID", "      ")
-   return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_ABSOLUTE_NODE_ID"))
-end
-
---- Get selected conversation node ID.
-function M.GetSelectedNodeID()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID", "      ")
-   return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_ID"))
-end
-
---- Get current conversation absolute node ID.
-function M.GetSelectedAbsoluteNodeID()
-   if not mod then mod = Game.GetModule() end
-   mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID", "      ")
-   return tonumber(mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_ABSOLUTE_NODE_ID"))
-end
-
---- Get conversation selected node text.
--- @param nLangID LANGUAGE_*
--- @param nGender GENDER_*
-function M.GetSelectedNodeText(nLangID, nGender)
-   if not mod then mod = Game.GetModule() end
-   if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
-   mod:SetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT", tostring(nLangID*2 + nGender))
-   return mod:GetLocalString("NWNX!EVENTS!GET_SELECTED_NODE_TEXT")
-end
-
---- Get conversation current node text.
--- @param nLangID LANGUAGE_*
--- @param nGender GENDER_*
-function M.GetCurrentNodeText(nLangID, nGender)
-   if not mod then mod = Game.GetModule() end
-   if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
-   mod:SetLocalString("NWNX!EVENTS!GET_NODE_TEXT", tostring(nLangID*2 + nGender))
-   return mod:GetLocalString("NWNX!EVENTS!GET_NODE_TEXT")
-end
-
---- Set conversation current node text.
--- @string sText New text value.
--- @param nLangID LANGUAGE_*
--- @param nGender GENDER_*
-function M.SetCurrentNodeText(sText, nLangID, nGender)
-   if not mod then mod = Game.GetModule() end
-   if nGender ~= GENDER_FEMALE then nGender = GENDER_MALE end
-   mod:SetLocalString("NWNX!EVENTS!SET_NODE_TEXT", tostring(nLangID*2 + nGender) .. "\xAC" ..sText)
 end
 
 for _, func in pairs(M) do
