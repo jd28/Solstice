@@ -243,20 +243,12 @@ function _SOL_ADD_COMMAND(id, action)
   return token
 end
 
-local NWNXCore = require 'solstice.nwnx.core'
-local function run_scriptsit(event)
-   event = ffi.cast("struct CoreRunScriptSituationEvent*", event)
-   local mark = ffi.string(event.marker)
-   if mark == "$solstice"
-      and _COMMANDS[event.token]
-      and _COMMANDS[event.token].f
-   then
-      _COMMANDS[event.token].f(_SOL_GET_CACHED_OBJECT(_COMMANDS[event.token].id))
-      return 1
-   end
-   return 0
+function _RUN_COMMAND(token)
+  if _COMMANDS[token] and _COMMANDS[token].f then
+    _COMMANDS[token].f(_SOL_GET_CACHED_OBJECT(_COMMANDS[token].id))
+    _COMMANDS[token] = nil
+  end
 end
-NWNXCore.HookEvent(NWNXCore.EVENT_CORE_RUNSCRIPT_SITUATION, run_scriptsit)
 
 -- Lock _G after all globals have been inserted.
 GLOBAL_lock(_G)
