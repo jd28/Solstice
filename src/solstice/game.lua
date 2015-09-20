@@ -16,26 +16,31 @@ safe_require 'solstice.game.tlk'
 
 --- Get if it's day
 function M.GetIsDay()
-   NWE.ExecuteCommand(405, 0)
-   return NWE.StackPopBoolean()
+   local mod = M.GetModule()
+   if not mod:GetIsValid() then return false end
+   return mod.obj.mod_time_of_day == 1
 end
 
 --- Get if it's night
 function M.GetIsNight()
-   NWE.ExecuteCommand(406, 0)
-   return NWE.StackPopBoolean()
+   local mod = M.GetModule()
+   if not mod:GetIsValid() then return false end
+   return mod.obj.mod_time_of_day == 2
+
 end
 
 --- Get if it's dawn
 function M.GetIsDawn()
-   NWE.ExecuteCommand(407, 0)
-   return NWE.StackPopBoolean()
+   local mod = M.GetModule()
+   if not mod:GetIsValid() then return false end
+   return mod.obj.mod_time_of_day == 3
 end
 
 --- Get if it's dusk
 function M.GetIsDusk()
-   NWE.ExecuteCommand(408, 0)
-   return NWE.StackPopBoolean()
+   local mod = M.GetModule()
+   if not mod:GetIsValid() then return false end
+   return mod.obj.mod_time_of_day == 4
 end
 
 --- Set calendar
