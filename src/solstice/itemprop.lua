@@ -243,17 +243,6 @@ function M.DamageBonus(damage_type, damage)
    return eff
 end
 
---- Creates a damage range itemproperty.
--- @param damage_type DAMAGE_INDEX_*
--- @param min Minimum damage.
--- @param max Maximum damage.
-function M.DamageRange(damage_type, min, max)
-   damage_type = Rules.ConvertDamageIndexToItempropConstant(damage_type)
-   local eff = CreateItempropEffect()
-   eff:SetValues(ITEM_PROPERTY_DAMAGE_RANGE, damage_type, 33, min, 12, max)
-   return eff
-end
-
 --- Creates a damage immunity itemproperty.
 -- If you are using CEP and CEP is set to true in your global options then you can pass values 1-100,
 -- otherwise you will have to pass the item property constants.
