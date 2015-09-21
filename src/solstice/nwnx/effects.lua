@@ -9,29 +9,29 @@ local Eff = require 'solstice.effect'
 local GetObjectByID = Game.GetObjectByID
 local M = {}
 
-local EVENT_EFFECTS_CUSTOM_APPLY = "Effects/Custom/Apply"
-local EVENT_EFFECTS_CUSTOM_REMOVE = "Effects/Custom/Remove"
-local EVENT_EFFECTS_IP_APPLY = "Effects/IP/Apply"
-local EVENT_EFFECTS_IP_REMOVE = "Effects/IP/Remove"
+local EVENT_EFFECTS_CUSTOM = "Effects/Custom"
+local EVENT_EFFECTS_IP = "Effects/IP"
 
 ffi.cdef[[
-struct EffectsCustomEvent {
-   /* The object on which the effect is applied/removed. */
-   CNWSObject  *object;
-   /* The effect itself. */
-   CGameEffect *effect;
-   /* Return true here if the effect cant be applied; this deletes it. */
-   bool         failed;
-};
+typedef struct {
+    /* The object on which the effect is applied/removed. */
+    CNWSObject  *object;
+    /* The effect itself. */
+    CGameEffect *effect;
+    /* Return true here if the effect cant be applied; this deletes it. */
+    bool         failed;
+    /* 0: Apply, 1: Remove, 2: Tick */
+    int32_t      type;
+} EffectsCustomEvent;
 
-struct EffectsItempropEvent {
+typedef struct {
     CNWSCreature    *obj;
     CNWSItem        *item;
     CNWItemProperty *ip;
     uint32_t         slot;
     bool             suppress;
     bool             remove;
-};
+} EffectsItempropEvent;
 ]]
 
 
@@ -117,7 +117,7 @@ end
 
 local NWNXCore = require 'solstice.nwnx.core'
 
-local function handle_effect(event, remove)
+local function handle_effect(event)
    local ev = ffi.cast("struct EffectsCustomEvent*", event)
    if ev == nil then return 0 end
 
@@ -126,39 +126,26 @@ local function handle_effect(event, remove)
    local h = EFF_HANDLERS[ev.effect.eff_type]
    if not h then return 0 end
 
-   local del = h(Eff.effect_t(ev.effect, true), obj, remove)
+   local del = h(Eff.effect_t(ev.effect, true), obj, event.type)
    ev.failed = del and 1 or 0
 
    return 1
 end
 
-local function __NWNXEffectsHandleRemoveEvent(event)
-  local ok, ret = pcall(handle_effect, event, true)
+local function __NWNXEffectsHandleEvent(event)
+  local ok, ret = pcall(handle_effect, event)
   if not ok then
     local Log = System.GetLogger()
-    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
+    Log:error("__NWNXEffectsHandleEvent: %s", ret)
     return 0
   end
   return ret
 end
-if not NWNXCore.HookEvent(EVENT_EFFECTS_CUSTOM_REMOVE, __NWNXEffectsHandleRemoveEvent) then
-   print(EVENT_EFFECTS_CUSTOM_REMOVE)
+if not NWNXCore.HookEvent(EVENT_EFFECTS_CUSTOM, __NWNXEffectsHandleEvent) then
+   print(EVENT_EFFECTS_CUSTOM)
 end
 
-local function __NWNXEffectsHandleApplyEvent(event)
-  local ok, ret = pcall(handle_effect, event, true)
-  if not ok then
-    local Log = System.GetLogger()
-    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
-    return 0
-  end
-  return ret
-end
-if not NWNXCore.HookEvent(EVENT_EFFECTS_CUSTOM_APPLY, __NWNXEffectsHandleApplyEvent) then
-   print(EVENT_EFFECTS_CUSTOM_APPLY)
-end
-
-local function handle_itemprop(event, remove)
+local function handle_itemprop(event)
    local ev = ffi.cast("struct EffectsItempropEvent*", event)
    if ev == nil then return 0 end
 
@@ -167,35 +154,23 @@ local function handle_itemprop(event, remove)
 
    local cre  = GetObjectByID(ev.obj.obj.obj_id)
    local item = GetObjectByID(ev.item.obj.obj_id)
-   f(item, cre, ev.ip, ffi.C.ns_BitScanFFS(ev.slot), remove)
+   f(item, cre, ev.ip, ffi.C.ns_BitScanFFS(ev.slot), event.remove)
 
    return 1
 end
 
-local function __NWNXEffectsHandleItemPropEventApply(event)
-  local ok, ret = pcall(handle_itemprop, event, false)
+local function __NWNXEffectsHandleItemPropEvent(event)
+  local ok, ret = pcall(handle_itemprop, event)
   if not ok then
     local Log = System.GetLogger()
-    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
+    Log:error("__NWNXEffectsHandleItemPropEvent: %s", ret)
     return 0
   end
   return ret
 end
 
-if not NWNXCore.HookEvent(EVENT_EFFECTS_IP_APPLY, __NWNXEffectsHandleItemPropEventApply) then
-   print(EVENT_EFFECTS_IP_APPLY)
+if not NWNXCore.HookEvent(EVENT_EFFECTS_IP, __NWNXEffectsHandleItemPropEvent) then
+   print(EVENT_EFFECTS_IP)
 end
 
-local function __NWNXEffectsHandleItemPropEventRemove(event)
-  local ok, ret = pcall(handle_itemprop, event, true)
-  if not ok then
-    local Log = System.GetLogger()
-    Log:error("%s\nStack Trace: %s\n", ret, debug.traceback())
-    return 0
-  end
-  return ret
-end
-if not NWNXCore.HookEvent(EVENT_EFFECTS_IP_REMOVE, __NWNXEffectsHandleItemPropEventRemove) then
-   print(EVENT_EFFECTS_IP_REMOVE)
-end
 return M
