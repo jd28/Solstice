@@ -1,6 +1,6 @@
 local ffi = require 'ffi'
 local C = ffi.C
-local M = require 'solstice.game.init'
+local M = {}
 
 local EVENT_HANDLERS = {}
 
@@ -91,6 +91,5 @@ M.SetCanUseOverride = SetCanUseOverride
 M.SetCanEquipOverride = SetCanEquipOverride
 M.SetCanUnequipOverride = SetCanUnequipOverride
 M.SetCalculateBaseCostOverride = SetCalculateBaseCostOverride
-
 
 return M

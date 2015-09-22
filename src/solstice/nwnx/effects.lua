@@ -118,7 +118,7 @@ end
 local NWNXCore = require 'solstice.nwnx.core'
 
 local function handle_effect(event)
-   local ev = ffi.cast("struct EffectsCustomEvent*", event)
+   local ev = ffi.cast("EffectsCustomEvent*", event)
    if ev == nil then return 0 end
 
    local obj = GetObjectByID(ev.object.obj_id)
@@ -146,7 +146,7 @@ if not NWNXCore.HookEvent(EVENT_EFFECTS_CUSTOM, __NWNXEffectsHandleEvent) then
 end
 
 local function handle_itemprop(event)
-   local ev = ffi.cast("struct EffectsItempropEvent*", event)
+   local ev = ffi.cast("EffectsItempropEvent*", event)
    if ev == nil then return 0 end
 
    local f = IP_HANDLERS[ev.ip.ip_type]

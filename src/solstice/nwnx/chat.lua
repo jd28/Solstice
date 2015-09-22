@@ -7,7 +7,7 @@ local C = ffi.C
 local CHAT_HANDLER
 local CC_HANDLER
 
-local M = require 'solstice.game.init'
+local M = {}
 
 --- TODO
 function M.SetChatHandler(func)
@@ -131,3 +131,4 @@ if not NWNXCore.HookEvent(EVENT_CHAT_CCMESSAGE, __HandleCombatMessage) then
   Log:error("Unable to hook EVENT_CHAT_CCMESSAGE!")
 end
 
+return M
