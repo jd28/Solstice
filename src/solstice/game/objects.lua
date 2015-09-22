@@ -67,15 +67,8 @@ end
 -- are re-applied on enter.
 -- @param obj Creature object.
 function M.ClearCache(obj)
-   ffi.fill(obj.ci.defense.immunity, 4 * DAMAGE_INDEX_NUM)
-   ffi.fill(obj.ci.defense.immunity_misc, 4 * IMMUNITY_TYPE_NUM)
-   ffi.fill(obj.ci.ability_eff, 4 * ABILITY_NUM)
-   obj.ci.defense.hp_eff = 0
    obj.load_char_finished = 0
-   if OPT.TA then
-      obj:SetLocalInt("gsp_mod_dc", 0)
-      obj.ta_move_speed = 0
-   end
+   M.OnClearCreatureCache:notify(obj)
 end
 
 --- Remove object from Solstice object cache.

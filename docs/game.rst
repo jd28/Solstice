@@ -144,6 +144,16 @@ and optionally enforcing a particular interface.
 
   :param string name: Plugin interface name.
 
+Signals
+-------
+
+.. data:: OnPreExportCharacter
+
+.. data:: OnPostExportCharacter
+
+.. data:: OnClearCreatureCache
+
+  This signal is called when a player leaves the server.  This allows plugins to clear any data that may need to be reset when a player logs back in with same character.  E.g. if some effect application data is a stored.
 
 Scripts
 -------
