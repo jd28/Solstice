@@ -482,6 +482,11 @@ class Creature
 
   .. method:: Creature:GetTurnResistanceHD()
 
+  .. method:: Creature:GetWeaponFromAttackType(atype)
+
+    :param int atype: ATTACK_TYPE_*
+    :rtype: An item or ``OBJECT_INVALID``
+
   .. method:: Creature:GetWings()
 
   .. method:: Creature:GetWizardSpecialization()
