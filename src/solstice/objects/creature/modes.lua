@@ -41,7 +41,6 @@ function Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
    local off = mode == COMBAT_MODE_INVALID
    if change and self.obj.cre_mode_combat > 11 then
-      Rules.ResolveMode(mode, self, off)
       return
    end
 
@@ -93,11 +92,8 @@ function Creature:SetCombatMode(mode, change)
       self.obj.cre_combat_round == nil or
       self.obj.cre_combat_round.cr_round_started ~= 1
    then
-      if off or Rules.ResolveMode(mode, self, off) then
+      if off or Rules.CanUseMode(mode, self) then
          set_activity()
-      end
-      if off then
-         ffi.fill(self.ci.mod_mode, ffi.sizeof("CombatMod"))
       end
    else
       self.obj.cre_mode_desired = mode
