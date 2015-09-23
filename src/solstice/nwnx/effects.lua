@@ -52,7 +52,12 @@ function M.RegisterEffectHandler(handler, ...)
       print("Error: No effects were specified!\n" .. debug.traceback())
    end
    for i=1, types.n do
-      EFF_HANDLERS[types[i]] = handler
+      if not types[i] then
+        local Log = System.GetLogger()
+        Log:error("nil effect specified!\nStack Trace: %s", debug.traceback())
+      else
+        EFF_HANDLERS[types[i]] = handler
+      end
    end
 end
 
