@@ -6,75 +6,15 @@
 Combat Modifiers
 ----------------
 
-.. function:: GetAbilityCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetAreaCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetClassCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetFavoredEnemyCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetFeatCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetRaceCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetSizeCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetSkillCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: GetTrainingVsCombatModifier(cre)
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: ResolveCombatModifier(type, cre)
-
-  Resolves combat modifier.
-
-  :param int type: COMBAT_MOD\_*
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: ResolveCombatModifiers(cre)
-
-  Resolves all combat modifiers
-
-  :param cre: Creture instance.
-  :type cre: :class:`Creature`
-
-.. function:: SetCombatModifierOverride(type, func)
-
-  Sets combat modifier override.
+.. function:: GetCombatModifier(type, modifier, cre)
 
   :param int type: COMBAT_MOD_*
-  :param function func: (:class:`Creature`) -> ``nil``
-
-.. function:: ZeroCombatModifier(cre, mod)
-
-  :param cre: Creture instance.
+  :param int modifier: ATTACK_MODIFIER_*
+  :param cre: Creature.
   :type cre: :class:`Creature`
-  :param int mod: COMBAT_MOD_*
+
+
+.. function:: RegisterComabtModifier(type, func)
+
+  :param int type: COMBAT_MOD_*
+  :param function func: A function taking two parameters: an ATTACK_MODIFIER_* constant and a :class:`Creature` instance.
