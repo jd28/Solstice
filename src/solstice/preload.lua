@@ -24,8 +24,8 @@ local Eff = require 'solstice.effect'
 local GetObjectByID = require('solstice.game').GetObjectByID
 
 if OPT.JIT_DUMP then
-   local dump = require 'jit.dump'
-   dump.on(nil, "luajit.dump")
+  local dump = require 'jit.dump'
+  dump.on(nil, "luajit.dump")
 end
 
 -- Seed random number generator.
@@ -40,32 +40,34 @@ local Eff = require 'solstice.effect'
 -- not to have those HP usable this will heal the target amount for the
 -- additional hitpoints that it receives.
 NWNXEffects.RegisterEffectHandler(
-   function (eff, target, is_remove)
-      local amount = eff:GetInt(0)
-      if not is_remove then
-         if target:GetIsDead() then return true end
-         target.ci.defense.hp_eff = target.ci.defense.hp_eff + amount
-         target:ApplyEffect(DURATION_TYPE_INSTANT, Eff.Heal(amount))
-      else
-         target.ci.defense.hp_eff = target.ci.defense.hp_eff - amount
-      end
-   end,
-   CUSTOM_EFFECT_TYPE_HITPOINTS)
+  function (eff, target, is_remove)
+    local amount = eff:GetInt(0)
+    local res = 0
+    if not is_remove then
+      if target:GetIsDead() then return true end
+      res = (target.sol_hp_eff or 0) + amount
+      target:ApplyEffect(DURATION_TYPE_INSTANT, Eff.Heal(amount))
+    else
+      res = (target.sol_hp_eff or 0) - amount
+    end
+   target.sol_hp_eff = res
+  end,
+  CUSTOM_EFFECT_TYPE_HITPOINTS)
 
 NWNXEffects.RegisterEffectHandler(
-   function (effect, target, is_remove)
-      local immunity = effect:GetInt(0)
-      local amount   = effect:GetInt(1)
-      local new      = target.ci.defense.immunity_misc[immunity]
+  function (effect, target, is_remove)
+    local immunity = effect:GetInt(0)
+    local amount = effect:GetInt(1)
+    local new = target.sol_immunity_misc[immunity]
 
-      if not is_remove then
-         if target:GetIsDead() then return true end
-         new = new - amount
-      else
-         new = new + amount
-      end
+    if not is_remove then
+      if target:GetIsDead() then return true end
+      new = new - amount
+    else
+      new = new + amount
+    end
 
-      target.ci.defense.immunity_misc[immunity] = new
-      return false
-   end,
-   CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)
+    target.sol_immunity_misc[immunity] = new
+    return false
+  end,
+  CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)
