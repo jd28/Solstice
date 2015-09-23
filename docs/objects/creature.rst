@@ -200,8 +200,6 @@ class Creature
 
   .. method:: Creature:GetAssociateType()
 
-  .. method:: Creature:GetAttackBonusVs(target, equip)
-
   .. method:: Creature:GetAttackTarget()
 
   .. method:: Creature:GetAttemptedAttackTarget()
@@ -209,8 +207,6 @@ class Creature
   .. method:: Creature:GetAttemptedSpellTarget()
 
   .. method:: Creature:GetBICFileName()
-
-  .. method:: Creature:GetBaseAttackBonus()
 
   .. method:: Creature:GetBodyPart(part)
 
@@ -433,8 +429,6 @@ class Creature
   .. method:: Creature:GetPositionByClass(class)
 
   .. method:: Creature:GetRacialType()
-
-  .. method:: Creature:GetRangedAttackMod(target, distance)
 
   .. method:: Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
 

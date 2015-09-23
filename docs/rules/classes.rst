@@ -14,14 +14,6 @@ Classes
   :type cre: :class:`Creature`
   :param int class: CLASS_TYPE_*
 
-.. function:: GetBaseAttackBonus(cre, [pre_epic=false])
-
-  Get base attack bonus.
-
-  :param cre: Creature instance.
-  :type cre: :class:`Creature`
-  :param boolean pre_epic: If ``true`` only calculate pre-epic BAB.
-
 .. function:: GetClassName(class)
 
   Get class name.
