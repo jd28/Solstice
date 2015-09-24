@@ -43,11 +43,11 @@ function Creature:GetACVersus(vs, touch, is_ranged, attack, state)
       ac = ac + self.obj.cre_stats.cs_ac_shield_base
    end
 
-   ac = ac + self.ci.mod_mode.ac
+   ac = ac + Rules.GetModeModifier(self.obj.cre_combat_mode, ATTACK_MODIFIER_AC, cre)
 
    -- Area, class, feat, race, size bonuses.
    for i=0, COMBAT_MOD_SKILL - 1 do
-      ac = ac + self.ci.mods[i].ac
+      ac = ac + Rules.GetCombatModifier(i, ATTACK_MODIFIER_AC, self)
    end
 
    if not attack then
@@ -58,7 +58,7 @@ function Creature:GetACVersus(vs, touch, is_ranged, attack, state)
       dodge = self.obj.cre_stats.cs_ac_dodge_bonus - self.obj.cre_stats.cs_ac_dodge_penalty
 
       -- Skill: Tumble...
-      ac = ac + self.ci.mods[COMBAT_MOD_SKILL].ac
+      ac = ac + Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, self)
 
       -- Dex Mod.
       local val = self:GetDexMod(not self:GetIsPolymorphed())
@@ -85,7 +85,7 @@ function Creature:GetACVersus(vs, touch, is_ranged, attack, state)
             dodge = self.obj.cre_stats.cs_ac_dodge_bonus - self.obj.cre_stats.cs_ac_dodge_penalty
 
             -- Skill: Tumble...
-            ac = ac + self.ci.mods[COMBAT_MOD_SKILL].ac
+            ac = ac + Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, self)
 
             -- If this is an attack of opportunity and target has mobility
             -- there is a +4 ac bonus. TODO: Fix

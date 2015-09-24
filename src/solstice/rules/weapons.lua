@@ -847,7 +847,7 @@ local function InitializeNumberOfAttacks(cre)
    local rh  = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
    local rbi = rh:GetIsValid() and rh:GetBaseType() or -1
 
-   local on, off = cre.ci.offense.attacks_on, cre.ci.offense.attacks_off
+   local on, off = GetOnhandAttacks(cre), GetOffhandAttacks(cre)
 
    if (rbi == BASE_ITEM_HEAVYCROSSBOW or
        rbi == BASE_ITEM_LIGHTCROSSBOW) and

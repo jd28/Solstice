@@ -52,7 +52,7 @@ end
 -- Note: This name was chosen to match other
 -- on creature objects, that have Hardness.
 function Creature:GetHardness()
-  return self.ci.defense.soak
+  return Rules.GetBaseDamageReduction(self)
 end
 
 --- Adds parry attack.
