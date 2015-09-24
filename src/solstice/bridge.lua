@@ -320,41 +320,41 @@ end
 function __GetCriticalHitMultiplier(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
-   local equip = EQUIP_TYPE_UNARMED
+   local equip = attacker:GetItemInSlot(INVENTORY_SLOT_ARMS)
    local it
    if is_offhand then
       it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
       if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
          return 0
       end
-      equip = EQUIP_TYPE_OFFHAND
+      equip = it
    else
       it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
       if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
-         equip = EQUIP_TYPE_ONHAND
+         equip = it
       end
    end
-   return attacker.ci.equips[equip].crit_mult
+   return Rules.GetWeaponCritMultiplier(attacker, equip)
 end
 
 function __GetCriticalHitRoll(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
-   local equip = EQUIP_TYPE_UNARMED
+   local equip = attacker:GetItemInSlot(INVENTORY_SLOT_ARMS)
    local it
    if is_offhand then
       it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
       if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
          return 0
       end
-      equip = EQUIP_TYPE_OFFHAND
+      equip = it
    else
       it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
       if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
-         equip = EQUIP_TYPE_ONHAND
+         equip = it
       end
    end
-   return 21 - attacker.ci.equips[equip].crit_range
+   return 21 - Rules.GetWeaponCritRange(attacker, equip)
 end
 
 function __ResolveDamageShields(cre, attacker)
