@@ -45,12 +45,12 @@ NWNXEffects.RegisterEffectHandler(
     local res = 0
     if not is_remove then
       if target:GetIsDead() then return true end
-      res = (target.sol_hp_eff or 0) + amount
+      res = (target['SOL_HP_EFF'] or 0) + amount
       target:ApplyEffect(DURATION_TYPE_INSTANT, Eff.Heal(amount))
     else
-      res = (target.sol_hp_eff or 0) - amount
+      res = (target['SOL_HP_EFF'] or 0) - amount
     end
-   target.sol_hp_eff = res
+   target['SOL_HP_EFF'] = res
   end,
   CUSTOM_EFFECT_TYPE_HITPOINTS)
 

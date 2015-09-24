@@ -170,6 +170,8 @@ function _SOL_GET_CACHED_OBJECT(id)
          object.ci = combat_info_t()
       end
       assert(object.ci ~= nil, "CombatInfo cannot be nil...")
+      object['SOL_HP_EFF'] = object['SOL_HP_EFF'] or 0
+
    elseif type == OBJECT_TRUETYPE_MODULE then
       object.obj = C.nwn_GetModule()
    elseif type == OBJECT_TRUETYPE_AREA then
