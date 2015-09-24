@@ -26,8 +26,8 @@ function Creature:GetDamageImmunity(dmgidx)
   if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM then
     return 0
   end
-  return math.clamp(self.ci.defense.immunity[dmgidx] +
-                    self.ci.defense.immunity_base[dmgidx],
+  return math.clamp(self:GetInnateDamageImmunity(dmgidx) +
+                    self['SOL_DMG_IMMUNITY'].get(dmgidx)
                     0, 100)
 end
 

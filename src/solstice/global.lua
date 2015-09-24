@@ -6,6 +6,9 @@
 
 local tremove = table.remove
 local tinsert = table.insert
+local ffi = require 'ffi'
+local lds = require 'solstice.external.lds'
+local int32 = ffi.typeof("int32_t")
 
 --===================================================
 --=  Niklas Frykholm
@@ -166,10 +169,12 @@ function _SOL_GET_CACHED_OBJECT(id)
       if object.id == id then
          object.load_char_finished = true
       end
-      if not object.ci then
-         object.ci = combat_info_t()
+      if not object['SOL_DMG_IMMUNITY'] then
+         object['SOL_DMG_IMMUNITY'] = lds.Array(int32, DAMAGE_INDEX_NUM)
       end
-      assert(object.ci ~= nil, "CombatInfo cannot be nil...")
+      if not object['SOL_IMMUNITY_MISC'] then
+         object['SOL_IMMUNITY_MISC'] = lds.Array(int32, IMMUNITY_TYPE_NUM)
+      end
       object['SOL_HP_EFF'] = object['SOL_HP_EFF'] or 0
 
    elseif type == OBJECT_TRUETYPE_MODULE then

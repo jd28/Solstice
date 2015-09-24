@@ -56,18 +56,9 @@ NWNXEffects.RegisterEffectHandler(
 
 NWNXEffects.RegisterEffectHandler(
   function (effect, target, is_remove)
-    local immunity = effect:GetInt(0)
-    local amount = effect:GetInt(1)
-    local new = target.sol_immunity_misc[immunity]
-
-    if not is_remove then
-      if target:GetIsDead() then return true end
-      new = new - amount
-    else
-      new = new + amount
+    if not is_remove and target:GetIsDead() then
+      return true
     end
-
-    target.sol_immunity_misc[immunity] = new
     return false
   end,
   CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)

@@ -91,8 +91,7 @@ local function GetEffectImmunity(cre, imm_type, vs)
    end
 
    local innate = GetInnateImmunity(imm_type, cre)
-   return math.max(cre.ci.defense.immunity_misc[imm_type] + innate,
-                   innate)
+   return math.max(cre['SOL_IMMUNITY_MISC']:get(imm_type) + innate, innate)
 end
 
 SetInnateImmunityOverride(crits, IMMUNITY_TYPE_CRITICAL_HIT)
