@@ -66,7 +66,7 @@ Events
 Objects
 -------
 
-.. function:: ClearCache(obj)
+.. function:: ClearCacheData(obj)
 
 .. function:: CreateObject(object_type, template, loc, appear, newtag)
 
@@ -98,7 +98,7 @@ Objects
 
 .. function:: PCs()
 
-.. function:: RemoveObject(obj)
+.. function:: RemoveObjectFromCache(obj)
 
 Plugins
 -------
@@ -151,9 +151,13 @@ Signals
 
 .. data:: OnPostExportCharacter
 
-.. data:: OnClearCreatureCache
+.. data:: OnObjectClearCacheData
 
-  This signal is called when a player leaves the server.  This allows plugins to clear any data that may need to be reset when a player logs back in with same character.  E.g. if some effect application data is a stored.
+  This signal is called when an object has its data cleared from the cache.  This is typically for PCs only as they are not removed from the cache, but need some data reset for when the log in again.
+
+.. data:: OnObjectRemovedFromCache
+
+  This signal is called when an object is removed fromt the cache.  Note that PCs are never removed from the cache.
 
 Scripts
 -------

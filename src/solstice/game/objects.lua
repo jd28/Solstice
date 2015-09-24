@@ -63,19 +63,31 @@ function M.GetCanonicalID(cre)
 end
 
 --- Clear the effect cache.
--- This function must be run on client leave, since effects
--- are re-applied on enter.
--- @param obj Creature object.
-function M.ClearCache(obj)
+function M.ClearCacheData(obj)
    obj.load_char_finished = 0
-   M.OnClearCreatureCache:notify(obj)
+   if obj['SOL_IMMUNITY_MISC'] then
+      for i=0, IMMUNITY_TYPE_NUM - 1 do
+         obj['SOL_IMMUNITY_MISC']:set(i, 0)
+      end
+   end
+   if obj['SOL_DMG_IMMUNITY'] then
+      for i=0, DAMAGE_INDEX_NUM - 1 do
+         obj['SOL_DMG_IMMUNITY']:set(i, 0)
+      end
+   end
+   obj['SOL_HP_EFF'] = 0
+   M.OnObjectClearCacheData:notify(obj)
 end
 
 --- Remove object from Solstice object cache.
 -- @param obj Any object.
-function M.RemoveObject(obj)
-   _SOL_REMOVE_CACHED_OBJECT(obj.id)
-   if obj:GetType() == OBJECT_TYPE_CREATURE and not obj:GetIsPC() then
+function M.RemoveObjectFromCache(obj)
+   -- Don't remove PC's from the cahce
+   if obj:GetType() == OBJECT_TYPE_CREATURE and obj:GetIsPC() then
+      M.ClearCacheData(obj)
+   else
+      _SOL_REMOVE_CACHED_OBJECT(obj.id)
+      M.OnObjectRemovedFromCache:notify(obj)
    end
 end
 
