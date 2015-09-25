@@ -6,6 +6,14 @@
 Attack Bonus
 ============
 
+.. function:: DebugAttackBonus(cre)
+
+  Generates a string with attack bonus related information.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :rtype: ``string``
+
 .. function:: GetAttackBonusVs(cre, atype[, target])
 
   :param cre: Creature instance.

@@ -118,8 +118,6 @@ class Creature
 
   .. method:: Creature:DebugArmorClass()
 
-  .. method:: Creature:DebugAttackBonus()
-
   .. method:: Creature:DebugCombatEquips()
 
   .. method:: Creature:DebugSaves()

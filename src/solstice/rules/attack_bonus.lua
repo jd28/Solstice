@@ -197,7 +197,57 @@ local function GetRangedAttackMod(attacker, target, distance)
   return ab
 end
 
+local function DebugAttackBonus(cre)
+  local t = {}
+  local eff_ab = GetEffectAttackModifier(cre, nil, OBJECT_INVALID)
+  table.insert(t, "Attack Bonus")
+  table.insert(t, string.format("  BAB: %d", GetBaseAttackBonus(cre)))
+  local on, off = Rules.GetDualWieldPenalty(cre)
+  table.insert(t, string.format("  Dual Wield Penalty: On: %d, Off: %d", on, off))
+  table.insert(t, string.format("  Effect AB Bonus: %d", eff_ab[ATTACK_TYPE_MISC]))
+  table.insert(t, "  Combat Modifiers:")
+  for i=0, COMBAT_MOD_NUM - 1 do
+    local mod = Rules.GetCombatModifier(i, ATTACK_MODIFIER_AB, cre)
+    if mod then
+      table.insert(t, string.format("   %d: %d", i, mod))
+    end
+  end
+
+  table.insert(t, "")
+  table.insert(t, "  Weapons")
+  local fmt = sm([[   Slot: %s
+                  |   ID: %x:
+                  |   Ability AB: %d,
+                  |   AB Modifier : %d,
+                  |   Effect AB Modifier: %d]])
+
+  local function weapon(slot, name, atype)
+    local it = cre:GetItemInSlot(slot)
+    if it:GetIsValid() or slot == INVENTORY_SLOT_ARMS then
+      table.insert(t,
+        string.format(fmt,
+                      name,
+                      it.id,
+                      M.GetWeaponAttackAbility(cre, it),
+                      M.GetWeaponAttackBonus(cre, it),
+                      eff_ab[atype]))
+      table.insert(t, "")
+    end
+  end
+
+  weapon(INVENTORY_SLOT_RIGHTHAND, 'Righthand', ATTACK_TYPE_ONHAND)
+  weapon(INVENTORY_SLOT_LEFTHAND, 'Lefthand', ATTACK_TYPE_OFFHAND)
+  weapon(INVENTORY_SLOT_ARMS, 'Unarmed', ATTACK_TYPE_UNARMED)
+  weapon(INVENTORY_SLOT_CWEAPON_R, 'Creature 1', ATTACK_TYPE_CWEAPON1)
+  weapon(INVENTORY_SLOT_CWEAPON_L, 'Creature 2', ATTACK_TYPE_CWEAPON2)
+  weapon(INVENTORY_SLOT_CWEAPON_B, 'Creature 3', ATTACK_TYPE_CWEAPON3)
+
+  return table.concat(t, '\n')
+end
+
+
 -- Exports
+M.DebugAttackBonus = DebugAttackBonus
 M.GetEffectAttackModifier = GetEffectAttackModifier
 M.GetEffectAttackLimits = GetEffectAttackLimits
 M.GetBaseAttackBonus = GetBaseAttackBonus
