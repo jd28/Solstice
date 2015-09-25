@@ -116,8 +116,6 @@ class Creature
 
     Create Ability debug string.
 
-  .. method:: Creature:DebugArmorClass()
-
   .. method:: Creature:DebugCombatEquips()
 
   .. method:: Creature:DebugSaves()
@@ -172,8 +170,6 @@ class Creature
 
     :param boolean armor_check: If true uses armor check penalty.  (Default: ``false``)
 
-  .. method:: Creature:GetACVersus(vs, touch, is_ranged, attack, state)
-
   .. method:: Creature:GetAILevel()
 
   .. method:: Creature:GetActionMode(mode)
@@ -191,8 +187,6 @@ class Creature
   .. method:: Creature:GetAppearanceType()
 
   .. method:: Creature:GetArcaneSpellFailure()
-
-  .. method:: Creature:GetArmorCheckPenalty()
 
   .. method:: Creature:GetAssociate(assoc_type, nth)
 
@@ -392,8 +386,6 @@ class Creature
 
   .. method:: Creature:GetMaster()
 
-  .. method:: Creature:GetMaxArmorClassMod()
-
   .. method:: Creature:GetMaxAttackRange(target)
 
   .. method:: Creature:GetMaxHitPoints()
@@ -403,8 +395,6 @@ class Creature
   .. method:: Creature:GetMaxSpellSlots(sp_class, sp_level)
 
   .. method:: Creature:GetMemorizedSpell(sp_class, sp_level, sp_idx)
-
-  .. method:: Creature:GetMinArmorClassMod()
 
   .. method:: Creature:GetMissChance(vs, is_ranged)
 

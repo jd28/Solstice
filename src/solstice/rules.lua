@@ -9,6 +9,7 @@ local C = ffi.C
 local M = require 'solstice.rules.init'
 safe_require 'solstice.rules.ability'
 safe_require 'solstice.rules.attack_bonus'
+safe_require 'solstice.rules.armor_class'
 safe_require 'solstice.rules.classes'
 safe_require 'solstice.rules.combatmods'
 safe_require 'solstice.rules.combat'
