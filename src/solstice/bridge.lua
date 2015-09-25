@@ -240,10 +240,6 @@ function __HandleEffect()
       or data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE
    then
       Rules.UpdateAbilityEffects(cre)
-   elseif data.eff.eff_type == EFFECT_TYPE_ATTACK_INCREASE
-      or data.eff.eff_type == EFFECT_TYPE_ATTACK_DECREASE
-   then
-      Rules.UpdateAttackBonusEffects(cre)
    end
 end
 

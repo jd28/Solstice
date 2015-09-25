@@ -20,11 +20,6 @@ Effects
   :param cre: Creature.
   :type cre: :class:`Creature`
 
-.. function:: UpdateAttackBonusEffects(cre)
-
-  :param cre: Creature.
-  :type cre: :class:`Creature`
-
 .. function:: UpdateMiscImmunityEffects(cre)
 
   :param cre: Creature.
