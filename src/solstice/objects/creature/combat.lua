@@ -27,7 +27,7 @@ function Creature:GetDamageImmunity(dmgidx)
     return 0
   end
   return math.clamp(self:GetInnateDamageImmunity(dmgidx) +
-                    self['SOL_DMG_IMMUNITY'].get(dmgidx)
+                    self['SOL_DMG_IMMUNITY'].get(dmgidx),
                     0, 100)
 end
 

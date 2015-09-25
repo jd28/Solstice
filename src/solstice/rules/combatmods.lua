@@ -230,3 +230,4 @@ end
 
 -- Exports.
 M.RegisterComabtModifier = RegisterComabtModifier
+M.GetCombatModifier = GetCombatModifier
