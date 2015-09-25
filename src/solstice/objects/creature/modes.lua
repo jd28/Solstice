@@ -34,6 +34,11 @@ end
 
 jit.off(Creature.SetActivity)
 
+function Creature:GetCombatMode()
+   if not self:GetIsValid() then return -1 end
+   return self.obj.cre_mode_combat
+end
+
 --- Sets creature's combat mode
 -- @param mode solstice.modes type constant.
 -- @param change If false the combat mode is already active.

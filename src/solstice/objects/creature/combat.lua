@@ -97,12 +97,6 @@ function Creature:GetChallengeRating()
   return self.obj.cre_stats.cs_cr
 end
 
---- Get creature's combat mode
-function Creature:GetCombatMode()
-  if not self:GetIsValid() then return 0 end
-  return self.obj.cre_mode_combat
-end
-
 --- Get Concealment
 function Creature:GetConcealment(vs, is_ranged)
   return Rules.GetConcealment(self, vs, is_ranged)
