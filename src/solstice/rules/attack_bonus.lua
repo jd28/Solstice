@@ -2,60 +2,60 @@ local M = require 'solstice.rules.init'
 
 local ffi = require 'ffi'
 local clamp = math.clamp
-local int32 = ffi.typeof('int32_t')
-local lds = require 'solstice.external.lds'
-local bonus = lds.Array(int32, 9)
-local penalty = lds.Array(int32, 9)
-local result = lds.Array(int32, 9)
+local sm = string.strip_margin
+
+local bonus = ffi.new("int32_t[10]")
+local penalty = ffi.new("int32_t[10]")
+local result = ffi.new("int32_t[10]")
 
 local function GetEffectAttackModifier(cre, atype, target)
-  ffi.fill(bonus, 4 * 9)
-  ffi.fill(penalty, 4 * 9)
-  ffi.fill(result, 4 * 9)
+  ffi.fill(bonus, 4 * 10)
+  ffi.fill(penalty, 4 * 10)
+  ffi.fill(result, 4 * 10)
 
   if cre.obj.obj.obj_effects_len <= 0 then return end
 
   for i = cre.obj.cre_stats.cs_first_ab_eff, cre.obj.obj.obj_effects_len - 1 do
-   if cre.obj.obj.obj_effects[i].eff_type > EFFECT_TYPE_ATTACK_DECREASE then
-    break
-   end
+    if cre.obj.obj.obj_effects[i].eff_type > EFFECT_TYPE_ATTACK_DECREASE then
+      break
+    end
 
-   if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE
-    or cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_DECREASE
-   then
+    if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE
+      or cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_DECREASE
+    then
 
-    local amount  = cre.obj.obj.obj_effects[i].eff_integers[0]
-    local atktype  = cre.obj.obj.obj_effects[i].eff_integers[1]
-    local race    = cre.obj.obj.obj_effects[i].eff_integers[2]
-    local lawchaos = cre.obj.obj.obj_effects[i].eff_integers[3]
-    local goodevil = cre.obj.obj.obj_effects[i].eff_integers[4]
+      local amount  = cre.obj.obj.obj_effects[i].eff_integers[0]
+      local atktype  = cre.obj.obj.obj_effects[i].eff_integers[1]
+      local race   = cre.obj.obj.obj_effects[i].eff_integers[2]
+      local lawchaos = cre.obj.obj.obj_effects[i].eff_integers[3]
+      local goodevil = cre.obj.obj.obj_effects[i].eff_integers[4]
 
-    if race == 28 and lawchaos == 0 and goodevil == 0 then
-      if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE then
-       if atktype == ATTACK_TYPE_MISC then
-        bonus:set(atktype, bonus:get(atktype) + amount)
-       else
-        bonus:set(atktype, math.max(bonus:get(atktype), amount))
-       end
-      elseif cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_DECREASE then
-       if atktype == ATTACK_TYPE_MISC then
-        penalty:set(atktype, penalty:get(atktype) + amount)
-       else
-        penalty:set(atktype, math.max(penalty:get(atktype), amount))
+      if race == 28 and lawchaos == 0 and goodevil == 0 then
+       if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_INCREASE then
+         if atktype == ATTACK_TYPE_MISC then
+           bonus[atktype] = bonus[atktype] + amount
+         else
+           bonus[atktype] = math.max(bonus[atktype], amount)
+         end
+       elseif cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ATTACK_DECREASE then
+         if atktype == ATTACK_TYPE_MISC then
+           penalty[atktype] = penalty[atktype] + amount
+         else
+           penalty[atktype] = math.max(penalty[atktype], amount)
+         end
        end
       end
     end
-   end
   end
 
   for i=0, 9 do
-   result:set(i, bonus[i] - penalty[i])
+    result[i] = bonus[i] - penalty[i]
   end
 
   if atype == nil then
-   return result
+    return result
   else
-   return result[atype]
+    return result[atype]
   end
 end
 
@@ -138,10 +138,10 @@ end
 --- Get attack bonus vs target.
 local function GetAttackBonusVs(attacker, atype, target)
   local ab = GetBaseAttackBonus(attacker)
-  local eff_ab = GetEffectAttackModifier(attacker, atype, target)
+  local eff_ab = GetEffectAttackModifier(attacker, nil, target)
   local min, max = GetEffectAttackLimits(attacker)
 
-  ab = ab + clamp(eff_ab.get(ATTACK_TYPE_MISC) + eff_ab.get(atype), min, max)
+  ab = ab + clamp(eff_ab[ATTACK_TYPE_MISC] + eff_ab[atype], min, max)
 
   local weapon = attacker:GetWeaponFromAttackType(atype)
   ab = ab + M.GetWeaponAttackBonus(attacker, weapon)
