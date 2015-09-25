@@ -10,6 +10,7 @@ Rules
   :maxdepth: 1
 
   rules/abilities
+  rules/armor-class
   rules/attack-bonus
   rules/classes
   rules/combat
