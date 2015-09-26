@@ -229,13 +229,6 @@ function __HandleEffect()
       or data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE
    then
       Rules.UpdateDamageImmunityEffects(cre)
-   elseif data.eff.eff_type == EFFECT_TYPE_IMMUNITY then
-      if data.eff.eff_integers[1] == 28
-         and data.eff.eff_integers[2] == 0
-         and data.eff.eff_integers[3] == 0
-      then
-         Rules.UpdateMiscImmunityEffects(cre)
-      end
    elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_INCREASE
       or data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE
    then

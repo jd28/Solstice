@@ -9,10 +9,10 @@ local _IMM = {}
 --- Get innate immunity.
 -- @param imm IMMUNITY_TYPE_* constant.
 -- @param cre Creature object.
-local function GetInnateImmunity(imm, cre)
+local function GetInnateImmunity(cre, imm)
    local f = _IMM[imm]
    if not f then return 0 end
-   return f(imm, cre)
+   return f(cre, imm)
 end
 
 --- Sets innate immunity override.
@@ -20,14 +20,57 @@ end
 -- returning a percent immunity.
 -- @param ... List of IMMUNITY_TYPE_* constants.
 local function SetInnateImmunityOverride(func, ...)
-   local t = {...}
-   assert(#t > 0, "At least one IMMUNITY_TYPE_* constnats must be specified!")
-   for _, v in ipairs(t) do
-      _IMM[v] = func
+   local t = table.pack(...)
+   for i=1, t.n do
+      if not t[i] then
+         local Log = System.GetLogger()
+         Log:error('Null immunity constant has been passed.  Stacktrace: %s', debug.traceback())
+      else
+         _IMM[t[i]] = func
+      end
    end
 end
 
-local function crits(imm, cre)
+local function GetEffectImmunityModifier(cre, imm, vs)
+   local res = 0
+   if cre.obj.obj.obj_effects_len <= 0 then return 0 end
+   for i = cre.obj.cre_stats.cs_first_imm_eff, cre.obj.obj.obj_effects_len - 1 do
+      if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_IMMUNITY then
+         break
+      end
+      local immtype = cre.obj.obj.obj_effects[i].eff_integers[0]
+      if immtype >= 0
+         and immtype < IMMUNITY_TYPE_NUM
+         and immtype == imm
+      then
+         local amt = cre.obj.obj.obj_effects[i].eff_integers[4]
+         amt = amt == 0 and 100 or amt
+         res = res + amt
+      end
+   end
+   for i = cre.obj.obj.obj_effects_len - 1, 0, -1 do
+      if cre.obj.obj.obj_effects[i].eff_type < SOL_EFFECT_TYPE_IMMUNITY_DECREASE then
+         break
+      end
+      if cre.obj.obj.obj_effects[i].eff_type == SOL_EFFECT_TYPE_IMMUNITY_DECREASE then
+      local immtype = cre.obj.obj.obj_effects[i].eff_integers[0]
+         if immtype >= 0
+            and immtype < IMMUNITY_TYPE_NUM
+            and immtype == imm
+         then
+            local amt = cre.obj.obj.obj_effects[i].eff_integers[1]
+            res = res - amt
+         end
+      end
+   end
+   return res
+end
+
+local function GetEffectImmunityLimits(cre)
+  return 0, 100
+end
+
+local function crits(cre, imm)
    if cre:GetRacialType() == RACIAL_TYPE_UNDEAD
       or cre:GetRacialType() == RACIAL_TYPE_CONSTRUCT
    then
@@ -52,7 +95,7 @@ local function crits(imm, cre)
    return mod
 end
 
-local function sneaks(imm, cre)
+local function sneaks(cre, imm)
    if cre:GetRacialType() == RACIAL_TYPE_UNDEAD
       or cre:GetRacialType() == RACIAL_TYPE_CONSTRUCT
    then
@@ -73,15 +116,12 @@ local function sneaks(imm, cre)
 end
 
 --- Determine if creature has an immunity.
--- @param cre Creature
--- @param imm_type IMMUNITY_TYPE_*
--- @param[opt] vs Creature's attacker.
-local function GetEffectImmunity(cre, imm_type, vs)
-   if imm_type == nil then
+local function GetEffectImmunity(cre, imm, vs)
+   if imm == nil then
       error(debug.traceback())
    end
    if not cre:GetIsValid() or
-      imm_type < 0 or imm_type >= IMMUNITY_TYPE_NUM
+      imm < 0 or imm >= IMMUNITY_TYPE_NUM
    then
       return 0
    end
@@ -90,14 +130,28 @@ local function GetEffectImmunity(cre, imm_type, vs)
       error "Net yet implimented"
    end
 
-   local innate = GetInnateImmunity(imm_type, cre)
-   return math.max(cre['SOL_IMMUNITY_MISC']:get(imm_type) + innate, innate)
+   local innate = GetInnateImmunity(cre, imm)
+   local effect = GetEffectImmunityModifier(cre, imm)
+   return math.max(effect + innate, innate)
 end
 
 SetInnateImmunityOverride(crits, IMMUNITY_TYPE_CRITICAL_HIT)
 SetInnateImmunityOverride(sneaks, IMMUNITY_TYPE_SNEAK_ATTACK)
 
+local function DebugEffectImmunities(cre)
+   local t = {"Immunities:"}
+   for i=0, IMMUNITY_TYPE_NUM - 1 do
+      local innate = GetInnateImmunity(cre, i)
+      local effect = GetEffectImmunityModifier(cre, i)
+      table.insert(t, string.format("  %d: Innate: %d, Effect: %d", i, innate, effect))
+   end
+   return table.concat(t, '\n')
+end
+
 local M = require 'solstice.rules.init'
+M.DebugEffectImmunities = DebugEffectImmunities
+M.GetEffectImmunity = GetEffectImmunity
+M.GetEffectImmunityLimits = GetEffectImmunityLimits
+M.GetEffectImmunityModifier = GetEffectImmunityModifier
 M.GetInnateImmunity = GetInnateImmunity
 M.SetInnateImmunityOverride = SetInnateImmunityOverride
-M.GetEffectImmunity = GetEffectImmunity
