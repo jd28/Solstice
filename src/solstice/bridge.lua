@@ -70,7 +70,7 @@ function __DoDamageImmunity(obj, vs, amount, flags, no_feedback)
    if not cre:GetIsValid() then return amount end
 
    local idx = C.ns_BitScanFFS(flags)
-   local amt, adj = cre:DoDamageImmunity(amount, idx)
+   local amt, adj = Rules.DoDamageImmunity(cre, amount, idx)
 
    result.damages[idx] = amt
    result.immunity[idx] = adj
@@ -111,8 +111,8 @@ function __DoDamageResistance(obj, vs, amount, flags, no_feedback)
       start = cre.obj.cre_stats.cs_first_dmgresist_eff
    end
 
-   local eff, start = cre:GetBestDamageResistEffect(idx, start)
-   local amt, adj, removed = cre:DoDamageResistance(amount, eff, idx)
+   local eff, start = Rules.GetBestDamageResistEffect(cre, idx, start)
+   local amt, adj, removed = Rules.DoDamageResistance(cre, amount, eff, idx)
    result.damages[idx] = amt
    if adj > 0 then
       result.resist[idx] = adj
@@ -166,9 +166,8 @@ function __DoDamageReduction(obj, vs, amount, power, no_feedback)
       start = cre.obj.cre_stats.cs_first_dmgred_eff
    end
 
-   eff = cre:GetBestDamageReductionEffect(power, start)
-
-   amt, adj, removed = cre:DoDamageReduction(amount, eff, power)
+   eff = Rules.GetBestDamageReductionEffect(cre, power, start)
+   amt, adj, removed = Rules.DoDamageReduction(cre, amount, eff, power)
    result.damages[idx] = amt
    if adj > 0 then
       result.reduction = adj

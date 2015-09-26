@@ -48,12 +48,6 @@ class Object
 
   .. method:: Object:CountItem(id, resref)
 
-  .. method:: Object:DebugDamageImmunities()
-
-  .. method:: Object:DebugDamageReduction()
-
-  .. method:: Object:DebugDamageResistance()
-
   .. method:: Object:DecrementLocalInt(name, val)
 
   .. method:: Object:DelayCommand(delay, action)
@@ -100,10 +94,6 @@ class Object
 
   .. method:: Object:GetBaseResist(dmgidx)
 
-  .. method:: Object:GetBestDamageReductionEffect(power, start)
-
-  .. method:: Object:GetBestDamageResistEffect(dmgidx, start)
-
   .. method:: Object:GetCasterLevel()
 
   .. method:: Object:GetColor(channel)
@@ -115,8 +105,6 @@ class Object
   .. method:: Object:GetCurrentAction()
 
   .. method:: Object:GetCurrentHitPoints()
-
-  .. method:: Object:GetDamageImmunity(dmgidx)
 
   .. method:: Object:GetDescription(original, identified)
 
