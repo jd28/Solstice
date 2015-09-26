@@ -19,7 +19,6 @@ Rules
   rules/constants
   rules/damage
   rules/damage-reduction
-  rules/effects
   rules/feats
   rules/hp
   rules/immunities
