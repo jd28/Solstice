@@ -65,11 +65,6 @@ end
 --- Clear the effect cache.
 function M.ClearCacheData(obj)
    obj.load_char_finished = 0
-   if obj['SOL_DMG_IMMUNITY'] then
-      for i=0, DAMAGE_INDEX_NUM - 1 do
-         obj['SOL_DMG_IMMUNITY']:set(i, 0)
-      end
-   end
    obj['SOL_HP_EFF'] = 0
    M.OnObjectClearCacheData:notify(obj)
 end
