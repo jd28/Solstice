@@ -52,7 +52,7 @@ NWNXEffects.RegisterEffectHandler(
     end
    target['SOL_HP_EFF'] = res
   end,
-  CUSTOM_EFFECT_TYPE_HITPOINTS)
+  SOL_EFFECT_TYPE_HITPOINTS)
 
 NWNXEffects.RegisterEffectHandler(
   function (effect, target, is_remove)
