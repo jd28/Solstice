@@ -84,8 +84,6 @@ class Object
 
   .. method:: Object:FortitudeSave(dc, save_type, vs)
 
-  .. method:: Object:GetACVersus(attacker, attack)
-
   .. method:: Object:GetAllVars(match, type)
 
   .. method:: Object:GetArea()

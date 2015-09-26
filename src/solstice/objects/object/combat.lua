@@ -25,15 +25,6 @@ function Object:DoDamage(amount)
    return C.nwn_DoDamage(self.obj.obj, self.type, amount)
 end
 
---- Get an objects AC versus
--- This is just a placeholder function, if anyone wants to hook in and give, say, a
--- placeable AC.
--- @param attacker Whoever is attacking the object
--- @param attack Attack instance, just in case.
-function Object:GetACVersus(attacker, attack)
-   return 0
-end
-
 --- Get an objects concealment
 -- This is just a placeholder function, if anyone wants to hook in and give, say, a
 -- placeable concealment.
