@@ -29,25 +29,26 @@ Examples
                                           is_crit, save, save_vs, skill,
                                           ability, is_offhand)
 
-     print(cre, eff_switch , versus, elemental,
-           is_crit, save, save_vs, skill,
-           ability, is_offhand)
+    print(cre, eff_switch , versus, elemental,
+          is_crit, save, save_vs, skill,
+          ability, is_offhand)
 
-     if is_april_fools then
-        return -2
-     else
-        -- If you want to inspect parameters and just call the original function you can:
-        return GetTotalEffectBonus_orig(cre, eff_switch , versus, elemental,
-                                        is_crit, save, save_vs, skill,
-                                        ability, is_offhand)
-     end
+    if is_april_fools then
+       return -2
+    else
+      -- If you want to inspect parameters and just call the original function you can:
+      return GetTotalEffectBonus_orig(cre, eff_switch , versus, elemental,
+                                      is_crit, save, save_vs, skill,
+                                      ability, is_offhand)
+    end
   end
 
   GetTotalEffectBonus_orig = Hook.hook {
-     address = 0x08132298,
-     func = Hook_GetTotalEffectBonus,
-     type = "int (*)(CNWSCreature *, uint8_t, CNWSObject *, int32_t, int32_t, uint8_t, uint8_t, uint8_t, uint8_t, int32_t)",
-     length = 5
+    name = "GetTotalEffectBonus",
+    address = 0x08132298,
+    func = Hook_GetTotalEffectBonus,
+    type = "int (*)(CNWSCreature *, uint8_t, CNWSObject *, int32_t, int32_t, uint8_t, uint8_t, uint8_t, uint8_t, int32_t)",
+    length = 5
   }
 
 
@@ -78,5 +79,4 @@ Functions
 
   :param info: Table with hook data.
   :type info: :data:`HookDesc`
-
   :rtype: Function pointer to the trampoline.
