@@ -61,4 +61,4 @@ NWNXEffects.RegisterEffectHandler(
     end
     return false
   end,
-  CUSTOM_EFFECT_TYPE_IMMUNITY_DECREASE)
+  SOL_EFFECT_TYPE_IMMUNITY_DECREASE)
