@@ -6,6 +6,9 @@
 
 local tremove = table.remove
 local tinsert = table.insert
+local ffi = require 'ffi'
+local lds = require 'solstice.external.lds'
+local int32 = ffi.typeof("int32_t")
 
 --===================================================
 --=  Niklas Frykholm
@@ -166,10 +169,8 @@ function _SOL_GET_CACHED_OBJECT(id)
       if object.id == id then
          object.load_char_finished = true
       end
-      if not object.ci then
-         object.ci = combat_info_t()
-      end
-      assert(object.ci ~= nil, "CombatInfo cannot be nil...")
+      object['SOL_HP_EFF'] = object['SOL_HP_EFF'] or 0
+
    elseif type == OBJECT_TRUETYPE_MODULE then
       object.obj = C.nwn_GetModule()
    elseif type == OBJECT_TRUETYPE_AREA then

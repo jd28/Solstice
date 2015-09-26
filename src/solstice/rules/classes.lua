@@ -6,81 +6,11 @@
 -- @section class
 
 local _CLASS = {}
-local _TIERS = {}
-
-local _TIER2 = {}
-local _TIER3 = {}
-
 local _FEATS = {}
 
-for i=0, Game.Get2daRowCount("cls_atk_2") - 1 do
-   _TIER2[i] = Game.Get2daInt("cls_atk_2", "BAB", i)
-end
-
-for i=0, Game.Get2daRowCount("cls_atk_3") - 1 do
-   _TIER3[i] = Game.Get2daInt("cls_atk_3", "BAB", i)
-end
 
 for i=0, Game.Get2daRowCount("classes") - 1 do
-   local atk = Game.Get2daString("classes", "AttackBonusTable", i)
-   if atk == 'CLS_ATK_1' then
-      _TIERS[i] = 1
-   elseif atk == 'CLS_ATK_2' then
-      _TIERS[i] = 2
-   elseif atk == 'CLS_ATK_3' then
-      _TIERS[i] = 3
-   else
-      _TIERS[i] = 0
-   end
-
    _FEATS[i] = Game.Get2daString("classes", "FeatsTable", i):lower()
-end
-
---- Get base attack bonus
--- @param cre Creature object.
--- @param[opt=false] pre_epic Only calculate pre-epic BAB.
-local function GetBaseAttackBonus(cre, pre_epic)
-   local t = {0, 0, 0}
-   local hd = cre:GetHitDice()
-
-   if not cre:GetIsPC() or cre:GetIsPossessedFamiliar()
-      or cre:GetIsDMPossessed()
-   then
-      local l = math.min(20, cre:GetLevelByPosition(0))
-      local remaining = 20 - l
-      local c = cre:GetClassByPosition(0)
-      t[_TIERS[c]] = t[_TIERS[c]] + l
-
-      if remaining > 0 and cre.obj.cre_stats.cs_classes_len > 1 then
-         l = math.min(remaining, cre:GetLevelByPosition(1))
-         remaining = remaining - l
-         c = cre:GetClassByPosition(1)
-         t[_TIERS[c]] = t[_TIERS[c]] + l
-      end
-
-      if remaining > 0 and cre.obj.cre_stats.cs_classes_len > 2 then
-         l = math.min(remaining, cre:GetLevelByPosition(2))
-         remaining = remaining - l
-         c = cre:GetClassByPosition(2)
-         t[_TIERS[c]] = t[_TIERS[c]] + l
-      end
-   else
-      for i = 1, math.min(20, hd) do
-         local c = cre:GetClassByLevel(i)
-         if c == -1 then break end
-         t[_TIERS[c]] = t[_TIERS[c]] + 1
-      end
-   end
-
-   local res = t[1] + _TIER2[t[2]] + _TIER3[t[3]]
-   if pre_epic then return res end
-
-   if hd > 20 then
-      local epic = math.floor((hd - 20) / 2)
-      res = res + epic
-   end
-
-   return res
 end
 
 --- Determine if creature can use class abilites.

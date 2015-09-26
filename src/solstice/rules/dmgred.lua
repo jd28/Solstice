@@ -1,6 +1,8 @@
 --- Rules module
 -- @module rules
 
+local ffi = require 'ffi'
+
 local _DMG_IMM = {}
 local _DMG_RED = {}
 
@@ -20,12 +22,15 @@ end
 -- @func func (creature) -> int
 -- @param ... DAMAGE_INDEX_*
 local function SetBaseDamageImmunityOverride(func, ...)
-   local t = {...}
-   assert(#t > 0, "At least one DAMAGE_INDEX_* constant must be specified!")
-
-   for _, v in ipairs({...}) do
-      _DMG_IMM[v] = func
-   end
+  local t = table.pack(...)
+  for i=1, t.n do
+    if not t[i] then
+      local Log = System.GetLogger()
+      Log:error("Null damage type.  Stack Trace:\n%s", debug.traceback())
+    else
+      _DMG_IMM[t[i]] = func
+    end
+  end
 end
 
 local function rdd(cre)
@@ -37,7 +42,6 @@ local function rdd(cre)
 end
 
 SetBaseDamageImmunityOverride(rdd, DAMAGE_INDEX_FIRE)
-
 
 --- Get base damage reduction.
 -- @param cre Creature object.
@@ -76,15 +80,242 @@ end
 -- @func func (creature) -> int
 -- @param ... DAMAGE_INDEX_*
 local function SetBaseDamageResistanceOverride(func, ...)
-  local t = {...}
-  for _, dmg in ipairs(t) do
-    _DMG_RED[dmg] = func
+  local t = table.pack(...)
+  for i=1, t.n do
+    if not t[i] then
+      local Log = System.GetLogger()
+      Log:error("Null damage type.  Stack Trace:\n%s", debug.traceback())
+    else
+      _DMG_RED[t[i]] = func
+    end
   end
 end
 
+local DMG_IMMUNITIES = ffi.new('int32_t[?]', DAMAGE_INDEX_NUM)
+
+local function GetEffectDamageImmunity(obj, dmgidx)
+  ffi.fill(DMG_IMMUNITIES, 4 * DAMAGE_INDEX_NUM)
+  for i = 0, obj.obj.obj.obj_effects_len - 1 do
+    local type = obj.obj.obj.obj_effects[i].eff_type
+    if type > EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE then break end
+    local idx = C.ns_BitScanFFS(obj.obj.obj.obj_effects[i].eff_integers[0])
+
+    if type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE
+       or type == EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE
+    then
+      local amt = obj.obj.obj.obj_effects[i].eff_integers[1]
+      if type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE then
+        amt = -amt
+      end
+    end
+    DMG_IMMUNITIES[idx] = DMG_IMMUNITIES[idx] + amt
+  end
+
+  if dmgidx then
+    return DMG_IMMUNITIES[dmgidx]
+  else
+    return DMG_IMMUNITIES
+  end
+end
+
+local function GetEffectDamageImmunityLimits(obj)
+  return -100, 100
+end
+
+--- Determines damage immunity adjustment.
+-- @param amt Damage amount.
+-- @param dmgidx Damage index DAMAGE_INDEX_*
+-- @return Both the adjusted damage amt and the amount resisted will
+-- be returned.
+local function DoDamageImmunity(obj, amt, dmgidx)
+  -- If the damage index is invalid... skip it.
+  if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM or amt <= 0 then
+    return amt, 0
+  end
+  local min, max = GetEffectDamageImmunityLimits(obj)
+  local innate = 0
+  if obj.type == OBJECT_TRUETYPE_CREATURE then
+    innate = GetBaseDamageImmunity(obj, dmgidx)
+  end
+  local imm = math.max(GetEffectDamageImmunity(obj, dmgidx) + innate, innate)
+  imm = math.clamp(imm, min, max)
+  if imm == 100 then return 0, amt end
+
+  local imm_adj = math.floor((imm * amt) / 100)
+
+  return amt - imm_adj, imm_adj
+end
+
+--- Determine best damage reduction effect.
+-- @param dmgidx DAMAGE_INDEX_*
+-- @param[opt=0] start Place in object effect array to start looking.
+local function GetBestDamageResistEffect(obj, dmgidx, start)
+   start = start or 0
+
+   local cur, camount, climit
+   local flag = bit.lshift(1, dmgidx)
+
+   for i = start, obj.obj.obj.obj_effects_len - 1 do
+      if obj.obj.obj.obj_effects[i].eff_type > EFFECT_TYPE_DAMAGE_RESISTANCE then
+         return cur, i
+      end
+
+      if obj.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_RESISTANCE then
+         if obj.obj.obj.obj_effects[i].eff_integers[0] > flag then
+            return cur, i
+         end
+
+         local amount = obj.obj.obj.obj_effects[i].eff_integers[1]
+         local limit = obj.obj.obj.obj_effects[i].eff_integers[2]
+
+         if amount > 0 and obj.obj.obj.obj_effects[i].eff_integers[0] == flag then
+            if not cur then
+               cur, camount, climit = obj.obj.obj.obj_effects[i], amount, limit
+            else
+               -- If the resist amount is higher, set the resist effect list to the effect index.
+               -- If they are equal prefer the one with the highest damage limit.
+               if amount > camount or (amount == camount and limit > climit) then
+                  cur, camount, climit = obj.obj.obj.obj_effects[i], amount, limit
+               end
+            end
+         end
+      end
+   end
+end
+
+--- Determine best damage reduction effect.
+-- @param power Damage power.
+-- @param[opt=0] start Place in object effect array to start looking.
+local function GetBestDamageReductionEffect(obj, power, start)
+   local cur, camount, climit
+   start = start or 0
+
+   for i = start, obj.obj.obj.obj_effects_len - 1 do
+      -- Only check damage reduction effects.
+      if obj.obj.obj.obj_effects[i].eff_type >
+         EFFECT_TYPE_DAMAGE_REDUCTION then return cur end
+
+      if obj.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_DAMAGE_REDUCTION then
+         local amount = obj.obj.obj.obj_effects[i].eff_integers[0]
+         local dmg_power = obj.obj.obj.obj_effects[i].eff_integers[1]
+         local limit = obj.obj.obj.obj_effects[i].eff_integers[2]
+
+         if dmg_power > power then
+            if not cur and amount > 0 then
+               cur, camount, climit = obj.obj.obj.obj_effects[i], amount, limit
+            else
+               -- If the soak amount is higher, set the soak effect list to the effect index.
+               -- If they are equal prefer the one with the highest damage limit.
+               if amount > camount or (amount == camount and limit > climit) then
+                  cur, camount, climit = obj.obj.obj.obj_effects[i], amount, limit
+               end
+            end
+         end
+      end
+   end
+end
+
+--- Resolves damage resistance.
+-- @param amt Damage amount.
+-- @param eff Damage Resistance effect if any.
+-- @param dmgidx DAMAGE_INDEX_*
+-- @return Adjusted damage amount.
+-- @return Adjustment amount.
+local function DoDamageResistance(obj, amt, eff, dmgidx)
+   if amt <= 0 then return amt, 0 end
+
+   local resist = GetBaseDamageResistance(obj, dmgidx)
+   local total = amt
+   local resist_adj = 0
+   local remove_effect = false
+
+   -- Innate / Feat resistance.  In the case of damage reduction these stack
+   -- with damage resistance effects.
+   -- If the resistance is greater than zero, use it.
+   if resist > 0 then
+      -- Take the minimum of damage and resistance, since you can't resist
+      -- more damage than you take.
+      resist_adj = min(amt, resist)
+      total = amt - resist_adj
+   end
+
+   if total > 0 and eff then
+      -- Take the minimum of current damage told and effect resistance.
+      local eff_resist_adj = min(eff.eff_integers[1], total)
+      local eff_limit = eff.eff_integers[2]
+      if eff_limit > 0 then
+         -- If the remaining damage limit is less than the amount to resist.
+         -- then resist only what is left and remove the effect.
+         -- Else modifiy the effects damage limit by the resist amount.
+         if eff_limit <= eff_resist_adj then
+            eff_resist_adj = eff_limit
+            C.nwn_RemoveEffectById(obj.obj.obj, eff.eff_id)
+            remove_effect = true
+         else
+            eff.eff_integers[2] = eff_limit - eff_resist_adj
+         end
+      end
+      resist_adj = resist_adj + eff_resist_adj
+   end
+   return amt - resist_adj, resist_adj, remove_effect
+end
+
+--- Resolves damage reduction.
+-- @param amt Damage amount.
+-- @param eff Damage reduction effect if any.
+-- @param power DAMAGE_POWER_*
+-- @return Adjusted damage amount.
+-- @return Adjustment amount.
+local function DoDamageReduction(obj, amt, eff, power)
+   if amt <= 0 or power <= 0 then return amt, 0 end
+   -- Set highest soak amount to the players innate soak.  E,g their EDR
+   -- Dwarven Defender, and/or Barbarian Soak.
+   local highest_soak = obj:GetHardness()
+   local use_eff
+   local remove_effect = false
+
+   if eff then
+      use_eff = eff.eff_integers[0] > highest_soak
+      highest_soak = max(eff.eff_integers[0], highest_soak)
+   end
+
+   -- Now that the highest soak amount has been found, determine the minimum of it and
+   -- the base damage.  I.e. you can't soak more than your damamge.
+   highest_soak = min(amt, highest_soak)
+
+
+   -- If using a soak effect determine if the effect has a limit and adjust it if so.
+   if use_eff then
+      local eff_limit = eff.eff_integers[2]
+      if eff_limit > 0 then
+         -- If the effect damage limit is less than the highest soak amount then
+         -- the effect needs to be remove and the highest soak amount adjusted. I.e.
+         -- You can't soak more than the remaing limit on soak damage.
+         -- Else the current limit must be adjusted by the highest soak amount.
+         if eff_limit <= highest_soak then
+            highest_soak = eff_limit
+            C.nwn_RemoveEffectById(obj.obj.obj, eff.eff_id)
+            remove_effect = true
+         else
+            eff.eff_integers[2] = eff_limit - highest_soak
+         end
+      end
+   end
+
+   return amt - highest_soak, highest_soak, remove_effect
+end
+
+
 local M = require 'solstice.rules.init'
+M.DoDamageImmunity                = DoDamageImmunity
+M.DoDamageReduction               = DoDamageReduction
+M.DoDamageResistance              = DoDamageResistance
 M.GetBaseDamageImmunity           = GetBaseDamageImmunity
-M.SetBaseDamageImmunityOverride   = SetBaseDamageImmunityOverride
 M.GetBaseDamageReduction          = GetBaseDamageReduction
 M.GetBaseDamageResistance         = GetBaseDamageResistance
+M.GetBestDamageResistEffect       = GetBestDamageResistEffect
+M.GetBestDamageReductionEffect    = GetBestDamageReductionEffect
+M.GetEffectDamageImmunity         = GetEffectDamageImmunity
+M.GetEffectDamageImmunityLimits   = GetEffectDamageImmunityLimits
+M.SetBaseDamageImmunityOverride   = SetBaseDamageImmunityOverride
 M.SetBaseDamageResistanceOverride = SetBaseDamageResistanceOverride

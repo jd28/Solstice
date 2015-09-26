@@ -6,6 +6,40 @@
 Damage Reduction
 ----------------
 
+.. function:: DoDamageImmunity(obj, amt, dmgidx)
+
+  Determines the amount damage is modified by damage immunity.
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int amt: Damage amount.
+  :param int dmgidx: DAMAGE_INDEX_*
+  :rtype: Modified damage amount and the amount damage was modified.
+
+.. function:: DoDamageReduction(obj, amt, eff, power)
+
+  Determines the amount damage is modified by damage reduction.  If the parameter ``eff`` is a damage absorbtion limit, it will be removed from ``obj``.
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int amt: Damage amount.
+  :param eff: Effect to use to modify the damage amount.  Generally this should be the value returned from :func:`GetBestDamageReductionEffect`.
+  :type eff: :class:`Effect`
+  :param int power: Damage power.
+  :rtype: Modified damage amount and the amount damage was modified.
+
+.. function:: DoDamageResistance(obj, amt, eff, dmgidx)
+
+  Determines the amount damage is modified by damage resistance.  If the parameter ``eff`` is a damage absorbtion limit, it will be removed from ``obj``.
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int amt: Damage amount.
+  :param eff: Effect to use to modify the damage amount.  Generally this should be the value returned from :func:`GetBestDamageResistEffect`.
+  :type eff: :class:`Effect`
+  :param int dmgidx: DAMAGE_INDEX_*
+  :rtype: Modified damage amount and the amount damage was modified.
+
 .. function:: GetBaseDamageImmunity(cre, dmgidx)
 
   Get base damage immunity.
@@ -32,6 +66,42 @@ Damage Reduction
   :param cre: Creature instance.
   :type cre: :class:`Creature`
   :param int dmgidx: DAMAGE_INDEX_*
+
+.. function:: GetBestDamageReductionEffect(obj, power[, start])
+
+  Determines the best damage reduction effect currently applied to ``obj``.  The effect with the highest reduction at any power level greater than ``power`` is selected.  If multiple effects have the same reduction the effect with the highest soak absorbtion limit is selected.
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int power: Damage power.
+  :param int start: Hint for where to start looking in ``obj``'s effect list.  This is uesful only for creature objects.
+  :rtype: :class:`Effect`
+
+
+.. function:: GetBestDamageResistEffect(obj, dmgidx[, start])
+
+  Determines the best damage resistance effect currently applied to ``obj``.  The effect with the highest resistance to ``dmgidx`` is selected.  If multiple effects have the same resistance the effect with the highest damage absorbtion limit is selected.
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int dmgidx: DAMAGE_INDEX_*
+  :param int start: Hint for where to start looking in ``obj``'s effect list.  This is uesful only for creature objects.
+  :rtype: :class:`Effect`
+
+.. function:: GetEffectDamageImmunity(obj[, dmgidx])
+
+  Get damage immunity from effects.  The values returned by this function are not clamped by :func:`GetEffectDamageImmunityLimits`
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :param int dmgidx: DAMAGE_INDEX_*
+  :rtype: If ``dmgidx`` is provided an ``int`` is returned, otherwise an array of all damage immunity effects is returned.
+
+.. function:: GetEffectDamageImmunityLimits(obj)
+
+  :param obj: Object instance.
+  :type obj: :class:`Object`
+  :rtype: -100, 100
 
 .. function:: SetBaseDamageImmunityOverride(func, ...)
 
@@ -60,3 +130,4 @@ Damage Reduction
 
   :param function func: (:class:`Creature`) -> ``int``
   :param ...: DAMAGE_INDEX_* constants.
+

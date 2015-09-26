@@ -116,10 +116,6 @@ class Creature
 
     Create Ability debug string.
 
-  .. method:: Creature:DebugArmorClass()
-
-  .. method:: Creature:DebugAttackBonus()
-
   .. method:: Creature:DebugCombatEquips()
 
   .. method:: Creature:DebugSaves()
@@ -174,8 +170,6 @@ class Creature
 
     :param boolean armor_check: If true uses armor check penalty.  (Default: ``false``)
 
-  .. method:: Creature:GetACVersus(vs, touch, is_ranged, attack, state)
-
   .. method:: Creature:GetAILevel()
 
   .. method:: Creature:GetActionMode(mode)
@@ -194,13 +188,9 @@ class Creature
 
   .. method:: Creature:GetArcaneSpellFailure()
 
-  .. method:: Creature:GetArmorCheckPenalty()
-
   .. method:: Creature:GetAssociate(assoc_type, nth)
 
   .. method:: Creature:GetAssociateType()
-
-  .. method:: Creature:GetAttackBonusVs(target, equip)
 
   .. method:: Creature:GetAttackTarget()
 
@@ -209,8 +199,6 @@ class Creature
   .. method:: Creature:GetAttemptedSpellTarget()
 
   .. method:: Creature:GetBICFileName()
-
-  .. method:: Creature:GetBaseAttackBonus()
 
   .. method:: Creature:GetBodyPart(part)
 
@@ -398,8 +386,6 @@ class Creature
 
   .. method:: Creature:GetMaster()
 
-  .. method:: Creature:GetMaxArmorClassMod()
-
   .. method:: Creature:GetMaxAttackRange(target)
 
   .. method:: Creature:GetMaxHitPoints()
@@ -409,8 +395,6 @@ class Creature
   .. method:: Creature:GetMaxSpellSlots(sp_class, sp_level)
 
   .. method:: Creature:GetMemorizedSpell(sp_class, sp_level, sp_idx)
-
-  .. method:: Creature:GetMinArmorClassMod()
 
   .. method:: Creature:GetMissChance(vs, is_ranged)
 
@@ -433,8 +417,6 @@ class Creature
   .. method:: Creature:GetPositionByClass(class)
 
   .. method:: Creature:GetRacialType()
-
-  .. method:: Creature:GetRangedAttackMod(target, distance)
 
   .. method:: Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
 
@@ -487,6 +469,11 @@ class Creature
   .. method:: Creature:GetTrainingVsMask()
 
   .. method:: Creature:GetTurnResistanceHD()
+
+  .. method:: Creature:GetWeaponFromAttackType(atype)
+
+    :param int atype: ATTACK_TYPE_*
+    :rtype: An item or ``OBJECT_INVALID``
 
   .. method:: Creature:GetWings()
 
@@ -672,5 +659,3 @@ class Creature
   .. method:: Creature:TakeGold(amount, feedback, source)
 
   .. method:: Creature:UnpossessFamiliar()
-
-  .. method:: Creature:UpdateCombatInfo(all)

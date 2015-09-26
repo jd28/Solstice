@@ -88,6 +88,24 @@ function Creature:GetItemInSlot(slot)
    return GetObjectByID(self.obj.cre_equipment.equips[slot])
 end
 
+function Creature:GetWeaponFromAttackType(atype)
+   if atype == ATTACK_TYPE_ONHAND then
+      return self:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+   elseif atype == ATTACK_TYPE_OFFHAND then
+      return self:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+   elseif atype == ATTACK_TYPE_CWEAPON1 then
+      return self:GetItemInSlot(INVENTORY_SLOT_CWEAPON_L)
+   elseif atype == ATTACK_TYPE_CWEAPON2 then
+      return self:GetItemInSlot(INVENTORY_SLOT_CWEAPON_R)
+   elseif atype == ATTACK_TYPE_CWEAPON3 then
+      return self:GetItemInSlot(INVENTORY_SLOT_CWEAPON_B)
+   elseif atype == ATTACK_TYPE_UNARMED then
+      return self:GetItemInSlot(INVENTORY_SLOT_ARMS)
+   end
+
+   return OBJECT_INVALID
+end
+
 --- Determines a weapons weapon size relative to a creature.
 -- @param weap The weapon in question.
 function Creature:GetRelativeWeaponSize(weap)

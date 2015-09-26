@@ -53,7 +53,6 @@ function __UpdateCombatInfo(attacker)
    attacker = GetObjectByID(attacker)
    if not attacker:GetIsValid() then return end
 
-   attacker:UpdateCombatInfo(true)
    local ce = Rules.GetCombatEngine()
    if ce and ce.UpdateCombatInformation then
       ce.UpdateCombatInformation(attacker)
@@ -70,7 +69,7 @@ function __DoDamageImmunity(obj, vs, amount, flags, no_feedback)
    if not cre:GetIsValid() then return amount end
 
    local idx = C.ns_BitScanFFS(flags)
-   local amt, adj = cre:DoDamageImmunity(amount, idx)
+   local amt, adj = Rules.DoDamageImmunity(cre, amount, idx)
 
    result.damages[idx] = amt
    result.immunity[idx] = adj
@@ -111,8 +110,8 @@ function __DoDamageResistance(obj, vs, amount, flags, no_feedback)
       start = cre.obj.cre_stats.cs_first_dmgresist_eff
    end
 
-   local eff, start = cre:GetBestDamageResistEffect(idx, start)
-   local amt, adj, removed = cre:DoDamageResistance(amount, eff, idx)
+   local eff, start = Rules.GetBestDamageResistEffect(cre, idx, start)
+   local amt, adj, removed = Rules.DoDamageResistance(cre, amount, eff, idx)
    result.damages[idx] = amt
    if adj > 0 then
       result.resist[idx] = adj
@@ -166,9 +165,8 @@ function __DoDamageReduction(obj, vs, amount, power, no_feedback)
       start = cre.obj.cre_stats.cs_first_dmgred_eff
    end
 
-   eff = cre:GetBestDamageReductionEffect(power, start)
-
-   amt, adj, removed = cre:DoDamageReduction(amount, eff, power)
+   eff = Rules.GetBestDamageReductionEffect(cre, power, start)
+   amt, adj, removed = Rules.DoDamageReduction(cre, amount, eff, power)
    result.damages[idx] = amt
    if adj > 0 then
       result.reduction = adj
@@ -229,21 +227,10 @@ function __HandleEffect()
       or data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE
    then
       Rules.UpdateDamageImmunityEffects(cre)
-   elseif data.eff.eff_type == EFFECT_TYPE_IMMUNITY then
-      if data.eff.eff_integers[1] == 28
-         and data.eff.eff_integers[2] == 0
-         and data.eff.eff_integers[3] == 0
-      then
-         Rules.UpdateMiscImmunityEffects(cre)
-      end
    elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_INCREASE
       or data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE
    then
       Rules.UpdateAbilityEffects(cre)
-   elseif data.eff.eff_type == EFFECT_TYPE_ATTACK_INCREASE
-      or data.eff.eff_type == EFFECT_TYPE_ATTACK_DECREASE
-   then
-      Rules.UpdateAttackBonusEffects(cre)
    end
 end
 
@@ -320,41 +307,41 @@ end
 function __GetCriticalHitMultiplier(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
-   local equip = EQUIP_TYPE_UNARMED
+   local equip = attacker:GetItemInSlot(INVENTORY_SLOT_ARMS)
    local it
    if is_offhand then
       it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
       if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
          return 0
       end
-      equip = EQUIP_TYPE_OFFHAND
+      equip = it
    else
       it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
       if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
-         equip = EQUIP_TYPE_ONHAND
+         equip = it
       end
    end
-   return attacker.ci.equips[equip].crit_mult
+   return Rules.GetWeaponCritMultiplier(attacker, equip)
 end
 
 function __GetCriticalHitRoll(obj, is_offhand)
    local attacker = GetObjectByID(obj)
    if not attacker:GetIsValid() then return 0 end
-   local equip = EQUIP_TYPE_UNARMED
+   local equip = attacker:GetItemInSlot(INVENTORY_SLOT_ARMS)
    local it
    if is_offhand then
       it = attacker:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
       if not it:GetIsValid() or Rules.BaseitemToWeapon(it) == 0 then
          return 0
       end
-      equip = EQUIP_TYPE_OFFHAND
+      equip = it
    else
       it = attacker:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
       if it:GetIsValid() and Rules.BaseitemToWeapon(it) ~= 0 then
-         equip = EQUIP_TYPE_ONHAND
+         equip = it
       end
    end
-   return 21 - attacker.ci.equips[equip].crit_range
+   return 21 - Rules.GetWeaponCritRange(attacker, equip)
 end
 
 function __ResolveDamageShields(cre, attacker)

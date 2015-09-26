@@ -14,334 +14,339 @@ GetObjectByID = Game.GetObjectByID
 -- @param cre Creature to toggle mode on
 -- @param mode ACTION_MODE_*
 function __ToggleMode(cre, mode)
-   cre = GetObjectByID(cre)
-   if not cre:GetIsValid() then return false end
+  cre = GetObjectByID(cre)
+  if not cre:GetIsValid() then return false end
 
-   local bypass = true
-   local act, on
+  local bypass = true
+  local act, on
 
-   if cre:GetIsDead() or cre:GetIsPCDying() then
-      return false
-   end
+  if cre:GetIsDead() or cre:GetIsPCDying() then
+    return false
+  end
 
-   if mode == ACTION_MODE_DETECT then
-      if cre:GetDetectMode() == 1 then
-         act, on = 2, 0
+  if mode == ACTION_MODE_DETECT then
+    if cre:GetDetectMode() == 1 then
+      act, on = 2, 0
+    else
+      act, on = 2, 1
+    end
+    cre:SetActivity(act, on)
+  elseif mode == ACTION_MODE_STEALTH then
+    if cre.obj.cre_attack_target ~= OBJECT_INVALID.id
+      or cre.obj.cre_attempted_target ~= OBJECT_INVALID.id
+    then
+      cre:SendMessageByStrRef(60)
+    elseif cre:CanUseSkill(SKILL_HIDE) or cre:CanUseSkill(SKILL_MOVE_SILENTLY) then
+      if cre.obj.cre_mode_stealth == 1 then
+        act, on = 1, 0
       else
-         act, on = 2, 1
+        act, on = 1, 1
       end
       cre:SetActivity(act, on)
-   elseif mode == ACTION_MODE_STEALTH then
-      if cre.obj.cre_attack_target ~= OBJECT_INVALID.id
-         or cre.obj.cre_attempted_target ~= OBJECT_INVALID.id
-      then
-         cre:SendMessageByStrRef(60)
-      elseif cre:CanUseSkill(SKILL_HIDE) or cre:CanUseSkill(SKILL_MOVE_SILENTLY) then
-         if cre.obj.cre_mode_stealth == 1 then
-            act, on = 1, 0
-         else
-            act, on = 1, 1
-         end
-         cre:SetActivity(act, on)
-      end
-   elseif mode == ACTION_MODE_PARRY then
-      if cre.obj.cre_mode_combat == COMBAT_MODE_PARRY then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_PARRY, false)
-      end
-   elseif mode == ACTION_MODE_POWER_ATTACK then
-      if not cre:GetHasFeat(FEAT_POWER_ATTACK) then
-         return false
-      end
+    end
+  elseif mode == ACTION_MODE_PARRY then
+    if cre.obj.cre_mode_combat == COMBAT_MODE_PARRY then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_PARRY, false)
+    end
+  elseif mode == ACTION_MODE_POWER_ATTACK then
+    if not cre:GetHasFeat(FEAT_POWER_ATTACK) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_POWER_ATTACK then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_POWER_ATTACK, false)
-      end
-   elseif mode == ACTION_MODE_IMPROVED_POWER_ATTACK then
-      if not cre:GetHasFeat(FEAT_IMPROVED_POWER_ATTACK) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_POWER_ATTACK then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_POWER_ATTACK, false)
+    end
+  elseif mode == ACTION_MODE_IMPROVED_POWER_ATTACK then
+    if not cre:GetHasFeat(FEAT_IMPROVED_POWER_ATTACK) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_IMPROVED_POWER_ATTACK then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_IMPROVED_POWER_ATTACK, false)
-      end
-   elseif mode == ACTION_MODE_COUNTERSPELL then
-      if cre.obj.cre_mode_combat == COMBAT_MODE_COUNTERSPELL then
-         cre:SetCombatMode(COMBAT_MODE_COUNTERSPELL, false)
-      else
-         cre:SetCombatMode(COMBAT_MODE_COUNTERSPELL, true)
-      end
-   elseif mode == ACTION_MODE_FLURRY_OF_BLOWS then
-      if not cre:GetHasFeat(FEAT_FLURRY_OF_BLOWS) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_IMPROVED_POWER_ATTACK then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_IMPROVED_POWER_ATTACK, false)
+    end
+  elseif mode == ACTION_MODE_COUNTERSPELL then
+    if cre.obj.cre_mode_combat == COMBAT_MODE_COUNTERSPELL then
+      cre:SetCombatMode(COMBAT_MODE_COUNTERSPELL, false)
+    else
+      cre:SetCombatMode(COMBAT_MODE_COUNTERSPELL, true)
+    end
+  elseif mode == ACTION_MODE_FLURRY_OF_BLOWS then
+    if not cre:GetHasFeat(FEAT_FLURRY_OF_BLOWS) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_FLURRY_OF_BLOWS then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_FLURRY_OF_BLOWS, false)
-      end
-   elseif mode == ACTION_MODE_RAPID_SHOT then
-      if not cre:GetHasFeat(FEAT_RAPID_SHOT) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_FLURRY_OF_BLOWS then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_FLURRY_OF_BLOWS, false)
+    end
+  elseif mode == ACTION_MODE_RAPID_SHOT then
+    if not cre:GetHasFeat(FEAT_RAPID_SHOT) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_RAPID_SHOT then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_RAPID_SHOT, false)
-      end
-   elseif mode == ACTION_MODE_EXPERTISE then
-      if not cre:GetHasFeat(FEAT_EXPERTISE) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_RAPID_SHOT then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_RAPID_SHOT, false)
+    end
+  elseif mode == ACTION_MODE_EXPERTISE then
+    if not cre:GetHasFeat(FEAT_EXPERTISE) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_EXPERTISE then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_EXPERTISE, false)
-      end
-   elseif mode == ACTION_MODE_IMPROVED_EXPERTISE then
-      if not cre:GetHasFeat(FEAT_IMPROVED_EXPERTISE) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_EXPERTISE then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_EXPERTISE, false)
+    end
+  elseif mode == ACTION_MODE_IMPROVED_EXPERTISE then
+    if not cre:GetHasFeat(FEAT_IMPROVED_EXPERTISE) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_IMPROVED_EXPERTISE then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_IMPROVED_EXPERTISE, true)
-      end
-   elseif mode == ACTION_MODE_DEFENSIVE_CAST then
-      if cre.obj.cre_mode_combat == COMBAT_MODE_DEFENSIVE_CASTING then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_DEFENSIVE_CASTING, false)
-      end
-   elseif mode == ACTION_MODE_DIRTY_FIGHTING then
-      if not cre:GetHasFeat(FEAT_DIRTY_FIGHTING) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_IMPROVED_EXPERTISE then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_IMPROVED_EXPERTISE, true)
+    end
+  elseif mode == ACTION_MODE_DEFENSIVE_CAST then
+    if cre.obj.cre_mode_combat == COMBAT_MODE_DEFENSIVE_CASTING then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_DEFENSIVE_CASTING, false)
+    end
+  elseif mode == ACTION_MODE_DIRTY_FIGHTING then
+    if not cre:GetHasFeat(FEAT_DIRTY_FIGHTING) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_DIRTY_FIGHTING then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_DIRTY_FIGHTING, false)
-      end
-   elseif mode == ACTION_MODE_DEFENSIVE_STANCE then
-      if not cre:GetHasFeat(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE) then
-         return false
-      end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_DIRTY_FIGHTING then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_DIRTY_FIGHTING, false)
+    end
+  elseif mode == ACTION_MODE_DEFENSIVE_STANCE then
+    if not cre:GetHasFeat(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE) then
+      return false
+    end
 
-      if cre.obj.cre_mode_combat == COMBAT_MODE_DEFENSIVE_STANCE then
-         cre:SetCombatMode(COMBAT_MODE_INVALID, true)
-      else
-         cre:SetCombatMode(COMBAT_MODE_DEFENSIVE_STANCE, false)
-         cre:DecrementRemainingFeatUses(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE)
-      end
-   end
+    if cre.obj.cre_mode_combat == COMBAT_MODE_DEFENSIVE_STANCE then
+      cre:SetCombatMode(COMBAT_MODE_INVALID, true)
+    else
+      cre:SetCombatMode(COMBAT_MODE_DEFENSIVE_STANCE, false)
+      cre:DecrementRemainingFeatUses(FEAT_DWARVEN_DEFENDER_DEFENSIVE_STANCE)
+    end
+  end
 
-   cre:NotifyAssociateActionToggle(mode)
-   return true
+  cre:NotifyAssociateActionToggle(mode)
+  return true
 end
 
 jit.off(__ToggleMode)
 
 --- Register a combat mode.
--- @param mode
--- @param f A function taking a creature object returning a boolean value
--- indicating whether the mode was useable.
-local function RegisterMode(mode, f)
-   MODES[mode] = f
+local function RegisterMode(mode, ...)
+  local t = table.pack(...)
+  for i=1, t.n do
+    if not t[i] then
+      local Log = System.GetLogger()
+      Log:error("Nil combat mode!\nStack Trace: %s", debug.traceback())
+    else
+      MODES[t[i]] = mode
+    end
+  end
 end
 
---- Updates combat modifer when mode changes.
--- @param mode COMBAT_MODE_*.
--- @param cre Creature object
--- @bool[opt=false] off True if the mode is being turned off.
-function M.ResolveMode(mode, cre, off)
-   ffi.fill(cre.ci.mod_mode, ffi.sizeof("CombatMod"))
-   local f = MODES[mode]
-   if not f then return end
-   return f(cre, mode, off)
+local function GetCanUseMode(mode, cre)
+  if not MODES[mode] then return false end
+  if type(MODES[mode]) == 'boolean' then return true end
+  return MODES[mode].use(mode, cre)
+end
+
+local function GetModeModifier(mode, modifier, cre)
+  if not MODES[mode] or not MODES[mode].modifier then return end
+  return MODES[mode].modifier(mode, modifier, cre)
 end
 
 --- Convert COMBAT_MODE_\* to ACTION_MODE_\*.
 -- @param mode COMBAT_MODE_\*.
 -- @return -1 on error.
 function M.ToAction(mode)
-   if mode == COMBAT_MODE_PARRY then
-      return ACTION_MODE_PARRY
-   elseif mode == COMBAT_MODE_POWER_ATTACK then
-      return ACTION_MODE_POWER_ATTACK
-   elseif mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
-      return ACTION_MODE_IMPROVED_POWER_ATTACK
-   elseif mode == COMBAT_MODE_COUNTER_SPELL then
-      return ACTION_MODE_COUNTERSPELL
-   elseif mode == COMBAT_MODE_FLURRY_OF_BLOWS then
-      return ACTION_MODE_FLURRY_OF_BLOWS
-   elseif mode == COMBAT_MODE_RAPID_SHOT then
-      return ACTION_MODE_RAPID_SHOT
-   elseif mode == COMBAT_MODE_EXPERTISE then
-      return ACTION_MODE_EXPERTISE
-   elseif mode == COMBAT_MODE_IMPROVED_EXPERTISE then
-      return ACTION_MODE_IMPROVED_EXPERTISE
-   elseif mode == COMBAT_MODE_DEFENSIVE_CASTING then
-      return ACTION_MODE_DEFENSIVE_CAST
-   elseif mode == COMBAT_MODE_DIRTY_FIGHTING then
-      return ACTION_MODE_DIRTY_FIGHTING
-   elseif mode == COMBAT_MODE_DEFENSIVE_STANCE then
-      return ACTION_MODE_DEFENSIVE_STANCE
-   end
+  if mode == COMBAT_MODE_PARRY then
+    return ACTION_MODE_PARRY
+  elseif mode == COMBAT_MODE_POWER_ATTACK then
+    return ACTION_MODE_POWER_ATTACK
+  elseif mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
+    return ACTION_MODE_IMPROVED_POWER_ATTACK
+  elseif mode == COMBAT_MODE_COUNTER_SPELL then
+    return ACTION_MODE_COUNTERSPELL
+  elseif mode == COMBAT_MODE_FLURRY_OF_BLOWS then
+    return ACTION_MODE_FLURRY_OF_BLOWS
+  elseif mode == COMBAT_MODE_RAPID_SHOT then
+    return ACTION_MODE_RAPID_SHOT
+  elseif mode == COMBAT_MODE_EXPERTISE then
+    return ACTION_MODE_EXPERTISE
+  elseif mode == COMBAT_MODE_IMPROVED_EXPERTISE then
+    return ACTION_MODE_IMPROVED_EXPERTISE
+  elseif mode == COMBAT_MODE_DEFENSIVE_CASTING then
+    return ACTION_MODE_DEFENSIVE_CAST
+  elseif mode == COMBAT_MODE_DIRTY_FIGHTING then
+    return ACTION_MODE_DIRTY_FIGHTING
+  elseif mode == COMBAT_MODE_DEFENSIVE_STANCE then
+    return ACTION_MODE_DEFENSIVE_STANCE
+  end
 
-   return -1
+  return -1
 end
 
---Defensive Cast--------------------------------------------------------
-local function def_cast(cre, mode, off)
-   -- Nothing to be done but return true really
-   -- Concentration checks are dealt with during damage application.
-   return true
-end
+-- The following modes can always be used.
+RegisterMode({ use = true},
+  COMBAT_MODE_DEFENSIVE_CASTING,
+  COMBAT_MODE_DEFENSIVE_STANCE,
+  COMBAT_MODE_PARRY)
 
-RegisterMode(COMBAT_MODE_DEFENSIVE_CASTING, def_cast)
-
---Defensive Stance-------------------------------------------------------
-local function def_stance(cre, mode, off)
-   return true
-end
-RegisterMode(COMBAT_MODE_DEFENSIVE_STANCE, def_stance)
 
 --Dirty Fighting--------------------------------------------------------
-local function dirty(cre, mode, off)
-   if off then return true end
-   -- Really is worthless but there you go.  Attack number modifications
-   -- are dealth with in Rules.InitializeNumberOfAttacks
-   cre.ci.mod_mode.dmg.type = DAMAGE_INDEX_BASE_WEAPON
-   cre.ci.mod_mode.dmg.roll.dice = 1
-   cre.ci.mod_mode.dmg.roll.sides = 4
-
-   return true
+local function dirty(mode, modifier, cre)
+  if modifier == ATTACK_MODIFIER_DAMAGE then
+    local roll = damage_roll_t()
+    roll.type = DAMAGE_INDEX_BASE_WEAPON
+    roll.roll.dice = 1
+    roll.roll.sides = 4
+    return roll
+  end
 end
 
-RegisterMode(COMBAT_MODE_DIRTY_FIGHTING, dirty)
+RegisterMode(
+  { use = true, modifier = dirty },
+  COMBAT_MODE_DIRTY_FIGHTING)
 
 --Expertise-------------------------------------------------------------
 
-local function expertise(cre, mode, off)
-   if off then return true end
+local function expertise(mode, modifier, cre)
+  local res = 0
+  if modifier == ATTACK_MODIFIER_AB then
+    res = -5
+  elseif modifier == ATTACK_MODIFIER_AC then
+    res = 5
+  end
 
-   if mode == COMBAT_MODE_IMPROVED_EXPERTISE then
-      cre.ci.mod_mode.ab = -10
-      cre.ci.mod_mode.ac = 10
-   else
-      cre.ci.mod_mode.ab = -5
-      cre.ci.mod_mode.ac = 5
-   end
+  if mode == COMBAT_MODE_IMPROVED_EXPERTISE then
+    res = res * 2
+  end
 
-   return true
+  return res
 end
 
-RegisterMode(COMBAT_MODE_EXPERTISE, expertise)
-RegisterMode(COMBAT_MODE_IMPROVED_EXPERTISE, expertise)
+RegisterMode(
+  { use = true, modifier = expertise },
+  COMBAT_MODE_EXPERTISE,
+  COMBAT_MODE_IMPROVED_EXPERTISE)
 
 --Flurry of Blows-------------------------------------------------------
-local function flurry(cre, mode, off)
-   if off then return true end
+local function flurry_use(mode, cre)
+  local result = false
+  local monk = cre:GetLevelByClass(CLASS_TYPE_MONK)
+  local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
 
-   local result = false
-   local monk = cre:GetLevelByClass(CLASS_TYPE_MONK)
-   local rh = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-
-   if not rh:GetIsValid() then
-      -- Creature is unarmed
-      result = true
-   elseif Rules.GetIsRangedWeapon(rh) then
-      -- Right hand is valid and is a ranged weapon.
-      result = false
-   else
-      -- If it's a monk weapon and creature has enough levels of monk to
-      -- use it, then check if there is an offhand weapon.
-      if Rules.GetIsMonkWeapon(rh) then
-         local lh = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
-         if not lh:GetIsValid() then
-            -- lefthand weapon if invalid
-            -- righthand weapon is a monk weapon
-            result = true
-         else
-            result = Rules.GetIsMonkWeapon(lh)
-         end
+  if not rh:GetIsValid() then
+    -- Creature is unarmed
+    result = true
+  elseif Rules.GetIsRangedWeapon(rh) then
+    -- Right hand is valid and is a ranged weapon.
+    result = false
+  else
+    -- If it's a monk weapon and creature has enough levels of monk to
+    -- use it, then check if there is an offhand weapon.
+    if Rules.GetIsMonkWeapon(rh) then
+      local lh = cre:GetItemInSlot(INVENTORY_SLOT_LEFTHAND)
+      if not lh:GetIsValid() then
+        -- lefthand weapon if invalid
+        -- righthand weapon is a monk weapon
+        result = true
       else
-         -- righthand weapon is not a monk weapon.
-         result = false
+        result = Rules.GetIsMonkWeapon(lh)
       end
-   end
+    else
+      -- righthand weapon is not a monk weapon.
+      result = false
+    end
+  end
 
-   if result then
-      -- Addition onhand attack is dealt with in NSInitializeNumberOfAttacks.
-      -- So only the AB needs to be set here.
-      cre.ci.mod_mode.ab = -2
-   else
-      cre:SendMessageByStrRef(66246)
-   end
+  if not result then
+    cre:SendMessageByStrRef(66246)
+  end
 
-   return result
+  return result
 end
 
-RegisterMode(COMBAT_MODE_FLURRY_OF_BLOWS, flurry)
+local function flurry(mode, modifier, cre)
+  if modifier == ATTACK_MODIFIER_AB then
+    return -2
+  end
+end
+
+RegisterMode(
+  { use = flurry_use , modifier = flurry },
+  COMBAT_MODE_FLURRY_OF_BLOWS)
 
 --Power Attack----------------------------------------------------------
-local function power_attack(cre, mode, off)
-   if off then return true end
 
-   cre.ci.mod_mode.dmg.type = DAMAGE_INDEX_BASE_WEAPON
-   if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
-      cre.ci.mod_mode.ab = -10
-      cre.ci.mod_mode.dmg.roll.bonus = 10
-   else
-      cre.ci.mod_mode.ab = -5
-      cre.ci.mod_mode.dmg.roll.bonus = 5
-   end
+local function power_attack(mode, modifier, cre)
+  if off then return true end
 
-   return true
+  if modifier == ATTACK_MODIFIER_DAMAGE then
+    local dmg = damage_roll_t()
+    dmg.type = DAMAGE_INDEX_BASE_WEAPON
+    local res = 5
+    if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
+       res = res * 2
+    end
+    dmg.roll.bonus = res
+    return dmg
+  elseif modifier == ATTACK_MODIFIER_AB then
+    local res = -5
+    if mode == COMBAT_MODE_IMPROVED_POWER_ATTACK then
+       res = res * 2
+    end
+    return res
+  end
 end
 
-RegisterMode(COMBAT_MODE_POWER_ATTACK, power_attack)
-RegisterMode(COMBAT_MODE_IMPROVED_POWER_ATTACK, power_attack)
+RegisterMode(
+  { use = true, modifier = power_attack },
+  COMBAT_MODE_IMPROVED_POWER_ATTACK,
+  COMBAT_MODE_POWER_ATTACK)
 
 --Rapid Shot------------------------------------------------------------
-local function rapid_shot(cre, mode, off)
-   if off then return true end
-
-   local weap = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
-   if not Rules.GetIsRangedWeapon(weap) then
-      cre:SendMessageByStrRef(66246)
-      return false
-   end
-
-   -- Addition onhand attack is dealt with in Rules.InitializeNumberOfAttacks.
-   -- So only the AB needs to be set here.
-   cre.ci.mod_mode.ab = -2
-
-   return true
+local function rapid_shot_use(mode, cre)
+  local weap = cre:GetItemInSlot(INVENTORY_SLOT_RIGHTHAND)
+  if not Rules.GetIsRangedWeapon(weap) then
+    cre:SendMessageByStrRef(66246)
+    return false
+  end
+  return true
 end
 
-RegisterMode(COMBAT_MODE_RAPID_SHOT, rapid_shot)
-
-
---Parry-----------------------------------------------------------------
-local function parry(cre, mode, off)
-   -- The parry ripostes are dealth with in the attack roll.
-   -- Nothing to be done but return true.
-   return true
+local function rapid_shot(mode, modifier, cre)
+  if modifier == ATTACK_MODIFIER_AB then
+    return -2
+  end
 end
 
-RegisterMode(COMBAT_MODE_PARRY, parry)
+RegisterMode(
+  { use = rapid_shot_use, modifier = rapid_shot },
+  COMBAT_MODE_RAPID_SHOT)
 
 -- Exports
 M.RegisterMode = RegisterMode
+M.GetCanUseMode = GetCanUseMode
+M.GetModeModifier = GetModeModifier
 return M

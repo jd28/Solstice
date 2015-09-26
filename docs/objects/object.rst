@@ -48,12 +48,6 @@ class Object
 
   .. method:: Object:CountItem(id, resref)
 
-  .. method:: Object:DebugDamageImmunities()
-
-  .. method:: Object:DebugDamageReduction()
-
-  .. method:: Object:DebugDamageResistance()
-
   .. method:: Object:DecrementLocalInt(name, val)
 
   .. method:: Object:DelayCommand(delay, action)
@@ -90,19 +84,11 @@ class Object
 
   .. method:: Object:FortitudeSave(dc, save_type, vs)
 
-  .. method:: Object:GetACVersus(attacker, attack)
-
-  .. method:: Object:GetAllProperties()
-
   .. method:: Object:GetAllVars(match, type)
 
   .. method:: Object:GetArea()
 
   .. method:: Object:GetBaseResist(dmgidx)
-
-  .. method:: Object:GetBestDamageReductionEffect(power, start)
-
-  .. method:: Object:GetBestDamageResistEffect(dmgidx, start)
 
   .. method:: Object:GetCasterLevel()
 
@@ -115,8 +101,6 @@ class Object
   .. method:: Object:GetCurrentAction()
 
   .. method:: Object:GetCurrentHitPoints()
-
-  .. method:: Object:GetDamageImmunity(dmgidx)
 
   .. method:: Object:GetDescription(original, identified)
 
@@ -255,8 +239,6 @@ class Object
   .. method:: Object:GetPortraitResRef()
 
   .. method:: Object:GetPosition()
-
-  .. method:: Object:GetProperty(prop)
 
   .. method:: Object:GetReflexSavingThrow()
 

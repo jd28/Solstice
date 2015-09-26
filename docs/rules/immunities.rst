@@ -6,9 +6,26 @@
 Immunities
 ----------
 
+.. note::
+
+  Immunities versus alignements, races, etc have not been implemented.
+
+.. function:: DebugEffectImmunities(cre)
+
+  Generate a debug string with effect immunity info.
+
+  :param vs: Creature.
+  :type vs: :class:`Creature`
+  :rtype: ``string``
+
+
 .. function:: GetEffectImmunity(cre, imm, vs)
 
-  Determine if creature has an immunity.
+  Determines total effect immunity.  This is the maximum of creatures innate immunity and their innate immunity plus immunity effect modifiers.  The result is not clamped by :func:`GetEffectImmunityLimits`.
+
+  .. note::
+
+    This function is not limited to default NWN behavior.  It was modified to facilitate a percentate immunity to an IMMUNITY_TYPE_*.  However, this doesn't modify the default behavior of item properties or :func:`effect.Immunity` so it stills work as expected.
 
   :param cre: Creature.
   :type cre: :class:`Creature`
@@ -17,13 +34,29 @@ Immunities
   :type vs: :class:`Creature`
   :rtype: ``int``
 
-.. function:: GetInnateImmunity(imm, cre)
+.. function:: GetEffectImmunityLimits(cre)
+
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :rtype: 0, 100
+
+.. function:: GetEffectImmunityModifier(cre, imm, vs)
+
+  Determines the amount the modifier from effects.
+
+  :param cre: Creature.
+  :type cre: :class:`Creature`
+  :param int imm: IMMUNITY_TYPE_* constant.
+  :param vs: Creature.
+  :type vs: :class:`Creature`
+
+.. function:: GetInnateImmunity(cre, imm)
 
   Get innate immunity.
 
-  :param int imm: IMMUNITY_TYPE_* constant.
   :param cre: Creature.
   :type cre: :class:`Creature`
+  :param int imm: IMMUNITY_TYPE_* constant.
   :rtype: ``int``
 
 .. function:: SetInnateImmunityOverride(func, ...)

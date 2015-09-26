@@ -11,12 +11,12 @@ local M = {}
 
 --- TODO
 function M.SetChatHandler(func)
-   CHAT_HANDLER = func
+  CHAT_HANDLER = func
 end
 
 --- TODO
 function M.SetCombatMessageHandler(func)
-   CC_HANDLER = func
+  CC_HANDLER = func
 end
 
 local EVENT_CHAT_MESSAGE = "Chat/Message";
@@ -30,16 +30,16 @@ ffi.cdef[[
  * Called whenever a qualifying chat message is sent, dependent on nwnx_chat settings.
  */
 typedef struct {
-    /* Chat message being sent. */
-    const char* msg;
-    /* Object receiving the message. */
-    unsigned int to;
-    /* Object sending the message. */
-    unsigned int from;
-    /* Channel the message was sent on. */
-    unsigned char channel;
-    /* Set to true to suppress the chat message. */
-    bool suppress;
+   /* Chat message being sent. */
+   const char* msg;
+   /* Object receiving the message. */
+   unsigned int to;
+   /* Object sending the message. */
+   unsigned int from;
+   /* Channel the message was sent on. */
+   unsigned char channel;
+   /* Set to true to suppress the chat message. */
+   bool suppress;
 }
 ChatMessageEvent;
 
@@ -50,77 +50,79 @@ ChatMessageEvent;
  * Called whenever a CNWCCMessage is sent.
  */
 typedef struct {
-    /* CNWCCMessageData type. */
-    int type;
-    /* CNWCCMessageData subtype. */
-    int subtype;
-    /* Object being sent the message. */
-    unsigned int to;
-    /* CNWCCMessageData instance. */
-    void *msg_data;
-    /* Set to true to suppress the CNWCCMessageData message. */
-    bool suppress;
+   /* CNWCCMessageData type. */
+   int type;
+   /* CNWCCMessageData subtype. */
+   int subtype;
+   /* Object being sent the message. */
+   unsigned int to;
+   /* CNWCCMessageData instance. */
+   void *msg_data;
+   /* Set to true to suppress the CNWCCMessageData message. */
+   bool suppress;
 }
 ChatCCMessageEvent;
 ]]
 
 local function HandleChatMessage(event)
-   if not CHAT_HANDLER then return 0 end
+  if not CHAT_HANDLER then return 0 end
 
-   local msg = ffi.cast("ChatMessageEvent*", event)
-   if msg == nil then
-      return 0
-   end
+  local msg = ffi.cast("ChatMessageEvent*", event)
+  if msg == nil then
+    return 0
+  end
 
-   local to = OBJECT_INVALID
-   if msg.to ~= 0xffffffff then
-      local pl = C.nwn_GetPlayerByPlayerID(msg.to)
-      if pl ~= nil then
-         to = Game.GetObjectByID(pl.obj_id)
-      end
-   end
+  local to = OBJECT_INVALID
+  if msg.to ~= 0xffffffff then
+    local pl = C.nwn_GetPlayerByPlayerID(msg.to)
+    if pl ~= nil then
+      to = Game.GetObjectByID(pl.obj_id)
+    end
+  end
 
-   msg.suppress = CHAT_HANDLER(msg.channel,
-                Game.GetObjectByID(msg.from),
-                ffi.string(msg.msg),
-                to)
+  msg.suppress = CHAT_HANDLER(msg.channel,
+           Game.GetObjectByID(msg.from),
+           ffi.string(msg.msg),
+           to)
 
-   return msg.suppress and 1 or 0
+  return msg.suppress and 1 or 0
 end
 
 local function HandleCombatMessage(event)
-   if not CC_HANDLER then return 0 end
+  if not CC_HANDLER then return 0 end
 
-   local msg = ffi.cast("ChatCCMessageEvent*", event)
-   if msg == nil then
-      return 0
-   end
+  local msg = ffi.cast("ChatCCMessageEvent*", event)
+  if msg == nil then
+    return 0
+  end
 
-   msg.suppress = CC_HANDLER(msg)
+  msg.suppress = CC_HANDLER(msg)
 
-   return msg.suppress and 1 or 0
+  return msg.suppress and 1 or 0
 end
 
 local function __HandleChatMessage(event)
-   local ok, ret = pcall(HandleChatMessage, event)
-   if not ok then
-      local Log = System.GetLogger()
-      Log:error("HandleChatMessage: %s", ret)
-      return 0
-   end
-   return ret
+  local ok, ret = pcall(HandleChatMessage, event)
+  if not ok then
+    local Log = System.GetLogger()
+    Log:error("HandleChatMessage: %s", ret)
+    return 0
+  end
+  return ret
 end
 
 local function __HandleCombatMessage(event)
-   local ok, ret = pcall(HandleCombatMessage, event)
-   if not ok then
-      local Log = System.GetLogger()
-      Log:error("HandleCombatMessage: %s", ret)
-      return 0
-   end
-   return ret
+  local ok, ret = pcall(HandleCombatMessage, event)
+  if not ok then
+    local Log = System.GetLogger()
+    Log:error("HandleCombatMessage: %s", ret)
+    return 0
+  end
+  return ret
 end
 
+jit.off(HandleChatMessage)
+jit.off(HandleCombatMessage)
 
 local Log = System.GetLogger()
 local NWNXCore = require 'solstice.nwnx.core'
