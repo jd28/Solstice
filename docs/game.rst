@@ -115,7 +115,7 @@ and optionally enforcing a particular interface.
   Registers a plugin interface.
 
   :param string name: Plugin interface name.
-  :param function enforcer: Function that is called when a plugin attempts to load.  This is to allow eforcing a particular interface.
+  :param function enforcer: Function that is called when a plugin attempts to load.  This is to allow enforcing a particular interface.
 
 .. function:: LoadPlugin(name, interface)
 
@@ -133,7 +133,7 @@ and optionally enforcing a particular interface.
 
 .. function:: UnloadPlugin(name)
 
-  Unloads a plugin for a given plugin interface.  Rhe plugin system will attempt to
+  Unloads a plugin for a given plugin interface.  The plugin system will attempt to
   call ``plugin.OnUnload`` if it exists.
 
   :param string name: Plugin interface name.
@@ -149,7 +149,11 @@ Signals
 
 .. data:: OnPreExportCharacter
 
+  This event is fired before saving a character.
+
 .. data:: OnPostExportCharacter
+
+  This event is fired after saving a character.
 
 .. data:: OnObjectClearCacheData
 
@@ -157,7 +161,7 @@ Signals
 
 .. data:: OnObjectRemovedFromCache
 
-  This signal is called when an object is removed fromt the cache.  Note that PCs are never removed from the cache.
+  This signal is called when an object is removed from the cache.  Note that PCs are never removed from the cache.
 
 .. data:: OnUpdateEffect
 
