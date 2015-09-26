@@ -40,7 +40,7 @@ Attack Bonus
   :param int atype: ATTACK_TYPE_*
   :param target: Object instance.
   :type target: :class:`Object`
-  :rtype: If ``atype`` is passed to the function the unclamped attack bonus is returned, if not an ``lds.Array`` of all ATTACK_TYPE_* bonuses is returned.
+  :rtype: If ``atype`` is passed to the function the unclamped attack bonus is returned, if not an ``int32_t`` array of all ATTACK_TYPE_* bonuses is returned.
 
 .. function:: GetEffectAttackLimits(cre)
 
