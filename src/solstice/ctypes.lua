@@ -17,10 +17,6 @@
 local ffi = require 'ffi'
 local C = ffi.C
 
-local function interp(s, tab)
-  return (s:gsub('($%b{})', function(w) return tab[w:sub(3, -2)] or w end))
-end
-
 require 'solstice.nwn.ctypes.foundation'
 require 'solstice.nwn.ctypes.2da'
 require 'solstice.nwn.ctypes.effect'

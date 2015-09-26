@@ -18,11 +18,7 @@ local Dice   = require 'solstice.dice'
 local DoRoll = Dice.DoRoll
 local RollValid = Dice.IsValid
 
-local function interp(s, tab)
-  return (s:gsub('($%b{})', function(w) return tab[w:sub(3, -2)] or w end))
-end
-
-ffi.cdef(interp([[
+ffi.cdef(string.interp([[
 typedef struct {
     int32_t    damages[${DAMAGE_INDEX_NUM}];
     int32_t    damages_unblocked[${DAMAGE_INDEX_NUM}];

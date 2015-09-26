@@ -219,6 +219,10 @@ function math.clamp(number, low, high)
    return number
 end
 
+function string.interp(s, tab)
+  return (s:gsub('($%b{})', function(w) return tab[w:sub(3, -2)] or w end))
+end
+
 --- Returns the Levenshtein distance between the two given strings
 -- @param str1 String
 -- @param str2 String
