@@ -659,5 +659,3 @@ class Creature
   .. method:: Creature:TakeGold(amount, feedback, source)
 
   .. method:: Creature:UnpossessFamiliar()
-
-  .. method:: Creature:UpdateCombatInfo(all)

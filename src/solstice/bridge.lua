@@ -53,7 +53,6 @@ function __UpdateCombatInfo(attacker)
    attacker = GetObjectByID(attacker)
    if not attacker:GetIsValid() then return end
 
-   attacker:UpdateCombatInfo(true)
    local ce = Rules.GetCombatEngine()
    if ce and ce.UpdateCombatInformation then
       ce.UpdateCombatInformation(attacker)
