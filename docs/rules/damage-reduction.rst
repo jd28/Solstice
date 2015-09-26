@@ -26,7 +26,7 @@ Damage Reduction
   :param eff: Effect to use to modify the damage amount.  Generally this should be the value returned from :func:`GetBestDamageReductionEffect`.
   :type eff: :class:`Effect`
   :param int power: Damage power.
-  :rtype: Modified damage amount and the amount damage was modified.
+  :rtype: Modified damage amount, the amount damage was modified, and a ``bool`` indicating whether the effect was removed.
 
 .. function:: DoDamageResistance(obj, amt, eff, dmgidx)
 
@@ -38,7 +38,7 @@ Damage Reduction
   :param eff: Effect to use to modify the damage amount.  Generally this should be the value returned from :func:`GetBestDamageResistEffect`.
   :type eff: :class:`Effect`
   :param int dmgidx: DAMAGE_INDEX_*
-  :rtype: Modified damage amount and the amount damage was modified.
+  :rtype: Modified damage amount, the amount damage was modified, and a ``bool`` indicating whether the effect was removed.
 
 .. function:: GetBaseDamageImmunity(cre, dmgidx)
 
