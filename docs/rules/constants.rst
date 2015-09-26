@@ -18,6 +18,10 @@ Constants
 
   :param int const: IMMUNITY_TYPE_*
 
+.. function:: GetConstantTable()
+
+  :rtype: The global constant table.
+
 .. function:: RegisterConstants(tda, column_label[, extract[, value_label[, value_type]]])
 
   Register constant loader.

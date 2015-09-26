@@ -148,4 +148,8 @@ function M.ConvertImmunityToIPConstant(const)
    end
 end
 
+function M.GetConstantTable()
+   return _CONSTS
+end
+
 return M
