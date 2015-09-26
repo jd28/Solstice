@@ -86,8 +86,6 @@ class Object
 
   .. method:: Object:GetACVersus(attacker, attack)
 
-  .. method:: Object:GetAllProperties()
-
   .. method:: Object:GetAllVars(match, type)
 
   .. method:: Object:GetArea()
@@ -243,8 +241,6 @@ class Object
   .. method:: Object:GetPortraitResRef()
 
   .. method:: Object:GetPosition()
-
-  .. method:: Object:GetProperty(prop)
 
   .. method:: Object:GetReflexSavingThrow()
 
