@@ -223,15 +223,7 @@ function __HandleEffect()
    _SOL_LOG_INTERNAL:debug("Handling effect of type: %d, on object: 0x%x remove: %d",
                            data.eff.eff_type, data.obj.obj_id, data.is_remove and 1 or 0)
 
-   if data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_INCREASE
-      or data.eff.eff_type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE
-   then
-      Rules.UpdateDamageImmunityEffects(cre)
-   elseif data.eff.eff_type == EFFECT_TYPE_ABILITY_INCREASE
-      or data.eff.eff_type == EFFECT_TYPE_ABILITY_DECREASE
-   then
-      Rules.UpdateAbilityEffects(cre)
-   end
+   Game.OnUpdateEffect:notify(cre, Eff.effect_t(data.eff, true))
 end
 
 function __GetEffectImmunity(obj, imm)
