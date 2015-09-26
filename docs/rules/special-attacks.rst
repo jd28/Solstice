@@ -42,6 +42,7 @@ Special Attacks
 
   .. note::
 
+    The boolean return value indicates whether the special attack was successful.
 
   :param int special_attack: FEAT_* or SPECIAL_ATTACK_*
   :param info: Attack ctype from combat engine.
