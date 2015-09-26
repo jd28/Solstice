@@ -1,6 +1,8 @@
 --- Rules module
 -- @module rules
 
+local ffi = require 'ffi'
+
 local _DMG_IMM = {}
 local _DMG_RED = {}
 
@@ -89,7 +91,7 @@ local function SetBaseDamageResistanceOverride(func, ...)
   end
 end
 
-local DMG_IMMUNITIES = ffi.new('int32[?]', DAMAGE_INDEX_NUM)
+local DMG_IMMUNITIES = ffi.new('int32_t[?]', DAMAGE_INDEX_NUM)
 
 local function GetEffectDamageImmunity(obj, dmgidx)
   ffi.fill(DMG_IMMUNITIES, 4 * DAMAGE_INDEX_NUM)
