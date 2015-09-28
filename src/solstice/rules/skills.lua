@@ -168,32 +168,43 @@ function M.GetSkillEffectLimits(cre, skill)
 end
 
 --- Get skill modification from effects.
--- @param cre Creature object.
--- @param skill SKILL_*
--- @return Total amount, uncapped
+local SKILL_EFF = ffi.new('int32_t[?]', SKILL_NUM)
 function M.GetSkillEffectModifier(cre, skill)
-   local eff = 0
-   if cre.obj.obj.obj_effects_len <= 0 then return eff end
+  for i=0, SKILL_NUM - 1 do
+    SKILL_EFF[i] = 0
+  end
 
-   if cre.obj.cre_stats.cs_first_skill_eff > 0 then
-      for i = cre.obj.cre_stats.cs_first_skill_eff, cre.obj.obj.obj_effects_len - 1 do
-         if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_INCREASE
-            and cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_DECREASE
-         then
-            break
-         end
-         if cre.obj.obj.obj_effects[i].eff_integers[0] == skill
-            or cre.obj.obj.obj_effects[i].eff_integers[0] == 255
-         then
-            if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_SKILL_INCREASE then
-               eff = eff + cre.obj.obj.obj_effects[i].eff_integers[1]
-            else
-               eff = eff - cre.obj.obj.obj_effects[i].eff_integers[1]
-            end
-         end
+  local all = 0
+  if cre.obj.obj.obj_effects_len <= 0 then return 0 end
+
+  if cre.obj.cre_stats.cs_first_skill_eff > 0 then
+    for i = cre.obj.cre_stats.cs_first_skill_eff, cre.obj.obj.obj_effects_len - 1 do
+      if cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_INCREASE
+        and cre.obj.obj.obj_effects[i].eff_type ~= EFFECT_TYPE_SKILL_DECREASE
+      then
+        break
       end
-   end
-   return eff
+      local sktype = cre.obj.obj.obj_effects[i].eff_integers[0]
+      local amt = cre.obj.obj.obj_effects[i].eff_integers[1]
+      if sktype == 255 then
+        all = all + amt
+      else
+        if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_SKILL_INCREASE then
+          SKILL_EFF[sktype] = SKILL_EFF[sktype] + amt
+        else
+          SKILL_EFF[sktype] = SKILL_EFF[sktype] - amt
+        end
+      end
+    end
+  end
+  if skill then
+    return SKILL_EFF[skill] + all
+  else
+    for i=0, SKILL_NUM - 1 do
+      SKILL_EFF[i] = SKILL_EFF[i] + all
+    end
+    return SKILL_EFF
+  end
 end
 
 --- Determines if a creature can use a skill
