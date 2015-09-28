@@ -9,14 +9,6 @@ local C = require('ffi').C
 local M = require 'solstice.game.init'
 local ffi = require 'ffi'
 
---- Create an object of a specified type at a given location
--- NWScript: CreateObject
--- @param object_type OBJECT_TYPE_*
--- @param template The resref of the object to create from the pallet.
--- @param loc The location to create the object at.
--- @param[opt=false] appear If `true`, the object will play its spawn in animation.
--- @param[opt=""] newtag If this string is not empty, it will replace the default tag from the template.
--- @return New object or OBJECT_INVALID
 function M.CreateObject(object_type, template, loc, appear, newtag)
    if appear == nil then appear = false end
    newtag = newtag or ""
@@ -30,8 +22,6 @@ function M.CreateObject(object_type, template, loc, appear, newtag)
    return NWE.StackPopObject()
 end
 
---- Export single character.
--- @param player Object to export.
 function M.ExportSingleCharacter(player)
    M.OnPreExportCharacter:notify(player)
    NWE.StackPushObject(player)
@@ -49,28 +39,20 @@ function M.GetModule()
    return mod
 end
 
---- Get object by ID.
--- @param id Object ID.
--- @return An object or OBJECT_INVALID
 function M.GetObjectByID(id)
    return _SOL_GET_CACHED_OBJECT(id)
 end
 
---- Get canonical ID
--- @param cre Player character
 function M.GetCanonicalID(cre)
    return _GET_CANONICAL_ID(cre)
 end
 
---- Clear the effect cache.
 function M.ClearCacheData(obj)
    obj.load_char_finished = 0
    obj['SOL_HP_EFF'] = 0
    M.OnObjectClearCacheData:notify(obj)
 end
 
---- Remove object from Solstice object cache.
--- @param obj Any object.
 function M.RemoveObjectFromCache(obj)
    -- Don't remove PC's from the cahce
    if obj:GetType() == OBJECT_TYPE_CREATURE and obj:GetIsPC() then
@@ -81,9 +63,6 @@ function M.RemoveObjectFromCache(obj)
    end
 end
 
---- Gets an object by tag
--- @param tag Tag of object
--- @param[opt=1] nth Nth object.
 function M.GetObjectByTag(tag, nth)
    nth = nth or 1
 
@@ -93,8 +72,6 @@ function M.GetObjectByTag(tag, nth)
    return NWE.StackPopObject()
 end
 
---- Iterator over objects by tag
--- @param tag Tag of object
 function M.ObjectsByTag(tag)
    local i = 1
    return function()
@@ -106,8 +83,6 @@ function M.ObjectsByTag(tag)
    end
 end
 
--- Gets first PC.
--- @return OBJECT_INVALID if no PCs are logged into the server.
 local function GetFirstPC()
    NWE.ExecuteCommand(548, 0)
    return NWE.StackPopObject()
@@ -125,7 +100,6 @@ function M.PCs()
    return make_iter_valid(GetFirstPC, GetNextPC)
 end
 
---- Gets the PC speaker.
 function M.GetPCSpeaker()
    NWE.ExecuteCommand(238, 0)
    return NWE.StackPopObject()
@@ -157,13 +131,6 @@ local function GetNextObjectInShape(shape, size, location, line_of_sight, mask, 
    return NWE.StackPopObject()
 end
 
---- Iterator over objects in a shape.
--- @param shape SHAPE_*
--- @param size The size of the shape. Dependent on shape or RADIUS_SIZE_*.
--- @param location Shapes location
--- @param[opt=false] line_of_sight This can be used to ensure that spell effects do not go through walls.
--- @param[opt=OBJECT_TYPE_CREATURE] mask Object type mask.
--- @param[opt=vector(0)] origin Normally the spell-caster's position.
 function M.ObjectsInShape(shape, size, location, line_of_sight, mask, origin)
    local function first()
       return GetFirstObjectInShape(shape, size, location, line_of_sight, mask, origin)
@@ -175,9 +142,6 @@ function M.ObjectsInShape(shape, size, location, line_of_sight, mask, origin)
    return make_iter_valid(first, next)
 end
 
---- Finds a waypiont by tag
--- @param tag Tag of waypoint.
--- @return OBJECT_INVALID if no Waypoint is found.
 function M.GetWaypointByTag(tag)
    NWE.StackPushString(tag)
    return NWE.StackPopObject()

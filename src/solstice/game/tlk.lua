@@ -6,8 +6,6 @@
 
 local ffi = require 'ffi'
 
---- Get string by TLK table reference.
--- @param strref TLK table reference.
 local function GetTlkString(strref)
    local s = ffi.C.nwn_GetStringByStrref(strref)
    local ret = ""
