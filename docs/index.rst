@@ -26,10 +26,6 @@ of the combat engine replacement see
 ``examples/core_combat_engine.lua``, just be aware that that code is
 atypical in that it’s written for the highest performance possible.
 
-There are also other projects similar to this: nwnx_jvm, nwnx_ruby,
-nwnx_lua. So if you like the idea but not Lua or the implementation,
-there are other options.
-
 Status
 ------
 
@@ -74,7 +70,7 @@ A normal ‘script’:
 .. code:: lua
 
     function hello_world(obj)
-        obj:SendMessage('Hello, world!')
+      obj:SendMessage('Hello, world!')
     end
 
 A ‘script’ that can be used in a conversation conditional:
@@ -82,7 +78,7 @@ A ‘script’ that can be used in a conversation conditional:
 .. code:: lua
 
     function is_epic_char(obj)
-        return obj:GetHitDice() >= 20
+      return obj:GetHitDice() > 20
     end
 
 This has a some side effects:
@@ -94,7 +90,7 @@ This has a some side effects:
    display their contents.
 -  Many Lua functions can be placed into a single file.
 -  None of these external Lua scripts count towards resource limits and
-   if you build your module they will be c
+   if you build your module they will be consider 'missing'.
 
 .. _Neverwinter Nights: http://neverwinternights.info/
 .. _here: https://github.com/jd28/the_awakening/tree/master/scripts/lua
@@ -127,8 +123,9 @@ This has a some side effects:
   :caption: Development
   :maxdepth: 3
 
-  known_issues
-  todo
+  dev/why_lua
+  dev/known_issues
+  dev/todo
 
 Indices and tables
 ==================
