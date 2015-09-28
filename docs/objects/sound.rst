@@ -6,10 +6,23 @@ class Sound
 
 .. class:: Sound
 
-.. method:: Sound:Play()
+  .. method:: Sound:Play()
 
-.. method:: Sound:Stop()
+    Play sound.
 
-.. method:: Sound:SetVolume(volume)
+  .. method:: Sound:Stop()
 
-.. method:: Sound:SetPosition(position)
+    Stop sound
+
+  .. method:: Sound:SetVolume(volume)
+
+    Set volume.
+
+    :param int volume: New volume.
+
+  .. method:: Sound:SetPosition(position)
+
+    Set sounds position.
+
+    :param position: Position.
+    :type position: :class:`Vector`
