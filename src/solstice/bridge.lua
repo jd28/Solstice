@@ -48,15 +48,15 @@ function __ResolvePreAttack(attacker_, target_)
 end
 
 function __UpdateCombatInfo(attacker)
-   _SOL_LOG_INTERNAL:debug("__UpdateCombatInfo: Creature: 0x%x", attacker)
+  _SOL_LOG_INTERNAL:debug("__UpdateCombatInfo: Creature: 0x%x", attacker)
 
-   attacker = GetObjectByID(attacker)
-   if not attacker:GetIsValid() then return end
+  attacker = GetObjectByID(attacker)
+  if not attacker:GetIsValid() then return end
 
-   local ce = Rules.GetCombatEngine()
-   if ce and ce.UpdateCombatInformation then
-      ce.UpdateCombatInformation(attacker)
-   end
+  local ce = Rules.GetCombatEngine()
+  if ce then
+    Game.OnUpdateCombatInfo:notify(attacker)
+  end
 end
 
 local result

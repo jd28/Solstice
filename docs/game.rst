@@ -313,6 +313,14 @@ Signals
 
   This signal is called when an object is removed from the cache.  Note that PCs are never removed from the cache.
 
+.. data:: OnUpdateCombatInfo
+
+  This signal is called when combat information is updated.  Only one parameters is passed: a :class:`Creature` instance.
+
+  .. note::
+
+    This is only active when a combat engine has been registered!
+
 .. data:: OnUpdateEffect
 
   This is called whenever an effect is applied or removed from a creature.  Two parameters are passed: a :class:`Creature` instance and a :class:`Effect`.  Note: there is no way to determine if the effect was applied or removed, so it's only useful in cases of updating/invalidating cached information.
