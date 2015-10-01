@@ -22,23 +22,28 @@ local _COMBAT_ENGINE
 --- Register a combat engine.
 -- @param engine CombatEngine table.
 local function RegisterCombatEngine(engine)
-   assert(engine.DoMeleeAttack, "ERROR: Missing DoMeleeAttack!")
-   assert(engine.DoPreAttack, "ERROR: Missing DoPreAttack!")
-   assert(engine.DoRangedAttack, "ERROR: Missing DoRangedAttack!")
-   _COMBAT_ENGINE = engine
-   ffi.C.Local_SetCombatEngineActive(true)
+  if engine then
+    assert(engine.DoMeleeAttack, "ERROR: Missing DoMeleeAttack!")
+    assert(engine.DoPreAttack, "ERROR: Missing DoPreAttack!")
+    assert(engine.DoRangedAttack, "ERROR: Missing DoRangedAttack!")
+    _COMBAT_ENGINE = engine
+    ffi.C.Local_SetCombatEngineActive(true)
+  else
+    _COMBAT_ENGINE = nil
+    ffi.C.Local_SetCombatEngineActive(false)
+  end
 end
 
 --- Get current combat engine.
 local function GetCombatEngine()
-   return _COMBAT_ENGINE
+  return _COMBAT_ENGINE
 end
 
 --- Set combat engine active.
 -- Note this is implicitly called by RegisterCombatEngine.
 -- @bool active Turn combat engine on or off.
 local function SetCombatEngineActive(active)
-   ffi.C.Local_SetCombatEngineActive(active)
+  ffi.C.Local_SetCombatEngineActive(active)
 end
 
 local M = require 'solstice.rules.init'

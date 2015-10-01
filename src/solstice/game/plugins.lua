@@ -43,6 +43,21 @@ local function IsPluginLoaded(name)
   return not not p
 end
 
+local PLUGIN_COMBAT_ENGINE = "_SOL_PLUGIN_COMBAT_ENGINE"
+
+RegisterPlugin(
+  PLUGIN_COMBAT_ENGINE,
+  function(interface)
+    if not interface.DoRangedAttack then
+      return false
+    elseif not interface.DoMeleeAttack then
+      return false
+    elseif not interface.DoPreAttack then
+      return false
+    end
+    return true
+  end)
+
 local M = require 'solstice.game.init'
 M.RegisterPlugin = RegisterPlugin
 M.LoadPlugin = LoadPlugin
@@ -50,3 +65,4 @@ M.GetPlugin = GetPlugin
 M.UnloadPlugin = UnloadPlugin
 M.IsPluginLoaded = IsPluginLoaded
 
+M.PLUGIN_COMBAT_ENGINE = PLUGIN_COMBAT_ENGINE

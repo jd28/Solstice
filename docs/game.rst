@@ -8,6 +8,15 @@ Game
 
 This module provides defines an interface for game related state.
 
+Constants
+---------
+
+.. data:: PLUGIN_COMBAT_ENGINE
+
+  Combat engine plugin ID.
+
+---
+
 2DA
 ----
 
