@@ -49,7 +49,7 @@ local function GetAbilityEffectModifier(cre, ability)
     end
   end
 
-  if not ability then
+  if ability then
     return ABILITY_EFF[ability]
   else
     return ABILITY_EFF

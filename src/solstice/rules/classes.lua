@@ -144,7 +144,6 @@ end
 local M = require 'solstice.rules.init'
 M.CanUseClassAbilities            = CanUseClassAbilities
 M.SetCanUseClassAbilitiesOverride = SetCanUseClassAbilitiesOverride
-M.GetBaseAttackBonus              = GetBaseAttackBonus
 M.GetLevelBonusFeats              = GetLevelBonusFeats
 M.GetClassName                    = GetClassName
 M.GetSkillPointsGainedOnLevelUp   = GetSkillPointsGainedOnLevelUp

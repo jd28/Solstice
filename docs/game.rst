@@ -315,7 +315,7 @@ Signals
 
 .. data:: OnUpdateEffect
 
-  This is called whenever an effect is applied or removed from a creature.  Two parameters are passed: a :class:`Creature` instant and a :class:`Effect`.  Note: there is no way to determine if the effect was applied or removed, so it's only useful in cases of updating/invalidating cached information.
+  This is called whenever an effect is applied or removed from a creature.  Two parameters are passed: a :class:`Creature` instance and a :class:`Effect`.  Note: there is no way to determine if the effect was applied or removed, so it's only useful in cases of updating/invalidating cached information.
 
 Scripts
 -------

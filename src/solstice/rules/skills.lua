@@ -188,7 +188,7 @@ function M.GetSkillEffectModifier(cre, skill)
       local amt = cre.obj.obj.obj_effects[i].eff_integers[1]
       if sktype == 255 then
         all = all + amt
-      else
+      elseif sktype == skill then
         if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_SKILL_INCREASE then
           SKILL_EFF[sktype] = SKILL_EFF[sktype] + amt
         else
