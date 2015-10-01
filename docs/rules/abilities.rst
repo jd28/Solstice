@@ -6,6 +6,14 @@
 Abilities
 ---------
 
+.. function:: DebugAbilities(cre)
+
+  Returns a string with some abiltiy related information.
+
+  :param cre: Creature instance
+  :type cre: :class:`Creature`
+  :rtype: string
+
 .. function:: GetAbilityName(ability)
 
   Gets the name of an ability.

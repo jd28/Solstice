@@ -7,7 +7,7 @@
 local ffi = require 'ffi'
 
 local function GetAbilityName(ability)
-   return Game.GetTlkString(TDA.GetInt("abilities", "Name", ability))
+   return Game.GetTlkString(Game.Get2daInt("abilities", "Name", ability))
 end
 
 --- Get the limits of ability effects
@@ -23,7 +23,7 @@ end
 -- @param cre Creature object.
 -- @param ability ABILITY_*
 -- @return Total amount, uncapped
-local ABILITY_EFF = ffi.new('int32_t[?]', ABILITY_NUM)
+local ABILITY_EFF = ffi.cast('int32_t*', ffi.C.malloc(4 * ABILITY_NUM))
 local function GetAbilityEffectModifier(cre, ability)
   for i=0, ABILITY_NUM -1 do
      ABILITY_EFF[i] = 0
@@ -42,9 +42,9 @@ local function GetAbilityEffectModifier(cre, ability)
       local amt = cre.obj.obj.obj_effects[i].eff_integers[1]
 
       if cre.obj.obj.obj_effects[i].eff_type == EFFECT_TYPE_ABILITY_INCREASE then
-        ABILITY_EFF[i] = ABILITY_EFF[i] + amt
+        ABILITY_EFF[abtype] = ABILITY_EFF[abtype] + amt
       else
-        ABILITY_EFF[i] = ABILITY_EFF[i] - amt
+        ABILITY_EFF[abtype] = ABILITY_EFF[abtype] - amt
       end
     end
   end
@@ -56,7 +56,28 @@ local function GetAbilityEffectModifier(cre, ability)
   end
 end
 
+local ABIL_FMT = "  %s: Total: %d (%d), Modifier: %d (%d), Effect: %d, Limits: %d-%d"
+
+local function DebugAbilities(cre)
+  local t = { "Abilities: "}
+  for i=0, ABILITY_NUM - 1 do
+    local low, high = GetAbilityEffectLimits(cre, i)
+    table.insert(t,
+      string.format(ABIL_FMT,
+        GetAbilityName(i),
+        cre:GetAbilityScore(i),
+        cre:GetAbilityScore(i, true),
+        cre:GetAbilityModifier(i),
+        cre:GetAbilityModifier(i, true),
+        GetAbilityEffectModifier(cre, i),
+        low,
+        high))
+  end
+  return table.concat(t, '\n')
+end
+
 local M = require 'solstice.rules.init'
 M.GetAbilityEffectLimits = GetAbilityEffectLimits
 M.GetAbilityEffectModifier = GetAbilityEffectModifier
 M.GetAbilityName = GetAbilityName
+M.DebugAbilities = DebugAbilities
