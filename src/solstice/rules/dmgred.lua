@@ -2,7 +2,7 @@
 -- @module rules
 
 local ffi = require 'ffi'
-
+local C = ffi.C
 local _DMG_IMM = {}
 local _DMG_RED = {}
 
@@ -107,8 +107,8 @@ local function GetEffectDamageImmunity(obj, dmgidx)
       if type == EFFECT_TYPE_DAMAGE_IMMUNITY_DECREASE then
         amt = -amt
       end
+      DMG_IMMUNITIES[idx] = DMG_IMMUNITIES[idx] + amt
     end
-    DMG_IMMUNITIES[idx] = DMG_IMMUNITIES[idx] + amt
   end
 
   if dmgidx then
