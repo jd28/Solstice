@@ -6,6 +6,30 @@
 Damage Reduction
 ----------------
 
+.. function:: DebugDamageImmunity(cre)
+
+  Generates a debug string with damage immunity related values.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :rtype: ``string``
+
+.. function:: DebugDamageResistance(cre)
+
+  Generates a debug string with damage resistance related values.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :rtype: ``string``
+
+.. function:: DebugDamageReduction(cre)
+
+  Generates a debug string with damage reduction related values.
+
+  :param cre: Creature instance.
+  :type cre: :class:`Creature`
+  :rtype: ``string``
+
 .. function:: DoDamageImmunity(obj, amt, dmgidx)
 
   Determines the amount damage is modified by damage immunity.

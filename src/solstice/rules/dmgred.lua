@@ -122,6 +122,19 @@ local function GetEffectDamageImmunityLimits(obj)
   return -100, 100
 end
 
+local function DebugDamageImmunity(cre)
+  local t = { "Damage Immunities" }
+  local effs = GetEffectDamageImmunity(cre)
+  for i=0, DAMAGE_INDEX_NUM - 1 do
+    table.insert(t,
+      string.format("  %s: Effects: %d; Innate: %d",
+                    Rules.GetDamageName(i),
+                    effs[i],
+                    GetBaseDamageImmunity(cre, i)))
+  end
+  return table.concat(t, '\n')
+end
+
 --- Determines damage immunity adjustment.
 -- @param amt Damage amount.
 -- @param dmgidx Damage index DAMAGE_INDEX_*
@@ -183,6 +196,34 @@ local function GetBestDamageResistEffect(obj, dmgidx, start)
    end
 end
 
+--- Debug damage resistance.
+local function DebugDamageResistance(cre)
+   local t = {}
+   local eff
+   local start = cre.obj.cre_stats.cs_first_dmgresist_eff
+   if start <= 0 then start = 0 end
+
+   table.insert(t, "Damage Resist:")
+
+   for i = 0, DAMAGE_INDEX_NUM - 1 do
+      eff, start = GetBestDamageResistEffect(cre, i, start)
+
+      if eff then
+        table.insert(t, string.format('  %s: Innate: %d, Effect: %d/- Limit: %d',
+                                      Rules.GetDamageName(i),
+                                      GetBaseDamageResistance(cre, dmgidx),
+                                      eff.eff_integers[1],
+                                      eff.eff_integers[2]))
+      else
+         table.insert(t, string.format('  %s: Innate: %d',
+                                       Rules.GetDamageName(i),
+                                       GetBaseDamageResistance(cre, dmgidx)))
+      end
+   end
+   return table.concat(t, '\n')
+end
+
+
 --- Determine best damage reduction effect.
 -- @param power Damage power.
 -- @param[opt=0] start Place in object effect array to start looking.
@@ -213,6 +254,29 @@ local function GetBestDamageReductionEffect(obj, power, start)
          end
       end
    end
+end
+
+--- Debug damage reduction.
+local function DebugDamageReduction(cre)
+   local t = {}
+   local eff
+   local start = cre.obj.cre_stats.cs_first_dmgred_eff
+   if start <= 0 then start = 0 end
+
+   table.insert(t, "Damage Reduction:")
+   table.insert(t, string.format('  Innate: %d', GetBaseDamageReduction(cre)))
+
+   for i=0, DAMAGE_POWER_NUM - 1 do
+      eff, start = GetBestDamageReductionEffect(cre, i, start)
+      if eff then
+         table.insert(t, string.format('  %d: Effect: %d/+%d Limit: %d',
+                                       i,
+                                       eff.eff_integers[0],
+                                       i,
+                                       eff.eff_integers[2]))
+      end
+   end
+   return table.concat(t, '\n')
 end
 
 --- Resolves damage resistance.
@@ -307,6 +371,9 @@ end
 
 
 local M = require 'solstice.rules.init'
+M.DebugDamageImmunity             = DebugDamageImmunity
+M.DebugDamageResistance           = DebugDamageResistance
+M.DebugDamageReduction            = DebugDamageReduction
 M.DoDamageImmunity                = DoDamageImmunity
 M.DoDamageReduction               = DoDamageReduction
 M.DoDamageResistance              = DoDamageResistance
