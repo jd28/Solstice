@@ -9,16 +9,11 @@ local Creature = M.Creature
 --- Experience
 -- @section
 
---- Gets a creatures XP
 function Creature:GetXP()
    if not self:GetIsValid() then return 0 end
    return self.obj.cre_stats.cs_xp
 end
 
---- Modifies a creatures XP.
--- @param amount Amount of XP to give or take.
--- @bool[opt=false] direct If true the xp amount is set directly with
--- no feedback to player.
 function Creature:ModifyXP(amount, direct)
    local cmd = 393
    if amount < 0 then
@@ -35,11 +30,6 @@ function Creature:ModifyXP(amount, direct)
    end
 end
 
-
---- Sets a creatures XP
--- @param amount Amount to set XP to
--- @bool[opt=false] direct If true the xp amount is set directly with
--- no feedback to player.
 function Creature:SetXP(amount, direct)
    if direct then
       if not self:GetIsValid() then return end

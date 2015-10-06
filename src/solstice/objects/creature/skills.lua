@@ -12,14 +12,6 @@ local color = require 'solstice.color'
 local D     = require 'solstice.dice'
 local Log   = System.GetLogger()
 
---- [DEPRECATE] Determines if a creature can use a skill
--- @param skill SKILL_*.
-function Creature:CanUseSkill(skill)
-   return ffi.C.nwn_CanUseSkill(self.obj, skill)
-end
-
---- Determines if a creature has a skill
--- @param skill SKILL_*.
 function Creature:GetHasSkill(skill)
    NWE.StackPushObject(self)
    NWE.StackPushInteger(skill)
@@ -27,29 +19,10 @@ function Creature:GetHasSkill(skill)
    return NWE.StackPopBoolean()
 end
 
---- Determines if skill check is successful
--- @param skill SKILL_*
--- @param dc Difficulty Class
--- @param vs Versus a target
--- @param feedback If true sends feedback to participants.
--- @param auto If true a roll of 20 is automatic success, 1 an automatic failure
--- @param delay Delay in seconds.
--- @param take Replaces dice roll.
--- @param bonus And bonus.
 function Creature:GetIsSkillSuccessful(skill, dc, vs, feedback, auto, delay, take, bonus)
    return self:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus) > 0
 end
 
---- Determine's a skill check.
--- Source: FunkySwerve on NWN bioboards
--- @param skill SKILL_*
--- @param dc Difficulty Class
--- @param vs Versus a target
--- @param feedback If true sends feedback to participants.
--- @param auto If true a roll of 20 is automatic success, 1 an automatic failure
--- @param delay Delay in seconds.
--- @param take Replaces dice roll.
--- @param bonus And bonus.
 function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take, bonus)
    vs = vs or OBJECT_INVALID
    if feedback == nil then feedback = true end
@@ -106,10 +79,6 @@ function Creature:GetSkillCheckResult(skill, dc, vs, feedback, auto, delay, take
    return ret
 end
 
---- Gets the amount a skill was increased at a level.
--- @param level Level to check
--- @param skill SKILL_*
--- @return -1 on error.
 function Creature:GetSkillIncreaseByLevel(level, skill)
    if not self:GetIsValid()
       or skill < 0 or skill > SKILL_LAST
@@ -123,17 +92,12 @@ function Creature:GetSkillIncreaseByLevel(level, skill)
    return ls.ls_skilllist[skill]
 end
 
---- Returns a creatures unused skillpoints.
 function Creature:GetSkillPoints()
    if not self:GetIsValid() then return 0 end
 
    return self.obj.cre_stats.cs_skill_points
 end
 
---- Gets creature's skill rank.
--- @param skill SKILL_*
--- @param[opt] vs Versus
--- @bool[opt=false] base If true returns base skill rank.
 function Creature:GetSkillRank(skill, vs, base)
    if not self:GetIsValid() or skill < 0 or skill > SKILL_LAST then
       return 0
@@ -159,10 +123,6 @@ function Creature:GetSkillRank(skill, vs, base)
    return math.clamp(result, -127, 127)
 end
 
---- Modifies skill rank.
--- @param skill SKILL_*
--- @param amount Amount to modify skill rank.
--- @param level If a level is specified the modification will occur at that level.
 function Creature:ModifySkillRank(skill, amount, level)
    if not self:GetIsValid() or
       skill < 0 or skill > SKILL_LAST
@@ -188,8 +148,6 @@ function Creature:ModifySkillRank(skill, amount, level)
    return self.obj.cre_stats.cs_skills[skill]
 end
 
---- Sets a creatures skillpoints available.
--- @param amount New amount
 function Creature:SetSkillPoints(amount)
    if not self:GetIsValid() then return 0 end
 
@@ -197,9 +155,6 @@ function Creature:SetSkillPoints(amount)
    return self.obj.cre_stats.cs_skill_points
 end
 
---- Sets a creatures skill rank
--- @param skill SKILL_*
--- @param amount New skill rank
 function Creature:SetSkillRank(skill, amount)
    if not self:GetIsValid() or
       skill < 0 or skill > SKILL_LAST

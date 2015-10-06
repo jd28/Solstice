@@ -19,63 +19,24 @@ local Creature = M.Creature
 --- Combat
 -- @section
 
---- Get creatures total damage immunity.
--- @param dmgidx DAMAMGE_INDEX_*
-function Creature:GetDamageImmunity(dmgidx)
-  -- If the damage index is invalid... skip it.
-  if dmgidx < 0 or dmgidx >= DAMAGE_INDEX_NUM then
-    return 0
-  end
-  return math.clamp(self:GetInnateDamageImmunity(dmgidx) +
-                    self['SOL_DMG_IMMUNITY'].get(dmgidx),
-                    0, 100)
-end
-
---- Gets innate damage immunity.
--- @param dmg_idx damage type index
-function Creature:GetInnateDamageImmunity(dmg_idx)
-  return Rules.GetBaseDamageImmunity(self, dmg_idx)
-end
-
---- Gets innate damage immunity.
-function Creature:GetInnateDamageReduction()
-  return Rules.GetBaseDamageReduction(self)
-end
-
---- Get innate/feat damage resistance.
--- @param dmg_idx
-function Creature:GetInnateDamageResistance(dmg_idx)
-  return Rules.GetBaseDamageResistance(self, dmg_idx)
-end
-
---- Get creatures innate soak.
--- Note: This name was chosen to match other
--- on creature objects, that have Hardness.
-function Creature:GetHardness()
-  return Rules.GetBaseDamageReduction(self)
-end
-
 --- Adds parry attack.
 -- @param attacker Attacker to do parry attack against.
 function Creature:AddParryAttack(attacker)
   C.nwn_AddParryAttack(self.obj.cre_combat_round, attacker.id)
 end
 
---- Get creature's arcane spell failure.
 function Creature:GetArcaneSpellFailure()
   if not self:GetIsValid() then return 0 end
   local amt = self.obj.cre_stats.cs_arcane_sp_fail_2 + self.obj.cre_stats.cs_arcane_sp_fail_1 + self.obj.cre_stats.cs_arcane_sp_fail_3
   return math.clamp(amt, 0, 100)
 end
 
---- Get creature's attack target
 function Creature:GetAttackTarget()
   if not self:GetIsValid() then return OBJECT_INVALID end
   local obj = self.obj.cre_attack_target
   return GetObjectByID(obj)
 end
 
---- Get creature's attempted attack target
 function Creature:GetAttemptedAttackTarget()
   if not self:GetIsValid() then return OBJECT_INVALID end
 
@@ -83,7 +44,6 @@ function Creature:GetAttemptedAttackTarget()
   return NWE.StackPopObject()
 end
 
---- Get creature's attempted spell target
 function Creature:GetAttemptedSpellTarget()
   if not self:GetIsValid() then return OBJECT_INVALID end
 
@@ -91,24 +51,16 @@ function Creature:GetAttemptedSpellTarget()
   return NWE.StackPopObject()
 end
 
---- Get creature's challenge rating
 function Creature:GetChallengeRating()
   if not self:GetIsValid() then return 0 end
   return self.obj.cre_stats.cs_cr
 end
 
---- Get Concealment
-function Creature:GetConcealment(vs, is_ranged)
-  return Rules.GetConcealment(self, vs, is_ranged)
-end
-
---- Get creature's damage flags.
 function Creature:GetDamageFlags()
   if not self:GetIsValid() then return 0 end
   return C.nwn_GetDamageFlags(self.obj)
 end
 
---- Get creatures attacker.
 function Creature:GetGoingToBeAttackedBy()
   if not self:GetIsValid() then return OBJECT_INVALID end
 
@@ -116,54 +68,37 @@ function Creature:GetGoingToBeAttackedBy()
   return GetObjectByID(obj)
 end
 
---- Determines if creature is in combat.
 function Creature:GetIsInCombat()
   if not self:GetIsValid() then return false end
   return self.obj.cre_combat_state ~= 0
 end
 
---- Get's last attack type used by creature.
 function Creature:GetLastAttackType()
   if not self:GetIsValid() then return 0 end
   return self.obj.obj.obj_last_attack_type
 end
 
---- Get's last attack mode used by creature.
 function Creature:GetLastAttackMode()
   if not self:GetIsValid() then return 0 end
   return self.obj.obj.obj_last_attack_mode
 end
 
---- Get's last trap detected by creature.
 function Creature:GetLastTrapDetected()
   if not self:GetIsValid() then return OBJECT_INVALID end
   local obj = self.obj.cre_last_trap_detected
   return GetObjectByID(obj)
 end
 
---- Get's last weapon used by creature.
 function Creature:GetLastWeaponUsed()
   if not self:GetIsValid() then return OBJECT_INVALID end
   local obj = self.obj.obj.obj_last_attack_weapon
   return GetObjectByID(obj)
 end
 
---- Determines creatures maximum attack range.
--- @param target Target to attack
 function Creature:GetMaxAttackRange(target)
   return C.nwn_GetMaxAttackRange(self.obj, target.id)
 end
 
---- Get miss chance
-function Creature:GetMissChance(vs, is_ranged)
-  return Rules.GetMissChance(self, vs, is_ranged)
-end
-
---- Determines reflex saved damage adjustment.
--- @param damage Total damage.
--- @param dc Difficulty class
--- @param savetype solstice.save constant.
--- @param versus Creature to roll against.
 function Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
   NWE.StackPushObject(versus)
   NWE.StackPushInteger(savetype)
@@ -174,8 +109,6 @@ function Creature:GetReflexAdjustedDamage(damage, dc, savetype, versus)
   return NWE.StackPopInteger()
 end
 
---- Get target state bit mask.
--- @param target Creature target.
 function Creature:GetTargetState(target)
   if not target:GetIsValid() or
     target.type ~= OBJECT_TRUETYPE_CREATURE
@@ -238,7 +171,6 @@ function Creature:GetTargetState(target)
    return res
 end
 
---- Determine Creatures Favored Enemey Bit Mask.
 function Creature:GetFavoredEnemenyMask()
   local res = 0
 
@@ -276,7 +208,6 @@ function Creature:GetFavoredEnemenyMask()
   return res
 end
 
---- Determine if creature is favored enemy.
 function Creature:GetIsFavoredEnemy(vs)
   if not vs:GetIsValid()
     or vs.type ~= OBJECT_TRUETYPE_CREATURE
@@ -288,7 +219,6 @@ function Creature:GetIsFavoredEnemy(vs)
   return band(self.sol_fe_mask, lshift(1, vs:GetRacialType())) ~= 0
 end
 
---- Determine if creature training vs.
 function Creature:GetHasTrainingVs(vs)
   if not vs:GetIsValid()
     or not self.sol_training_vs_mask
@@ -321,29 +251,23 @@ function Creature:GetTrainingVsMask()
   return res
 end
 
---- Determines turn resistance hit dice.
 function Creature:GetTurnResistanceHD()
   NWE.StackPushObject(self)
   NWE.ExecuteCommand(478, 1)
   NWE.StackPopInteger()
 end
 
---- Restores a creature's base number of attacks.
 function Creature:RestoreBaseAttackBonus()
   NWE.StackPushObject(self)
   NWE.ExecuteCommand(756, 1)
 end
 
---- Sets a creature's base number of attacks.
--- @param amount Amount of attacks.
 function Creature:SetBaseAttackBonus(amount)
   NWE.StackPushObject(self)
   NWE.StackPushInteger(amount)
   NWE.ExecuteCommand(755, 2)
 end
 
---- Causes all creatures in a 10 meter (1 tile) radius to stop actions.
--- Improves the creature's reputation with nearby enemies for 3 minutes. Only works for NPCs.
 function Creature:SurrenderToEnemies()
   NWE.ExecuteCommand(476, 0);
 end

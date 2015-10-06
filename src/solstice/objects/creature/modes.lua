@@ -19,15 +19,10 @@ function Creature:GetDetectMode()
    return NWE.StackPopInteger();
 end
 
---- Notifies creature's associats of combat mode change
--- @param mode solstice.modes type constant.
 function Creature:NotifyAssociateActionToggle(mode)
    C.nwn_NotifyAssociateActionToggle(self.obj, mode)
 end
 
---- Sets a creature's activity
--- @param act
--- @param on
 function Creature:SetActivity(act, on)
    C.nwn_SetActivity(self.obj, act, on)
 end
@@ -39,9 +34,6 @@ function Creature:GetCombatMode()
    return self.obj.cre_mode_combat
 end
 
---- Sets creature's combat mode
--- @param mode solstice.modes type constant.
--- @param change If false the combat mode is already active.
 function Creature:SetCombatMode(mode, change)
    local current_mode = self.obj.cre_mode_combat
    local off = mode == COMBAT_MODE_INVALID
@@ -107,10 +99,6 @@ end
 
 jit.off(Creature.SetCombatMode)
 
--- Sets creature's combat mode
--- @param cre Creature in question.
--- @param mode solstice.modes type constant.
--- @param change If false the combat mode is already active.
 function __SetCombatMode(cre, mode, change)
    cre = GetObjectByID(cre)
    cre:SetCombatMode(mode, change)

@@ -11,8 +11,6 @@ local Creature = M.Creature
 --- State
 -- @section
 
---- Check if a creature is using a given action mode
--- @param mode ACTION_MODE_*
 function Creature:GetActionMode(mode)
    NWE.StackPushInteger(mode)
    NWE.StackPushObject(self)
@@ -20,7 +18,6 @@ function Creature:GetActionMode(mode)
    return NWE.StackPopBoolean()
 end
 
---- Determines if a creature is blind.
 function Creature:GetIsBlind()
    if not self:GetIsValid() then return false end
 
@@ -36,20 +33,16 @@ function Creature:GetIsBlind()
    return false
 end
 
---- Determines if a creature is flanked.
--- @param vs Attacker
 function Creature:GetIsFlanked(vs)
    if not vs:GetIsValid() then return false end
    return C.nwn_GetFlanked(self.obj, vs.obj)
 end
 
---- Determines if a creature is flatfooted
 function Creature:GetIsFlatfooted()
    if not self:GetIsValid() then return false end
    return C.nwn_GetFlatFooted(self.obj)
 end
 
---- Determines whether an object is in conversation.
 function Creature:GetIsInConversation()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(445, 1)
@@ -64,16 +57,12 @@ function Creature:GetIsPCDying()
    return NWE.StackPopBoolean();
 end
 
---- Check whether a creature is resting.
 function Creature:GetIsResting()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(505, 1)
    return NWE.StackPopBoolean()
 end
 
---- Sets the status of an action mode on a creature
--- @param mode ACTION_MODE_*
--- @bool status New value.
 function Creature:SetActionMode(mode, status)
    NWE.StackPushBoolean(status)
    NWE.StackPushInteger(mode)

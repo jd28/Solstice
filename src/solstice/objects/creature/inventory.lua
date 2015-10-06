@@ -14,8 +14,6 @@ local GetObjectByID = Game.GetObjectByID
 --- Inventory
 -- @section
 
---- Iterator of a creature's equipped items.
--- @param[opt=false] creature If true include creature items.
 function Creature:Equips(creature)
    local i, _i = 0
    local obj, _obj = self:GetItemInSlot(i)
@@ -29,9 +27,6 @@ function Creature:Equips(creature)
    end
 end
 
---- Determine inventory slot from item
--- @param item Item
--- @return INVENTORY_SLOT_* or -1
 function Creature:GetInventorySlotFromItem(item)
    if not self:GetIsValid() then return -1 end
    for it, slot in self:Equips(true) do
@@ -42,8 +37,6 @@ function Creature:GetInventorySlotFromItem(item)
    return -1
 end
 
---- Forces creature to equip items
--- @param equips A list of items to equip
 function Creature:ForceEquip(equips)
    self:ClearAllActions(true)
    for i = 0, INVENTORY_SLOT_NUM - 1 do
@@ -55,8 +48,6 @@ function Creature:ForceEquip(equips)
    self:SetCommandable(false)
 end
 
---- Forces creature to unequip an item
--- @param item The item in question.
 function Creature:ForceUnequip(item)
    self:ClearAllActions(true)
    self:ActionUnequipItem(item)
@@ -64,9 +55,6 @@ function Creature:ForceUnequip(item)
    self:SetCommandable(false)
 end
 
---- Determines if weapon is effect versus a target.
--- @param vs Attack target.
--- @param is_offhand true if the attack is an offhand attack.
 function Creature:GetIsWeaponEffective(vs, is_offhand)
    NWE.StackPushBoolean(is_offhand)
    NWE.StackPushObject(vs)
@@ -75,8 +63,6 @@ function Creature:GetIsWeaponEffective(vs, is_offhand)
    return NWE.StackPopBoolean()
 end
 
---- Gets an equipped item in creature's inventory.
--- @param slot INVENTORY_SLOT_*
 function Creature:GetItemInSlot(slot)
    if not self:GetIsValid() or
       slot < 0              or
@@ -106,8 +92,6 @@ function Creature:GetWeaponFromAttackType(atype)
    return OBJECT_INVALID
 end
 
---- Determines a weapons weapon size relative to a creature.
--- @param weap The weapon in question.
 function Creature:GetRelativeWeaponSize(weap)
    if not self:GetIsValid() or not weap:GetIsValid() then
       return 0
@@ -115,11 +99,7 @@ function Creature:GetRelativeWeaponSize(weap)
    return C.nwn_GetRelativeWeaponSize(self.obj, weap.obj)
 end
 
---- Gives gold to creature
--- @param amount Amount of gold to give.
--- @param[opt=true] feedback Sends feedback to creature.
--- @param[opt=OBJECT_INVALID] source Source object
-function Creature:GiveGold(amount, feedback, source)
+function Creature:TakeGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
    if not self:GetIsValid()
@@ -141,8 +121,6 @@ function Creature:GiveGold(amount, feedback, source)
    end
 end
 
---- Forces the item in an inventory slot to be reequiped.
--- @param slot INVENTORY_SLOT_*
 function Creature:ReequipItemInSlot(slot)
    local item = self:GetItemInSlot(slot)
    if not item then return end
@@ -154,11 +132,7 @@ function Creature:ReequipItemInSlot(slot)
    self:SetCommandable(false)
 end
 
---- Gives gold to creature
--- @param amount Amount of gold to give.
--- @param[opt=true] feedback Sends feedback to creature.
--- @param[opt=OBJECT_INVALID] source Source object
-function Creature:TakeGold(amount, feedback, source)
+function Creature:GiveGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
    if not self:GetIsValid()

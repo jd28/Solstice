@@ -13,8 +13,6 @@ function Creature:DebugSaves()
    return ""
 end
 
---- Gets creatures saving throw bonus
--- @param save SAVING_THROW_*
 function Creature:GetSavingThrowBonus(save)
    if not self:GetIsValid() then return 0 end
 
@@ -31,9 +29,6 @@ function Creature:GetSavingThrowBonus(save)
    return bonus
 end
 
---- Sets creatures saving throw bonus
--- @param save solstice.save type
--- @param bonus New saving throw bonus
 function Creature:SetSavingThrowBonus(save, bonus)
    if not self:GetIsValid() then return 0 end
 

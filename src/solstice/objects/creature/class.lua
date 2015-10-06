@@ -19,20 +19,15 @@ function Creature:Classes()
    end
 end
 
---- Determines class that was chosen at a particular level.
--- @param level Level to get class at.
--- @return CLASS_TYPE_* constant or -1 on error.
 function Creature:GetClassByLevel(level)
    if not self:GetIsValid() then return -1 end
 
    local ls = self:GetLevelStats(level)
-   if ls == nil then return -1 end
+   if ls == nil then return CLASS_TYPE_INVALID end
 
    return ls.ls_class
 end
 
---- Determines a cleric's domain.
--- @param domain Cleric's first or second domain
 function Creature:GetClericDomain(domain)
    if not self:GetIsValid() then return -1 end
    if domain ~= 1 and domain ~= 2 then
@@ -58,8 +53,6 @@ function Creature:GetClericDomain(domain)
    return -1
 end
 
---- Get number of levels a creature by class
--- @param class CLASS_TYPE_* type constant.
 function Creature:GetLevelByClass(class)
    for i=0, self.obj.cre_stats.cs_classes_len -1 do
       if self.obj.cre_stats.cs_classes[i].cl_class == class then
@@ -69,8 +62,6 @@ function Creature:GetLevelByClass(class)
    return 0
 end
 
---- Get number of levels a creature by position
--- @param position Valid values: 0, 1, or 2
 function Creature:GetLevelByPosition(position)
    if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
@@ -92,25 +83,19 @@ function Creature:GetLevelStats(level)
    return self.obj.cre_stats.cs_levelstat[level - 1];
 end
 
---- Get class type by position
--- @param position Valid values: 0, 1, or 2
--- @return -1 on error.
 function Creature:GetClassByPosition(position)
    if position < 0 or position > 2 then
       error("Invalid class position: " .. position)
    end
 
-   if not self:GetIsValid() then return -1 end
+   if not self:GetIsValid() then return CLASS_TYPE_INVALID end
 
    local cl = self.obj.cre_stats.cs_classes[position]
-   if cl == nil then return -1 end
+   if cl == nil then return CLASS_TYPE_INVALID end
 
    return cl.cl_class
 end
 
---- Determins class postion by class type.
--- @param class CLASS_TYPE_*
--- @return 0, 1, 2, or -1 on error.
 function Creature:GetPositionByClass(class)
    if self:GetClassByPosition(0) == class then
       return 0
@@ -123,7 +108,6 @@ function Creature:GetPositionByClass(class)
    return -1
 end
 
---- Gets a creature's wizard specialization.
 function Creature:GetWizardSpecialization()
    if not self:GetIsValid() then return -1 end
 
@@ -135,9 +119,6 @@ function Creature:GetWizardSpecialization()
    return -1
 end
 
---- Sets a cleric's domain.
--- @param domain Cleric's first or second domain
--- @param newdomain See domains.2da
 function Creature:SetClericDomain(domain, newdomain)
    if not self:GetIsValid() then return -1 end
 
@@ -163,8 +144,6 @@ function Creature:SetClericDomain(domain, newdomain)
    return -1
 end
 
---- Set a wizard's specialization.
--- @param specialization see schools.2da
 function Creature:SetWizardSpecialization(specialization)
    if not self:GetIsValid() then return -1 end
 
@@ -178,8 +157,6 @@ function Creature:SetWizardSpecialization(specialization)
    return -1
 end
 
---- Determins creatures highest class level
--- @return CLASS_TYPE_*, level
 function Creature:GetHighestLevelClass()
    local hclass, hlevel = -1, -1
    for class in self:Classes() do
