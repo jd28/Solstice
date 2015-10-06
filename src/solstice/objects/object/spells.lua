@@ -11,7 +11,6 @@ local GetObjectByID = Game.GetObjectByID
 --- Class Object: Spells
 -- @section spells
 
---- Determines caster level
 function Object:GetCasterLevel()
    if not self:GetIsValid() then return 0 end
    NWE.StackPushObject(self)
@@ -19,26 +18,22 @@ function Object:GetCasterLevel()
    return NWE.StackPopInteger()
 end
 
---- Gets the caster of the last spell
 function Object:GetSpellCastAtCaster()
    if not self:GetIsValid() then return M.INVALID end
    local o = self.obj.obj.obj_last_spell_castat_caster
    return GetObjectByID(o)
 end
 
---- Determine if the last spell cast at object is harmful
 function Object:GetSpellCastAtHarmful()
    if not self:GetIsValid() then return -1 end
    return self.obj.obj.obj_last_spell_castat_harmful == 1
 end
 
---- Determine spell id of the last spell cast at object
 function Object:GetSpellCastAtId()
    if not self:GetIsValid() then return -1 end
    return self.obj.obj.obj_last_spell_castat_id
 end
 
---- Determine class of the last spell cast at object
 function Object:GetSpellCastClass()
    if not self:GetIsValid() then return -1 end
 
@@ -52,13 +47,11 @@ function Object:GetSpellCastClass()
    return -1
 end
 
---- Get spell id of that last spell cast
 function Object:GetSpellId()
    if not self:GetIsValid() then return -1 end
    return self.obj.obj.obj_last_spell_id
 end
 
---- Get item of that last spell cast
 function Object:GetSpellCastItem()
    if not self:GetIsValid() then return nil end
    if not self:GetType() == OBJECT_TYPE_CREATURE then
@@ -68,13 +61,10 @@ function Object:GetSpellCastItem()
    return GetObjectByID(o)
 end
 
---- Get spell resitance.
 function Object:GetSpellResistance()
    return self:GetLocalInt("SR")
 end
 
---- Determine spell save DC.
--- @param spell Spell ID.
 function Object:GetSpellSaveDC(spell)
    local dc = 14
 
@@ -89,7 +79,6 @@ function Object:GetSpellSaveDC(spell)
    return dc
 end
 
---- Get spell target location
 function Object:GetSpellTargetLocation()
    if not self:GetIsValid() then return -1 end
    local area = self:GetArea()
@@ -98,8 +87,6 @@ function Object:GetSpellTargetLocation()
    return location_t(loc, Vec.vector_t(0,0,0), area.id)
 end
 
---- Get last spell target
--- @return solstice.object.INVALID on error.
 function Object:GetSpellTargetObject()
    if not self:GetIsValid() then return M.INVALID end
    local o = self.obj.obj.obj_last_spell_target

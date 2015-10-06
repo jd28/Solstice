@@ -8,8 +8,6 @@ local Object = M.Object
 --- Class Object: Actions
 -- @section action
 
---- An action that causes an object to close a door.
--- @param door Door to close
 function Object:ActionCloseDoor(door)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -21,9 +19,6 @@ function Object:ActionCloseDoor(door)
 end
 
 
---- Gives a specified item to a target creature.
--- @param item Item to give.
--- @param target Receiver
 function Object:ActionGiveItem(item, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -35,10 +30,6 @@ function Object:ActionGiveItem(item, target)
    NWE.SetCommandObject(temp)
 end
 
---- An action that will cause a creature to lock a door or
--- other unlocked object.
--- @param target Door or placeable object that will be the
---     target of the lock attempt.
 function Object:ActionLockObject(target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -49,8 +40,6 @@ function Object:ActionLockObject(target)
    NWE.SetCommandObject(temp)
 end
 
---- An action that will cause a creature to open a door.
--- @param door Door to open
 function Object:ActionOpenDoor(door)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -61,7 +50,6 @@ function Object:ActionOpenDoor(door)
    NWE.SetCommandObject(temp)
 end
 
---- Pause the current conversation.
 function Object:ActionPauseConversation()
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -71,7 +59,6 @@ function Object:ActionPauseConversation()
    NWE.SetCommandObject(temp)
 end
 
---- Resume a conversation after it has been paused.
 function Object:ActionResumeConversation()
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -81,9 +68,6 @@ function Object:ActionResumeConversation()
    NWE.SetCommandObject(temp)
 end
 
---- Causes an object to speak.
--- @param message String to be spoken.
--- @param[opt=VOLUME_TALK] volume VOLUME_*
 function Object:ActionSpeakString(message, volume)
    volume = volume or VOLUME_TALK
 
@@ -97,9 +81,6 @@ function Object:ActionSpeakString(message, volume)
    NWE.SetCommandObject(temp)
 end
 
---- Causes the creature to speak a translated string.
--- @param strref Reference of the string in the talk table
--- @param[opt=VOLUME_TALK] volume VOLUME_*
 function Object:ActionSpeakStringByStrRef(strref, volume)
    volume = volume or VOLUME_TALK
 
@@ -113,12 +94,6 @@ function Object:ActionSpeakStringByStrRef(strref, volume)
    NWE.SetCommandObject(temp)
 end
 
---- Action to start a conversation with a PC
--- @param target An object to converse with.
--- @param[opt=""] dialog The resource reference (filename) of a conversation.
--- @param[opt=false] private Specify whether the conversation is audible to everyone
---     or only to the PC.
--- @param[opt=true] hello Determines if initial greeting is played.
 function Object:ActionStartConversation(target, dialog, private, hello)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -135,9 +110,6 @@ function Object:ActionStartConversation(target, dialog, private, hello)
    NWE.SetCommandObject(temp)
 end
 
---- Takes an item from an object
--- @param item The item to take.
--- @param target The object from which to take the item.
 function Object:ActionTakeItem(item, target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -149,9 +121,6 @@ function Object:ActionTakeItem(item, target)
    NWE.SetCommandObject(temp)
 end
 
---- Causes a creature to unlock a door or other locked object.
--- @param target Door or placeable object that will be the
---     target of the unlock attempt.
 function Object:ActionUnlockObject(target)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -162,8 +131,6 @@ function Object:ActionUnlockObject(target)
    NWE.SetCommandObject(temp)
 end
 
---- Adds a wait action to an objects queue.
--- @param time Time in seconds to wait.
 function Object:ActionWait(time)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -174,8 +141,6 @@ function Object:ActionWait(time)
    NWE.SetCommandObject(temp)
 end
 
---- Removes all actions from an action queue.
--- @param[opt=false] clear_combat combat along with all other actions.
 function Object:ClearAllActions(clear_combat)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -186,7 +151,6 @@ function Object:ClearAllActions(clear_combat)
    NWE.SetCommandObject(temp)
 end
 
---- Returns the currently executing Action.
 function Object:GetCurrentAction()
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -198,9 +162,6 @@ function Object:GetCurrentAction()
    return NWE.StackPopInteger()
 end
 
---- Forces an object to immediately speak.
--- @param text Text to be spoken.
--- @param[opt=VOLUME_TALK] volume VOLUME_*
 function Object:SpeakString(text, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)
@@ -213,9 +174,6 @@ function Object:SpeakString(text, volume)
    NWE.SetCommandObject(temp)
 end
 
---- Causes an object to instantly speak a translated string.
--- @param strref TLK string reference to speak.
--- @param[opt=VOLUME_TALK] volume VOLUME_*
 function Object:SpeakStringByStrRef(strref, volume)
    local temp = NWE.GetCommandObject()
    NWE.SetCommandObject(self)

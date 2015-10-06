@@ -43,10 +43,6 @@ safe_require "solstice.objects.object.vars"
 --- Class Object
 -- @section class_object
 
---- Copies an object
--- @param location Location to copy the object to.
--- @param owner Owner of the object
--- @param[opt=""] tag Tag of new object.
 function Object:Copy(location, owner, tag)
    tag = tag or ""
 
@@ -59,9 +55,6 @@ function Object:Copy(location, owner, tag)
    return NWE.StackPopObject()
 end
 
---- Begin conversation
--- @param target Object to converse with
--- @param[opt=""] conversation Dialog resref
 function Object:BeginConversation(target, conversation)
    conversation = conversation or ""
 
@@ -71,8 +64,6 @@ function Object:BeginConversation(target, conversation)
    NWE.StackPopInteger()
 end
 
---- Destroy an object.
--- @param[opt=0.0] delay Delay (in seconds) before object is destroyed.
 function Object:Destroy(delay)
    delay = delay or 0.0
 
@@ -81,7 +72,6 @@ function Object:Destroy(delay)
    NWE.ExecuteCommand(241, 2)
 end
 
---- Determine if dead
 function Object:GetIsDead()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(140, 1);
@@ -89,48 +79,26 @@ function Object:GetIsDead()
 end
 
 
---- Determine if named timer is still active.
--- @param name Timer name.
--- @return true if the timer is active
 function Object:GetIsTimerActive(name)
    return self:GetLocalBool(name)
 end
 
-function Object:GetTrap()
-   if self.type == GAME_OBJECT_TYPE_DOOR or
-      self.type == GAME_OBJECT_TYPE_PLACEABLE or
-      self.type == GAME_OBJECT_TYPE_TRIGGER then
-      return trap_t(self.id, self.type, ffi.cast("CGameObject*", self.obj))
-   end
--- TODO: Implement
-   return M.INVALID
-end
-
---- Check whether an object is trapped.
--- @return true if self is trapped, otherwise false.
 function Object:GetIsTrapped()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(551, 1)
    return NWE.StackPopBoolean()
 end
 
---- Determines if an object is valid
 function Object:GetIsValid()
    if self.id == 0x7F000000 then return false end
    return C.nwn_GetObjectByID(self.id) ~= nil
 end
 
---- Causes object to play a sound
--- @param sound Sound to play
 function Object:PlaySound(sound)
    NWE.StackPushString(sound)
    NWE.ExecuteCommand(46, 1)
 end
 
---- Causes object to play a sound
--- @param strref Sound to play
--- @param[opt=true] as_action Determines if this is an action that
--- can be stacked on the action queue.
 function Object:PlaySoundByStrRef(strref, as_action)
    if as_action == nil then as_action = true end
    NWE.StackPushInteger(as_action)
@@ -138,8 +106,6 @@ function Object:PlaySoundByStrRef(strref, as_action)
    NWE.ExecuteCommand(720, 2)
 end
 
---- Attemp to resist a spell
--- @param vs Attacking caster
 function Object:ResistSpell(vs)
    NWE.StackPushObject(self)
    NWE.StackPushObject(vs)
@@ -147,18 +113,11 @@ function Object:ResistSpell(vs)
    return NWE.StackPopBoolean()
 end
 
---- Changes an objects tag.
--- @param tag New tag.
 function Object:SetTag(tag)
    error "TODO"
    -- TODO: Implement
 end
 
---- Traps an objeect
--- @param type TRAP\_BASE\_TYPE_*
--- @param faction STANDARD\_FACTION\_*
--- @param[opt=""] on_disarm OnDisarmed script.
--- @param[opt=""] on_trigger OnTriggered script.
 function Object:Trap(type, faction, on_disarm, on_trigger)
    NWE.StackPushString(on_trigger or "")
    NWE.StackPushString(on_disarm or "")
@@ -168,15 +127,12 @@ function Object:Trap(type, faction, on_disarm, on_trigger)
    NWE.ExecuteCommand(810, 5)
 end
 
---- Gets transition target
 function Object:GetTransitionTarget()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(198, 1)
    return NWE.StackPopObject()
 end
 
---- Get an object's type.
--- @return OBJECT\_TYPE\_* or OBJECT_TYPE_NONE on error.
 function Object:GetType()
    if not self:GetIsValid() then return OBJECT_TYPE_NONE end
    if self.type == OBJECT_TRUETYPE_CREATURE then
@@ -202,17 +158,11 @@ function Object:GetType()
    return OBJECT_TYPE_NONE
 end
 
---- Gets the last object to open an object
 function Object:GetLastOpenedBy()
    NWE.ExecuteCommand(376, 0)
    return NWE.StackPopObject()
 end
 
---- Sets a timer on an object
--- @param var_name Variable name to hold the timer
--- @param duration Duration in seconds before timer expires.
--- @param on_expire Function which takes to arguments then object the
--- timer was set on and the variable.
 function Object:SetTimer(var_name, duration, on_expire)
    self:SetLocalBool(var_name, true)
    self:DelayCommand(duration,

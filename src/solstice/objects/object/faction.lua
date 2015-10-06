@@ -11,23 +11,18 @@ local NWE = require 'solstice.nwn.engine'
 --- Class Object: Faction
 -- @section faction
 
---- Changes objects faction
--- @param faction
 function Object:ChangeFaction(faction)
    NWE.StackPushObject(faction)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(173, 2)
 end
 
---- Gets an objects faction ID
 function Object:GetFactionId()
    if not self:GetIsValid() then return -1 end
 
    return C.nl_Object_GetFactionId(self.id)
 end
 
---- Sets an objects faction ID
--- @param faction New faction ID.
 function Object:SetFactionId(faction)
    if not self:GetIsValid() or not faction then return -1 end
 
@@ -70,8 +65,6 @@ function Object:GetFactionAverageXP()
    return NWE.StackPopInteger()
 end
 
---- Get faction member with best AC
--- @param visible If true member must be visible
 function Object:GetFactionBestAC(visible)
    if visible == nil then visible = true end
 
@@ -81,7 +74,6 @@ function Object:GetFactionBestAC(visible)
    return NWE.StackPopObject()
 end
 
---- Get factions gold
 function Object:GetFactionGold()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(185, 1)

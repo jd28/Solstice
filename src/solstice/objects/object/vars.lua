@@ -35,15 +35,12 @@ local function get_var_value(var)
 
 end
 
---- Get local variable count.
 function Object:GetLocalVarCount()
    if not self:GetIsValid() then return 0 end
    local vt = get_var_table(self)
    return vt.vt_len
 end
 
---- Get local variable by index.
--- @param index Postive integer.
 function Object:GetLocalVarByIndex(index)
    if not self:GetIsValid() then return end
    local vt = get_var_table(self)
@@ -51,9 +48,6 @@ function Object:GetLocalVarByIndex(index)
    return vt.vt_list[index]
 end
 
---- Get all variables.
--- @param[opt] match A string pattern for testing variable names.  See string.find
--- @param[opt] type Get variables of a particular type.
 function Object:GetAllVars(match, type)
    local res = {}
    for i = 0, self:GetLocalVarCount() - 1 do
@@ -68,10 +62,6 @@ function Object:GetAllVars(match, type)
    return res
 end
 
---- Decrements local integer variable
--- @param name Variable name
--- @param[opt=1] val Amount to decrement.
--- @return New local variable value.
 function Object:DecrementLocalInt(name, val)
    if not self:GetIsValid() then return end
    val = val or 1
@@ -81,63 +71,44 @@ function Object:DecrementLocalInt(name, val)
    return newval
 end
 
---- Boolean wrapper around DeleteLocalInt
--- Int/Bool values are stored under the same name
--- @param name Variable name.
 function Object:DeleteLocalBool(name)
    self:DeleteLocalInt(name)
 end
 
---- Delete a local int variable
--- @param name Variable name.
 function Object:DeleteLocalInt(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(265, 2)
 end
 
---- Delete a local float variable
--- @param name Variable to delete
 function Object:DeleteLocalFloat(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(266, 2)
 end
 
---- Delete a local string variable
--- @param name Variable to delete
 function Object:DeleteLocalString(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(267, 2)
 end
 
---- Delete a local object variable
--- @param name Variable to delete
 function Object:DeleteLocalObject(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(268, 2)
 end
 
---- Delete a local location variable
--- @param name Variable to delete
 function Object:DeleteLocalLocation(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(269, 2)
 end
 
---- Boolean wrapper around GetLocalInt
--- A wrapper around GetLocalInt returning false if the result is 0, true otherwise.
--- Int/Bool values are stored under the same name
--- @param name Variable name
 function Object:GetLocalBool(name)
    return self:GetLocalInt(name) ~= 0
 end
 
---- Get a local int variable
--- @param name Variable name
 function Object:GetLocalInt(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
@@ -145,8 +116,6 @@ function Object:GetLocalInt(name)
    return NWE.StackPopInteger()
 end
 
---- Get local float variable
--- @param name Variable name
 function Object:GetLocalFloat(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
@@ -154,8 +123,6 @@ function Object:GetLocalFloat(name)
    return NWE.StackPopFloat()
 end
 
---- Get local location variable
--- @param name Variable name
 function Object:GetLocalLocation(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
@@ -163,8 +130,6 @@ function Object:GetLocalLocation(name)
    return NWE.StackPopLocation()
 end
 
---- Get local object variable
--- @param name Variable name
 function Object:GetLocalObject(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
@@ -172,8 +137,6 @@ function Object:GetLocalObject(name)
    return NWE.StackPopObject()
 end
 
---- Get local string
--- @param name Variable name.
 function Object:GetLocalString(name)
    NWE.StackPushString(name)
    NWE.StackPushObject(self)
@@ -182,10 +145,6 @@ function Object:GetLocalString(name)
    return s
 end
 
---- Increment local integer variable
--- @param name Variable name
--- @param[opt=1] val Amount to increment.
--- @return New local variable value.
 function Object:IncrementLocalInt(name, val)
    val = val or 1
 
@@ -194,18 +153,10 @@ function Object:IncrementLocalInt(name, val)
    return newval
 end
 
---- Boolean wrapper around SetLocalInt
--- A wrapper around GetLocalInt returning false if the result is 0, true otherwise.
--- Int/Bool values are stored under the same name.
--- @param name Variable name
--- @param val Value
 function Object:SetLocalBool(name, val)
    self:SetLocalInt(name, val and 1 or 0)
 end
 
---- Set local float variable
--- @param name Variable name
--- @param val Value
 function Object:SetLocalFloat(name, val)
    NWE.StackPushFloat(val)
    NWE.StackPushString(name)
@@ -213,9 +164,6 @@ function Object:SetLocalFloat(name, val)
    NWE.ExecuteCommand(56, 3)
 end
 
---- Set local int variable
--- @param name Variable name
--- @param val Value
 function Object:SetLocalInt(name, val)
    NWE.StackPushInteger(val)
    NWE.StackPushString(name)
@@ -223,9 +171,6 @@ function Object:SetLocalInt(name, val)
    NWE.ExecuteCommand(55, 3)
 end
 
---- Set local location variable
--- @param name Variable name
--- @param val Value
 function Object:SetLocalLocation(name, val)
    NWE.StackPushLocation(val)
    NWE.StackPushString(name)
@@ -233,11 +178,6 @@ function Object:SetLocalLocation(name, val)
    NWE.ExecuteCommand(152, 3)
 end
 
---- Set local string variable
--- NOTE: SetLocalObject must use the NWN stack in order
---    for NWNX hook to work.
--- @param name Variable name
--- @param val Value
 function Object:SetLocalString(name, val)
    NWE.StackPushString(val)
    NWE.StackPushString(name)
@@ -245,11 +185,6 @@ function Object:SetLocalString(name, val)
    NWE.ExecuteCommand(57, 3)
 end
 
---- Set local object variable
--- NOTE: SetLocalObject must use the NWN stack in order
---    for NWNX hook to work.
--- @param name Variable name
--- @param val Value
 function Object:SetLocalObject(name, val)
    NWE.StackPushObject(val)
    NWE.StackPushString(name)

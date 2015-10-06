@@ -8,9 +8,6 @@ local Object = M.Object
 --- Class Object: Inventory
 -- @section inventory
 
---- Get first item in object's inventory.
--- I suggest using the Object:Items() iterator instead.
--- @return object or nil
 function Object:GetFirstItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(339, 1)
@@ -18,22 +15,17 @@ function Object:GetFirstItemInInventory()
    return NWE.StackPopObject()
 end
 
---- Determines if object has an inventory.
 function Object:GetHasInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(570, 1)
    NWE.StackPopBoolean()
 end
 
---- Determines if an object has an item by tag
 function Object:HasItem(tag)
    local item = self:GetItemPossessedBy(tag)
    return item:GetIsValid()
 end
 
---- Determine if object has an item
--- @param tag Object tag to search for
--- @param is_resref If true search by reserf rather than tag.
 function Object:GetItemPossessedBy(tag, is_resref)
    if not is_resref then
       NWE.StackPushString(tag)
@@ -50,7 +42,6 @@ function Object:GetItemPossessedBy(tag, is_resref)
    return OBJECT_INVALID
 end
 
---- Iterator over items in an object's inventory
 function Object:Items()
    local obj = self:GetFirstItemInInventory()
    local prev_obj
@@ -63,23 +54,12 @@ function Object:Items()
    end
 end
 
---- Get first item in object's inventory.
--- I suggest using the Object:Items() iterator instead.
--- @return object or nil
 function Object:GetNextItemInInventory()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(340, 1)
    return NWE.StackPopObject()
 end
 
---- Create a specific item in an objects inventory.
--- NWScript: CreateItemOnObject
--- @param resref The blueprint ResRef string of the item to be created or tag.
--- @param[opt=1] stack_size The number of items to be created.
--- @param[opt=""] new_tag If this string is empty (""), it be set to the default tag from the template.
--- @param[opt=false] only_once If true, function will not give item if
--- object already possess one.
--- @return The new item or solstice.object.INVALID on error.
 function Object:GiveItem(resref, stack_size, new_tag, only_once)
    if only_once then
       local item = self:GetItemPossessedBy(resref, true)
@@ -96,17 +76,12 @@ function Object:GiveItem(resref, stack_size, new_tag, only_once)
    return NWE.StackPopObject()
 end
 
----Open Inventory of specified target
--- @param target Creature to view the inventory of.
 function Object:OpenInventory(target)
    NWE.StackPushObject(target)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(701, 2)
 end
 
---- Get number of items that an object carries.
--- @param id Tag or Resref.
--- @param[opt=false] resref Use resref.
 function Object:CountItem(id, resref)
    local count = 0
    for item in self:Items() do
@@ -123,13 +98,6 @@ function Object:CountItem(id, resref)
    return count
 end
 
---- Take an item from an object.
--- This function handles stack size reduction.  It also checks if the
--- object posses enough of them before taking any.
--- @param id Tag or Resref.
--- @param[opt=1] count How many of the items to take.
--- @param[opt=false] resref Use resref.
--- @return The amount taken.
 function Object:TakeItem(id, count, resref)
    count = count or 1
    if count > self:CountItem(id, resref) then

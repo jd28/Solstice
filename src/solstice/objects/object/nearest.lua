@@ -8,7 +8,6 @@ local Object = M.Object
 --- Class Object: Nearest Objects
 -- @section nearest
 
---- Gets nearest creature by criteria types and values
 function Object:GetNearestCreature(type1, value1, nth, ...)
    nth = nth or 1
    local type2, value2, type3, value3 = ...
@@ -29,9 +28,6 @@ function Object:GetNearestCreature(type1, value1, nth, ...)
    NWE.StackPopObject()
 end
 
---- Get nearest object
--- @param[opt=OBJECT_TYPE_ALL] obj_type OBJECT_TYPE_*
--- @param[opt=1] nth Which object to return.
 function Object:GetNearestObject(obj_type, nth)
    obj_type = obj_type or OBJECT_TYPE_ALL
    nth = nth or 1
@@ -43,9 +39,6 @@ function Object:GetNearestObject(obj_type, nth)
    return NWE.StackPopObject()
 end
 
---- Get nearest object by tag.
--- @param tag Tag of object
--- @param[opt=1] nth Which object to return
 function Object:GetNearestObjectByTag(tag, nth)
    nth = nth or 1
 
@@ -56,8 +49,6 @@ function Object:GetNearestObjectByTag(tag, nth)
    return NWE.StackPopObject()
 end
 
---- Get nearest trap.
--- @param[opt=false] is_detected If true return only detected traps.
 function Object:GetNearestTrap(is_detected)
    NWE.StackPushBoolean(is_detected)
    NWE.StackPushObject(self)

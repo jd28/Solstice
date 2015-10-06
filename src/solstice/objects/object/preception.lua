@@ -8,7 +8,6 @@ local Object = M.Object
 --- Class Object: Preception
 -- @section preception
 
---- Get if object is listening
 function Object:GetIsListening()
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(174, 1)
@@ -16,17 +15,12 @@ function Object:GetIsListening()
    return NWE.StackPopBoolean()
 end
 
---- Set object to listen or not.
--- @bool val
 function Object:SetListening(val)
    NWE.StackPushBoolean(val)
    NWE.StackPushObject(self)
    NWE.ExecuteCommand(175, 2)
 end
 
---- Set listening patterns.
--- @param pattern Pattern to listen for.
--- @param[opt=0] number Number.
 function Object:SetListenPattern(pattern, number)
    number = number or 0
    NWE.StackPushInteger(number)
