@@ -15,7 +15,7 @@ Constants
 
   Combat engine plugin ID.
 
----
+-----------------------------------------
 
 2DA
 ----
@@ -59,6 +59,8 @@ Constants
   :type col: *int* or *string*
   :param int row: Row index.
 
+-----------------------------------------
+
 Events
 ------
 
@@ -74,13 +76,13 @@ Events
 
   Create conversation event.
 
-.. function:: EventSpellCastAt(caster, spell, is_harmful)
+.. function:: EventSpellCastAt(caster, spell[, is_harmful])
 
   Creature spell cast at event.
 
   :param caster: Spell caster.
   :param int spell: SPELL_* constant.
-  :param bool is_harmful: Is spell harmful to target.
+  :param bool is_harmful: Is spell harmful to target.  Default: ``true``
 
 .. function:: EventUserDefined(event)
 
@@ -146,7 +148,8 @@ Events
 
 .. function:: GetUserDefinedItemEventNumber(obj)
 
-  Get the current UserDefined Item Event Number
+  Get the current UserDefined Item Event Number.
+
   :param obj: Item object
   :type obj: :class:`Item`
   :rtype: ITEM_EVENT_* (see itemevents.2da)
@@ -167,6 +170,8 @@ Events
   :type obj: :class:`Object`
   :param event: Event object.
 
+-----------------------------------------
+
 Objects
 -------
 
@@ -174,7 +179,7 @@ Objects
 
   Clear the effect cache.
 
-.. function:: CreateObject(object_type, template, loc[, appear=false[, newtag=""]])
+.. function:: CreateObject(object_type, template, loc[, appear[, newtag]])
 
   Create an object of a specified type at a given location
 
@@ -182,8 +187,8 @@ Objects
   :param string template: The resref of the object to create from the pallet.
   :param loc: The location to create the object at.
   :type loc: :class:`Location`
-  :param bool appear: If ``true``, the object will play its spawn in animation.
-  :param string newtag: If this string is not empty, it will replace the default tag from the template.
+  :param bool appear: If ``true``, the object will play its spawn in animation.  Default: ``false``.
+  :param string newtag: If this string is not empty, it will replace the default tag from the template.  Default: ""
   :rtype: New object or OBJECT_INVALID
 
 .. function:: ExportSingleCharacter(player)
@@ -212,12 +217,12 @@ Objects
   :rtype: An object or ``OBJECT_INVALID``
 
 
-.. function:: GetObjectByTag(tag[, nth=1])
+.. function:: GetObjectByTag(tag[, nth])
 
   Gets an object by tag
 
-  :param string tag: Tag of object
-  :param int nth: Nth object.
+  :param string tag: Tag of object.
+  :param int nth: Nth object.  Default: 1
 
 .. function:: GetPCSpeaker()
 
@@ -244,10 +249,10 @@ Objects
 
   :param int shape: SHAPE_*
   :param int size: The size of the shape. Dependent on shape or RADIUS_SIZE_*.
-  :param location: Shapes location
-  :param bool line_of_sight: This can be used to ensure that spell effects do nt go through walls.
-  :param int mask: Object type mask.
-  :param vector origin: Normally the spell-caster's position.
+  :param location: Shapes location.
+  :param bool line_of_sight: This can be used to ensure that spell effects don't go through walls.  Default: ``false``
+  :param int mask: Object type mask. Default: ``OBJECT_TYPE_CREATURE``.
+  :param vector origin: Normally the spell-caster's position.  Default: Zero vector.
 
 .. function:: PCs()
 
@@ -259,6 +264,8 @@ Objects
   :param obj: Any object.
   :type obj: :class:`Object`
 
+-----------------------------------------
+
 Plugins
 -------
 
@@ -269,7 +276,7 @@ and optionally enforcing a particular interface.
 
   Only one plugin can be registered to a plugin interface.
 
-.. function:: RegisterPlugin(name, enforcer)
+.. function:: RegisterPlugin(name[, enforcer])
 
   Registers a plugin interface.
 
@@ -303,6 +310,8 @@ and optionally enforcing a particular interface.
 
   :param string name: Plugin interface name.
 
+-----------------------------------------
+
 Signals
 -------
 
@@ -333,6 +342,8 @@ Signals
 .. data:: OnUpdateEffect
 
   This is called whenever an effect is applied or removed from a creature.  Two parameters are passed: a :class:`Creature` instance and a :class:`Effect`.  Note: there is no way to determine if the effect was applied or removed, so it's only useful in cases of updating/invalidating cached information.
+
+-----------------------------------------
 
 Scripts
 -------
@@ -402,17 +413,18 @@ Scripts
   :param obj: Object script is being run on.
   :param int event: ITEM_EVENT_* See itemevents.2da
 
-
 .. function:: SetScriptReturnValue(object[, value=SCRIPT_RETURN_CONTINUE])
 
   Set script return value.
 
   :param object: Object script is being run on.
-  :param int value: SCRIPT_RETURN_* constnat.
+  :param int value: SCRIPT_RETURN_* constant.
 
 .. function:: UnlockScriptEnvironment()
 
   Unlocks the script environment. After this is called variables can be set globally in the script environment
+
+-----------------------------------------
 
 Time
 ----
@@ -489,7 +501,6 @@ Time
   :param int month: Specific month to set calendar from 1 to 12.
   :param int day: Specific day to set calendar to from 1 to 28.
 
-
 .. function:: SetTime(hour, minute, second, millisecond)
 
   Sets the game's current time.
@@ -509,6 +520,8 @@ Time
 .. function:: UpdateTime()
 
   Force update time.
+
+-----------------------------------------
 
 TLK
 ---
