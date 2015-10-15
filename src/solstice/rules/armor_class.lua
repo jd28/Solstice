@@ -42,7 +42,7 @@ local function GetACVersus(cre, vs, touch, is_ranged, attack, state)
     ac = ac + cre.obj.cre_stats.cs_ac_shield_base
   end
 
-  local mode = Rules.GetModeModifier(cre:GetCombatMode(), ATTACK_MODIFIER_AC, cre)
+  local mode = Rules.GetModeModifier(cre:GetCombatMode(), ATTACK_MODIFIER_AC, cre) or 0
   if mode then
     ac = ac + mode
   end
@@ -50,10 +50,7 @@ local function GetACVersus(cre, vs, touch, is_ranged, attack, state)
   local mod
   -- Area, class, feat, race, size bonuses.
   for i=0, COMBAT_MOD_SKILL - 1 do
-    mod = Rules.GetCombatModifier(i, ATTACK_MODIFIER_AC, cre)
-    if mod then
-      ac = ac + mod
-    end
+    ac = ac + (Rules.GetCombatModifier(i, ATTACK_MODIFIER_AC, cre) or 0)
   end
 
   if not attack then
@@ -65,7 +62,7 @@ local function GetACVersus(cre, vs, touch, is_ranged, attack, state)
 
     -- Skill: Tumble...
 
-    local mod = Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, cre)
+    local mod = Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, cre) or 0
     if mod then
       ac = ac + mod
     end
@@ -95,7 +92,7 @@ local function GetACVersus(cre, vs, touch, is_ranged, attack, state)
         dodge = cre.obj.cre_stats.cs_ac_dodge_bonus - cre.obj.cre_stats.cs_ac_dodge_penalty
 
         -- Skill: Tumble...
-        ac = ac + Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, cre)
+        ac = ac + (Rules.GetCombatModifier(COMBAT_MOD_SKILL, ATTACK_MODIFIER_AC, cre) or 0)
 
         -- If this is an attack of opportunity and target has mobility
         -- there is a +4 ac bonus. TODO: Fix

@@ -155,18 +155,18 @@ local function GetAttackBonusVs(attacker, atype, target)
   end
 
   for i = 0, COMBAT_MOD_SKILL do
-    ab = ab + Rules.GetCombatModifier(i, ATTACK_MODIFIER_AB, attacker)
+    ab = ab + (Rules.GetCombatModifier(i, ATTACK_MODIFIER_AB, attacker) or 0)
   end
 
   if attacker:GetHasTrainingVs(target) then
-    ab = ab + Rules.GetCombatModifier(COMBAT_MOD_TRAINING_VS, ATTACK_MODIFIER_AB, attacker)
+    ab = ab + (Rules.GetCombatModifier(COMBAT_MOD_TRAINING_VS, ATTACK_MODIFIER_AB, attacker) or 0)
   end
 
   if attacker:GetIsFavoredEnemy(target) then
-    ab = ab + Rules.GetCombatModifier(COMBAT_MOD_FAVORED_ENEMY, ATTACK_MODIFIER_AB, attacker)
+    ab = ab + (Rules.GetCombatModifier(COMBAT_MOD_FAVORED_ENEMY, ATTACK_MODIFIER_AB, attacker) or 0)
   end
 
-  ab = ab + Rules.GetModeModifier(attacker.obj.cre_combat_mode, ATTACK_MODIFIER_AB, cre)
+  ab = ab + (Rules.GetModeModifier(attacker:GetCombatMode(), ATTACK_MODIFIER_AB, cre) or 0)
 
   return ab
 end

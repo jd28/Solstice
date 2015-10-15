@@ -1,6 +1,8 @@
 --- Rules module
 -- @module rules
 
+local min = math.min
+local max = math.max
 local ffi = require 'ffi'
 local C = ffi.C
 local _DMG_IMM = {}
