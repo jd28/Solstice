@@ -1,4 +1,4 @@
-﻿---
+---
 -- Colors should probably be encoded with rgb values or hext strings, string constants
 -- copied from NWScript will not work 99.9% of the time in most cases due to character
 -- encoding issues.
