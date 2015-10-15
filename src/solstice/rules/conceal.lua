@@ -82,7 +82,7 @@ end
 --- Determine Miss Chance.
 -- @param cre Creature
 -- @param is_ranged Is ranged attack.
-function GetMissChance(cre, is_ranged)
+local function GetMissChance(cre, is_ranged)
    local total = 0
 
    for i = cre.obj.cre_stats.cs_first_misschance_eff, cre.obj.obj.obj_effects_len - 1 do
