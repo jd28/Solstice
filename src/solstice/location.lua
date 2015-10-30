@@ -74,7 +74,7 @@ function Location:ApplyVisual(vfx, duration)
    duration = duration or 0
 
    local eff = Eff.VisualEffect(vfx)
-   self:ApplyEffect(durtype, eff)
+   self:ApplyEffect(durtype, eff, duration)
 end
 
 --- Gets nearest object to location

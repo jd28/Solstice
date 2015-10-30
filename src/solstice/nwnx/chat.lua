@@ -57,7 +57,7 @@ typedef struct {
    /* Object being sent the message. */
    unsigned int to;
    /* CNWCCMessageData instance. */
-   void *msg_data;
+   CNWCCMessageData *msg_data;
    /* Set to true to suppress the CNWCCMessageData message. */
    bool suppress;
 }

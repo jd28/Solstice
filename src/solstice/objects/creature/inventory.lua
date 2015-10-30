@@ -99,16 +99,27 @@ function Creature:GetRelativeWeaponSize(weap)
    return C.nwn_GetRelativeWeaponSize(self.obj, weap.obj)
 end
 
+function Creature:ReequipItemInSlot(slot)
+   local item = self:GetItemInSlot(slot)
+   if not item then return end
+
+   self:ClearAllActions(true)
+   self:ActionUnequipItem(item)
+   self:ActionEquipItem(item, slot)
+   self:ActionDoCommand(function (self) self:SetCommandable(true) end)
+   self:SetCommandable(false)
+end
+
 function Creature:TakeGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
    if not self:GetIsValid()
-      or self.obj.cre_gold >= 999999999
+      or self.obj.cre_gold == 0
       or amount <= 0
    then
       return
    end
-   self.obj.cre_gold = math.min(999999999, self.obj.cre_gold + amount)
+   self.obj.cre_gold = math.max(0, self.obj.cre_gold - amount)
 
    if feedback then
       local str
@@ -121,27 +132,16 @@ function Creature:TakeGold(amount, feedback, source)
    end
 end
 
-function Creature:ReequipItemInSlot(slot)
-   local item = self:GetItemInSlot(slot)
-   if not item then return end
-
-   self:ClearAllActions(true)
-   self:ActionUnequipItem(item)
-   self:ActionEquipItem(item, slot)
-   self:ActionDoCommand(function (self) self:SetCommandable(true) end)
-   self:SetCommandable(false)
-end
-
 function Creature:GiveGold(amount, feedback, source)
    if feedback == nil then feedback = true end
 
    if not self:GetIsValid()
-      or self.obj.cre_gold == 0
+      or self.obj.cre_gold >= 999999999
       or amount <= 0
    then
       return
    end
-   self.obj.cre_gold = math.max(0, self.obj.cre_gold - amount)
+   self.obj.cre_gold = math.min(999999999, self.obj.cre_gold + amount)
 
    if feedback then
       local str
