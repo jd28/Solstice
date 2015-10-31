@@ -59,7 +59,7 @@ const char* ns_GetCombatDamageString(
 Attack* Local_GetAttack();
 ]], _CONSTS))
 
-damage_result_t = ffi.typeof('DamageRoll')
+damage_result_t = ffi.typeof('DamageResult')
 
 --- Adds combat message to an attack.
 local function AddCCMessage(info, type, objs, ints, str)
