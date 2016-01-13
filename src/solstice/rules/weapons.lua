@@ -835,8 +835,14 @@ local function InitializeNumberOfAttacks(cre)
       add = add + 1
    end
 
+   -- Not default behavior.  Normally slowed would allow only one
+   -- onhand attack
+   if cre.obj.cre_slowed ~= 0 then
+    on = on - 1
+   end
+
    cre.obj.cre_combat_round.cr_additional_atks = add
-   cre.obj.cre_combat_round.cr_onhand_atks = on
+   cre.obj.cre_combat_round.cr_onhand_atks = math.max(1, on)
    cre.obj.cre_combat_round.cr_offhand_atks = off
 
    cre.obj.cre_combat_round.cr_offhand_taken = 0
