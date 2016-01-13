@@ -76,6 +76,12 @@ local function GetIsRangedWeapon(item)
    return Game.Get2daInt(tda, "Ranged", BaseitemToWeapon(item)) ~= 0
 end
 
+local function GetIsUnarmedWeapon(item)
+   local tda = Game.GetCached2da("wpnprops")
+   if tda == nil then error "Unable to locate wpnprops.2da!" end
+   return Game.Get2daInt(tda, "Type", BaseitemToWeapon(item)) == 8
+end
+
 --- Determine if weapon is light.
 -- @param item The weapon in question.
 -- @param cre Creature weilding weapon
@@ -867,6 +873,7 @@ M.GetDualWieldPenalty             = GetDualWieldPenalty
 
 M.GetIsMonkWeapon                 = GetIsMonkWeapon
 M.GetIsRangedWeapon               = GetIsRangedWeapon
+M.GetIsUnarmedWeapon              = GetIsUnarmedWeapon
 M.GetIsWeaponLight                = GetIsWeaponLight
 M.GetIsWeaponFinessable           = GetIsWeaponFinessable
 M.GetIsWeaponSimple               = GetIsWeaponSimple

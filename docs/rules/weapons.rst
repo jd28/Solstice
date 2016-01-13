@@ -24,7 +24,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetDualWieldPenalty(cre)
@@ -36,19 +36,24 @@ Weapons
 
 .. function:: GetIsMonkWeapon(item, cre)
 
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
   :param cre: Creature.
   :type cre: :class:`Creature`
 
 .. function:: GetIsRangedWeapon(item)
 
-  :parm item: Item instance.
+  :param item: Item instance.
+  :type item: :class:`Item`
+
+.. function:: GetIsUnarmedWeapon(item)
+
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetIsWeaponFinessable(item, cre)
 
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
   :param cre: Creature.
   :type cre: :class:`Creature`
@@ -88,7 +93,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
   :rtype: ABILITY_*
 
@@ -105,14 +110,14 @@ Weapons
 
     This does not support multiple weapon damage types and most likely never will.
 
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetWeaponBaseDamage(item, cre)
 
   Determine weapons base damage roll.
 
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
   :param cre: Creature.
   :type cre: :class:`Creature`
@@ -121,7 +126,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
   :rtype: ABILITY_*
 
@@ -129,7 +134,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetWeaponFeat(masterfeat, basetype)
@@ -140,12 +145,12 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetWeaponType(item)
 
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetWeaponCritRange(cre, item)
@@ -154,7 +159,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: GetWeaponCritMultiplier(cre, item)
@@ -163,7 +168,7 @@ Weapons
 
   :param cre: Creature.
   :type cre: :class:`Creature`
-  :parm item: Item instance.
+  :param item: Item instance.
   :type item: :class:`Item`
 
 .. function:: InventorySlotToAttackType(atype)
