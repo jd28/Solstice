@@ -295,58 +295,11 @@ local function GetWeaponAttackBonus(cre, weap)
          if wm >= 13 then
             ab = ab + math.floor((wm - 10) / 3)
          end
-         if TA then
-            if wm >= 30 then
-               ab = ab + 4
-            elseif wm >= 29 then
-               ab = ab + 2
-            elseif wm >= 10 then
-               ab = ab + 1
-            end
-         end
-      end
-   end
-
-   if TA then
-      local monk, lvl = M.CanUseClassAbilities(cre, CLASS_TYPE_MONK)
-      if monk and GetIsMonkWeapon(weap, cre) then
-         if cre:GetHasFeat(FEAT_EPIC_IMPROVED_KI_STRIKE_5) then
-            ab = ab + 5
-         elseif cre:GetHasFeat(FEAT_EPIC_IMPROVED_KI_STRIKE_4) then
-            ab = ab + 4
-         elseif cre:GetHasFeat(FEAT_KI_STRIKE_3) then
-            ab = ab + 3
-         elseif cre:GetHasFeat(FEAT_KI_STRIKE_2) then
-            ab = ab + 2
-         elseif cre:GetHasFeat(FEAT_KI_STRIKE) then
-            ab = ab + 1
-         end
       end
    end
 
    if not weap:GetIsValid() then return ab end
    local base = weap:GetBaseType()
-
-   -- NOTE: Derived from nwnx_weapons
-   -- rogues with the Opportunist feat get to add their base int modifier
-   -- to attacks with light weapons (including slings, light crossbows,
-   -- and morningstars) capped by rogue level
-   local rogue = cre:GetLevelByClass(CLASS_TYPE_ROGUE)
-   if rogue >= 25                              and
-      cre.obj.cre_stats.cs_ac_armour_base <= 3 and
-      (GetIsWeaponLight(weap, cre)             or
-       base == BASE_ITEM_LIGHTCROSSBOW         or
-       base == BASE_ITEM_MORNINGSTAR           or
-       base == BASE_ITEM_SLING)
-   then
-      local mx = math.min(5, math.floor((rogue - 20) / 5))
-      local int = math.floor((cre:GetAbilityScore(ABILITY_INTELLIGENCE) - 10) / 2)
-      int = math.clamp(int, 0, mx)
-      if int > 0 and rogue >= 30 then
-         int = int + 1
-      end
-      ab = ab + int
-   end
 
    -- Enchant Arrow
    if base == BASE_ITEM_LONGBOW or base == BASE_ITEM_SHORTBOW then
