@@ -56,9 +56,9 @@ local function GetAbilityEffectModifier(cre, ability)
   end
 end
 
-local ABIL_FMT = "  %s: Total: %d (%d), Modifier: %d (%d), Effect: %d, Limits: %d-%d"
 
 local function DebugAbilities(cre)
+  local ABIL_FMT = "  %s: Total: %d (%d), Modifier: %d (%d), Effect: %d, Limits: %d-%d"
   local t = { "Abilities: "}
   for i=0, ABILITY_NUM - 1 do
     local low, high = GetAbilityEffectLimits(cre, i)
