@@ -42,8 +42,6 @@ local function GetMaxHitPoints(cre)
       res = res + et
    end
 
-   res = res + cre['SOL_HP_EFF']
-
    if not_pc then
       res = res + cre.obj.obj.obj_hp_max
    else
