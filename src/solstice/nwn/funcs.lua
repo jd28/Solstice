@@ -262,6 +262,7 @@ void ns_AddOnHitSpells(CNWSCombatAttackData *data,
 void ns_PostPolymorph(CNWSCreature *cre, int32_t ignore_pos, bool is_apply);
 
 uint32_t ns_GetAmmunitionAvailable(CNWSCreature *attacker, int32_t num_attacks, int32_t ranged_type, bool equip);
+int ns_SendMessagePopupToPlayer(CNWSCreature *to, CNWSPlaceable *from, const char* message);
 
 void              Local_NWNXLog(int level, const char* log);
 void              Local_SetDamageInfo(int32_t index, const char* name, const char* color);
