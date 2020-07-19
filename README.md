@@ -1,3 +1,5 @@
+**This repository is no longer maintained.**
+
 # Solstice
 
 Solstice is a scripting library and optionally a combat engine
